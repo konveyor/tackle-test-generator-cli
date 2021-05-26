@@ -1,7 +1,5 @@
 # Tackle-Test CLI
 
-[![Build Status](https://travis.ibm.com/tackle/tackle-test-generator-cli.svg?token=zDRZaqH5UsnWWgqLxyPG&branch=master)](https://travis.ibm.com/tackle/tackle-test-generator-cli)
-
 This repository contains a Python-based Command-line interface (CLI), `tkltest`, for the Tackle-Test
 tooling for performing automated test generation and differential testing on two application versions
 (in the context of application modernization). Currently, `tlktest` provides this capability for Java unit
@@ -140,7 +138,7 @@ the CLI uses by default `./tkltest_config.toml` as the configuration file.
 
 ## Generate Command
 
-Generates JUnit test cases on the monolith. Currently, the supported sub-command of `generate`
+Generates JUnit test cases on the application. Currently, the supported sub-command of `generate`
 is `ctd-amplified`, which performs CTD modeling and optimization over application classes to
 compute coverage goals, and generates test cases to cover those  goals. CTD-guided test
 generation can leverage either Randoop or EvoSuite for generating  initial or building-block
