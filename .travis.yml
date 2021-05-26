@@ -1,0 +1,39 @@
+dist: xenial
+sudo: true
+
+language: java
+jdk:
+  - openjdk8
+
+services:
+  - docker
+
+env:
+  global:
+    - PATH=/opt/python/3.7/bin:$PATH
+
+before_install:
+  - python3 --version
+  - bats --version
+  - java -version
+  - which java
+  - sudo apt-get install ant-optional libxml2-utils
+  - ant -version
+  - xmllint --version
+  - ls /opt/python
+
+install:
+  - cd lib; ./download_lib_jars.sh; cd ..
+  - ls lib/*
+  - pip3 -q install -U -r ./requirements.txt
+  - python3 -m venv venv
+  - source venv/bin/activate
+  - pip3 install --editable .
+
+script:
+  - nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
+  - bats test/test_cli.bats
+  - bats test/test_cli_irs.bats
+  - bats test/test_cli_daytrader.bats
+#  - tkltest -c ./test/data/irs/tkltest_config.toml --verbose -l INFO generate ctd-amplified --no-diff-assertions
+#  - tkltest -c ./test/data/irs/tkltest_config.toml --verbose -l INFO execute mono

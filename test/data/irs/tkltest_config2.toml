@@ -1,0 +1,93 @@
+name = "TKLTEST_CONFIG_FILE"
+
+# general options
+[general]
+    app_name = "irs"
+    monolith_app_path = ["test/data/irs/monolith/target/classes"]
+    app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
+    # test_directory = "irs-ctd-amplified-tests"
+
+    # user-specific JDK home for win/mac
+    # java_jdk_home = "C:/Program Files/Java/jdk1.8.0_241"
+    # java_jdk_home = "/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home"
+    # JDK home for travis builds
+    java_jdk_home = "/usr/local/lib/jvm/openjdk8"
+
+# options for "tkltest generate" command
+[generate]
+    time_limit = 2
+    add_assertions = false
+    jee_support = false
+
+    # partitions file path. If specified, this option overrides target_class_list option.
+    # partitions_file = "test/data/irs/refactored/PartitionsFile.json"
+
+    # list of target classes for test generation. If unspecified, targets all application classes
+    target_class_list = ["irs.Employee", "irs.IRS"]
+
+# options for "tkltest generate randoop" command
+[generate.randoop]
+    no_error_revealing_tests=true
+
+# options for "tkltest generate evosuite" command
+[generate.evosuite]
+    criterion = ["LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH"]
+
+# options for "tkltest generate ctd-amplified" command
+[generate.ctd_amplified]
+    base_test_generator = "combined" # both Randoop and EvoSuite
+    #base_test_generator = "randoop"
+    #base_test_generator = "evosuite"
+    refactored_app_path_prefix = "test/data/irs/refactored"
+    refactored_app_path_suffix = ["target/classes"]
+    interaction_level = 1
+    ctd_coverage = true
+    num_seq_executions = 2
+
+# options for "tkltest execute" command
+[execute]
+    test_class = ""
+    junit_report = true
+    code_coverage = true
+    app_packages = ["irs.*"]
+
+# options for "tkltest execute mono" command
+[execute.mono]
+#    output_directory (optional)
+
+# options for "tkltest execute micro" command
+[execute.micro]
+
+    # partition to run tests on; if unspecified, tests are run on all partitions (that have test cases)
+    partitions = []
+
+    # path to docker compose file to run the partitions
+    docker_compose_file = "test/data/irs/refactored/docker-compose.yml"
+
+    # message to check for to determine whether a partition container started successfully
+    partition_container_success_message = "Application irs started"
+
+    # max retries for container status check; sleep interval (in seconds) between tries
+    container_status_check_retries = 6
+    container_status_check_sleep_interval = 20
+
+# specification of paths to application classes for each partition of the transformed app
+[execute.micro.partition_paths]
+
+    app-partition_1 = [
+        "test/data/irs/refactored/app-partition_1/target/classes"
+    ]
+    app-partition_2 = [
+        "test/data/irs/refactored/app-partition_2/target/classes"
+    ]
+
+# specification of env vars that need to set for each partition of the transformed app for running tests
+[execute.micro.partition_env_vars]
+
+    app-partition_1 = [
+        "IRS_PARTITION_2_REST_URL=http://localhost:9180/irs/partition-2/",
+    ]
+
+    app-partition_2 = [
+        "IRS_PARTITION_1_REST_URL=http://localhost:9080/irs/partition-1/",
+    ]
