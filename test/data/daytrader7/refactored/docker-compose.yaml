@@ -1,0 +1,79 @@
+version: "3.0"
+
+services:
+
+  daytrader7-web:
+    build: ./daytrader7-web
+    image: daytrader7-web
+    container_name: daytrader7-web
+    ports:
+      - "9080:9080"
+    environment: 
+      - DB_HOST=db2
+      - DB_PORT=50000
+      - DB_DATABASE=TRADEDB
+      - DB_USER=db2inst1
+      - DB_PASSWORD=db2inst1
+      - APPLICATION_PARTITION_1_REST_URL=http://daytrader7-partition1:9080/daytrader/rest/
+      - APPLICATION_PARTITION_2_REST_URL=http://daytrader7-partition2:9080/daytrader/rest/
+      - APPLICATION_PARTITION_3_REST_URL=http://daytrader7-partition3:9080/daytrader/rest/
+    networks:
+      - daytrader7
+
+  daytrader7-partition1:
+    build: ./daytrader7-partition1
+    image: daytrader7-partition1
+    container_name: daytrader7-partition1
+    ports:
+      - "9081:9080"
+    environment: 
+      - DB_HOST=db2
+      - DB_PORT=50000
+      - DB_DATABASE=TRADEDB
+      - DB_USER=db2inst1
+      - DB_PASSWORD=db2inst1
+      - APPLICATION_PARTITION_2_REST_URL=http://daytrader7-partition2:9080/daytrader/rest/
+      - APPLICATION_PARTITION_3_REST_URL=http://daytrader7-partition3:9080/daytrader/rest/
+    networks:
+      - daytrader7
+
+  daytrader7-partition2:
+    build: ./daytrader7-partition2
+    image: daytrader7-partition2
+    container_name: daytrader7-partition2
+    ports:
+      - "9082:9080"
+    environment: 
+      - DB_HOST=db2
+      - DB_PORT=50000
+      - DB_DATABASE=TRADEDB
+      - DB_USER=db2inst1
+      - DB_PASSWORD=db2inst1
+      - APPLICATION_PARTITION_1_REST_URL=http://daytrader7-partition1:9080/daytrader/rest/
+      - APPLICATION_PARTITION_3_REST_URL=http://daytrader7-partition3:9080/daytrader/rest/
+    networks:
+      - daytrader7
+
+  daytrader7-partition3:
+    build: ./daytrader7-partition3
+    image: daytrader7-partition3
+    container_name: daytrader7-partition3
+    environment: 
+      - DB_HOST=db2
+      - DB_PORT=50000
+      - DB_DATABASE=TRADEDB
+      - DB_USER=db2inst1
+      - DB_PASSWORD=db2inst1
+      - APPLICATION_PARTITION_1_REST_URL=http://daytrader7-partition1:9080/daytrader/rest/
+      - APPLICATION_PARTITION_2_REST_URL=http://daytrader7-partition2:9080/daytrader/rest/
+    ports:
+      - "9083:9080"
+    networks:
+      - daytrader7
+
+networks:
+  daytrader7:
+    external: true
+
+# volumes:
+#   db2data:

@@ -1,0 +1,45 @@
+[general]
+app_name = ""
+app_classpath_file = ""
+monolith_app_path = []
+java_jdk_home = ""
+test_directory = ""
+verbose = false
+
+[generate]
+add_assertions = false
+jee_support = false
+partitions_file = ""
+target_class_list = []
+time_limit = 10
+
+[execute]
+app_packages = []
+code_coverage = false
+junit_report = false
+offline_instrumentation = false
+reports_path = ""
+test_class = ""
+
+[generate.ctd_amplified]
+base_test_generator = "combined"
+ctd_coverage = false
+no_diff_assertions = false
+interaction_level = 1
+num_seq_executions = 10
+refactored_app_path_prefix = ""
+refactored_app_path_suffix = []
+
+[generate.evosuite]
+criterion = [ "BRANCH",]
+
+[generate.randoop]
+no_error_revealing_tests = false
+
+[execute.mono]
+
+[execute.micro]
+docker_compose_file = ""
+partitions = []
+run_partition_containers = false
+stop_partition_containers = false

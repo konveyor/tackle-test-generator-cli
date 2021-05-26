@@ -1,0 +1,45 @@
+<!-- 
+ * (C) Copyright IBM Corporation 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<ejb-jar-bnd
+        xmlns="http://websphere.ibm.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://websphere.ibm.com/xml/ns/javaee http://websphere.ibm.com/xml/ns/javaee/ibm-ejb-jar-bnd_1_0.xsd"
+        version="1.0">
+
+	<session name="TradeSLSBBean"> 
+        <resource-ref name="jms/QueueConnectionFactory" binding-name="jms/TradeBrokerQCF">
+           <authentication-alias name="TradeAdminAuthData"/> 
+        </resource-ref>     
+        <resource-ref name="jms/TopicConnectionFactory" binding-name="jms/TradeStreamerTCF">  
+           <authentication-alias name="TradeAdminAuthData"/> 
+        </resource-ref>
+        <message-destination-ref name="jms/TradeStreamerTopic" binding-name="jms/TradeStreamerTopic"/>
+        <message-destination-ref name="jms/TradeBrokerQueue" binding-name="jms/TradeBrokerQueue"/>
+    </session>
+    
+    <message-destination name="TradeBrokerQueue" binding-name="jms/TradeBrokerQueue"/>
+    <message-destination name="TradeStreamerTopic" binding-name="jms/TradeStreamerTopic"/>
+    
+    <message-driven name="DTBroker3MDB">
+        <jca-adapter activation-spec-binding-name="eis/TradeBrokerMDB" destination-binding-name="jms/TradeBrokerQueue" activation-spec-auth-alias="TradeAdminAuthData" />
+        <resource-env-ref name="com.ibm.websphere.samples.daytrader.ejb3.DTBroker3MDB/mdc" binding-name="eis/TradeBrokerMDB/mdc"/>             
+    </message-driven>
+    <message-driven name="DTStreamer3MDB">
+        <jca-adapter activation-spec-binding-name="eis/TradeStreamerMDB" destination-binding-name="jms/TradeStreamerTopic" activation-spec-auth-alias="TradeAdminAuthData" />
+        <resource-env-ref name="com.ibm.websphere.samples.daytrader.ejb3.DTStreamer3MDB/mdc" binding-name="eis/TradeStreamerMDB/mdc"/>
+    </message-driven>
+
+</ejb-jar-bnd>

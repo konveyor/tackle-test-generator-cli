@@ -1,0 +1,6 @@
+/.apt_generated/
+/build/
+/bin/
+.classpath
+.project
+/.settings/

@@ -1,0 +1,130 @@
+name = "TKLTEST_CONFIG_FILE"
+
+# general options
+[general]
+    app_name = "daytrader7"
+    monolith_app_path = [
+        "test/data/daytrader7/monolith/daytrader-ee7-ejb/target/classes",
+        "test/data/daytrader7/monolith/daytrader-ee7-web/target/classes"
+    ]
+    app_classpath_file ="./test/data/daytrader7/DayTraderMonoClasspath.txt"
+    verbose = false
+    # test_directory = ""
+
+    # user-specific JDK home for win/mac
+    # java_jdk_home = "C:/Program Files/Java/jdk1.8.0_241"
+    # java_jdk_home = "/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home"
+    # JDK home for travis builds
+    java_jdk_home = "/usr/local/lib/jvm/openjdk8"
+
+# options for "tkltest generate" command
+[generate]
+    time_limit = 2
+    add_assertions = false
+    jee_support = true
+
+    # partitions file path. If specified, this option overrides target_class_list option.
+    # partitions_file = "test/data/daytrader7/refactored/PartitionsFile.json"
+
+    # list of target classes for test generation. If unspecified, targets all application classes
+    target_class_list = [
+        "com.ibm.websphere.samples.daytrader.TradeAction",
+        "com.ibm.websphere.samples.daytrader.direct.TradeDirect"
+    ]
+
+# options for "tkltest generate randoop" command
+[generate.randoop]
+    no_error_revealing_tests=true
+
+# options for "tkltest generate evosuite" command
+[generate.evosuite]
+    criterion = ["LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH"]
+
+# options for "tkltest generate ctd-amplified" command
+[generate.ctd_amplified]
+    base_test_generator = "combined" # both Randoop and EvoSuite
+    #base_test_generator = "randoop"
+    #base_test_generator = "evosuite"
+    refactored_app_path_prefix = "test/data/daytrader7/refactored"
+    refactored_app_path_suffix = [
+        "daytrader-ee7-ejb/target/classes",
+        "daytrader-ee7-web/target/classes"
+    ]
+    interaction_level = 1
+    no_diff_assertions = false
+    ctd_coverage = true
+    num_seq_executions = 1
+
+# options for "tkltest execute" command
+[execute]
+    test_class = ""
+    junit_report = true
+    code_coverage = true
+    app_packages = ["com.ibm.websphere.samples.daytrader.*"]
+
+# options for "tkltest execute mono" command
+[execute.mono]
+
+# options for "tkltest execute micro" command
+[execute.micro]
+
+    # partition to run tests on; if unspecified, tests are run on all partitions (that have test cases)
+    partitions = []
+
+    # path to docker compose file to run the partitions
+    docker_compose_file = "test/data/daytrader7/refactored/docker-compose.yaml"
+
+    # message to check for to determine whether a partition container started successfully
+    partition_container_success_message = "Application daytrader started"
+
+    # max retries for container status check; sleep interval (in seconds) between tries
+    container_status_check_retries = 6
+    container_status_check_sleep_interval = 20
+
+# specificaton of paths to application classes for each partition of the transformed app
+[execute.micro.partition_paths]
+
+    daytrader7-partition1 = [
+        "test/data/daytrader7/refactored/daytrader7-partition1/daytrader-ee7-ejb/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition1/daytrader-ee7-web/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition1/cardinal-utils/target/classes"
+    ]
+    daytrader7-partition2 = [
+        "test/data/daytrader7/refactored/daytrader7-partition2/daytrader-ee7-ejb/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition2/daytrader-ee7-web/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition2/cardinal-utils/target/classes"
+    ]
+    daytrader7-partition3 = [
+        "test/data/daytrader7/refactored/daytrader7-partition3/daytrader-ee7-ejb/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition3/daytrader-ee7-web/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-partition3/cardinal-utils/target/classes"
+    ]
+    daytrader7-web = [
+        "test/data/daytrader7/refactored/daytrader7-web/daytrader-ee7-ejb/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-web/daytrader-ee7-web/target/classes",
+        "test/data/daytrader7/refactored/daytrader7-web/cardinal-utils/target/classes"
+    ]
+
+# specificaton of env vars that need to set for each partition of the transformed app for running tests
+[execute.micro.partition_env_vars]
+
+    daytrader7-partition1 = [
+        "APPLICATION_PARTITION_2_REST_URL=http://localhost:9082/daytrader/rest/",
+        "APPLICATION_PARTITION_3_REST_URL=http://localhost:9083/daytrader/rest/"
+    ]
+
+    daytrader7-partition2 = [
+        "APPLICATION_PARTITION_1_REST_URL=http://localhost:9081/daytrader/rest/",
+        "APPLICATION_PARTITION_3_REST_URL=http://localhost:9083/daytrader/rest/"
+    ]
+
+    daytrader7-partition3 = [
+        "APPLICATION_PARTITION_1_REST_URL=http://localhost:9081/daytrader/rest/",
+        "APPLICATION_PARTITION_2_REST_URL=http://localhost:9082/daytrader/rest/"
+    ]
+
+    daytrader7-web = [
+        "APPLICATION_PARTITION_1_REST_URL=http://localhost:9081/daytrader/rest/",
+        "APPLICATION_PARTITION_2_REST_URL=http://localhost:9082/daytrader/rest/",
+        "APPLICATION_PARTITION_3_REST_URL=http://localhost:9083/daytrader/rest/"
+    ]
