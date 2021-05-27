@@ -1,7 +1,7 @@
 import argparse
 import copy
 import tabulate
-from . import constants
+from tkltest.util import constants
 
 """
 This module contains the specification of all tkltest CLI configuration options.
@@ -174,7 +174,8 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'root directory for JDK installation (must be JDK; JRE will not suffice)'
+            'help_message': 'root directory for JDK installation (must be JDK; JRE will not suffice); '
+                            'can be set as environment variable JAVA_HOME'
         },
         'test_directory': {
             'required': False,
@@ -425,8 +426,8 @@ __options_spec = {
             'long_name': '--offline-instrumentation',
             'type': bool,
             'default_value': False,
-            'help_message': 'perform offline instrumentation of app classes for measuring code coverage '+\
-                '(default: app classes are instrumented dynamically during class loading)'
+            'help_message': 'perform offline instrumentation of app classes for measuring code coverage ' + \
+                            '(default: app classes are instrumented dynamically during class loading)'
         },
         'reports_path': {
             'required': False,
@@ -477,8 +478,8 @@ __options_spec = {
                     'long_name': '--partitions',
                     'type': list,
                     'default_value': [],
-                    'help_message': 'refactored app partitions to run tests on (space-separated partition names); '+\
-                        'if omitted, tests are run on all partitions'
+                    'help_message': 'refactored app partitions to run tests on (space-separated partition names); ' + \
+                                    'if omitted, tests are run on all partitions'
                 },
                 'run_partition_containers': {
                     'required': False,
@@ -520,7 +521,6 @@ __options_spec = {
     # }
 
 }
-
 
 if __name__ == '__main__':
     print_options_with_help(tablefmt='github')

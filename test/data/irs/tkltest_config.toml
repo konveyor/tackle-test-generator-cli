@@ -7,11 +7,8 @@ name = "TKLTEST_CONFIG_FILE"
     app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
     # test_directory = "irs-ctd-amplified-tests"
 
-    # user-specific JDK home for win/mac
-    # java_jdk_home = "C:/Program Files/Java/jdk1.8.0_241"
-    # java_jdk_home = "/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home"
-    # JDK home for travis builds
-    java_jdk_home = "/usr/local/lib/jvm/openjdk8"
+    # JDK home directory
+    java_jdk_home = ""
 
 # options for "tkltest generate" command
 [generate]
