@@ -1,4 +1,5 @@
 import logging
+import os
 import toml
 import sys
 
@@ -175,6 +176,12 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
         if callable(opt['required']):
             is_required = opt['required'](opt_name, loaded_config)
         if is_required and config[opt_name] == opt['default_value']:
+            # for java_jdk_path check whether it can be read from env var JAVA_HOME
+            if opt_name == 'java_jdk_home':
+                env_java_home = os.getenv("JAVA_HOME", None)
+                if env_java_home:
+                    config[opt_name] = env_java_home
+                    continue
             val_errors['missing_required_params'].append(opt_name)
         if 'choices' in opt.keys() and opt_name in config.keys() and config[opt_name] not in opt['choices']:
             val_errors['invalid_enum_values'][opt_name] = 'must be one of {}: {}'.format(

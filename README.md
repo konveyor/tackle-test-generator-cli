@@ -87,7 +87,8 @@ optional arguments:
 
 ```
 
-To see the CLI in action on a sample Java application, run the command
+To see the CLI in action on a sample Java application, set JAVA_HOME to the JDK installation
+and run the command
 ```
 tkltest --config-file ./test/data/irs/tkltest_config.toml --verbose generate ctd-amplified
 ```
@@ -236,7 +237,7 @@ required, and the option description).
 | config_file^                        | -cf/--config-file                | path to TOML file containing configuration options                                                                                                  |
 | log_level^                          | -l/--log-level                   | logging level for printing diagnostic messages                                                                                                      |
 | monolith_app_path*                  |                                  | list of paths to application classes                                                                                                                |
-| java_jdk_home*                      |                                  | root directory for JDK installation (must be JDK; JRE will not suffice)                                                                             |
+| java_jdk_home*                      |                                  | root directory for JDK installation (must be JDK; JRE will not suffice); can be set as environment variable JAVA_HOME                               |
 | test_directory                      | -td/--test-directory             | name of root test directory containing the generated JUnit test classes                                                                             |
 | verbose                             | -vb/--verbose                    | run in verbose mode printing detailed status messages                                                                                               |
 | version^                            | -v/--version                     | print CLI version number                                                                                                                            |
@@ -285,3 +286,4 @@ required, and the option description).
 | partitions                          | -p/--partitions                  | refactored app partitions to run tests on (space-separated partition names); if omitted, tests are run on all partitions                            |
 | run_partition_containers            | -rpc/--run-partition-containers  | run partition containers before running tests                                                                                                       |
 | stop_partition_containers           | -spc/--stop-partition-containers | stop partition containers after running tests                                                                                                       |
+|                                     |                                  |                                                                                                                                                     |
