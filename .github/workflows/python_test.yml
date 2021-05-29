@@ -29,8 +29,9 @@ jobs:
     - name: Install Prerequisites
       run: |
         ant -version
-        sudo apt-get install -y bats
+        sudo apt-get install -y bats libxml2-utils
         bats --version
+        xmllint --version
         cd lib; ./download_lib_jars.sh; cd ..
         ls lib/*
     - name: Install Python Dependencies
