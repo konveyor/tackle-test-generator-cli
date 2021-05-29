@@ -30,5 +30,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
+      env:
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
+        echo $JAVA_HOME
+        ls $JAVA_HOME/bin
         nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
