@@ -60,6 +60,7 @@ setup_file() {
 }
 
 @test "Test 03: CLI generate --partitions-file ctd-amplified daytrader" {   
+    skip
     rm -rf $DAYTRADER_CTD_AMPLIFIED_TESTDIR $DAYTRADER_TEST_REPORTS_DIR
     rm -f $DAYTRADER_CTD_TEST_PLAN_FILE $DAYTRADER_TESTGEN_SUMMARY_FILE
     run tkltest \
@@ -91,6 +92,7 @@ setup_file() {
 }
 
 @test "Test 04: CLI execute mono daytrader" {
+    skip
     run tkltest --log-level INFO \
         --config-file $DAYTRADER_CONFIG_FILE \
         --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
