@@ -2,7 +2,13 @@ name: Testgen-CLI CI
 
 on:
   push:
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
   pull_request:
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
 
 jobs:
   build:
@@ -33,15 +39,17 @@ jobs:
         pip install -r requirements.txt
         python -m venv venv
         source venv/bin/activate
-        pip install --editable .
-    - name: Run Python Unit Tests
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
-      run: |
-        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
-    - name: Run Bats Tests
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
-      run: |
-        bats test/test_cli.bats
-        bats test/test_cli_irs.bats
+        pip install .
+        which tkltest
+        tkltest --help
+#    - name: Run Python Unit Tests
+#      env:
+#        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+#      run: |
+#        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
+#    - name: Run Bats Tests
+#      env:
+#        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+#      run: |
+#        bats test/test_cli.bats
+#        bats test/test_cli_irs.bats
