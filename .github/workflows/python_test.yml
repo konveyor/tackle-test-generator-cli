@@ -23,6 +23,8 @@ jobs:
     - name: Install Prerequisites
       run: |
         ant -version
+        sudo apt-get install -y bats
+        bats --version
         cd lib; ./download_lib_jars.sh; cd ..
         ls lib/*
     - name: Install Python Dependencies
@@ -33,6 +35,10 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        echo $JAVA_HOME
-        ls $JAVA_HOME/bin
         nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
+    - name: Run Bats Tests
+      env:
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+      run: |
+        bats test/test_cli.bats
+        bats test/test_cli_irs.bats

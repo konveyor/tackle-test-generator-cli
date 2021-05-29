@@ -5,23 +5,10 @@ name = "TKLTEST_CONFIG_FILE"
     # app_name = "irs"
     # monolith_app_path = ["test/data/irs/monolith/target/classes"]
     # app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
-    
-    # output test directory for "generate"; input test directory for "execute"
-    # if unspecified, tests are written to (read from) <appname>-ctd-amplified-tests
     # test_directory = "irs-ctd-amplified-tests"
 
-    # required for running randoop, JRE will not suffice
-    # user-specific JDK home for win/mac
-    # java_jdk_home = "C:/Program Files/Java/jdk1.8.0_241"
-    # java_jdk_home = "/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home"
-    # JDK home for travis builds
-    java_jdk_home = "/usr/local/lib/jvm/openjdk8"
-
-    # partitions file path. If specified, this option overrides target_class_list option.
-    # partitions_file = "test/data/irs/refactored/PartitionsFile.json"
-
-    # list of target classes for test generation. If unspecified, targets all application classes
-    # target_class_list = []
+    # JDK home directory
+    java_jdk_home = ""
 
 # options for "tkltest generate" command
 [generate]
@@ -45,9 +32,6 @@ name = "TKLTEST_CONFIG_FILE"
     # refactored_app_path_prefix = "test/data/irs/refactored"
     # refactored_app_path_suffix = ["target/classes"]
     interaction_level = 1
-    # max_collection_next_depth = 2
-    # add_local_remote_tag = true
-    # include_all_hca_types = true
     no_diff_assertions = true
     ctd_coverage = true
     num_seq_executions = 10

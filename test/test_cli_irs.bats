@@ -109,6 +109,7 @@ setup_file() {
 }
 
 @test "Test 04: CLI execute micro irs" {
+    skip
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
@@ -216,6 +217,7 @@ setup_file() {
 }
 
 @test "Test 07: CLI execute micro irs" {
+    skip
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
