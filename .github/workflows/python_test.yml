@@ -1,4 +1,4 @@
-name: Python CI
+name: Testgen-CLI CI
 
 on:
   push:
@@ -23,14 +23,13 @@ jobs:
     - name: Install Prerequisites
       run: |
         ant -version
-        bats --version
         cd lib; ./download_lib_jars.sh; cd ..
         ls lib/*
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Run Tests
+    - name: Run Python Unit Tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
