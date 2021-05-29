@@ -23,6 +23,7 @@ jobs:
     - name: Install Prerequisites
       run: |
         ant -version
+        bats --version
         cd lib; ./download_lib_jars.sh; cd ..
         ls lib/*
     - name: Install Python Dependencies
