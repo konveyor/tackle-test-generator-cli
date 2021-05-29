@@ -22,8 +22,7 @@ jobs:
         distribution: 'adopt'
     - name: Install Prerequisites
       run: |
-        sudo apt-get install ant-optional
-        ant --version
+        ant -version
         cd lib; ./download_lib_jars.sh; cd ..
         ls lib/*
     - name: Install Python Dependencies
