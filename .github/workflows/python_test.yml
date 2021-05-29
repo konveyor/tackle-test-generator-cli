@@ -1,0 +1,35 @@
+name: Python CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - name: Install Prerequisites
+      run: |
+        sudo apt-get install ant-optional
+        ant --version
+        cd lib; ./download_lib_jars.sh; cd ..
+        ls lib/*
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests
+      run: |
+        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
