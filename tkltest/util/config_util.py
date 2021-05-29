@@ -38,36 +38,42 @@ def load_config(args=None, config_file=None):
     __merge_config(tkltest_config, toml_config)
     logging.debug('config: {}'.format(tkltest_config))
 
-    # if command-line args provided, update config for options specified in the command line
+            # update general options with values specified in command line
+    __update_config_with_cli_value(config=tkltest_config['general'],
+        options_spec=config_options.get_options_spec(command='general'),
+        args=args)
+
+    # if args specified, get command and subcommand
+    command = None
+    subcommand = None
     if args is not None:
-        # update general options with values specified in command line
-        __update_config_with_cli_value(config=tkltest_config['general'],
-            options_spec=config_options.get_options_spec(command='general'),
-            args=args)
-
-        # update command options with values specified in command line
-        __update_config_with_cli_value(config=tkltest_config[args.command],
-            options_spec=config_options.get_options_spec(command=args.command),
-            args=args)
-
-        # update subcommand options with values specified in command line
-        subcommand = None
+        command = args.command
         if hasattr(args, 'sub_command') and args.sub_command:
             subcommand = args.sub_command.replace('-', '_')
-            __update_config_with_cli_value(config=tkltest_config[args.command][subcommand],
-                options_spec=config_options.get_options_spec(command=args.command, subcommand=subcommand),
-                args=args)
 
-        # validate loaded config information, exit if validation errors occur
-        val_failure_msgs = __validate_config(config=tkltest_config, command=args.command, subcommand=subcommand)
-        if val_failure_msgs:  # pragma: no cover
-            tkltest_status('configuration options validation failed:\n{}'.format(''.join(val_failure_msgs)), error=True)
-            sys.exit(1)
+    # if command-line args provided, update config for options specified in the command line
+    if command:
+        # update command options with values specified in command line
+        __update_config_with_cli_value(config=tkltest_config[command],
+            options_spec=config_options.get_options_spec(command=command),
+            args=args)
 
-        # map base test generator name to the internal code component name
-        if subcommand == 'ctd_amplified':
-            tkltest_config[args.command][subcommand]['base_test_generator'] = \
-                constants.BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
+    # update subcommand options with values specified in command line
+    if subcommand:
+        __update_config_with_cli_value(config=tkltest_config[command][subcommand],
+            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand),
+            args=args)
+
+    # validate loaded config information, exit if validation errors occur
+    val_failure_msgs = __validate_config(config=tkltest_config, command=command, subcommand=subcommand)
+    if val_failure_msgs:  # pragma: no cover
+        tkltest_status('configuration options validation failed:\n{}'.format(''.join(val_failure_msgs)), error=True)
+        sys.exit(1)
+
+    # map base test generator name to the internal code component name
+    if subcommand == 'ctd_amplified':
+        tkltest_config[args.command][subcommand]['base_test_generator'] = \
+            constants.BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
 
     logging.debug('validated config: {}'.format(tkltest_config))
     return tkltest_config
@@ -109,7 +115,7 @@ def init_config():
     return config
 
 
-def __validate_config(config, command, subcommand=None):
+def __validate_config(config, command=None, subcommand=None):
     """Validate loaded config information.
 
     Validates the given loaded config information in the context of the given command and (optionally)
@@ -120,9 +126,10 @@ def __validate_config(config, command, subcommand=None):
     """
     # get general options spec and options spec for the given command and subcommand
     options_spec = {
-        'general': config_options.get_options_spec('general'),
-        command: config_options.get_options_spec(command)
+        'general': config_options.get_options_spec('general')
     }
+    if command is not None:
+        options_spec[command] = config_options.get_options_spec(command)
     if subcommand is not None:
         options_spec[subcommand] = config_options.get_options_spec(command, subcommand)
 
