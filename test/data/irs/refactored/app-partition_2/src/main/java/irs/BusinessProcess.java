@@ -31,49 +31,49 @@ import java.util.logging.Logger;
 
 public class BusinessProcess implements KluInterface {
     private String klu__referenceID = "";
-    private static String serviceURI;
-    private static Client client;
-    private static final Logger logger = CardinalLogger.getLogger(BusinessProcess.class);
+    private static String klu__serviceURI;
+    private static Client klu__client;
+    private static final Logger klu__logger = CardinalLogger.getLogger(BusinessProcess.class);
 
     static {
-        client = ClientBuilder.newClient();
+        klu__client = ClientBuilder.newClient();
 
-        logger.info("Static initializer of BusinessProcess of cluster partition_1");
+        klu__logger.info("Static initializer of BusinessProcess of cluster partition_1");
 
-        serviceURI = System.getenv().get("IRS_PARTITION_1_REST_URL");
-        if (serviceURI == null) {
-            throw new RuntimeException("Environment variable "+
+        klu__serviceURI = System.getenv().get("IRS_PARTITION_1_REST_URL");
+        if (klu__serviceURI == null) {
+            throw new java.lang.RuntimeException("Environment variable "+
                 "IRS_PARTITION_1_REST_URL not set\n"+
                 "Please set IRS_PARTITION_1_REST_URL to "+
                 "partition_1 host:port"
             );
         }
 
-        if (!serviceURI.endsWith("/")) {
-            serviceURI += "/";
+        if (!klu__serviceURI.endsWith("/")) {
+            klu__serviceURI += "/";
         }
-        serviceURI += "BusinessProcessService";
+        klu__serviceURI += "BusinessProcessService";
 
         try {
-            java.net.URI uri = java.net.URI.create(serviceURI);
+            java.net.URI uri = java.net.URI.create(klu__serviceURI);
         }
-        catch (Exception e) {
-            throw new RuntimeException("Invalid URI for partition partition_1, "+
-                "service BusinessProcessService: "+serviceURI, e);
+        catch (java.lang.Exception e) {
+            throw new java.lang.RuntimeException("Invalid URI for partition partition_1, "+
+                "service BusinessProcessService: "+klu__serviceURI, e);
         }
 
-        logger.info("partition_1 BusinessProcessService URI = " + serviceURI);
+        klu__logger.info("partition_1 BusinessProcessService URI = " + klu__serviceURI);
     }
 
     // default constructor (generated)
     public BusinessProcess() {
         Response svc_response =
-            client.target(serviceURI) 
+            klu__client.target(klu__serviceURI) 
             .path("BusinessProcess_default_ctor") 
             .request(MediaType.APPLICATION_JSON) 
             .post(Entity.text(""), Response.class);
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[BusinessProcess()] Response JSON string: "+response_json_str);
+        klu__logger.info("[BusinessProcess()] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         setKlu__referenceID(response_json.getString("return_value"));
@@ -88,7 +88,7 @@ public class BusinessProcess implements KluInterface {
         setKlu__referenceID(referenceId.getString());
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        client.target(serviceURI)
+        klu__client.target(klu__serviceURI)
             .path("incObjectCount")
             .request()
             .post(Entity.form(form));
@@ -108,7 +108,7 @@ public class BusinessProcess implements KluInterface {
     public void finalize() {
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        client.target(serviceURI)
+        klu__client.target(klu__serviceURI)
             .path("decObjectCount")
             .request()
             .post(Entity.form(form));
@@ -123,24 +123,24 @@ public class BusinessProcess implements KluInterface {
         // create form for service request
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/getAllEmployers with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("getAllEmployers")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
+        klu__logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -161,20 +161,20 @@ public class BusinessProcess implements KluInterface {
         String irsInst_fpar = SerializationUtil.encodeWithDynamicTypeCheck(irsInst);
         form.param("irsInst", irsInst_fpar);
 
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/genSalarySlip with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("genSalarySlip")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -187,20 +187,20 @@ public class BusinessProcess implements KluInterface {
         String args_fpar = SerializationUtil.encode(args, null);
         form.param("args", args_fpar);
 
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/main with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("main")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -208,20 +208,20 @@ public class BusinessProcess implements KluInterface {
 	public static void test_irs() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_irs with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("test_irs")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -229,20 +229,20 @@ public class BusinessProcess implements KluInterface {
 	public static void test_employee() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_employee with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("test_employee")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -250,24 +250,24 @@ public class BusinessProcess implements KluInterface {
 	public static List<Employee> test_employer() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_employer with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("test_employer")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
+        klu__logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -282,24 +282,24 @@ public class BusinessProcess implements KluInterface {
 	public static Employer test_employer2() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_employer2 with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("test_employer2")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
+        klu__logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -314,24 +314,24 @@ public class BusinessProcess implements KluInterface {
 	public static int test_employer3() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_employer3 with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("test_employer3")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
+        klu__logger.info("[BusinessProcess] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -342,20 +342,20 @@ public class BusinessProcess implements KluInterface {
 	public static void test_salary() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_salary with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("test_salary")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -363,20 +363,20 @@ public class BusinessProcess implements KluInterface {
 	public static void test_irs_salary_set_map() {
         // create form for service request
         Form form = new Form();
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_irs_salary_set_map with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("test_irs_salary_set_map")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -385,22 +385,23 @@ public class BusinessProcess implements KluInterface {
         // create form for service request
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        logger.info("[BusinessProcess] Calling service "+serviceURI+
+        klu__logger.info("[BusinessProcess] Calling service "+klu__serviceURI+
             "/test_2 with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("test_2")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[BusinessProcess] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
 	
 }
+

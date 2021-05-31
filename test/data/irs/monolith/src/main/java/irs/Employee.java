@@ -6,20 +6,20 @@ public class Employee {
 	private String name;
 	private int hours;
 	private double rate;
-	private static String level;
+	private String level = "XYZ";
 
-	static {
-		level = "XYZ";
-		System.out.println("In Employee static block: level "+level);
-	}
+// 	static {
+// 		level = "XYZ";
+// 		System.out.println("In Employee static block: level "+level);
+// 	}
 	
-	public static String getLevel() {
+	public String getLevel() {
 		System.out.println("In Employee static getLevel: level "+level);
 		return level;
 	}
 
-	public static void setLevel(String level) {
-		Employee.level = level;
+	public void setLevel(String level) {
+		this.level = level;
 		System.out.println("In Employee static setLevel: level "+level);
 	}
 	

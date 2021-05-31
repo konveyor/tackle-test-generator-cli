@@ -332,6 +332,8 @@ def __execute_micro(args, config):  # pragma: no cover
 
     # remove test classes from previous runs
     test_directory = config['general']['test_directory']
+    if test_directory == '':
+        test_directory = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
     #__remove_test_classes(test_directory)
 
     # read generate config from test directory

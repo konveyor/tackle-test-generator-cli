@@ -7,6 +7,7 @@ venv/
 
 # IDE, log, backup files
 .idea/
+*.iml
 .code
 .vscode
 .DS_Store
@@ -14,3 +15,20 @@ venv/
 *.bak
 bak.*
 bak/
+
+lib/download
+test/coverage
+test/data/irs/monolith-*/
+maven-status/
+__tkltest.cfg
+__irs-generated-tests/
+randoop-*.txt
+*-ctd-amplified-*/
+*evosuite-*/
+*-randoop-*/
+*-tkltest-reports/
+*_bb_test_sequences.json
+*_class_list.txt
+*_coverage_report.json
+*_ctd_models_and_test_plans.json
+*_test_generation_summary.json

@@ -27,38 +27,38 @@ import com.ibm.cardinal.util.SerializationUtil;
 
 public class Salary implements KluInterface {
     private String klu__referenceID = "";
-    private static String serviceURI;
-    private static Client client;
-    private static final Logger logger = CardinalLogger.getLogger(Salary.class);
+    private static String klu__serviceURI;
+    private static Client klu__client;
+    private static final Logger klu__logger = CardinalLogger.getLogger(Salary.class);
 
     static {
-        client = ClientBuilder.newClient();
+        klu__client = ClientBuilder.newClient();
 
-        logger.info("Static initializer of Salary of cluster partition_2");
+        klu__logger.info("Static initializer of Salary of cluster partition_2");
 
-        serviceURI = System.getenv().get("IRS_PARTITION_2_REST_URL");
-        if (serviceURI == null) {
-            throw new RuntimeException("Environment variable "+
+        klu__serviceURI = System.getenv().get("IRS_PARTITION_2_REST_URL");
+        if (klu__serviceURI == null) {
+            throw new java.lang.RuntimeException("Environment variable "+
                 "IRS_PARTITION_2_REST_URL not set\n"+
                 "Please set IRS_PARTITION_2_REST_URL to "+
                 "partition_2 host:port"
             );
         }
 
-        if (!serviceURI.endsWith("/")) {
-            serviceURI += "/";
+        if (!klu__serviceURI.endsWith("/")) {
+            klu__serviceURI += "/";
         }
-        serviceURI += "SalaryService";
+        klu__serviceURI += "SalaryService";
 
         try {
-            java.net.URI uri = java.net.URI.create(serviceURI);
+            java.net.URI uri = java.net.URI.create(klu__serviceURI);
         }
-        catch (Exception e) {
-            throw new RuntimeException("Invalid URI for partition partition_2, "+
-                "service SalaryService: "+serviceURI, e);
+        catch (java.lang.Exception e) {
+            throw new java.lang.RuntimeException("Invalid URI for partition partition_2, "+
+                "service SalaryService: "+klu__serviceURI, e);
         }
 
-        logger.info("partition_2 SalaryService URI = " + serviceURI);
+        klu__logger.info("partition_2 SalaryService URI = " + klu__serviceURI);
     }
 
 
@@ -69,7 +69,7 @@ public class Salary implements KluInterface {
         setKlu__referenceID(referenceId.getString());
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        client.target(serviceURI)
+        klu__client.target(klu__serviceURI)
             .path("incObjectCount")
             .request()
             .post(Entity.form(form));
@@ -89,7 +89,7 @@ public class Salary implements KluInterface {
     public void finalize() {
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        client.target(serviceURI)
+        klu__client.target(klu__serviceURI)
             .path("decObjectCount")
             .request()
             .post(Entity.form(form));
@@ -98,30 +98,28 @@ public class Salary implements KluInterface {
 
 
 
-
-	    
-	public Salary() {
+public Salary() {
         // create form for service request
         Form form = new Form();
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/Salary_001 with form: "+form.asMap());
 
         // call constructor service and store ref ID
         Response svc_response;
         try {
             svc_response = 
-                client.target(serviceURI) 
+                klu__client.target(klu__serviceURI) 
                 .path("Salary_001") 
                 .request(MediaType.APPLICATION_JSON) 
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[Salary] Response JSON string: "+response_json_str);
+        klu__logger.info("[Salary] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         setKlu__referenceID(response_json.getString("return_value"));
@@ -137,25 +135,25 @@ public class Salary implements KluInterface {
 
         form.param("salary", String.valueOf(salary)); 
 
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/Salary_002 with form: "+form.asMap());
 
         // call constructor service and store ref ID
         Response svc_response;
         try {
             svc_response = 
-                client.target(serviceURI) 
+                klu__client.target(klu__serviceURI) 
                 .path("Salary_002") 
                 .request(MediaType.APPLICATION_JSON) 
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[Salary] Response JSON string: "+response_json_str);
+        klu__logger.info("[Salary] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         setKlu__referenceID(response_json.getString("return_value"));
@@ -166,24 +164,24 @@ public class Salary implements KluInterface {
         // create form for service request
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/getEmployerId with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("getEmployerId")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[Salary] Response JSON string: "+response_json_str);
+        klu__logger.info("[Salary] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -197,20 +195,20 @@ public class Salary implements KluInterface {
         form.param("klu__referenceID", getKlu__referenceID());
         form.param("employerId", String.valueOf(employerId)); 
 
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/setEmployerId with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("setEmployerId")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -219,24 +217,24 @@ public class Salary implements KluInterface {
         // create form for service request
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/getEmployeeId with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("getEmployeeId")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[Salary] Response JSON string: "+response_json_str);
+        klu__logger.info("[Salary] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -250,20 +248,20 @@ public class Salary implements KluInterface {
         form.param("klu__referenceID", getKlu__referenceID());
         form.param("employeeId", String.valueOf(employeeId)); 
 
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/setEmployeeId with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("setEmployeeId")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
@@ -272,24 +270,24 @@ public class Salary implements KluInterface {
         // create form for service request
         Form form = new Form();
         form.param("klu__referenceID", getKlu__referenceID());
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/getSalary with form: "+form.asMap());
 
         // call service and get encoded response from response JSON
         Response svc_response;
         try {
-            svc_response = client.target(serviceURI)
+            svc_response = klu__client.target(klu__serviceURI)
                 .path("getSalary")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form), Response.class);
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
         String response_json_str = svc_response.readEntity(String.class);
-        logger.info("[Salary] Response JSON string: "+response_json_str);
+        klu__logger.info("[Salary] Response JSON string: "+response_json_str);
         JsonReader json_reader = Json.createReader(new StringReader(response_json_str));
         JsonObject response_json = json_reader.readObject();
         String response = response_json.getString("return_value");
@@ -303,22 +301,23 @@ public class Salary implements KluInterface {
         form.param("klu__referenceID", getKlu__referenceID());
         form.param("salary", String.valueOf(salary)); 
 
-        logger.info("[Salary] Calling service "+serviceURI+
+        klu__logger.info("[Salary] Calling service "+klu__serviceURI+
             "/setSalary with form: "+form.asMap());
 
         // call service (no response for "void" return type)
         try {
-            client.target(serviceURI)
+            klu__client.target(klu__serviceURI)
                 .path("setSalary")
                 .request()
                 .post(Entity.form(form));
         }
         catch (WebApplicationException wae) {
-            Throwable cause = wae.getCause();
-            logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
-            throw (RuntimeException)cause;
+            java.lang.Throwable cause = wae.getCause();
+            klu__logger.warning("[Salary] Exception thrown in service call: "+wae.getMessage());
+            throw (java.lang.RuntimeException)cause;
         }
 
     }
 
 }
+
