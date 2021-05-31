@@ -20,3 +20,4 @@ public class AppTest
 		throw new CardinalException("ERROR: dummy function called at src/test/java/irs/AppTest.java:AppTest:shouldAnswerWithTrue");
     }
 }
+

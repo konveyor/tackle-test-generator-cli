@@ -30,7 +30,7 @@ import java.util.List;
 
 @Path("/EmployerService")
 public class EmployerService {
-    private static final Logger logger = CardinalLogger.getLogger(EmployerService.class);
+    private static final Logger klu__logger = CardinalLogger.getLogger(EmployerService.class);
 
 
 
@@ -40,7 +40,7 @@ public class EmployerService {
     @Path("/health") 
     @Produces(MediaType.TEXT_HTML) 
     public String getHealth() { 
-        logger.info("[Employer] getHealth() called");
+        klu__logger.info("[Employer] getHealth() called");
         return "EmployerService::Health OK"; 
     }
 
@@ -51,7 +51,7 @@ public class EmployerService {
     @Path("/incObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void incObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[EmployerService] incObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[EmployerService] incObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.incObjectCount(klu__referenceID);
     }
 
@@ -62,7 +62,7 @@ public class EmployerService {
     @Path("/decObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void decObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[Employer] decObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[Employer] decObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.decObjectCount(klu__referenceID);
     }
 
@@ -81,7 +81,7 @@ public class EmployerService {
         response = instEmployer.employerName;
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", response).build();
-        logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -116,9 +116,9 @@ public class EmployerService {
         try {
             instEmployer = new Employer();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to constructor Employer() raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         String refid = ClusterObjectManager.putObject(instEmployer);
@@ -157,9 +157,9 @@ public class EmployerService {
         try {
             instEmployer = new Employer(employerId_fpar, employerName_fpar, employees_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to constructor Employer() raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         String refid = ClusterObjectManager.putObject(instEmployer);
@@ -196,20 +196,20 @@ public class EmployerService {
             response = (int)methodDecl.invoke(instEmployer);
         }
     
-        catch (NoSuchMethodException | SecurityException | IllegalAccessException |
-            IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
+        catch (java.lang.NoSuchMethodException | java.lang.SecurityException | java.lang.IllegalAccessException |
+            java.lang.IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
             String msg = "Reflective call to non-public method getEmployerId() of Employer raised exception: "+e.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, e);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getEmployerId() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", String.valueOf(response)).build();
-        logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -240,15 +240,15 @@ public class EmployerService {
             methodDecl.invoke(instEmployer, employerId_fpar);
         }
     
-        catch (NoSuchMethodException | SecurityException | IllegalAccessException |
-            IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
+        catch (java.lang.NoSuchMethodException | java.lang.SecurityException | java.lang.IllegalAccessException |
+            java.lang.IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
             String msg = "Reflective call to non-public method setEmployerId() of Employer raised exception: "+e.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, e);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployerId() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -285,15 +285,15 @@ public class EmployerService {
             methodDecl.invoke(instEmployer, employerId_fpar, employerName_fpar, employees_fpar);
         }
     
-        catch (NoSuchMethodException | SecurityException | IllegalAccessException |
-            IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
+        catch (java.lang.NoSuchMethodException | java.lang.SecurityException | java.lang.IllegalAccessException |
+            java.lang.IllegalArgumentException | java.lang.reflect.InvocationTargetException e) {
             String msg = "Reflective call to non-public method setEmployerAttributes() of Employer raised exception: "+e.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, e);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployerAttributes() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -319,9 +319,9 @@ public class EmployerService {
         try {
             instEmployer.addEmployees(emps_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method addEmployees() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -344,14 +344,14 @@ public class EmployerService {
         try {
             response = instEmployer.getEmployerName();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getEmployerName() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", response).build();
-        logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -377,9 +377,9 @@ public class EmployerService {
         try {
             instEmployer.setEmployerName(employerName_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployerName() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -402,9 +402,9 @@ public class EmployerService {
         try {
             response = instEmployer.getEmployees();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getEmployees() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
@@ -413,7 +413,7 @@ public class EmployerService {
         String response_obj = SerializationUtil.encodeWithDynamicTypeCheck(response);
         JsonObject jsonobj = jsonresp.add("return_value", response_obj).build();
 
-        logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Employer] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -441,9 +441,9 @@ public class EmployerService {
         try {
             instEmployer.setEmployees(employees_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployees() of Employer raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
