@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 @Path("/BusinessProcessService")
 public class BusinessProcessService {
-    private static final Logger logger = CardinalLogger.getLogger(BusinessProcessService.class);
+    private static final Logger klu__logger = CardinalLogger.getLogger(BusinessProcessService.class);
 
     // default constructor service
     @POST
@@ -45,7 +45,7 @@ public class BusinessProcessService {
             .createObjectBuilder()
             .add("return_value", refid)
             .build();
-        logger.info("[BusinessProcessService] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[BusinessProcessService] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -59,7 +59,7 @@ public class BusinessProcessService {
     @Path("/health") 
     @Produces(MediaType.TEXT_HTML) 
     public String getHealth() { 
-        logger.info("[BusinessProcess] getHealth() called");
+        klu__logger.info("[BusinessProcess] getHealth() called");
         return "BusinessProcessService::Health OK"; 
     }
 
@@ -70,7 +70,7 @@ public class BusinessProcessService {
     @Path("/incObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void incObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[BusinessProcessService] incObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[BusinessProcessService] incObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.incObjectCount(klu__referenceID);
     }
 
@@ -81,7 +81,7 @@ public class BusinessProcessService {
     @Path("/decObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void decObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[BusinessProcess] decObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[BusinessProcess] decObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.decObjectCount(klu__referenceID);
     }
 
@@ -106,9 +106,9 @@ public class BusinessProcessService {
         try {
             response = instBusinessProcess.getAllEmployers();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getAllEmployers() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
@@ -117,7 +117,7 @@ public class BusinessProcessService {
         String response_obj = SerializationUtil.encodeWithDynamicTypeCheck(response);
         JsonObject jsonobj = jsonresp.add("return_value", response_obj).build();
 
-        logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -145,9 +145,9 @@ public class BusinessProcessService {
         try {
             instBusinessProcess.genSalarySlip(irsInst_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method genSalarySlip() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -168,9 +168,9 @@ public class BusinessProcessService {
         try {
             BusinessProcess.main(args_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method main() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -185,9 +185,9 @@ public class BusinessProcessService {
         try {
             BusinessProcess.test_irs();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_irs() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -202,9 +202,9 @@ public class BusinessProcessService {
         try {
             BusinessProcess.test_employee();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_employee() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -222,9 +222,9 @@ public class BusinessProcessService {
         try {
             response = BusinessProcess.test_employer();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_employer() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
@@ -233,7 +233,7 @@ public class BusinessProcessService {
         String response_obj = SerializationUtil.encodeWithDynamicTypeCheck(response);
         JsonObject jsonobj = jsonresp.add("return_value", response_obj).build();
 
-        logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -253,9 +253,9 @@ public class BusinessProcessService {
         try {
             response = BusinessProcess.test_employer2();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_employer2() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
@@ -264,7 +264,7 @@ public class BusinessProcessService {
         String response_obj = SerializationUtil.encodeWithDynamicTypeCheck(response);
         JsonObject jsonobj = jsonresp.add("return_value", response_obj).build();
 
-        logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -284,14 +284,14 @@ public class BusinessProcessService {
         try {
             response = BusinessProcess.test_employer3();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_employer3() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", String.valueOf(response)).build();
-        logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[BusinessProcess] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -308,9 +308,9 @@ public class BusinessProcessService {
         try {
             BusinessProcess.test_salary();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_salary() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -325,9 +325,9 @@ public class BusinessProcessService {
         try {
             BusinessProcess.test_irs_salary_set_map();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_irs_salary_set_map() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -347,9 +347,9 @@ public class BusinessProcessService {
         try {
             instBusinessProcess.test_2();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method test_2() of BusinessProcess raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 

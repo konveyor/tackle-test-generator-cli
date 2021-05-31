@@ -28,7 +28,7 @@ import com.ibm.cardinal.util.SerializationUtil;
 
 @Path("/SalaryService")
 public class SalaryService {
-    private static final Logger logger = CardinalLogger.getLogger(SalaryService.class);
+    private static final Logger klu__logger = CardinalLogger.getLogger(SalaryService.class);
 
 
 
@@ -38,7 +38,7 @@ public class SalaryService {
     @Path("/health") 
     @Produces(MediaType.TEXT_HTML) 
     public String getHealth() { 
-        logger.info("[Salary] getHealth() called");
+        klu__logger.info("[Salary] getHealth() called");
         return "SalaryService::Health OK"; 
     }
 
@@ -49,7 +49,7 @@ public class SalaryService {
     @Path("/incObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void incObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[SalaryService] incObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[SalaryService] incObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.incObjectCount(klu__referenceID);
     }
 
@@ -60,7 +60,7 @@ public class SalaryService {
     @Path("/decObjectCount")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void decObjectCount(@FormParam("klu__referenceID") String klu__referenceID) {
-        logger.info("[Salary] decObjectCount() called with ref: "+klu__referenceID);
+        klu__logger.info("[Salary] decObjectCount() called with ref: "+klu__referenceID);
         ClusterObjectManager.decObjectCount(klu__referenceID);
     }
 
@@ -80,9 +80,9 @@ public class SalaryService {
         try {
             instSalary = new Salary();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to constructor Salary() raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         String refid = ClusterObjectManager.putObject(instSalary);
@@ -119,9 +119,9 @@ public class SalaryService {
         try {
             instSalary = new Salary(employerId_fpar, employeeId_fpar, salary_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to constructor Salary() raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         String refid = ClusterObjectManager.putObject(instSalary);
@@ -153,14 +153,14 @@ public class SalaryService {
         try {
             response = instSalary.getEmployerId();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getEmployerId() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", String.valueOf(response)).build();
-        logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -186,9 +186,9 @@ public class SalaryService {
         try {
             instSalary.setEmployerId(employerId_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployerId() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -211,14 +211,14 @@ public class SalaryService {
         try {
             response = instSalary.getEmployeeId();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getEmployeeId() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", String.valueOf(response)).build();
-        logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -244,9 +244,9 @@ public class SalaryService {
         try {
             instSalary.setEmployeeId(employeeId_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setEmployeeId() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 
@@ -269,14 +269,14 @@ public class SalaryService {
         try {
             response = instSalary.getSalary();
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method getSalary() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
         JsonObjectBuilder jsonresp = Json.createObjectBuilder();
         JsonObject jsonobj = jsonresp.add("return_value", String.valueOf(response)).build();
-        logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
+        klu__logger.info("[Salary] Returning JSON object: "+jsonobj.toString());
         return Response
             .status(Response.Status.OK)
             .entity(jsonobj)
@@ -302,9 +302,9 @@ public class SalaryService {
         try {
             instSalary.setSalary(salary_fpar);
         }
-        catch (Throwable t) {
+        catch (java.lang.Throwable t) {
             String msg = "Call to method setSalary() of Salary raised exception: "+t.getMessage();
-            logger.warning(msg);
+            klu__logger.warning(msg);
             throw new WebApplicationException(msg, t, CardinalException.APPLICATION_EXCEPTION);
         }
 

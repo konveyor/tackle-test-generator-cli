@@ -27,7 +27,7 @@ public class BusinessProcess {
 		Employee employee2 = new Employee(22, "Bob", 40, 45);
 		System.out.println("2nd employee created: ");
 		System.out.println("2nd employee rate: "+String.valueOf(employee2.getRate()));
-		System.out.println("Employee static level is: "+Employee.getLevel());
+// 		System.out.println("Employee static level is: "+Employee.getLevel());
 		//ClusterObjectManagerEmployer.printTable();
 		
 		List<Employee> employeeList = new ArrayList<Employee>();
@@ -36,13 +36,13 @@ public class BusinessProcess {
 		
 		Employer employer = new Employer(1, "ACME", employeeList);
 		
-		Employee.setLevel("ABC");
+// 		Employee.setLevel("ABC");
 		
 		Employee employee3 = new Employee(45, "Charles", 40, 47);
 		System.out.println("3rd employee rate: "+String.valueOf(employee3.getRate()));
 		Employee employee4 = new Employee(25, "Dana", 40, 50);
 		System.out.println("4th employee rate: "+String.valueOf(employee4.getRate()));
-		System.out.println("Employee static level is: "+Employee.getLevel());
+// 		System.out.println("Employee static level is: "+Employee.getLevel());
 		
 		List<Employee> employeeList1 = new ArrayList<Employee>();
 		employeeList1.add(employee3);
