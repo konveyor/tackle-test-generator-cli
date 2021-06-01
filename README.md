@@ -35,8 +35,15 @@ are those that cause the application to fail with runtime exceptions.
    
 3. Install Maven and download Java libraries using the script:
     ```buildoutcfg
-    cd lib; ./download_lib_jars.sh
+    cd lib; ./download_lib_jars.sh 
     ```
+    
+    Windows users should run:
+    
+      ```buildoutcfg
+    cd lib; download_lib_jars.sh 
+    ```
+    
     This downloads the Java libraries required by the CLI into the `lib/download` directory.
 
 ## Developer Installation of the CLI
@@ -45,6 +52,14 @@ To install the CLI command `tkltest` in a virtual environment, follow these step
 ```
 python3 -m venv venv
 source venv/bin/activate
+pip install --editable .
+```
+
+Windows users should run:
+
+```
+python3 -m venv venv
+venv\Scripts\activate.bat
 pip install --editable .
 ```
 
