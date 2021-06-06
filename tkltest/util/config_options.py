@@ -235,7 +235,7 @@ __options_spec = {
 
     # "generate" command options
     'generate': {
-        'help_message': 'Generate test cases on the monolithic app version',
+        'help_message': 'Generate test cases on the application under test',
         'add_assertions': {
             'required': False,
             'is_toml_option': True,
@@ -381,7 +381,7 @@ __options_spec = {
 
     # "execute" command options
     'execute': {
-        'help_message': 'Execute generated tests on the mono or micro app version',
+        'help_message': 'Execute generated tests on the application version under test',
         'app_packages': {
             'required': True,
             'is_toml_option': True,

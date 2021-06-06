@@ -35,11 +35,3 @@ criterion = [ "BRANCH",]
 
 [generate.randoop]
 no_error_revealing_tests = false
-
-[execute.mono]
-
-[execute.micro]
-docker_compose_file = ""
-partitions = []
-run_partition_containers = false
-stop_partition_containers = false
