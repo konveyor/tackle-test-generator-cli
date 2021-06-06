@@ -47,11 +47,11 @@ setup_file() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: CLI execute mono daytrader" {
+@test "Test 02: CLI execute daytrader" {
     run tkltest --log-level INFO \
         --config-file $DAYTRADER_CONFIG_FILE \
         --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
-        execute mono
+        execute
     [ $status -eq 0 ]
 
         # assert over reports dirs and instrumented classes dir
@@ -91,12 +91,12 @@ setup_file() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 04: CLI execute mono daytrader" {
+@test "Test 04: CLI execute daytrader" {
     skip
     run tkltest --log-level INFO \
         --config-file $DAYTRADER_CONFIG_FILE \
         --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
-        execute mono
+        execute
     [ $status -eq 0 ]
 
         # assert over reports dirs and instrumented classes dir

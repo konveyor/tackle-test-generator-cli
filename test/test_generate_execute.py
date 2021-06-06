@@ -46,7 +46,7 @@ class GenerateExecuteTest(unittest.TestCase):
             app_info['config'] = app_config
 
     def test_generate_execute_ctdamplified_combined_classlist_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=target_class_list"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -61,13 +61,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_classlist_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=target_class_list"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -82,13 +82,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_classlist_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=target_class_list"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -101,13 +101,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_combined_allclasses_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=all_classes"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -120,13 +120,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_allclasses_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=all_classes"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -139,13 +139,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=all_classes"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -158,13 +158,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_combined_partitions_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=partitions_file"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -177,13 +177,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_partitions_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=partitions_file"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -196,13 +196,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_partitions_diffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=partitions_file"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -215,13 +215,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_combined_classlist_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=target_class_list no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -235,13 +235,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_classlist_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=target_class_list no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -255,13 +255,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_classlist_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=target_class_list no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=target_class_list no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -275,13 +275,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_combined_allclasses_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=all_classes no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -295,10 +295,10 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
     def test_generate_execute_ctdamplified_randoop_allclasses_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=all_classes no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -312,13 +312,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -332,10 +332,10 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
     def test_generate_execute_ctdamplified_combined_partitions_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=combined scope=partitions_file no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -349,13 +349,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_partitions_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=randoop scope=partitions_file no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -369,13 +369,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_evosuite_partitions_nodiffassert(self) -> None:
-        """Test "generate ctd-amplified" and "execute mono": base_test_generator=evosuite scope=partitions_file no_diff_assertions"""
+        """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             config = app_info['config']
@@ -389,13 +389,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_randoop_classlist(self) -> None:
-        """Test "generate randoop" and "execute mono": scope=target_class_list"""
+        """Test "generate randoop" and "execute": scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -409,13 +409,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='randoop')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_randoop_allclasses(self) -> None:
-        """Test "generate randoop" and "execute mono": scope=all_classes"""
+        """Test "generate randoop" and "execute": scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -429,14 +429,14 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='randoop')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     @unittest.skip('')
     def test_generate_execute_evosuite_classlist(self) -> None:
-        """Test "generate evosuite" and "execute mono": scope=target_class_list"""
+        """Test "generate evosuite" and "execute": scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -450,13 +450,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='evosuite')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_evosuite_allclasses(self) -> None:
-        """Test "generate evosuite" and "execute mono": scope=all_classes"""
+        """Test "generate evosuite" and "execute": scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
 
@@ -470,7 +470,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='evosuite')
 
             # execute tests
-            self.__process_execute(subcommand='mono', config=config)
+            self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
@@ -504,7 +504,8 @@ class GenerateExecuteTest(unittest.TestCase):
         self.args.sub_command = subcommand
         generate.process_generate_command(args=self.args, config=config)
 
-    def __process_execute(self, subcommand, config):
+    def __process_execute(self, config, subcommand=None):
         self.args.command = 'execute'
-        self.args.sub_command = subcommand
+        if subcommand:
+            self.args.sub_command = subcommand
         execute.process_execute_command(args=self.args, config=config)

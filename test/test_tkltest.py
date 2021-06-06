@@ -51,11 +51,11 @@ class TkltestTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.gen_config_file))
 
     def test_tkltest_main_generate_execute_randoop(self) -> None:
-        """Test main function of tkltest with "generate randoop" and "execute mono" commands"""
+        """Test main function of tkltest with "generate randoop" and "execute" commands"""
         args = ['--config-file', self.config_file, '--test-directory', self.test_directory, 'generate', 'randoop']
         sys.argv = [self.sys_argv[0]] + args
         tkltest.main()
 
-        args = ['--config-file', self.config_file, '--test-directory', self.test_directory, 'execute', 'mono']
+        args = ['--config-file', self.config_file, '--test-directory', self.test_directory, 'execute']
         sys.argv = [self.sys_argv[0]] + args
         tkltest.main()
