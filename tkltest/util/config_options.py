@@ -400,14 +400,6 @@ __options_spec = {
             'default_value': False,
             'help_message': 'generate code coverage report with JaCoCo agent'
         },
-        # 'has_partitions': {
-        #     'required': True,
-        #     'is_toml_option': True,
-        #     'is_cli_option': False,
-        #     'type': bool,
-        #     'default_value': False,
-        #     'help_message': 'app test cases are split into partitions'
-        # },
         'junit_report': {
             'required': False,
             'is_toml_option': True,
@@ -448,77 +440,8 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'help_message': 'path to a test class file (.java) to compile and run'
-        },
-
-        # subcommands for the execute command
-        # 'subcommands': {
-        #     # "execute mono" command options
-        #     'mono': {
-        #         'help_message': 'Execute tests on monolithic app version'
-        #     },
-        #
-        #     # "execute micro" command options
-        #     'micro': {
-        #         'help_message': 'Execute tests on refactored (microservice) app version',
-        #         'docker_compose_file': {
-        #             'required': True,
-        #             'is_toml_option': True,
-        #             'is_cli_option': True,
-        #             'short_name': '-dcf',
-        #             'long_name': '--docker-compose-file',
-        #             'type': str,
-        #             'default_value': '',
-        #             'help_message': 'docker compose file for running the partitions of the refactored app'
-        #         },
-        #         'partitions': {
-        #             'required': False,
-        #             'is_toml_option': True,
-        #             'is_cli_option': True,
-        #             'short_name': '-p',
-        #             'long_name': '--partitions',
-        #             'type': list,
-        #             'default_value': [],
-        #             'help_message': 'refactored app partitions to run tests on (space-separated partition names); ' + \
-        #                             'if omitted, tests are run on all partitions'
-        #         },
-        #         'run_partition_containers': {
-        #             'required': False,
-        #             'is_toml_option': True,
-        #             'is_cli_option': True,
-        #             'short_name': '-rpc',
-        #             'long_name': '--run-partition-containers',
-        #             'type': bool,
-        #             'default_value': False,
-        #             'help_message': 'run partition containers before running tests'
-        #         },
-        #         'stop_partition_containers': {
-        #             'required': False,
-        #             'is_toml_option': True,
-        #             'is_cli_option': True,
-        #             'short_name': '-spc',
-        #             'long_name': '--stop-partition-containers',
-        #             'type': bool,
-        #             'default_value': False,
-        #             'help_message': 'stop partition containers after running tests'
-        #         }
-        #     }
-        # }
-    },
-
-    # "classify" command options
-    # 'classify': {
-    #     'help_message': 'Group and classify test failures into categories',
-    #     'reports_path': {
-    #         'required': True,
-    #         'is_toml_option': True,
-    #         'is_cli_option': True,
-    #         'short_name': '-rp',
-    #         'long_name': '--reports-path',
-    #         'type': str,
-    #         'default_value': '',
-    #         'help_message': 'path to the reports directory'
-    #     }
-    # }
+        }
+    }
 
 }
 
