@@ -84,9 +84,9 @@ positional arguments:
   {config,generate,execute}
     config              Initialize configuration file or list configuration
                         options
-    generate            Generate test cases on the monolithic app version
-    execute             Execute generated tests on the mono or micro app
-                        version
+    generate            Generate test cases on the application under test
+    execute             Execute generated tests on the application version
+                        under test
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -95,11 +95,10 @@ optional arguments:
   -l {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
                         logging level for printing diagnostic messages
   -td TEST_DIRECTORY, --test-directory TEST_DIRECTORY
-                        directory containing generated test classes(space-
-                        separated fully qualified class names)
+                        name of root test directory containing the generated
+                        JUnit test classes
   -vb, --verbose        run in verbose mode printing detailed status messages
   -v, --version         print CLI version number
-
 ```
 
 To see the CLI in action on a sample Java application, set JAVA_HOME to the JDK installation
@@ -145,7 +144,7 @@ and executing them.
 
 4. To execute the generated unit tests on the legacy app, run the command
    ```
-   tkltest --verbose --test-directory <app-name>-ctd-amplified-tests execute mono
+   tkltest --verbose --test-directory <app-name>-ctd-amplified-tests execute
    ```
    JUnit reports and Jacoco code coverage reports will be created in  `<app-name>-tkltest-reports`.
  
@@ -181,18 +180,14 @@ optional arguments:
 
 ## Execute Command
 
-Executes generated JUnit test cases in the legacy or the refactored application. These two execution
-modes are supported via the `execute mono` and `execute micro` sub-commands.
+Executes generated JUnit test cases on the application under test. The application version
+(legacy or modernized) to run the tests on can specified in the toml file, via the general
+options `monolith_app_path` (list of paths to application classes) and `app_classpath_file`
+(file containing paths to jar files that  represent the library dependencies of app).
 
 ```
 usage: tkltest execute [-h] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]
                        [-tc TEST_CLASS]
-                       {mono,micro} ...
-
-positional arguments:
-  {mono,micro}
-    mono                Execute tests on monolithic app version
-    micro               Execute tests on refactored (microservice) app version
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -208,19 +203,7 @@ optional arguments:
                         path to a test class file (.java) to compile and run
 ```
 
-`execute mono` requires specifications of the legacy app classes as well as the library
-dependencies of the app.
-
-`execute micro` requires the app library dependencies to be specified along with the
-classpaths for each partition of the refactored app. `execute micro` also requires the
-partitions to be running for test execution because the execution of a unit test on
-a proxy class results in service calls being made across partitions. To support this,
-`execute micro` requires specification of the docker-compose file for the transformed
-app, along with information about environment variables that need to be set for
-test execution on each partition. `execute micro` can run tests on all partitions or
-on a specified list of partitions. Also, the command can optionally start partition
-containers before test execution and optionally stop partition containers after test
-execution.
+For details on the `execute` command options, see the section [Configuration Options](#configuration-options).
 
 ## Known Tool Issues
 
@@ -244,61 +227,52 @@ all available configuration options with information about each option: the opti
 the option's command-line short/long names (if it supported in the CLI), whether the option is
 required, and the option description).
 
-| TOML name ("*"=req, "^"=CLI-only)   | CLI name                         | Description                                                                                                                                         |
-|-------------------------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| general                             |                                  |                                                                                                                                                     |
-| app_name*                           |                                  | name of the application being tested                                                                                                                |
-| app_classpath_file*                 |                                  | file containing paths to jar files that represent the library dependencies of app                                                                   |
-| config_file^                        | -cf/--config-file                | path to TOML file containing configuration options                                                                                                  |
-| log_level^                          | -l/--log-level                   | logging level for printing diagnostic messages                                                                                                      |
-| monolith_app_path*                  |                                  | list of paths to application classes                                                                                                                |
-| java_jdk_home*                      |                                  | root directory for JDK installation (must be JDK; JRE will not suffice); can be set as environment variable JAVA_HOME                               |
-| test_directory                      | -td/--test-directory             | name of root test directory containing the generated JUnit test classes                                                                             |
-| verbose                             | -vb/--verbose                    | run in verbose mode printing detailed status messages                                                                                               |
-| version^                            | -v/--version                     | print CLI version number                                                                                                                            |
-|                                     |                                  |                                                                                                                                                     |
-| config                              |                                  | Initialize configuration file or list configuration options                                                                                         |
-|                                     |                                  |                                                                                                                                                     |
-| config.init                         |                                  | Initialize configuration options and print (in TOML format) to file or stdout                                                                       |
-| file^                               | -f/--file                        | name of TOML file to create with initialized configuration options                                                                                  |
-|                                     |                                  |                                                                                                                                                     |
-| config.list                         |                                  | List all configuration options with description                                                                                                     |
-|                                     |                                  |                                                                                                                                                     |
-| generate                            |                                  | Generate test cases on the monolithic app version                                                                                                   |
-| add_assertions                      |                                  | add assertions in evosuite/randoop-generated tests                                                                                                  |
-| jee_support                         |                                  | add support JEE mocking in generated tests cases                                                                                                    |
-| partitions_file                     | -pf/--partitions-file            | path to file containing specification of partitions                                                                                                 |
-| target_class_list                   |                                  | list of target classes to perform test generation on                                                                                                |
-| time_limit                          |                                  | time limit (in seconds) for evosuite/randoop test generation                                                                                        |
-|                                     |                                  |                                                                                                                                                     |
-| generate.ctd_amplified              |                                  | Use CTD for computing coverage goals                                                                                                                |
-| base_test_generator                 | -btg/--base-test-generator       | base test generator to use for creating building-block test sequences                                                                               |
-| ctd_coverage                        | -ctd/--ctd-coverage              | generate CTD coverage report                                                                                                                        |
-| no_diff_assertions                  | -nda/--no-diff-assertions        | do not add assertions for differential testing to the generated tests                                                                               |
-| interaction_level                   |                                  | CTD interaction level (strength) for test-plan generation                                                                                           |
-| num_seq_executions                  |                                  | number of executions to perform to determine pass/fail status of generated sequences                                                                |
-| refactored_app_path_prefix*         |                                  | path prefix to root directory of refactored app version                                                                                             |
-| refactored_app_path_suffix*         |                                  | list of paths to refactored app classes                                                                                                             |
-|                                     |                                  |                                                                                                                                                     |
-| generate.evosuite                   |                                  | Use EvoSuite for generating a test suite                                                                                                            |
-| criterion                           |                                  | coverage criterion for evosuite                                                                                                                     |
-|                                     |                                  |                                                                                                                                                     |
-| generate.randoop                    |                                  | Use Randoop for generating a test suite                                                                                                             |
-| no_error_revealing_tests            |                                  | do not generate error-revealing tests with randoop                                                                                                  |
-|                                     |                                  |                                                                                                                                                     |
-| execute                             |                                  | Execute generated tests on the mono or micro app version                                                                                            |
-| app_packages*                       |                                  | list of app packages (wildcard allowed in names)                                                                                                    |
-| code_coverage                       | -cc/--code-coverage              | generate code coverage report with JaCoCo agent                                                                                                     |
-| junit_report                        | -jr/--junit-report               | generate JUnit test results report                                                                                                                  |
-| offline_instrumentation             | -ofli/--offline-instrumentation  | perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented dynamically during class loading) |
-| reports_path                        | -rp/--reports-path               | path to the reports directory                                                                                                                       |
-| test_class                          | -tc/--test-class                 | path to a test class file (.java) to compile and run                                                                                                |
-|                                     |                                  |                                                                                                                                                     |
-| execute.mono                        |                                  | Execute tests on monolithic app version                                                                                                             |
-|                                     |                                  |                                                                                                                                                     |
-| execute.micro                       |                                  | Execute tests on refactored (microservice) app version                                                                                              |
-| docker_compose_file*                | -dcf/--docker-compose-file       | docker compose file for running the partitions of the refactored app                                                                                |
-| partitions                          | -p/--partitions                  | refactored app partitions to run tests on (space-separated partition names); if omitted, tests are run on all partitions                            |
-| run_partition_containers            | -rpc/--run-partition-containers  | run partition containers before running tests                                                                                                       |
-| stop_partition_containers           | -spc/--stop-partition-containers | stop partition containers after running tests                                                                                                       |
-|                                     |                                  |                                                                                                                                                     |
+| TOML name ("*"=req, "^"=CLI-only)   | CLI name                        | Description                                                                                                                                         |
+|-------------------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| general                             |                                 |                                                                                                                                                     |
+| app_name*                           |                                 | name of the application being tested                                                                                                                |
+| app_classpath_file*                 |                                 | file containing paths to jar files that represent the library dependencies of app                                                                   |
+| config_file^                        | -cf/--config-file               | path to TOML file containing configuration options                                                                                                  |
+| log_level^                          | -l/--log-level                  | logging level for printing diagnostic messages                                                                                                      |
+| monolith_app_path*                  |                                 | list of paths to application classes                                                                                                                |
+| java_jdk_home*                      |                                 | root directory for JDK installation (must be JDK; JRE will not suffice); can be set as environment variable JAVA_HOME                               |
+| test_directory                      | -td/--test-directory            | name of root test directory containing the generated JUnit test classes                                                                             |
+| verbose                             | -vb/--verbose                   | run in verbose mode printing detailed status messages                                                                                               |
+| version^                            | -v/--version                    | print CLI version number                                                                                                                            |
+|                                     |                                 |                                                                                                                                                     |
+| config                              |                                 | Initialize configuration file or list configuration options                                                                                         |
+|                                     |                                 |                                                                                                                                                     |
+| config.init                         |                                 | Initialize configuration options and print (in TOML format) to file or stdout                                                                       |
+| file^                               | -f/--file                       | name of TOML file to create with initialized configuration options                                                                                  |
+|                                     |                                 |                                                                                                                                                     |
+| config.list                         |                                 | List all configuration options with description                                                                                                     |
+|                                     |                                 |                                                                                                                                                     |
+| generate                            |                                 | Generate test cases on the application under test                                                                                                   |
+| add_assertions                      |                                 | add assertions in evosuite/randoop-generated tests                                                                                                  |
+| jee_support                         |                                 | add support JEE mocking in generated tests cases                                                                                                    |
+| partitions_file                     | -pf/--partitions-file           | path to file containing specification of partitions                                                                                                 |
+| target_class_list                   |                                 | list of target classes to perform test generation on                                                                                                |
+| time_limit                          |                                 | time limit (in seconds) for evosuite/randoop test generation                                                                                        |
+|                                     |                                 |                                                                                                                                                     |
+| generate.ctd_amplified              |                                 | Use CTD for computing coverage goals                                                                                                                |
+| base_test_generator                 | -btg/--base-test-generator      | base test generator to use for creating building-block test sequences                                                                               |
+| ctd_coverage                        | -ctd/--ctd-coverage             | generate CTD coverage report                                                                                                                        |
+| no_diff_assertions                  | -nda/--no-diff-assertions       | do not add assertions for differential testing to the generated tests                                                                               |
+| interaction_level                   |                                 | CTD interaction level (strength) for test-plan generation                                                                                           |
+| num_seq_executions                  |                                 | number of executions to perform to determine pass/fail status of generated sequences                                                                |
+| refactored_app_path_prefix*         |                                 | path prefix to root directory of refactored app version                                                                                             |
+| refactored_app_path_suffix*         |                                 | list of paths to refactored app classes                                                                                                             |
+|                                     |                                 |                                                                                                                                                     |
+| generate.evosuite                   |                                 | Use EvoSuite for generating a test suite                                                                                                            |
+| criterion                           |                                 | coverage criterion for evosuite                                                                                                                     |
+|                                     |                                 |                                                                                                                                                     |
+| generate.randoop                    |                                 | Use Randoop for generating a test suite                                                                                                             |
+| no_error_revealing_tests            |                                 | do not generate error-revealing tests with randoop                                                                                                  |
+|                                     |                                 |                                                                                                                                                     |
+| execute                             |                                 | Execute generated tests on the application version under test                                                                                       |
+| app_packages*                       |                                 | list of app packages (wildcard allowed in names)                                                                                                    |
+| code_coverage                       | -cc/--code-coverage             | generate code coverage report with JaCoCo agent                                                                                                     |
+| junit_report                        | -jr/--junit-report              | generate JUnit test results report                                                                                                                  |
+| offline_instrumentation             | -ofli/--offline-instrumentation | perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented dynamically during class loading) |
+| reports_path                        | -rp/--reports-path              | path to the reports directory                                                                                                                       |
+| test_class                          | -tc/--test-class                | path to a test class file (.java) to compile and run                                                                                                |

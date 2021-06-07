@@ -21,9 +21,10 @@ test/coverage
 test/data/irs/monolith-*/
 maven-status/
 __tkltest.cfg
-__irs-generated-tests/
+__*-generated-tests/
 randoop-*.txt
 *-ctd-amplified-*/
+*-instrumented-classes/
 *evosuite-*/
 *-randoop-*/
 *-tkltest-reports/

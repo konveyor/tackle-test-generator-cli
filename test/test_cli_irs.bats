@@ -58,12 +58,12 @@ setup_file() {
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
 }
 
-@test "Test 02: CLI execute mono irs" {
+@test "Test 02: CLI execute irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute mono
+        execute
     [ $status -eq 0 ]
 
     # assert over reports dirs and instrumented classes dir
@@ -94,12 +94,12 @@ setup_file() {
 }
 
 
-@test "Test 03: CLI execute --offline-instrumentation mono irs" {
+@test "Test 03: CLI execute --offline-instrumentation irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute --offline-instrumentation mono
+        execute --offline-instrumentation
     [ $status -eq 0 ]
 
     # assert over reports dirs and instrumented classes dir
@@ -108,36 +108,36 @@ setup_file() {
     [ -d $IRS_INSTR_CLASSES_DIR ]
 }
 
-@test "Test 04: CLI execute micro irs" {
-    skip
-    rm -rf $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
-        --config-file $IRS_CONFIG_FILE \
-        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute micro --run-partition-containers
-    [ $status -eq 0 ]
+# @test "Test 04: CLI execute micro irs" {
+#     skip
+#     rm -rf $IRS_TEST_REPORTS_DIR
+#     run tkltest --log-level INFO \
+#         --config-file $IRS_CONFIG_FILE \
+#         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
+#         execute micro --run-partition-containers
+#     [ $status -eq 0 ]
 
-    # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_1/raw
+#     # assert over test failures and errors
+#     partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_1/raw
 
-    employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
-    echo "# employee_test_errors_count=$employee_test_errors_count" >&3
+#     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
+#     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
     
-    employee_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@failures)'`
-    echo "# employee_test_failures_count=$employee_test_failures_count" >&3
+#     employee_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@failures)'`
+#     echo "# employee_test_failures_count=$employee_test_failures_count" >&3
 
-    # [ $employee_test_errors_count -eq 0 ]
-    # [ $employee_test_failures_count -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-    # partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_2/raw
-    # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-}
+#     # [ $employee_test_errors_count -eq 0 ]
+#     # [ $employee_test_failures_count -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+#     # partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_2/raw
+#     # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+# }
 
 @test "Test 05: CLI generate --partitions-file ctd-amplified [diff-assertions] irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
@@ -176,12 +176,12 @@ setup_file() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 06: CLI execute mono irs" {
+@test "Test 06: CLI execute irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute mono
+        execute
     [ $status -eq 0 ]
 
     # assert over reports dirs
@@ -216,45 +216,45 @@ setup_file() {
     # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
 }
 
-@test "Test 07: CLI execute micro irs" {
-    skip
-    rm -rf $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
-        --config-file $IRS_CONFIG_FILE \
-        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute micro
-    [ $status -eq 0 ]
+# @test "Test 07: CLI execute micro irs" {
+#     skip
+#     rm -rf $IRS_TEST_REPORTS_DIR
+#     run tkltest --log-level INFO \
+#         --config-file $IRS_CONFIG_FILE \
+#         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
+#         execute micro
+#     [ $status -eq 0 ]
 
-    # assert over reports dirs
-    [ -d ./$IRS_TEST_REPORTS_DIR/jacoco-reports ]
-    [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
+#     # assert over reports dirs
+#     [ -d ./$IRS_TEST_REPORTS_DIR/jacoco-reports ]
+#     [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
 
-    # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_1/raw
+#     # assert over test failures and errors
+#     partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_1/raw
 
-    employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
-    echo "# employee_test_errors_count=$employee_test_errors_count" >&3
+#     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
+#     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
     
-    employee_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@failures)'`
-    echo "# employee_test_failures_count=$employee_test_failures_count" >&3
+#     employee_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employee_Test.xml -xpath 'string(testsuite/@failures)'`
+#     echo "# employee_test_failures_count=$employee_test_failures_count" >&3
     
-    employer_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@errors)'`
-    echo "# employer_test_errors_count=$employer_test_errors_count" >&3
+#     employer_test_errors_count=`xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@errors)'`
+#     echo "# employer_test_errors_count=$employer_test_errors_count" >&3
     
-    employer_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@failures)'`
-    echo "# employer_test_failures_count=$employer_test_failures_count" >&3
+#     employer_test_failures_count=`xmllint $partition_rep_dir/TEST-irs_Employer_Test.xml -xpath 'string(testsuite/@failures)'`
+#     echo "# employer_test_failures_count=$employer_test_failures_count" >&3
 
-    # [ $employee_test_errors_count -eq 4 ] || [ $employee_test_failures_count -eq 4 ]
-    # [ $employer_test_errors_count -eq 3 ]
-    # [ $employer_test_failures_count -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-    # partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_2/raw
-    # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
-    # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
-}
+#     # [ $employee_test_errors_count -eq 4 ] || [ $employee_test_failures_count -eq 4 ]
+#     # [ $employer_test_errors_count -eq 3 ]
+#     # [ $employer_test_failures_count -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_IRS_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_Salary_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+#     # partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/app-partition_2/raw
+#     # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@errors)'` -eq 0 ]
+#     # [ `xmllint $partition_rep_dir/TEST-irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
+# }
 
 @test "Test 08: CLI generate [all-classes] randoop irs" {
     skip
