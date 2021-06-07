@@ -93,17 +93,17 @@ teardown_file() {
     [ "${lines[0]}" = "usage: tkltest generate randoop [-h]" ]
 }
 
-@test "Test 11: CLI \"execute mono\" command help" {
-    run tkltest execute mono --help
+@test "Test 11: CLI \"execute\" command help" {
+    run tkltest execute --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute mono [-h]" ]
+    [ "${lines[0]}" = "usage: tkltest execute [-h] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]" ]
 }
 
-@test "Test 12: CLI \"execute micro\" command help" {
-    run tkltest execute micro --help
-    [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute micro [-h] [-dcf DOCKER_COMPOSE_FILE]" ]
-}
+# @test "Test 12: CLI \"execute micro\" command help" {
+#     run tkltest execute micro --help
+#     [ $status -eq 0 ]
+#     [ "${lines[0]}" = "usage: tkltest execute micro [-h] [-dcf DOCKER_COMPOSE_FILE]" ]
+# }
 
 @test "Test 13: CLI --version" {
     run tkltest --version
@@ -137,8 +137,8 @@ teardown_file() {
     [[ "${lines[4]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
-@test "Test 17: CLI execute mono invalid spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR execute mono
+@test "Test 17: CLI execute invalid spec in toml" {
+    run tkltest --config-file $IRS_CONFIG_FILE_ERR execute
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
@@ -146,7 +146,7 @@ teardown_file() {
     [[ "${lines[3]}" == *"Missing required options for \"execute\": ['app_packages']"* ]]
 }
 
-@test "Test 18: CLI execute mono missing generate config" {
+@test "Test 18: CLI execute missing generate config" {
     if [ ! -d $IRS_CTD_AMPLIFIED_TESTDIR ];  then
         echo "# creating $IRS_CTD_AMPLIFIED_TESTDIR" >&3
         mkdir $IRS_CTD_AMPLIFIED_TESTDIR
@@ -156,7 +156,7 @@ teardown_file() {
         rm $IRS_GENERATE_CONFIG_FILE
     fi
     run tkltest --config-file $IRS_CONFIG_FILE \
-        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR execute mono
+        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR execute
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"Generate config file not found:"* ]]
