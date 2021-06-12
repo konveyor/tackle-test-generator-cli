@@ -184,7 +184,7 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
 
     # build java command to be executed
     modeling_command = "java -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "focus.jar")+os.pathsep
+    modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "acts_"+constants.ACTS_VERSION+".jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "minijdd_103.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-"+constants.SOOT_VERSION+".jar") + os.pathsep

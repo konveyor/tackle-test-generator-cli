@@ -64,3 +64,6 @@ EVOSUITE_VERSION = "1.0.7"
 
 # soot used version
 SOOT_VERSION = "4.1.0"
+
+# ACTS version
+ACTS_VERSION = '3.2'
