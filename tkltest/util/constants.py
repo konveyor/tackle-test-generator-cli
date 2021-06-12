@@ -10,6 +10,11 @@ TKLTEST_GENERATE_CONFIG_FILE='.tkltest_generate.toml'
 TKLTEST_LIB_DIR = 'lib'
 TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 
+# version of testgen core
+TKLTEST_TESTGEN_CORE_VERSION = '1.0.0'
+TKLTEST_TESTGEN_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
+                                        'tackle-test-generator-core-{}-SNAPSHOT.jar'.format(TKLTEST_TESTGEN_CORE_VERSION))
+
 # suffix for the default test directory name (used if test directory is unspecified)
 # CTD amplified tests
 TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX = "-ctd-amplified-tests"
@@ -59,3 +64,6 @@ EVOSUITE_VERSION = "1.0.7"
 
 # soot used version
 SOOT_VERSION = "4.1.0"
+
+# ACTS version
+ACTS_VERSION = '3.2'
