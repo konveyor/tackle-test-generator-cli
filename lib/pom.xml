@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.konveyor.tackle</groupId>
-  <artifactId>testgen-cli</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>org.konveyor</groupId>
+  <artifactId>tackle-test-generator-cli</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -12,7 +12,16 @@
     <junit.version>4.13.1</junit.version>
     <evosuite.version>1.0.7</evosuite.version>
     <randoop.version>4.2.6</randoop.version>
+    <testgencore.version>1.0.0-SNAPSHOT</testgencore.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>github</id>
+      <name>GitHub Konveyor-Tackle Test Generator Maven Packages</name>
+      <url>https://maven.pkg.github.com/konveyor/tackle-test-generator-core</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -61,7 +70,12 @@
       <artifactId>javaparser-symbol-solver-core</artifactId>
       <version>3.16.1</version>
     </dependency>
-</dependencies>
+    <dependency>
+      <groupId>org.konveyor</groupId>
+      <artifactId>tackle-test-generator-core</artifactId>
+      <version>${testgencore.version}</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
