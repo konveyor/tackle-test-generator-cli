@@ -40,8 +40,8 @@ are those that cause the application to fail with runtime exceptions.
    test generator core is downloaded from the Maven registry on GitHub Packages
    ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
    requires authentication. To do this, before running the download script, add a `<server>` entry for GitHub
-   to `settings.xml` (`~/.m2/settings.xml` or create one if it doesn't exist), replacing `USERNAME` with
-   your GitHub username and `PASSWORD` with the password or a personal access token.
+   to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
+   your GitHub username and `PASSWORD` with your password or a personal access token.
    ```
    <servers>
      <server>
