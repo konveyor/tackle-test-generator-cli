@@ -4,7 +4,10 @@ This repository contains a Python-based Command-line interface (CLI), `tkltest`,
 tooling for performing automated test generation and differential testing on two application versions
 (in the context of application modernization). Currently, `tlktest` provides this capability for Java unit
 testing, where unit test cases can be automatically generated on a given application version (the _base_ version)
-and executed against a modified version to detect differences. 
+and executed against a modified version to detect differences.
+
+The core test generator that the CLI invokes resides in the related
+[tackle-test-generator-core](https://github.com/konveyor/tackle-test-generator-core) repository.
 
 The tool is integrated with two automated unit test-generation tools for Java: 
 [Randoop](https://randoop.github.io/randoop/) and [EvoSuite](https://www.evosuite.org/). So tests can be
@@ -33,9 +36,29 @@ are those that cause the application to fail with runtime exceptions.
 2. Install Ant. The Ant executable must be in the path. Along with generating JUnit test cases,
    the CLI generates an Ant `build.xml` that can be used for building and running the generated tests.
    
-3. Install Maven and download Java libraries using the script:
+3. Install Maven and download Java libraries using the script `lib/download_lib_jars.sh`. The jar for the
+   test generator core is downloaded from the Maven registry on GitHub Packages
+   ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
+   requires authentication. To do this, before running the download script, add a `<server>` entry for GitHub
+   to `settings.xml` (`~/.m2/settings.xml` or create one if it doesn't exist), replacing `USERNAME` with
+   your GitHub username and `PASSWORD` with the password or a personal access token.
+   ```
+   <servers>
+     <server>
+     <id>github</id>
+     <username>USERNAME</username>
+     <password>PASSWORD</password>
+    </server>
+   </servers>
+   ```
+   Alternatively, you can download the test-generator-core jar manually
+   [here](https://github.com/konveyor/tackle-test-generator-core/packages/841780) and add it to the `lib/download`
+   directory.
+   
+   The remaining Java libraries can be downloaded using the script:
+   
     ```buildoutcfg
-    cd lib; ./download_lib_jars.sh 
+    cd lib; ./download_lib_jars.sh
     ```
     
     Windows users should run:
