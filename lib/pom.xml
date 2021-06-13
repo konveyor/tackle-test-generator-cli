@@ -21,6 +21,11 @@
       <name>GitHub Konveyor-Tackle Test Generator Maven Packages</name>
       <url>https://maven.pkg.github.com/konveyor/tackle-test-generator-core</url>
     </repository>
+    <repository>
+      <id>github-sinha108</id>
+      <name>Test Generator Maven Packages</name>
+      <url>https://maven.pkg.github.com/sinha108/maven-packages</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -74,6 +79,16 @@
       <groupId>org.konveyor</groupId>
       <artifactId>tackle-test-generator-core</artifactId>
       <version>${testgencore.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.evosuite</groupId>
+      <artifactId>evosuite-master</artifactId>
+      <version>${evosuite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.evosuite</groupId>
+      <artifactId>evosuite-standalone-runtime</artifactId>
+      <version>${evosuite.version}</version>
     </dependency>
   </dependencies>
 
