@@ -59,3 +59,22 @@ EVOSUITE_VERSION = "1.0.7"
 
 # soot used version
 SOOT_VERSION = "4.1.0"
+
+# maven version used for creating maven build file
+MAVEN_VERSION = "4.0.0"
+
+# Jacoco for maven used version
+
+JACOCO_MAVEN_VERSION = "0.8.7"
+
+# maven site plugin version used
+
+MAVEN_SITE_PLUGIN_VERSION = "3.7.1"
+
+# maven reports plugin version used
+
+MAVEN_REPORTS_PLUGIN_VERSION = "3.0.0"
+
+# maven surfire plugin version used
+
+MAVEN_SURFIRE_VERSION = "3.0.0-M5"

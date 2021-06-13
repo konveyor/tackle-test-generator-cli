@@ -82,7 +82,8 @@ def __execute_base(args, config):
         test_dirs = [test_root_dir]
 
     # run test classes
-    __run_test_cases(app_name=config['general']['app_name'],
+    __run_test_cases(build_type=config['general']['build_type'],
+        app_name=config['general']['app_name'],
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=classpath,
         test_root_dir=test_root_dir,
@@ -98,15 +99,16 @@ def __execute_base(args, config):
     )
 
 
-def __run_test_cases(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, gen_junit_report, collect_codecoverage,
+def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, gen_junit_report, collect_codecoverage,
     app_packages, partitions_file, target_class_list, reports_dir, offline_inst, env_vars={}, verbose=False, micro=False):
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
     main_reports_dir = os.path.join(reports_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
 
-    # generate ant build.xml file
-    build_xml_file = build_util.generate_ant_build_xml(
+    # generate build file
+    build_xml_file = build_util.generate_build_xml(
+        build_type=build_type,
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=app_classpath,
