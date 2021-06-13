@@ -187,14 +187,6 @@ __options_spec = {
             'default_value': '',
             'help_message': 'name of root test directory containing the generated JUnit test classes'
         },
-        'build_type': {
-            'required': True,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': 'ant',
-            'help_message': 'type of build file to create for the tests - maven and ant are supported'
-        },
         'verbose': {
             'required': False,
             'is_toml_option': True,

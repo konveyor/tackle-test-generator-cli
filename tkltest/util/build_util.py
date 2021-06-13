@@ -54,15 +54,14 @@ def get_build_classpath(config, partition=None):
     return classpath_str
 
 
-def generate_build_xml(build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
+def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
                            partitions_file, target_class_list, main_reports_dir, app_packages='',
                            collect_codecoverage=False, offline_instrumentation=False):
-    """Generates Ant build.xml file for running tests.
+    """Generates Ant build.xml file and Maven pom.xml for running tests.
 
-    Generates Ant build.xml file or Maven pom.xml for running generated tests and collecting coverage information.
+    Generates Ant build.xml file and Maven pom.xml for running generated tests and collecting coverage information.
 
     Args:
-        build_type: either "ant" or "maven"
         app_name: name of the app under test
         monolith_app_path: paths to classes for the app under test
         app_classpath: Java CLASSPATH for building the app under test
@@ -87,34 +86,30 @@ def generate_build_xml(build_type, app_name, monolith_app_path, app_classpath, t
         app_reported_packages = []
 
     # set the build xml file name and content based on the build file
-    if build_type == "ant":
-        build_xml_file = test_root_dir + os.sep + 'build.xml'
+    ant_build_xml_file = test_root_dir + os.sep + 'build.xml'
     # if micro:
     #     build_xml_file += 'micro.xml'
     # else:
     #     build_xml_file += 'mono.xml'
 
-        __build_xml(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                app_packages,
-                app_reported_packages, offline_instrumentation, main_reports_dir, build_xml_file)
+    __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
+                ant_build_xml_file)
 
-        # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
-        with open(build_xml_file, 'r') as inp:
-            content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
-        with open(build_xml_file, 'w') as outp:
-            outp.write(content)
-    elif build_type == "maven":
-        build_xml_file = test_root_dir + os.sep + 'pom.xml'
-        __build_maven(app_classpath, app_name, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, main_reports_dir, build_xml_file)
-    else:
-        tkltest_status("build type " + build_type + " not supported", error=True)
-        sys.exit(1)
+    # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
+    with open(ant_build_xml_file, 'r') as inp:
+        content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
+    with open(ant_build_xml_file, 'w') as outp:
+        outp.write(content)
 
-    return build_xml_file
+    maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
+    __build_maven(app_classpath, app_name, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
+
+    return ant_build_xml_file, maven_build_xml_file
 
 
-def __build_xml(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
+def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
                 app_collected_packages, app_reported_classes, offline_instrumentation, report_output_dir,
                 build_xml_file):
     classpath_list = classpath_list.split(os.pathsep)

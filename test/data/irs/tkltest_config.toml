@@ -6,7 +6,6 @@ name = "TKLTEST_CONFIG_FILE"
     monolith_app_path = ["test/data/irs/monolith/target/classes"]
     app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
     # test_directory = "irs-ctd-amplified-tests"
-    build_type = "ant"
     # JDK home directory
     java_jdk_home = ""
 

@@ -140,8 +140,7 @@ def generate_ctd_amplified_tests(config):
         os.path.join(test_directory, dir) for dir in os.listdir(test_directory)
         if os.path.isdir(os.path.join(test_directory, dir)) and not dir.startswith('.')
     ]
-    build_file = build_util.generate_build_xml(
-        build_type=config['general']['build_type'],
+    ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
@@ -151,7 +150,8 @@ def generate_ctd_amplified_tests(config):
         target_class_list=target_class_list,
         main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, build_file))))
+    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
+    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
 
     # prepend app name to names of summary and coverage files created by the extender
     shutil.move(constants.TKL_EXTENDER_SUMMARY_FILE,

@@ -106,8 +106,8 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     main_reports_dir = os.path.join(reports_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
 
-    # generate build file
-    build_xml_file = build_util.generate_build_xml(
+    # generate build files
+    ant_build_file, maven_build_file = build_util.generate_build_xml(
         build_type=build_type,
         app_name=app_name,
         monolith_app_path=monolith_app_path,
@@ -131,18 +131,18 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     try:
         if collect_codecoverage and not env_vars:
-            __run_command("ant -f {} merge-coverage-report".format(build_xml_file), verbose=verbose)
+            __run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
         else:
             task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
             for partition in partitions:
                 if not env_vars:
-                    __run_command("ant -f {} {}{}".format(build_xml_file, task_prefix, partition), 
+                    __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
                         verbose=verbose)
                 else:
                     # env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
                     for env_var in os.environ:
                         env_vars[env_var] = os.environ[env_var]
-                    __run_command("ant -f {} {}{}".format(build_xml_file, task_prefix, partition),
+                    __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
                         verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
             tkltest_status('Error executing junit ant: {}'.format(e), error=True)
