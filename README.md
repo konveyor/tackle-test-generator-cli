@@ -39,21 +39,29 @@ are those that cause the application to fail with runtime exceptions.
 3. Install Maven and download Java libraries using the script `lib/download_lib_jars.sh`. The jar for the
    test generator core is downloaded from the Maven registry on GitHub Packages
    ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
-   requires authentication. To do this, before running the download script, add a `<server>` entry for GitHub
-   to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
+   specific builds of  EvoSuite jars that are downloaded from another
+   [Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
+   both of these require authentication. To do this, before running the download script, add two `<server>`
+   entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
    your GitHub username and `PASSWORD` with your password or a personal access token.
    ```
    <servers>
      <server>
-     <id>github</id>
-     <username>USERNAME</username>
-     <password>PASSWORD</password>
-    </server>
+       <id>github</id>
+       <username>USERNAME</username>
+       <password>PASSWORD</password>
+     </server>
+     <server>
+       <id>github-sinha108</id>
+       <username>USERNAME</username>
+       <password>PASSWORD</password>
+     </server>
    </servers>
    ```
-   Alternatively, you can download the test-generator-core jar manually
-   [here](https://github.com/konveyor/tackle-test-generator-core/packages/841780) and add it to the `lib/download`
-   directory.
+   Alternatively, you can download the test-generator-core jar
+   [here](https://github.com/konveyor/tackle-test-generator-core/packages/841780) and the EvoSuite
+   jars [here](https://github.com/sinha108/maven-packages/packages),
+   and add them to the `lib/download` directory.
    
    The remaining Java libraries can be downloaded using the script:
    
