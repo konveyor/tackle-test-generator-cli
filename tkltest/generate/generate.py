@@ -248,8 +248,10 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     # build the java command to be executed
     tg_command = "\""+jdk_path+"\" -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DIR, "evosuite-standalone-runtime-"
-                               +constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-standalone-runtime-"
+                               +constants.EVOSUITE_VERSION+".jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-master-"
+                               +constants.EVOSUITE_VERSION+".jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-4.1.0.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-io-2.6.jar") + os.pathsep

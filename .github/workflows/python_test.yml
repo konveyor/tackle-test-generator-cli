@@ -35,7 +35,10 @@ jobs:
     - name: Create maven settings.xml
       uses: s4u/maven-settings-action@v2.4.0
       with:
-        servers: '[{"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}]'
+        servers: '[
+          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
+          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
+        ]'
     - name: Download Java libraries
       run: |
         cat ~/.m2/settings.xml

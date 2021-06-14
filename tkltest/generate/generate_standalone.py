@@ -28,11 +28,11 @@ def generate_evosuite(config):
     classpath = __get_classpath(config)
     tkltest_status('Generating test suite using Evosuite for application: ' + app_name)
     app_copy_folder, target_folder = __arrange_folders_for_evosuite(config['general']['monolith_app_path'], config)
-    evosuite_command = "java -cp " + classpath + os.pathsep + os.path.join(constants.TKLTEST_LIB_DIR,
-                                        'evosuite-standalone-runtime-'+constants.EVOSUITE_VERSION+'-SNAPSHOT.jar')
+    evosuite_command = "java -cp " + classpath + os.pathsep + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR,
+                                        'evosuite-standalone-runtime-'+constants.EVOSUITE_VERSION+'.jar')
     if target_folder:
         evosuite_command += os.pathsep + app_copy_folder + os.sep
-    evosuite_command += " -jar " + os.path.join(constants.TKLTEST_LIB_DIR, "evosuite-master-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar")
+    evosuite_command += " -jar " + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-master-"+constants.EVOSUITE_VERSION+".jar")
     if target_folder:
         evosuite_command += " -target " + target_folder
     else:
