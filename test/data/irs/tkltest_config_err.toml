@@ -39,6 +39,5 @@ name = "TKLTEST_CONFIG_FILE"
 # options for "tkltest execute" command
 [execute]
     test_class = ""
-    junit_report = true
     code_coverage = true
     # app_packages = ["irs.*"]

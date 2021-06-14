@@ -390,6 +390,16 @@ __options_spec = {
             'default_value': [],
             'help_message': 'list of app packages (wildcard allowed in names)'
         },
+        'build_type': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-bt',
+            'long_name': '--build-type',
+            'type': str,
+            'default_value': 'ant',
+            'help_message': 'build file type for compiling and running the tests - either ant or maven'
+        },
         'code_coverage': {
             'required': False,
             'is_toml_option': True,
@@ -399,16 +409,6 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'generate code coverage report with JaCoCo agent'
-        },
-        'junit_report': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-jr',
-            'long_name': '--junit-report',
-            'type': bool,
-            'default_value': False,
-            'help_message': 'generate JUnit test results report'
         },
         'offline_instrumentation': {
             'required': False,

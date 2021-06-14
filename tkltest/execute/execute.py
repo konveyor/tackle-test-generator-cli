@@ -82,13 +82,12 @@ def __execute_base(args, config):
         test_dirs = [test_root_dir]
 
     # run test classes
-    __run_test_cases(build_type=config['general']['build_type'],
+    __run_test_cases(build_type=config['execute']['build_type'],
         app_name=config['general']['app_name'],
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=classpath,
         test_root_dir=test_root_dir,
         test_dirs=test_dirs,
-        gen_junit_report=config['execute']['junit_report'],
         collect_codecoverage=config['execute']['code_coverage'],
         app_packages=config['execute']['app_packages'],
         partitions_file=gen_config['generate']['partitions_file'],
@@ -99,7 +98,7 @@ def __execute_base(args, config):
     )
 
 
-def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, gen_junit_report, collect_codecoverage,
+def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, collect_codecoverage,
     app_packages, partitions_file, target_class_list, reports_dir, offline_inst, env_vars={}, verbose=False, micro=False):
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
@@ -108,7 +107,6 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     # generate build files
     ant_build_file, maven_build_file = build_util.generate_build_xml(
-        build_type=build_type,
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=app_classpath,
@@ -119,8 +117,7 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
         main_reports_dir=main_reports_dir,
         app_packages=app_packages,
         collect_codecoverage=collect_codecoverage,
-        offline_instrumentation=offline_inst,
-        micro=micro
+        offline_instrumentation=offline_inst
     )
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
@@ -129,27 +126,42 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     # current limitation in ant script - if code coverage is requested then junit report is generated as well
 
-    try:
-        if collect_codecoverage and not env_vars:
-            __run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
-        else:
-            task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
-            for partition in partitions:
-                if not env_vars:
-                    __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-                        verbose=verbose)
-                else:
-                    # env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
-                    for env_var in os.environ:
-                        env_vars[env_var] = os.environ[env_var]
-                    __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-                        verbose=verbose, env_vars=env_vars)
-    except subprocess.CalledProcessError as e:
-            tkltest_status('Error executing junit ant: {}'.format(e), error=True)
-            sys.exit(1)
+    if build_type != 'ant' and build_type != 'maven':
+        tkltest_status("build type " + build_type + " not supported", error=True)
+        sys.exit(1)
 
-    if gen_junit_report:
-        tkltest_status("JUnit reports are saved in " +
+    try:
+        if build_type == 'maven':
+            __run_command("mvn -f {} clean test".format(maven_build_file), verbose=verbose)
+        else:
+            if collect_codecoverage:
+                __run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
+            else:
+                for partition in partitions:
+                    __run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
+                            verbose=verbose)
+
+        #else:
+         #   task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
+          #  for partition in partitions:
+                #if not env_vars:
+             #       __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+              #          verbose=verbose)
+                #else:
+                    # env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
+                 #   for env_var in os.environ:
+                  #      env_vars[env_var] = os.environ[env_var]
+                  #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+                   #     verbose=verbose, env_vars=env_vars)
+    except subprocess.CalledProcessError as e:
+        if build_type == 'ant':
+            tkltest_status('Error executing junit ant: {}'.format(e), error=True)
+        else:
+            tkltest_status('Error executing junit maven: {}'.format(e), error=True)
+        sys.exit(1)
+
+
+    tkltest_status("JUnit reports are saved in " +
                        os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
     if collect_codecoverage:
         tkltest_status("Jacoco code coverage reports are saved in " +

@@ -103,7 +103,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         outp.write(content)
 
     maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
-    __build_maven(app_classpath, app_name, test_root_dir, test_dirs, collect_codecoverage,
+    __build_maven(app_classpath, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
     return ant_build_xml_file, maven_build_xml_file
@@ -284,11 +284,13 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
                     line('version', '1.0')
                     line('scope', 'system')
                     line('systemPath', full_path)
-        for test_src_dir in test_dirs:
-            current_partition = os.path.basename(test_src_dir)
-            junit_output_dir = main_junit_dir + '/' + current_partition
-            with tag('build'):
-                line('testSourceDirectory', test_src_dir)
+        with tag('build'):
+            for test_src_dir in test_dirs:
+                if os.path.basename(test_src_dir) == 'target':
+                    continue # skip compilation output directory
+                current_partition = os.path.basename(test_src_dir)
+                junit_output_dir = main_junit_dir + '/' + current_partition
+                line('testSourceDirectory', os.path.abspath(test_src_dir))
                 with tag('resources'):
                     for app_path in monolith_app_paths:
                         with tag('resource'):
@@ -337,7 +339,7 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
                                 line('groupId', 'org.apache.maven.surefire')
                                 line('artifactId', 'surefire-junit47')
                                 line('version', constants.MAVEN_SURFIRE_VERSION)
-            with tag('reporting'):
+        with tag('reporting'):
                 with tag('plugins'):
                     with tag('plugin'):
                         line('groupId', 'org.apache.maven.plugins')

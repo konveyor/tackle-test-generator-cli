@@ -64,6 +64,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
+
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_randoop_classlist_diffassert(self) -> None:
@@ -82,6 +83,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
+            config['execute']['build_type'] = 'maven'
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
@@ -369,10 +371,11 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
+            config['execute']['code_coverage'] = False
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
-            self.__assert_execute_resources(app_name=app_name)
+            self.__assert_execute_resources(app_name=app_name, code_coverage=False)
 
     def test_generate_execute_ctdamplified_evosuite_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file no_diff_assertions"""
@@ -491,13 +494,16 @@ class GenerateExecuteTest(unittest.TestCase):
 
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name):
+    def __assert_execute_resources(self, app_name, code_coverage=True):
         main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
         self.assertTrue(os.path.isdir(junit_report_dir))
         cov_report_dir = os.path.join(main_report_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR)
-        self.assertTrue(os.path.isdir(cov_report_dir))
+        if code_coverage:
+            self.assertTrue(os.path.isdir(cov_report_dir))
+        else:
+            self.assertFalse(os.path.isdir(cov_report_dir))
 
     def __process_generate(self, subcommand, config):
         self.args.command = 'generate'
