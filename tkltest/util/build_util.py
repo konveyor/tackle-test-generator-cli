@@ -347,6 +347,7 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
                         line('version', constants.MAVEN_SURFIRE_VERSION)
                         with tag('configuration'):
                             line('reportsDirectories', junit_output_dir + '/raw')
+
     result = indent(
         doc.getvalue(),
         indentation=' ' * 4

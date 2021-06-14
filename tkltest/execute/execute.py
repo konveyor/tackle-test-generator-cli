@@ -132,7 +132,7 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     try:
         if build_type == 'maven':
-            __run_command("mvn -f {} clean test".format(maven_build_file), verbose=verbose)
+            __run_command("mvn -f {} clean test site clean".format(maven_build_file), verbose=verbose)
         else:
             if collect_codecoverage:
                 __run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
