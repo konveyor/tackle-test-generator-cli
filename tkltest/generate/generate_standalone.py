@@ -49,7 +49,7 @@ def generate_evosuite(config):
     tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
 
     # generate ant build file
-    build_file = build_util.generate_ant_build_xml(
+    build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=build_util.get_build_classpath(config),
@@ -114,7 +114,7 @@ def generate_randoop(config):
     tkltest_status('Generated Randoop test suite written to {}'.format(output_dir))
 
     # generate ant build file
-    build_file = build_util.generate_ant_build_xml(
+    build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
