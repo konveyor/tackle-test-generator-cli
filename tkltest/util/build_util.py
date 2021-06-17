@@ -103,7 +103,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         outp.write(content)
 
     maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
-    __build_maven(app_classpath, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+    __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
     return ant_build_xml_file, maven_build_xml_file
@@ -260,7 +260,7 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
         doc.stag('formatter', type='xml')
 
 
-def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
+def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, report_output_dir,
                   build_xml_file):
     classpath_list = classpath_list.split(os.pathsep)
@@ -269,6 +269,7 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))
+    inst_app_path = os.path.join(os.path.dirname(test_root_dir), app_name + "-instrumented-classes")
     with tag('project', xmlns="http://maven.apache.org/POM/"+constants.MAVEN_VERSION):
         line('modelVersion', constants.MAVEN_VERSION)
         line('groupId', 'org.jacoco')
@@ -285,19 +286,19 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
                     line('scope', 'system')
                     line('systemPath', full_path)
         with tag('build'):
+            with tag('resources'):
+                for app_path in monolith_app_paths:
+                    with tag('resource'):
+                        if offline_instrumentation:
+                            line('directory', os.path.abspath(inst_app_path))
+                        else:
+                            line('directory', os.path.abspath(app_path))
             for test_src_dir in test_dirs:
                 if os.path.basename(test_src_dir) == 'target':
                     continue # skip compilation output directory
                 current_partition = os.path.basename(test_src_dir)
-                junit_output_dir = main_junit_dir + '/' + current_partition
+                junit_output_dir = os.path.join(main_junit_dir, current_partition)
                 line('testSourceDirectory', os.path.abspath(test_src_dir))
-                with tag('resources'):
-                    for app_path in monolith_app_paths:
-                        with tag('resource'):
-                            if offline_instrumentation:
-                                line('directory',os.path.abspath(app_path))
-                            else:
-                                line('directory',os.path.abspath(app_path))
                 with tag('plugins'):
                     with tag('plugin'):
                         line('groupId', 'org.apache.maven.plugins')
@@ -314,20 +315,38 @@ def __build_maven(classpath_list, monolith_app_paths, test_root_dir, test_dirs, 
                             line('groupId', 'org.jacoco')
                             line('artifactId', 'jacoco-maven-plugin')
                             line('version', constants.JACOCO_MAVEN_VERSION)
-                            with tag('configuration'):
-                                line('dataFile', test_src_dir + '/jacoco.exec')
-                                line('outputDirectory', main_coverage_dir)
-                                with tag('includes'):
-                                    for collected_package in app_packages:
-                                        if collected_package == '*':
-                                            line('include', '**/*')
-                                        else:
-                                            line('include', collected_package)
+                            #with tag('configuration'):
+                                #with tag('includes'):
+                                 #   for collected_package in app_packages:
+                                  #      if collected_package == '*':
+                                   #         line('include', '**/*')
+                                    #    else:
+                                     #       line('include', collected_package)
                             with tag('executions'):
                                 with tag('execution'):
-                                    line('id', 'default-report')
+                                    line('id', 'jacoco-initialize')
+                                    with tag('goals'):
+                                        line('goal', 'prepare-agent')
+                                    with tag('configuration'):
+                                        line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                with tag('execution'):
+                                    line('id', 'generate-code-coverage-report')
+                                    line('phase', 'test')
                                     with tag('goals'):
                                         line('goal', 'report')
+                                    with tag('configuration'):
+                                        line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                        line('outputDirectory', main_coverage_dir)
+                                        with tag('rules'):
+                                            with tag('rule'):
+                                                line('element', 'package')
+                                                with tag('includes'):
+                                                    for collected_package in app_packages:
+                                                        if collected_package == '*':
+                                                            line('include', '**/*')
+                                                        else:
+                                                            line('include', collected_package)
+
                     with tag('plugin'):
                         line('groupId', 'org.apache.maven.plugins')
                         line('artifactId', 'maven-surefire-plugin')
