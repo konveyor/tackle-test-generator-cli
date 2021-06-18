@@ -72,7 +72,7 @@ teardown_file() {
 @test "Test 07: CLI execute command help" {
     run tkltest execute --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]" ]
+    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt BUILD_TYPE] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]" ]
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {
@@ -96,7 +96,7 @@ teardown_file() {
 @test "Test 11: CLI \"execute\" command help" {
     run tkltest execute --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]" ]
+    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt BUILD_TYPE] [-cc] [-jr] [-ofli] [-rp REPORTS_PATH]" ]
 }
 
 # @test "Test 12: CLI \"execute micro\" command help" {
