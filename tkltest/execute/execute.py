@@ -126,10 +126,6 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
 
     # current limitation in ant script - if code coverage is requested then junit report is generated as well
 
-    if build_type != 'ant' and build_type != 'maven':
-        tkltest_status("build type " + build_type + " not supported", error=True)
-        sys.exit(1)
-
     try:
         if build_type == 'maven':
             __run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
