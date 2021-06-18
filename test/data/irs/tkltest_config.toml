@@ -6,7 +6,6 @@ name = "TKLTEST_CONFIG_FILE"
     monolith_app_path = ["test/data/irs/monolith/target/classes"]
     app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
     # test_directory = "irs-ctd-amplified-tests"
-
     # JDK home directory
     java_jdk_home = ""
 
@@ -44,6 +43,5 @@ name = "TKLTEST_CONFIG_FILE"
 # options for "tkltest execute" command
 [execute]
     test_class = ""
-    junit_report = true
     code_coverage = true
     app_packages = ["irs.*"]

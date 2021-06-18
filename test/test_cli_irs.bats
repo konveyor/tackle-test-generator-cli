@@ -56,6 +56,7 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 }
 
 @test "Test 02: CLI execute irs" {
@@ -272,6 +273,7 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_RANDOOP_TESTDIR/build.xml ]
+    [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
 }
 
 @test "Test 09: CLI generate [all-classes] evosuite irs" {
@@ -290,6 +292,7 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_EVOSUITE_TESTDIR/build.xml ]
+    [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
 }
 
 @test "Test 10: CLI generate [target-class-list] ctd-amplified irs" {
@@ -314,6 +317,10 @@ setup_file() {
     test_count=`find $IRS_CTD_AMPLIFIED_TESTDIR -name *.java -exec grep "@Test" {} \; | wc -l`
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
+
+    # assert build file is generated
+    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 }
 
 @test "Test 11: CLI generate [target-class-list] randoop irs" {

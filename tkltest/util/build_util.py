@@ -1,10 +1,12 @@
 import json
 import logging
 import os
+import sys
 
 from yattag import Doc, indent
 
 from . import constants
+from tkltest.util.logging_util import tkltest_status
 
 
 def get_build_classpath(config, partition=None):
@@ -52,12 +54,12 @@ def get_build_classpath(config, partition=None):
     return classpath_str
 
 
-def generate_ant_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
+def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
                            partitions_file, target_class_list, main_reports_dir, app_packages='',
-                           collect_codecoverage=False, offline_instrumentation=False, micro=False):
-    """Generates Ant build.xml file for running tests.
+                           collect_codecoverage=False, offline_instrumentation=False):
+    """Generates Ant build.xml file and Maven pom.xml for running tests.
 
-    Generates Ant build.xml file for running generated tests and collecting coverage informstion.
+    Generates Ant build.xml file and Maven pom.xml for running generated tests and collecting coverage information.
 
     Args:
         app_name: name of the app under test
@@ -83,27 +85,31 @@ def generate_ant_build_xml(app_name, monolith_app_path, app_classpath, test_root
     else:
         app_reported_packages = []
 
-    # set the build xml file name for mono and micro executions
-    build_xml_file = test_root_dir + os.sep + 'build.xml'
+    # set the build xml file name and content based on the build file
+    ant_build_xml_file = test_root_dir + os.sep + 'build.xml'
     # if micro:
     #     build_xml_file += 'micro.xml'
     # else:
     #     build_xml_file += 'mono.xml'
 
-    __build_xml(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                app_packages,
-                app_reported_packages, offline_instrumentation, main_reports_dir, build_xml_file)
+    __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
+                ant_build_xml_file)
 
     # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
-    with open(build_xml_file, 'r') as inp:
+    with open(ant_build_xml_file, 'r') as inp:
         content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
-    with open(build_xml_file, 'w') as outp:
+    with open(ant_build_xml_file, 'w') as outp:
         outp.write(content)
 
-    return build_xml_file
+    maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
+    __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
+
+    return ant_build_xml_file, maven_build_xml_file
 
 
-def __build_xml(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
+def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
                 app_collected_packages, app_reported_classes, offline_instrumentation, report_output_dir,
                 build_xml_file):
     classpath_list = classpath_list.split(os.pathsep)
@@ -252,3 +258,118 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
             doc.stag('fileset', dir=test_src_dir, includes="**/*.class",
                      excludes="**/*ESTest_scaffolding.class")
         doc.stag('formatter', type='xml')
+
+
+def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, report_output_dir,
+                  build_xml_file):
+    classpath_list = classpath_list.split(os.pathsep)
+    doc, tag, text, line = Doc().ttl()
+    test_root_dir = os.path.abspath(test_root_dir)
+    main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
+    main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
+                                        os.path.basename(test_root_dir))
+    inst_app_path = os.path.join(os.path.dirname(test_root_dir), app_name + "-instrumented-classes")
+    with tag('project', xmlns="http://maven.apache.org/POM/"+constants.MAVEN_VERSION):
+        line('modelVersion', constants.MAVEN_VERSION)
+        line('groupId', 'org.jacoco')
+        line('artifactId', 'Jacoco')
+        line('version', constants.JACOCO_MAVEN_VERSION)
+        with tag('dependencies'):
+            for full_path in classpath_list:
+                file_name = full_path.rsplit(os.path.sep,1)[1]
+                file_name = file_name.replace('.jar', '')
+                with tag('dependency'):
+                    line('groupId', file_name)
+                    line('artifactId', file_name)
+                    line('version', '1.0')
+                    line('scope', 'system')
+                    line('systemPath', full_path)
+        with tag('build'):
+            with tag('resources'):
+                for app_path in monolith_app_paths:
+                    with tag('resource'):
+                        if offline_instrumentation:
+                            line('directory', os.path.abspath(inst_app_path))
+                        else:
+                            line('directory', os.path.abspath(app_path))
+            for test_src_dir in test_dirs:
+                if os.path.basename(test_src_dir) == 'target':
+                    continue # skip compilation output directory
+                current_partition = os.path.basename(test_src_dir)
+                junit_output_dir = os.path.join(main_junit_dir, current_partition)
+                line('testSourceDirectory', os.path.abspath(test_src_dir))
+                with tag('plugins'):
+                    with tag('plugin'):
+                        line('groupId', 'org.apache.maven.plugins')
+                        line('artifactId', 'maven-site-plugin')
+                        line('version', constants.MAVEN_SITE_PLUGIN_VERSION)
+                        with tag('configuration'):
+                            line('outputDirectory', junit_output_dir + '/html')
+                    with tag('plugin'):
+                        line('groupId', 'org.apache.maven.plugins')
+                        line('artifactId', 'maven-project-info-reports-plugin')
+                        line('version', constants.MAVEN_REPORTS_PLUGIN_VERSION)
+                    if collect_codecoverage:
+                        with tag('plugin'):
+                            line('groupId', 'org.jacoco')
+                            line('artifactId', 'jacoco-maven-plugin')
+                            line('version', constants.JACOCO_MAVEN_VERSION)
+                            #with tag('configuration'):
+                                #with tag('includes'):
+                                 #   for collected_package in app_packages:
+                                  #      if collected_package == '*':
+                                   #         line('include', '**/*')
+                                    #    else:
+                                     #       line('include', collected_package)
+                            with tag('executions'):
+                                with tag('execution'):
+                                    line('id', 'jacoco-initialize')
+                                    with tag('goals'):
+                                        line('goal', 'prepare-agent')
+                                    with tag('configuration'):
+                                        line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                with tag('execution'):
+                                    line('id', 'generate-code-coverage-report')
+                                    line('phase', 'test')
+                                    with tag('goals'):
+                                        line('goal', 'report')
+                                    with tag('configuration'):
+                                        line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                        line('outputDirectory', main_coverage_dir)
+                                        with tag('rules'):
+                                            with tag('rule'):
+                                                line('element', 'package')
+                                                with tag('includes'):
+                                                    for collected_package in app_packages:
+                                                        if collected_package == '*':
+                                                            line('include', '**/*')
+                                                        else:
+                                                            line('include', collected_package)
+
+                    with tag('plugin'):
+                        line('groupId', 'org.apache.maven.plugins')
+                        line('artifactId', 'maven-surefire-plugin')
+                        line('version', constants.MAVEN_SURFIRE_VERSION)
+                        with tag('configuration'):
+                            line('reportsDirectory', junit_output_dir + '/raw')
+                        with tag('dependencies'):
+                           with tag('dependency'):
+                                line('groupId', 'org.apache.maven.surefire')
+                                line('artifactId', 'surefire-junit47')
+                                line('version', constants.MAVEN_SURFIRE_VERSION)
+        with tag('reporting'):
+                with tag('plugins'):
+                    with tag('plugin'):
+                        line('groupId', 'org.apache.maven.plugins')
+                        line('artifactId', 'maven-surefire-report-plugin')
+                        line('version', constants.MAVEN_SURFIRE_VERSION)
+                        with tag('configuration'):
+                            line('reportsDirectories', junit_output_dir + '/raw')
+
+    result = indent(
+        doc.getvalue(),
+        indentation=' ' * 4
+    )
+    with open(build_xml_file, 'w') as outfile:
+        outfile.write(result)

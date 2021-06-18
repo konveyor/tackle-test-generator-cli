@@ -49,7 +49,7 @@ def generate_evosuite(config):
     tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
 
     # generate ant build file
-    build_file = build_util.generate_ant_build_xml(
+    ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=build_util.get_build_classpath(config),
@@ -59,7 +59,8 @@ def generate_evosuite(config):
         target_class_list=config['generate']['target_class_list'],
         main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, build_file))))
+    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
+    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
 
 
 def generate_randoop(config):
@@ -114,7 +115,7 @@ def generate_randoop(config):
     tkltest_status('Generated Randoop test suite written to {}'.format(output_dir))
 
     # generate ant build file
-    build_file = build_util.generate_ant_build_xml(
+    ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
@@ -124,7 +125,8 @@ def generate_randoop(config):
         target_class_list=config['generate']['target_class_list'],
         main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, build_file))))
+    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
+    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
 
 
 def __arrange_folders_for_evosuite(paths_list,  config):

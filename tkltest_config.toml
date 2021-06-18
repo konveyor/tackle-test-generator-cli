@@ -15,8 +15,8 @@ time_limit = 10
 
 [execute]
 app_packages = []
+build_type = "ant"
 code_coverage = false
-junit_report = false
 offline_instrumentation = false
 reports_path = ""
 test_class = ""
