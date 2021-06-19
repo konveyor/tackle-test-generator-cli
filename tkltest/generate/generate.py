@@ -1,3 +1,16 @@
+# ***************************************************************************
+# Copyright IBM Corporation 2021
+#
+# Licensed under the Eclipse Public License 2.0, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ***************************************************************************
+
 import logging
 import logging.handlers
 import os
@@ -187,7 +200,6 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     # build java command to be executed
     modeling_command = "java -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "acts_"+constants.ACTS_VERSION+".jar") + os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "minijdd_103.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-"+constants.SOOT_VERSION+".jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "axml-2.0.0.jar") + os.pathsep
