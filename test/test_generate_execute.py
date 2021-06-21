@@ -178,6 +178,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file"""
         for app_name in self.test_apps.keys():
@@ -197,6 +198,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_randoop_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file"""
         for app_name in self.test_apps.keys():
@@ -216,6 +218,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_evosuite_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file"""
         for app_name in self.test_apps.keys():
@@ -349,6 +352,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # execute tests
             self.__process_execute(config=config)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():
@@ -369,6 +373,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_randoop_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():
@@ -390,6 +395,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name, code_coverage=False)
 
+    @unittest.skip('')
     def test_generate_execute_ctdamplified_evosuite_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file no_diff_assertions"""
         for app_name in self.test_apps.keys():

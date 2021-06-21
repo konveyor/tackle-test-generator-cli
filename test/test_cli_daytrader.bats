@@ -1,5 +1,4 @@
 DAYTRADER_CONFIG_FILE=./test/data/daytrader7/tkltest_config.toml
-DAYTRADER_PARTITIONS_FILE=./test/data/daytrader7/refactored/PartitionsFile.json
 DAYTRADER_CTD_TEST_PLAN_FILE=./daytrader7_ctd_models_and_test_plans.json
 DAYTRADER_TESTGEN_SUMMARY_FILE=./daytrader7_test_generation_summary.json
 
@@ -48,51 +47,6 @@ setup_file() {
 }
 
 @test "Test 02: CLI execute daytrader" {
-    run tkltest --log-level INFO \
-        --config-file $DAYTRADER_CONFIG_FILE \
-        --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
-        execute
-    [ $status -eq 0 ]
-
-        # assert over reports dirs and instrumented classes dir
-    [ -d ./$DAYTRADER_TEST_REPORTS_DIR/jacoco-reports ]
-    [ -d ./$DAYTRADER_TEST_REPORTS_DIR/junit-reports ]
-}
-
-@test "Test 03: CLI generate --partitions-file ctd-amplified daytrader" {   
-    skip
-    rm -rf $DAYTRADER_CTD_AMPLIFIED_TESTDIR $DAYTRADER_TEST_REPORTS_DIR
-    rm -f $DAYTRADER_CTD_TEST_PLAN_FILE $DAYTRADER_TESTGEN_SUMMARY_FILE
-    run tkltest \
-        --config-file $DAYTRADER_CONFIG_FILE \
-        --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
-        generate --partitions-file $DAYTRADER_PARTITIONS_FILE ctd-amplified
-    [ $status -eq 0 ]
-
-    # assert over test reports dir
-    [ -d ./$DAYTRADER_TEST_REPORTS_DIR/ctd-report ]
-
-    # assert over test plan file
-    [ -f $DAYTRADER_CTD_TEST_PLAN_FILE ]
-    class_count=`jq '.models_and_test_plans | keys | length' $DAYTRADER_CTD_TEST_PLAN_FILE`
-    [ $class_count -eq 4 ]
-
-    # assert over test generation report
-    [ -f $DAYTRADER_TESTGEN_SUMMARY_FILE ]
-    [ `jq .extended_sequences_info.final_sequences $DAYTRADER_TESTGEN_SUMMARY_FILE` -gt 0 ]
-    [ `jq .test_plan_coverage_info.test_plan_rows $DAYTRADER_TESTGEN_SUMMARY_FILE` -gt 0 ]
-    [ `jq .test_plan_coverage_info.rows_covered_full $DAYTRADER_TESTGEN_SUMMARY_FILE` -gt 0 ]
-    [ `jq .test_plan_coverage_info.rows_covered_bb_sequences $DAYTRADER_TESTGEN_SUMMARY_FILE` -gt 0 ]
-
-    # assert over generated test cases
-    [ -d $DAYTRADER_CTD_AMPLIFIED_TESTDIR ]
-    test_count=`find $DAYTRADER_CTD_AMPLIFIED_TESTDIR -name *.java -exec grep "@Test" {} \; | wc -l`
-    echo "# test_count=$test_count" >&3
-    [ $test_count -gt 0 ]
-}
-
-@test "Test 04: CLI execute daytrader" {
-    skip
     run tkltest --log-level INFO \
         --config-file $DAYTRADER_CONFIG_FILE \
         --test-directory $DAYTRADER_CTD_AMPLIFIED_TESTDIR \
