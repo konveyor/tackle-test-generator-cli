@@ -42,11 +42,11 @@ name = "TKLTEST_CONFIG_FILE"
     base_test_generator = "combined" # both Randoop and EvoSuite
     #base_test_generator = "randoop"
     #base_test_generator = "evosuite"
-    refactored_app_path_prefix = "test/data/daytrader7/refactored"
-    refactored_app_path_suffix = [
-        "daytrader-ee7-ejb/target/classes",
-        "daytrader-ee7-web/target/classes"
-    ]
+#    refactored_app_path_prefix = "test/data/daytrader7/refactored"
+#    refactored_app_path_suffix = [
+#        "daytrader-ee7-ejb/target/classes",
+#        "daytrader-ee7-web/target/classes"
+#    ]
     interaction_level = 1
     no_diff_assertions = false
     ctd_coverage = true

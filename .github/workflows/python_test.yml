@@ -63,4 +63,3 @@ jobs:
         which tkltest
         bats test/test_cli.bats
         bats test/test_cli_irs.bats
-#        bats test/test_cli_daytrader.bats

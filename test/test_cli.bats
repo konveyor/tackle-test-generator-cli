@@ -93,31 +93,13 @@ teardown_file() {
     [ "${lines[0]}" = "usage: tkltest generate randoop [-h]" ]
 }
 
-@test "Test 11: CLI \"execute\" command help" {
-    run tkltest execute --help
-    [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt {ant,maven}] [-cc] [-ofli] [-rp REPORTS_PATH]" ]
-}
-
-# @test "Test 12: CLI \"execute micro\" command help" {
-#     run tkltest execute micro --help
-#     [ $status -eq 0 ]
-#     [ "${lines[0]}" = "usage: tkltest execute micro [-h] [-dcf DOCKER_COMPOSE_FILE]" ]
-# }
-
-@test "Test 13: CLI --version" {
+@test "Test 11: CLI --version" {
     run tkltest --version
     [ $status -eq 0 ]
     [ "${lines[0]}" = "$TKLTEST_CLI_VERSION" ]
 }
 
-# @test "Test 14: CLI classify command help" {
-#     run python3 tkltest.py classify --help
-#     [ $status -eq 0 ]
-#     [ "${lines[0]}" = "usage: tkltest classify [-h] [-rp REPORTS_PATH]" ]
-# }
-
-@test "Test 15: CLI generate ctd-amplified invalid spec in toml" {
+@test "Test 12: CLI generate ctd-amplified invalid spec in toml" {
     run tkltest --config-file $IRS_CONFIG_FILE_ERR generate ctd-amplified
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
@@ -126,7 +108,7 @@ teardown_file() {
     [[ "${lines[3]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
-@test "Test 16: CLI generate ctd-amplified invalid spec in toml" {
+@test "Test 13: CLI generate ctd-amplified invalid spec in toml" {
     run tkltest --config-file $IRS_CONFIG_FILE_ERR \
         generate --partitions-file $IRS_PARTITIONS_FILE ctd-amplified
     [ $status -eq 1 ]
@@ -137,7 +119,7 @@ teardown_file() {
     [[ "${lines[4]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
-@test "Test 17: CLI execute invalid spec in toml" {
+@test "Test 14: CLI execute invalid spec in toml" {
     run tkltest --config-file $IRS_CONFIG_FILE_ERR execute
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
@@ -146,7 +128,7 @@ teardown_file() {
     [[ "${lines[3]}" == *"Missing required options for \"execute\": ['app_packages']"* ]]
 }
 
-@test "Test 18: CLI execute missing generate config" {
+@test "Test 15: CLI execute missing generate config" {
     if [ ! -d $IRS_CTD_AMPLIFIED_TESTDIR ];  then
         echo "# creating $IRS_CTD_AMPLIFIED_TESTDIR" >&3
         mkdir $IRS_CTD_AMPLIFIED_TESTDIR
@@ -162,12 +144,3 @@ teardown_file() {
     [[ "${lines[1]}" == *"Generate config file not found:"* ]]
     [[ "${lines[2]}" == *"To execute tests in $IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"* ]]
 }
-
-# @test "Test ??: CLI classify invalid spec in toml" {
-#     run python3 tkltest.py --config-file $IRS_CONFIG_FILE_ERR classify
-#     [ $status -eq 1 ]
-#     echo "# ${lines[@]}" >&3
-#     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
-#     [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'app_classpath_file', 'monolith_app_path']"* ]]
-#     [[ "${lines[3]}" == *"Missing required options for \"classify\": ['reports_path']"* ]]
-# }
