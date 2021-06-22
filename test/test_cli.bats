@@ -126,6 +126,7 @@ teardown_file() {
     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
     [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'app_classpath_file', 'monolith_app_path']"* ]]
     [[ "${lines[3]}" == *"Missing required options for \"execute\": ['app_packages']"* ]]
+    [[ "${lines[4]}" == *"Value for option \"build_type\" must be one of ['ant', 'maven']: gradle"* ]]
 }
 
 @test "Test 15: CLI execute missing generate config" {
