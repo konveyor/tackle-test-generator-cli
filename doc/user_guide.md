@@ -24,26 +24,25 @@ evosuite subcommand with options
 
 ### Specifying assertion generation
 
-There are two general types of assertions that can be added to test cases. 
+There are two general types of assertions that can be automatically generated and added to the junit test cases. 
 
 The first assertion type, used in the CTD-guided testing strategy, is differential (diff) assertions. Diff assertion generation 
-records the created objected states for each statement execution of the test case on the legacy app 
-and adds them as assertions right after the statement. The final junit tests hence contain `assertEquals`  
-statements after each original test statement that resulted in the creation of new objects. Diff assertion generation
+records the created object states for each executed statement of the test case on the legacy app. It then adds them as assertions right after the statement. The final junit test cases hence contain `assertEquals`  
+statements after each original statement of the test case that resulted in the creation of new objects. Diff assertion generation
 is activated by default for CTD-guided testing and can be deactivated via the toml file option `generate.ctd_amplified.no_diff_assertions` 
 or the flag `--no-diff-assertions` (short name: `-nda`).
 
 The second assertion type, used in Randoop and EvoSuite testing strategies, is regression assertions. 
 These assertions reflect the current behavior of the app, including exceptions occurred during test execution.
-They are not activated by default, and are controlled via the toml file option `generate.add_assertions`
-
-Assertion generation can be controlled via the toml file option `add_assertions`.
+They are not activated by default, and are controlled via the toml file option `generate.add_assertions`.
 
 ### Controlling the time spent in test generation
 
 `time-limit` option, `num_seq_execution` option
 
 ## Test Execution
+
+
 
 Explain execution options using the CLI: build type, code coverage, offline instrumentation,
 app packages, reports path, test class
