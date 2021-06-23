@@ -42,9 +42,16 @@ They are not activated by default, and are controlled via the toml file option `
 
 ## Test Execution
 
+The CLI `execute` command automatically creates a build script to compile the test cases, execute them, 
+and create junit and (optionally) code coverage reports. Different configuration options exist to control the behavior of this command.
 
-
-Explain execution options using the CLI: build type, code coverage, offline instrumentation,
-app packages, reports path, test class
+1. `build_type` - can be either `ant` (default) or `maven`. Indicates the type of build script that will be generated.
+2. `code_coverage` - whether to create Jacoco code coverage reports for the executed test cases. Default is false.
+3. `offline_instrumentation` - whether to use offline instrumentation for the code coverage collection. Default is false, 
+                                meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.
+4. `app_packages` - a list of prefixes of the app under test, to be used by Jacoco so that it reports coverage of the app 
+                        under test only rather than also third party code
+5. `test_class` - a class name to be tested, in case the user wants to execute a specific class only. 
+Empty by default, in which case all classes targeted during test generation are executed.
 
 Illustrate generated reports.
