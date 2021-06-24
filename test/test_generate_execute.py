@@ -324,6 +324,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['general']['reports_path'] = app_name+"-user-reports"
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -333,7 +334,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
-            self.__assert_execute_resources(app_name=app_name)
+            self.__assert_execute_resources(app_name=app_name, reports_dir=app_name+"-user-reports")
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
@@ -513,8 +514,11 @@ class GenerateExecuteTest(unittest.TestCase):
 
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True):
-        main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path=''):
+        if reports_path:
+            main_report_dir = reports_path
+        else:
+            main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
         self.assertTrue(os.path.isdir(junit_report_dir))

@@ -105,7 +105,7 @@ def __execute_base(args, config):
         app_packages=config['execute']['app_packages'],
         partitions_file=gen_config['generate']['partitions_file'],
         target_class_list=gen_config['generate']['target_class_list'],
-        reports_dir=config['execute']['reports_path'],                     
+        reports_dir=config['general']['reports_path'],
         offline_inst=config['execute']['offline_instrumentation'],
         verbose=config['general']['verbose']
     )
