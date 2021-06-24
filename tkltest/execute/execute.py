@@ -116,7 +116,10 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
-    main_reports_dir = os.path.join(reports_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+    if reports_dir:
+        main_reports_dir = reports_dir
+    else:
+        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
     # generate build files
     ant_build_file, maven_build_file = build_util.generate_build_xml(

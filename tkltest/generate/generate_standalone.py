@@ -61,6 +61,11 @@ def generate_evosuite(config):
         sys.exit(1)
     tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
 
+    if config['general']['reports_path']:
+        reports_dir = config['general']['reports_path']
+    else:
+        reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+
     # generate ant build file
     ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
@@ -70,7 +75,7 @@ def generate_evosuite(config):
         test_dirs=[output_dir],
         partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
-        main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+        main_reports_dir=reports_dir
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
