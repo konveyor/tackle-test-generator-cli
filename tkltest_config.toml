@@ -4,6 +4,7 @@ app_classpath_file = ""
 monolith_app_path = []
 java_jdk_home = ""
 test_directory = ""
+reports_path = ""
 verbose = false
 
 [generate]
@@ -18,7 +19,6 @@ app_packages = []
 build_type = "ant"
 code_coverage = false
 offline_instrumentation = false
-reports_path = ""
 test_class = ""
 
 [generate.ctd_amplified]
