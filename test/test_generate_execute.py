@@ -334,7 +334,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
-            self.__assert_execute_resources(app_name=app_name, reports_dir=app_name+"-user-reports")
+            self.__assert_execute_resources(app_name=app_name, reports_path=app_name+"-user-reports")
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
