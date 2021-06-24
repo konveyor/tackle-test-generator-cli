@@ -200,6 +200,16 @@ __options_spec = {
             'default_value': '',
             'help_message': 'name of root test directory containing the generated JUnit test classes'
         },
+        'reports_path': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-rp',
+            'long_name': '--reports-path',
+            'type': str,
+            'default_value': '',
+            'help_message': 'path to the reports directory'
+        },
         'verbose': {
             'required': False,
             'is_toml_option': True,
@@ -434,16 +444,6 @@ __options_spec = {
             'default_value': False,
             'help_message': 'perform offline instrumentation of app classes for measuring code coverage ' + \
                             '(default: app classes are instrumented dynamically during class loading)'
-        },
-        'reports_path': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-rp',
-            'long_name': '--reports-path',
-            'type': str,
-            'default_value': '',
-            'help_message': 'path to the reports directory'
         },
         'test_class': {
             'required': False,

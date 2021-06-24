@@ -105,7 +105,7 @@ def __execute_base(args, config):
         app_packages=config['execute']['app_packages'],
         partitions_file=gen_config['generate']['partitions_file'],
         target_class_list=gen_config['generate']['target_class_list'],
-        reports_dir=config['execute']['reports_path'],                     
+        reports_dir=config['general']['reports_path'],
         offline_inst=config['execute']['offline_instrumentation'],
         verbose=config['general']['verbose']
     )
@@ -116,7 +116,10 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
-    main_reports_dir = os.path.join(reports_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+    if reports_dir:
+        main_reports_dir = reports_dir
+    else:
+        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
     # generate build files
     ant_build_file, maven_build_file = build_util.generate_build_xml(
