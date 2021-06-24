@@ -4,12 +4,6 @@ The core capability provided by the CLI is automated generation of unit test cas
 
 In this guide, we provide detailed description of the test-generation and test-execution capabilities, along with explanation of various configuration options that control the behavior of the CLI and the core test-generation engine.
 
-A few general "best practices" to follow in the using the CLI:
-
-1. Use the `-vb/--verbose` option, especially for test generation, because this prints out status messages that show progress during test generation/execution.
-
-2. For large applications, it might be a good practice to start with a limited scope of a few classes to get a feel for the tool before performing test generation on all application classes. Limited-scope testing is also useful in cases where testing has to be focused on certain application classes, e.g., for validating changes made to those classes.
-
 ## Test Generation
 
 To perform test generation, the starting point is creation of the configuration file, containing options and values for configuring the behavior of test generation. This includes specifying the app under test, selecting the test-generation strategy, specifying assertion generation, and specifying time limits for test generation.
@@ -40,7 +34,7 @@ CTD-guided test generation can be configured using the following parameters:
 
 To generate tests using EvoSuite in a standalone manner, the CLI provides the `generate evosuite` command. In this case, tests are generated directly by EvoSuite (without any CTD modeling), and test generation can be configured on the coverage criteria to be used by EvoSuite:
 
-`criterion`: A list of coverage criteria to be used by EvoSuite; possible values are `LINE`, `BRANCH`, `EXCEPTION`, `WEAKMUTATION`, `OUTPUT`, `METHOD`, `METHODNOEXCEPTION`, `CBRANCH`, and `ALL`. For more details, see **add link to evosuite doc**
+`criterion`: A list of coverage criteria to be used by EvoSuite; possible values are `LINE`, `BRANCH`, `EXCEPTION`, `WEAKMUTATION`, `OUTPUT`, `METHOD`, `METHODNOEXCEPTION`, `CBRANCH`, and `ALL`. For more details on EvoSuite, please see [EvoSuite documentation](https://github.com/EvoSuite/evosuite/wiki).
 
 To generate tests using Randoop in a standalone manner, the CLI provides the `generate randoop` command. In this case, tests are generated directly by Randoop (without any CTD modeling), and test generation can be configured on whether error-revealing tests are generated:
 
@@ -79,3 +73,11 @@ and create junit and (optionally) code coverage reports. Different configuration
 Empty by default, in which case all classes targeted during test generation are executed.
 
 Illustrate generated reports.
+
+## Best Practices and Troubleshooting Tips
+
+1. Use the `-vb/--verbose` option, especially for test generation, because this prints out status messages that show progress during test generation/execution.
+
+2. The CLI provides `-l/--log-level` option that enables detailed log messages to be printed at different logging levels (e.g., `INFO`, `WARNING`, `ERROR`). Enabling this option can help with troubleshooting in cases where the test generation or execution fails.
+
+3. For large applications, it might be a good practice to start with a limited scope of a few classes to get a feel for the tool before performing test generation on all application classes. Limited-scope testing is also useful in cases where testing has to be focused on certain application classes, e.g., for validating changes made to those classes.
