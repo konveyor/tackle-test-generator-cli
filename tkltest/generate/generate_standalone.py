@@ -150,12 +150,9 @@ def generate_randoop(config):
 def __arrange_folders_for_evosuite(paths_list,  config):
     # first copy the app to a new folder containing all the files.
     copy_dir_name = 'evosuite-app-copy'
-    from distutils.dir_util import copy_tree
-    if os.path.exists(copy_dir_name):
-        shutil.rmtree(copy_dir_name)
-    os.mkdir(copy_dir_name)
+    shutil.rmtree(copy_dir_name, ignore_errors=True)
     for p in paths_list:
-        copy_tree(p, copy_dir_name)
+        shutil.copytree(p, copy_dir_name)
 
     if config['generate']['partitions_file']:
         target_list = [f + ".class" for f in __parse_partitions_file(config['generate']['partitions_file'])]
