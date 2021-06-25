@@ -13,8 +13,8 @@ name = "TKLTEST_CONFIG_FILE"
 # options for "tkltest generate" command
 [generate]
     time_limit = 10
-    add_assertions = false
     jee_support = false
+    no_diff_assertions = true
 
 # options for "tkltest generate randoop" command
 [generate.randoop]
@@ -32,7 +32,6 @@ name = "TKLTEST_CONFIG_FILE"
     # refactored_app_path_prefix = "test/data/irs/refactored"
     # refactored_app_path_suffix = ["target/classes"]
     interaction_level = 1
-    no_diff_assertions = true
     ctd_coverage = true
     num_seq_executions = 10
 

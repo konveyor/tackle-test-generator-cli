@@ -259,14 +259,6 @@ __options_spec = {
     # "generate" command options
     'generate': {
         'help_message': 'Generate test cases on the application under test',
-        'add_assertions': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'add assertions in evosuite/randoop-generated tests'
-        },
         'jee_support': {
             'required': False,
             'is_toml_option': True,
@@ -274,6 +266,16 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'add support JEE mocking in generated tests cases'
+        },
+        'no_diff_assertions': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-nda',
+            'long_name': '--no-diff-assertions',
+            'type': bool,
+            'default_value': False,
+            'help_message': 'do not add assertions for differential testing to the generated tests'
         },
         'partitions_file': {
             'required': False,
@@ -327,16 +329,6 @@ __options_spec = {
                     'type': bool,
                     'default_value': False,
                     'help_message': 'generate CTD coverage report'
-                },
-                'no_diff_assertions': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': True,
-                    'short_name': '-nda',
-                    'long_name': '--no-diff-assertions',
-                    'type': bool,
-                    'default_value': False,
-                    'help_message': 'do not add assertions for differential testing to the generated tests'
                 },
                 'interaction_level': {
                     'required': False,

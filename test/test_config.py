@@ -46,7 +46,7 @@ class ConfigTest(unittest.TestCase):
         config = config_util.load_config(args=args)
         self.assertEqual(constants.BASE_TEST_GENERATORS['evosuite'],
                          config['generate']['ctd_amplified']['base_test_generator'])
-        self.assertTrue(config['generate']['ctd_amplified']['no_diff_assertions'])
+        self.assertTrue(config['generate']['no_diff_assertions'])
 
         # add partitions file to args and load config
         args.partitions_file = self.partitions_file

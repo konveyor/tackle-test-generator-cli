@@ -132,7 +132,7 @@ def generate_ctd_amplified_tests(config):
 
     # generate extended test sequences
     extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     config['generate']['ctd_amplified']['no_diff_assertions'],
+                     config['generate']['no_diff_assertions'],
                      config['generate']['jee_support'],
                      config['generate']['ctd_amplified']['num_seq_executions'],
                      test_directory, verbose)

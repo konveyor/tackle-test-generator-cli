@@ -8,8 +8,8 @@ reports_path = ""
 verbose = false
 
 [generate]
-add_assertions = false
 jee_support = false
+no_diff_assertions = false
 partitions_file = ""
 target_class_list = []
 time_limit = 10
@@ -24,7 +24,6 @@ test_class = ""
 [generate.ctd_amplified]
 base_test_generator = "combined"
 ctd_coverage = false
-no_diff_assertions = false
 interaction_level = 1
 num_seq_executions = 10
 refactored_app_path_prefix = ""
