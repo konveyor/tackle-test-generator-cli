@@ -19,6 +19,7 @@ name = "TKLTEST_CONFIG_FILE"
     time_limit = 2
     add_assertions = false
     jee_support = true
+    no_diff_assertions = false
 
     # partitions file path. If specified, this option overrides target_class_list option.
     # partitions_file = "test/data/daytrader7/refactored/PartitionsFile.json"
@@ -48,7 +49,6 @@ name = "TKLTEST_CONFIG_FILE"
 #        "daytrader-ee7-web/target/classes"
 #    ]
     interaction_level = 1
-    no_diff_assertions = false
     ctd_coverage = true
     num_seq_executions = 1
 

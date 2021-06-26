@@ -61,6 +61,11 @@ def generate_evosuite(config):
         sys.exit(1)
     tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
 
+    if config['general']['reports_path']:
+        reports_dir = config['general']['reports_path']
+    else:
+        reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+
     # generate ant build file
     ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
@@ -70,7 +75,7 @@ def generate_evosuite(config):
         test_dirs=[output_dir],
         partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
-        main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+        main_reports_dir=reports_dir
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
@@ -145,12 +150,9 @@ def generate_randoop(config):
 def __arrange_folders_for_evosuite(paths_list,  config):
     # first copy the app to a new folder containing all the files.
     copy_dir_name = 'evosuite-app-copy'
-    from distutils.dir_util import copy_tree
-    if os.path.exists(copy_dir_name):
-        shutil.rmtree(copy_dir_name)
-    os.mkdir(copy_dir_name)
+    shutil.rmtree(copy_dir_name, ignore_errors=True)
     for p in paths_list:
-        copy_tree(p, copy_dir_name)
+        shutil.copytree(p, copy_dir_name)
 
     if config['generate']['partitions_file']:
         target_list = [f + ".class" for f in __parse_partitions_file(config['generate']['partitions_file'])]
@@ -244,7 +246,7 @@ def __generate_class_list_file(class_list, app_name):
 
 def __get_randoop_flags(config, time_limit):
     flags = " --no-error-revealing-tests=" + str(config['generate']['randoop']['no_error_revealing_tests']).lower()
-    flags += " --no-regression-assertions=" + str(config['generate']['add_assertions']).lower()
+    flags += " --no-regression-assertions=" + str(not config['generate']['no_diff_assertions']).lower()
     if int(time_limit) > 0:
         flags += " --time-limit=" + str(time_limit)
     return flags
@@ -258,7 +260,7 @@ def __get_evosuite_flags(config):
         flags += " -criterion " + criterion_list
     if int(time_limit) > 0:
         flags += " -Dsearch_budget=" + str(time_limit)
-    flags += " -Dassertions=" + str(config['generate']['add_assertions']).lower()
+    flags += " -Dassertions=" + str(not config['generate']['no_diff_assertions']).lower()
     flags += " -Djee="+str(config['generate']['jee_support']).lower()
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':

@@ -66,13 +66,13 @@ teardown_file() {
 @test "Test 06: CLI generate command help" {
     run tkltest generate --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest generate [-h] [-pf PARTITIONS_FILE]" ]
+    [ "${lines[0]}" = "usage: tkltest generate [-h] [-nda] [-pf PARTITIONS_FILE]" ]
 }
 
 @test "Test 07: CLI execute command help" {
     run tkltest execute --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt {ant,maven}] [-cc] [-ofli] [-rp REPORTS_PATH]" ]
+    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt {ant,maven}] [-cc] [-ofli] [-tc TEST_CLASS]" ]
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {

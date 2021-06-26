@@ -51,8 +51,7 @@ The CLI supports test generation to be performed on all application classes or o
 There are two general types of assertions that can be automatically generated and added to the junit test cases. 
 
 The first assertion type, used in the CTD-guided testing strategy, is differential (diff) assertions. Diff assertion generation 
-records the created object states for each executed statement of the test case on the legacy app. It then adds them as assertions right after the statement. The final junit test cases hence contain `assertEquals`
-statements after each original statement of the test case that resulted in the creation of new objects. Diff assertion generation
+records the created object states for each executed statement of the test case on the legacy app. It then adds them as assertions right after the statement. The final junit test cases hence contain `assertEquals` statements after each original statement of the test case that resulted in the creation of new objects. Diff assertion generation
 is activated by default for CTD-guided testing and can be deactivated via the toml file option `generate.ctd_amplified.no_diff_assertions` 
 or the flag `--no-diff-assertions` (short name: `-nda`).
 
@@ -103,4 +102,3 @@ Illustrate generated reports.
    users can exclude UI-related classes from the set of test targets.
    
 5. Missing library dependencies can cause low coverage of the generated tests because many covering sequences can be discarded because their executions fail. Ensuring that all library dependencies are specified using the `app_classpath_file` option will avoid this problem.
-   

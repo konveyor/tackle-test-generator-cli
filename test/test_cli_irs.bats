@@ -18,11 +18,11 @@ setup_file() {
     rm -rf ./irs-randoop-standalone-tests
 }
 
-@test "Test 01: CLI generate [all-classes] ctd-amplified irs --no-diff-assertions" {
+@test "Test 01: CLI generate [all-classes] --no-diff-assertions ctd-amplified irs" {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified --no-diff-assertions
+        generate --no-diff-assertions ctd-amplified
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -227,7 +227,7 @@ setup_file() {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified --no-diff-assertions
+        generate --no-diff-assertions ctd-amplified
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -286,7 +286,7 @@ setup_file() {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified --no-diff-assertions --base-test-generator randoop
+        generate --no-diff-assertions ctd-amplified --base-test-generator randoop
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -310,7 +310,7 @@ setup_file() {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified --no-diff-assertions --base-test-generator evosuite
+        generate --no-diff-assertions ctd-amplified --base-test-generator evosuite
     [ $status -eq 0 ]
 
     # assert over test reports dir

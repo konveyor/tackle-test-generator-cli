@@ -200,6 +200,16 @@ __options_spec = {
             'default_value': '',
             'help_message': 'name of root test directory containing the generated JUnit test classes'
         },
+        'reports_path': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-rp',
+            'long_name': '--reports-path',
+            'type': str,
+            'default_value': '',
+            'help_message': 'path to the reports directory'
+        },
         'verbose': {
             'required': False,
             'is_toml_option': True,
@@ -249,14 +259,6 @@ __options_spec = {
     # "generate" command options
     'generate': {
         'help_message': 'Generate test cases on the application under test',
-        'add_assertions': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'add assertions in evosuite/randoop-generated tests'
-        },
         'jee_support': {
             'required': False,
             'is_toml_option': True,
@@ -264,6 +266,16 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'add support JEE mocking in generated tests cases'
+        },
+        'no_diff_assertions': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-nda',
+            'long_name': '--no-diff-assertions',
+            'type': bool,
+            'default_value': False,
+            'help_message': 'do not add assertions for differential testing to the generated tests'
         },
         'partitions_file': {
             'required': False,
@@ -317,16 +329,6 @@ __options_spec = {
                     'type': bool,
                     'default_value': False,
                     'help_message': 'generate CTD coverage report'
-                },
-                'no_diff_assertions': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': True,
-                    'short_name': '-nda',
-                    'long_name': '--no-diff-assertions',
-                    'type': bool,
-                    'default_value': False,
-                    'help_message': 'do not add assertions for differential testing to the generated tests'
                 },
                 'interaction_level': {
                     'required': False,
@@ -434,16 +436,6 @@ __options_spec = {
             'default_value': False,
             'help_message': 'perform offline instrumentation of app classes for measuring code coverage ' + \
                             '(default: app classes are instrumented dynamically during class loading)'
-        },
-        'reports_path': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-rp',
-            'long_name': '--reports-path',
-            'type': str,
-            'default_value': '',
-            'help_message': 'path to the reports directory'
         },
         'test_class': {
             'required': False,

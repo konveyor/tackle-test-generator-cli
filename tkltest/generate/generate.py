@@ -132,7 +132,7 @@ def generate_ctd_amplified_tests(config):
 
     # generate extended test sequences
     extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     config['generate']['ctd_amplified']['no_diff_assertions'],
+                     config['generate']['no_diff_assertions'],
                      config['generate']['jee_support'],
                      config['generate']['ctd_amplified']['num_seq_executions'],
                      test_directory, verbose)
@@ -153,6 +153,12 @@ def generate_ctd_amplified_tests(config):
         os.path.join(test_directory, dir) for dir in os.listdir(test_directory)
         if os.path.isdir(os.path.join(test_directory, dir)) and not dir.startswith('.')
     ]
+
+    if config['general']['reports_path']:
+        reports_dir = config['general']['reports_path']
+    else:
+        reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+
     ant_build_file, maven_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
@@ -161,7 +167,7 @@ def generate_ctd_amplified_tests(config):
         test_dirs=test_dirs,
         partitions_file=partitions_file,
         target_class_list=target_class_list,
-        main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+        main_reports_dir=reports_dir
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
