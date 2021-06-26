@@ -246,7 +246,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -266,7 +266,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -286,7 +286,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -306,7 +306,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -323,7 +323,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             config['general']['reports_path'] = app_name+"-user-reports"
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -344,7 +344,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -362,7 +362,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -383,7 +383,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -405,7 +405,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
-            config['generate']['ctd_amplified']['no_diff_assertions'] = True
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -417,7 +417,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_randoop_classlist(self) -> None:
+    def test_generate_execute_randoop_classlist_diffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
@@ -437,7 +437,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_randoop_allclasses(self) -> None:
+    def test_generate_execute_randoop_allclasses_diffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
@@ -457,8 +457,50 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    def test_generate_execute_randoop_classlist_nodiffassert(self) -> None:
+        """Test "generate randoop" and "execute": scope=target_class_list no_diff_assertions"""
+        for app_name in self.test_apps.keys():
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = app_info['target_class_list']
+            config['generate']['no_diff_assertions'] = True
+            self.__process_generate(subcommand='randoop', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='randoop')
+
+            # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
+    def test_generate_execute_randoop_allclasses_nodiffassert(self) -> None:
+        """Test "generate randoop" and "execute": scope=all_classes no_diff_assertions"""
+        for app_name in self.test_apps.keys():
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = []
+            config['generate']['no_diff_assertions'] = True
+            self.__process_generate(subcommand='randoop', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='randoop')
+
+            # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
     @unittest.skip('')
-    def test_generate_execute_evosuite_classlist(self) -> None:
+    def test_generate_execute_evosuite_classlist_diffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=target_class_list"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
@@ -478,7 +520,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_evosuite_allclasses(self) -> None:
+    def test_generate_execute_evosuite_allclasses_diffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=all_classes"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
@@ -487,6 +529,49 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            self.__process_generate(subcommand='evosuite', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='evosuite')
+
+            # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
+    @unittest.skip('')
+    def test_generate_execute_evosuite_classlist_nodiffassert(self) -> None:
+        """Test "generate evosuite" and "execute": scope=target_class_list no_diff_assertions"""
+        for app_name in self.test_apps.keys():
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = app_info['target_class_list']
+            config['generate']['no_diff_assertions'] = True
+            self.__process_generate(subcommand='evosuite', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='evosuite')
+
+            # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
+    def test_generate_execute_evosuite_allclasses_nodiffassert(self) -> None:
+        """Test "generate evosuite" and "execute": scope=all_classes no_diff_assertions"""
+        for app_name in self.test_apps.keys():
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = []
+            config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='evosuite', config=config)
 
             # assert that expected generate resources are created

@@ -150,12 +150,9 @@ def generate_randoop(config):
 def __arrange_folders_for_evosuite(paths_list,  config):
     # first copy the app to a new folder containing all the files.
     copy_dir_name = 'evosuite-app-copy'
-    from distutils.dir_util import copy_tree
-    if os.path.exists(copy_dir_name):
-        shutil.rmtree(copy_dir_name)
-    os.mkdir(copy_dir_name)
+    shutil.rmtree(copy_dir_name, ignore_errors=True)
     for p in paths_list:
-        copy_tree(p, copy_dir_name)
+        shutil.copytree(p, copy_dir_name)
 
     if config['generate']['partitions_file']:
         target_list = [f + ".class" for f in __parse_partitions_file(config['generate']['partitions_file'])]
@@ -249,7 +246,7 @@ def __generate_class_list_file(class_list, app_name):
 
 def __get_randoop_flags(config, time_limit):
     flags = " --no-error-revealing-tests=" + str(config['generate']['randoop']['no_error_revealing_tests']).lower()
-    flags += " --no-regression-assertions=" + str(config['generate']['add_assertions']).lower()
+    flags += " --no-regression-assertions=" + str(not config['generate']['no_diff_assertions']).lower()
     if int(time_limit) > 0:
         flags += " --time-limit=" + str(time_limit)
     return flags
@@ -263,7 +260,7 @@ def __get_evosuite_flags(config):
         flags += " -criterion " + criterion_list
     if int(time_limit) > 0:
         flags += " -Dsearch_budget=" + str(time_limit)
-    flags += " -Dassertions=" + str(config['generate']['add_assertions']).lower()
+    flags += " -Dassertions=" + str(not config['generate']['no_diff_assertions']).lower()
     flags += " -Djee="+str(config['generate']['jee_support']).lower()
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':
