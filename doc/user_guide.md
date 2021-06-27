@@ -62,7 +62,7 @@ is activated by default. It can be deactivated via the toml file option `generat
 
 The time taken in test generation can be controlled via a couple of options:
 
-- `time-limit`: The value, specified in seconds, is the upper bound on the time spent generating tests for _each class_ of the application. This option applies to the generation of building-block test sequences for CTD-guided test generation and for standalone test generation using EvoSuite and Randoop. The default time limit is 10s per class. The value can be lowered to reduce the time taken by test generation, at the cost of potentially lower coverage. Conversely, the time budget can be increased to allow for longer exploration of each class, but coverage tends to plateau so increasing the time to high values (e.g., 100s) may not provide much benefit.
+- `time-limit`: The value, specified in seconds, is the upper bound on the time spent generating tests for _each class_ of the application. This option applies to the generation of building-block test sequences for CTD-guided test generation and for standalone test generation using EvoSuite and Randoop. The default time limit is 10s per class. The value can be lowered to reduce the time taken by test generation (e.g., for large applications with hundreds of classes or if there is a limited time budget for testing), at the cost of potentially lower coverage. Conversely, the time limit can be increased to allow for longer exploration of each class, but coverage tends to plateau so increasing the time to high values (e.g., 100s) may not provide much benefit.
 
 - `num_seq_executions`: The value specifies the number of executions to perform to determine the pass/fail status of generated sequences. These executions are also used for checking the consistency of recorded object states for creating assertions, so that flaky assertions on non-deterministic values can be avoided. This option applies to CTD-guided test generation only. By default, each sequence is executed 10 times. To lower the cost of test generation, fewer executions can be performed, keeping in mind that fewer executions can result in some flaky tests being generated. 
 
@@ -78,7 +78,7 @@ By default, JEE support is disabled. Enabling JEE support is done via the `jee_s
 In EvoSuite test generation, this option simply activates JEE support. In CTD-guided test generation, it operates as follows:
 for every test sequence (generated for some CTD test plan row) that fails on the legacy app, before discarding it, an attempt is made to execute it 
 using EvoSuite classloader and JEE support. If the sequence passes, it is kept as part of the final junit test cases in an `EvoSuite` junit test file
-(that is, a junit test file for the relevant class under test, containing junit notations to use EvoSuite classloader and its JEE support). In Randoop test generation there is no JEE support, hence in this case the `jee_support` option is ignored. 
+(that is, a junit test file for the relevant class under test, containing junit notations to use EvoSuite classloader and its JEE support). In Randoop test generation, there is no JEE support. Hence in this case the `jee_support` option is ignored. 
 
 Note that the current level of JEE support is limited to the types of JEE operations supported by EvoSuite and can still result in low coverage on some classes.
 For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.evosuite.org/wp-content/papercite-data/pdf/ssbse16_jee.pdf). 
