@@ -71,14 +71,14 @@ The time taken in test generation can be controlled via a couple of options:
 For a JEE application, unit testing might be more challenging because the application server is not running and not initializing required resources. Queries 
 made by the business code for various external resources via JNDI might thus result in `NullPointerException`, causing the unit tests to fail and overall coverage decrease.
 To avoid such unit test failures, the test generator provides some limited support for JEE applications, with mocking support for JNDI lookups and database operations. This feature is built leveraging EvoSuite's capability for JEE support which mocks a database as well as the `InitialContext` object via its specialized classloader and online bytecode instrumentation. 
-By Default, JEE support is disabled. Enabling JEE support is done via the `jee_support` option for the `generate` command. 
+By default, JEE support is disabled. Enabling JEE support is done via the `jee_support` option for the `generate` command. 
 
 - `jee_support`: Boolean flag indicating whether to enable mocking support for some JEE features in the generated test cases.
 
 In EvoSuite test generation, this option simply activates JEE support. In CTD-guided test generation, it operates as follows:
 for every test sequence (generated for some CTD test plan row) that fails on the legacy app, before discarding it, an attempt is made to execute it 
 using EvoSuite classloader and JEE support. If the sequence passes, it is kept as part of the final junit test cases in an `EvoSuite` junit test file
-(that is, a junit test file for the relevant class under test, containing junit notations to use EvoSuite classloader and its JEE support). In the case of Randoop test generation, the `jee_support` is irrelevant and hence ignored. 
+(that is, a junit test file for the relevant class under test, containing junit notations to use EvoSuite classloader and its JEE support). In Randoop test generation there is no JEE support, hence in this case the `jee_support` option is ignored. 
 
 Note that the current level of JEE support is limited to the types of JEE operations supported by EvoSuite and can still result in low coverage on some classes.
 For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.evosuite.org/wp-content/papercite-data/pdf/ssbse16_jee.pdf). 
