@@ -32,6 +32,12 @@ CTD-guided test generation can be configured using the following parameters:
    
 3. `interaction_level`: CTD interaction level for test-plan generation. This option specifies the value of _n_ for _n-way_ interaction coverage. For example, the value `2` for `interaction_level` results in pair-wise testing, in which all combinations of subtypes for each pair of method parameters are included in the test plan. Note that increasing the interaction level to higher values can make test-generation expensive as it can generate very large test plans that the test generator then has generate covering sequences for.
 
+When CTD-guided test generation completes, it produces a coverage report summarizing the CTD test plans coverage it achieved. The report is available in json format (to be consumed by visualization tools), 
+as well as in html format where the user can drill down from class to method to CTD test plan row level, as illustrated below on the irs example.
+
+![](./images/ctd_coverage_report.png)    
+![](./images/ctd_coverage_report_methods.png)  
+
 To generate tests using EvoSuite in a standalone manner, the CLI provides the `generate evosuite` command. In this case, tests are generated directly by EvoSuite (without any CTD modeling), and test generation can be configured on the coverage criteria to be used by EvoSuite:
 
 - `criterion`: A list of coverage criteria to be used by EvoSuite; possible values are `LINE`, `BRANCH`, `EXCEPTION`, `WEAKMUTATION`, `OUTPUT`, `METHOD`, `METHODNOEXCEPTION`, `CBRANCH`, and `ALL`. For more details on EvoSuite, please see [EvoSuite documentation](https://github.com/EvoSuite/evosuite/wiki).
@@ -91,7 +97,16 @@ and create junit and (optionally) code coverage reports. Different configuration
 5. `test_class` - name of the class to be tested, in case the user wants to execute the tests for a specific class only. 
 Empty by default, in which case tests for all classes targeted during test generation are executed.
 
-Illustrate generated reports.
+When test execution completes, a junit report is generated, summarizing all test case results. Optionally, also a Jacoco code coverage report is generated to present the statement and branch coverage obtained during test case execution. 
+Both reports are illustrated below on the irs example.  
+
+Junit report:
+
+![](./images/junit_report.png)   
+
+Jacoco code coverage report:
+
+![](./images/jacoco_report.png)    
 
 ## Best Practices and Troubleshooting Tips
 
