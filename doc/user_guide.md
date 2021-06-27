@@ -48,16 +48,9 @@ The CLI supports test generation to be performed on all application classes or o
 
 ### Specifying assertion generation
 
-There are two general types of assertions that can be automatically generated and added to the junit test cases. 
-
-The first assertion type, used in the CTD-guided testing strategy, is differential (diff) assertions. Diff assertion generation 
-records the created object states for each executed statement of the test case on the legacy app. It then adds them as assertions right after the statement. The final junit test cases hence contain `assertEquals` statements after each original statement of the test case that resulted in the creation of new objects. Diff assertion generation
-is activated by default for CTD-guided testing and can be deactivated via the toml file option `generate.ctd_amplified.no_diff_assertions` 
-or the flag `--no-diff-assertions` (short name: `-nda`).
-
-The second assertion type, used in Randoop and EvoSuite testing strategies, is regression assertions. 
-These assertions reflect the current behavior of the app, including exceptions occurred during test execution.
-They are not activated by default, and are controlled via the toml file option `generate.add_assertions`.
+Differential (diff) assertions can be automatically generated and added to the junit test cases. Diff assertion generation records the created object states for each executed statement of the test case on the legacy app. 
+It then adds them as assertions right after the statement, to enforce the behavior observed on the legacy app also on any other version of the app on which the test cases will be executed. The final junit test cases hence contain `assertEquals` statements after each original statement of the test case that resulted in the creation of new objects. Diff assertion generation
+is activated by default. It can be deactivated via the toml file option `generate.no_diff_assertions` or the flag `--no-diff-assertions` (short name: `-nda`).
 
 ### Controlling the time spent in test generation
 
@@ -69,13 +62,20 @@ The time taken in test generation can be controlled via a couple of options:
 
 ### Support for Java Enterprise Edition (JEE) applications
 
-The test generator provides some limited support for JEE applications, with mocking support for JNDI lookups and (**_explain more_**) This feature is built leveraging EvoSuite's capability for JEE support (**_explain more_**)
-
-The option for enabling JEE support is done via the `jee_support` option for the `generate` command. 
+For a JEE application, unit testing might be more challenging because the application server is not running and not initializing required resources. Queries 
+made by the business code for various external resources via JNDI might thus result in `NullPointerException`, causing the unit tests to fail and overall coverage decrease.
+To avoid such unit test failures, the test generator provides some limited support for JEE applications, with mocking support for JNDI lookups and database operations. This feature is built leveraging EvoSuite's capability for JEE support which mocks a database as well as the `InitialContext` object via its specialized classloader and online bytecode instrumentation. 
+By Default, JEE support is disabled. Enabling JEE support is done via the `jee_support` option for the `generate` command. 
 
 - `jee_support`: Boolean flag indicating whether to enable mocking support for some JEE features in the generated test cases.
 
-However, the current level of JEE support is limited and can result in low coverage on some classes (* explain more *)
+In EvoSuite test generation, this option simply activates JEE support. In CTD-guided test generation, it operates as follows:
+for every test sequence (generated for some CTD test plan row) that fails on the legacy app, before discarding it, an attempt is made to execute it 
+using EvoSuite classloader and JEE support. If the sequence passes, it is kept as part of the final junit test cases in an `EvoSuite` junit test file
+(that is, a junit test file for the relevant class under test, containing junit notations to use EvoSuite classloader and its JEE support). In the case of Randoop test generation, the `jee_support` is irrelevant and hence ignored. 
+
+Note that the current level of JEE support is limited to the types of JEE operations supported by EvoSuite and can still result in low coverage on some classes.
+For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.evosuite.org/wp-content/papercite-data/pdf/ssbse16_jee.pdf). 
 
 ## Test Execution
 
