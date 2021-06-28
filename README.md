@@ -44,7 +44,7 @@ are those that cause the application to fail with runtime exceptions.
    [Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
    both of these require authentication. To do this, before running the download script, add two `<server>`
    entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
-   your GitHub username and `PASSWORD` with your password or a personal access token.
+   your GitHub username and `PASSWORD` with a personal access token.
    ```
    <servers>
      <server>
