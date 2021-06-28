@@ -60,7 +60,7 @@ are those that cause the application to fail with runtime exceptions.
    </servers>
    ```
    Alternatively, you can download the test-generator-core jar
-   [here](https://github.com/konveyor/tackle-test-generator-core/packages/841780) and the EvoSuite
+   [here](https://github.com/konveyor/tackle-test-generator-core/packages) and the EvoSuite
    jars [here](https://github.com/sinha108/maven-packages/packages),
    and add them to the `lib/download` directory.
    
