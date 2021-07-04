@@ -332,7 +332,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
                   ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+".jar"
     te_command += " -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR) + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
-    # te_command += os.path.abspath("evosuite-tests") + os.pathsep
+    te_command += os.path.abspath(app_name+constants.TKL_EVOSUITE_OUTDIR_SUFFIX) + os.pathsep
     if jee_support:
         te_command += os.path.join(constants.TKLTEST_LIB_DIR,
                                    "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
