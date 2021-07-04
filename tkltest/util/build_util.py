@@ -60,7 +60,7 @@ def get_build_classpath(config, partition=None):
     ])
 
     if config['generate']['jee_support']:
-        class_paths.insert(0, os.path.abspath("evosuite-tests"))  # for EvoSuite Scaffolding classes
+        class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
     logging.info('classpath: {} '.format(classpath_str))
@@ -378,7 +378,12 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                         line('artifactId', 'maven-surefire-report-plugin')
                         line('version', constants.MAVEN_SURFIRE_VERSION)
                         with tag('configuration'):
-                            line('reportsDirectories', junit_output_dir + '/raw')
+                            for test_src_dir in test_dirs:
+                                if os.path.basename(test_src_dir) == 'target':
+                                    continue  # skip compilation output directory
+                                current_partition = os.path.basename(test_src_dir)
+                                junit_output_dir = os.path.join(main_junit_dir, current_partition)
+                                line('reportsDirectories', junit_output_dir + '/raw')
 
     result = indent(
         doc.getvalue(),
