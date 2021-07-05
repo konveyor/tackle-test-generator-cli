@@ -95,7 +95,8 @@ def __execute_base(args, config):
         test_dirs = [test_root_dir]
 
     # run test classes
-    __run_test_cases(build_type=config['execute']['build_type'],
+    __run_test_cases(create_build=config['execute']['create_build_file'],
+        build_type=config['execute']['build_type'],
         app_name=config['general']['app_name'],
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=classpath,
@@ -111,7 +112,7 @@ def __execute_base(args, config):
     )
 
 
-def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, collect_codecoverage,
+def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, collect_codecoverage,
     app_packages, partitions_file, target_class_list, reports_dir, offline_inst, env_vars={}, verbose=False, micro=False):
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
@@ -122,19 +123,20 @@ def __run_test_cases(build_type, app_name, monolith_app_path, app_classpath, tes
         main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
     # generate build files
-    ant_build_file, maven_build_file = build_util.generate_build_xml(
-        app_name=app_name,
-        monolith_app_path=monolith_app_path,
-        app_classpath=app_classpath,
-        test_root_dir=test_root_dir,
-        test_dirs=test_dirs,
-        partitions_file=partitions_file,
-        target_class_list=target_class_list,
-        main_reports_dir=main_reports_dir,
-        app_packages=app_packages,
-        collect_codecoverage=collect_codecoverage,
-        offline_instrumentation=offline_inst
-    )
+    if create_build:
+        ant_build_file, maven_build_file = build_util.generate_build_xml(
+            app_name=app_name,
+            monolith_app_path=monolith_app_path,
+            app_classpath=app_classpath,
+            test_root_dir=test_root_dir,
+            test_dirs=test_dirs,
+            partitions_file=partitions_file,
+            target_class_list=target_class_list,
+            main_reports_dir=main_reports_dir,
+            app_packages=app_packages,
+            collect_codecoverage=collect_codecoverage,
+            offline_instrumentation=offline_inst
+        )
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
