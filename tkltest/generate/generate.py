@@ -219,7 +219,7 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "asm-utils-7.1.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "heros-1.2.0.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "httpcore-4.4.6.jar") + os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "httpclient-4.5.3.jar") + os.pathsep
+    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "httpclient-4.5.13.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "javax.json-1.0.4.jar")
     modeling_command += " org.konveyor.tackle.testgen.model.CTDTestPlanGenerator "
     modeling_command += " -app "+app_name
