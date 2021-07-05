@@ -416,6 +416,16 @@ __options_spec = {
             'default_value': 'ant',
             'help_message': 'build file type for compiling and running the tests - either ant or maven'
         },
+        'create_build_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-nbf',
+            'long_name': '--no-build-file-creation',
+            'type': bool,
+            'default_value': True,
+            'help_message': 'Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used'
+        },
         'code_coverage': {
             'required': False,
             'is_toml_option': True,

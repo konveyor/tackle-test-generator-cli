@@ -20,6 +20,7 @@ build_type = "ant"
 code_coverage = false
 offline_instrumentation = false
 test_class = ""
+create_build_file = true
 
 [generate.ctd_amplified]
 base_test_generator = "combined"
