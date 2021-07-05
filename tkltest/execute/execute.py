@@ -137,6 +137,9 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
             collect_codecoverage=collect_codecoverage,
             offline_instrumentation=offline_inst
         )
+    else:
+        ant_build_file = test_root_dir + os.sep + "build.xml"
+        maven_build_file  = test_root_dir + os.sep + "pom.xml"
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
