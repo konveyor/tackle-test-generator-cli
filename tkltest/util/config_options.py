@@ -320,12 +320,12 @@ __options_spec = {
                     'default_value': 'combined',
                     'help_message': 'base test generator to use for creating building-block test sequences'
                 },
-                'ctd_coverage': {
+                'no_ctd_coverage': {
                     'required': False,
                     'is_toml_option': True,
                     'is_cli_option': True,
-                    'short_name': '-ctd',
-                    'long_name': '--ctd-coverage',
+                    'short_name': '-nctd',
+                    'long_name': '--no-ctd-coverage',
                     'type': bool,
                     'default_value': False,
                     'help_message': 'generate CTD coverage report'

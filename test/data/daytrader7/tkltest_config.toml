@@ -49,7 +49,7 @@ name = "TKLTEST_CONFIG_FILE"
 #        "daytrader-ee7-web/target/classes"
 #    ]
     interaction_level = 1
-    ctd_coverage = true
+    no_ctd_coverage = false
     num_seq_executions = 1
 
 # options for "tkltest execute" command

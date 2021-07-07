@@ -44,7 +44,7 @@ are those that cause the application to fail with runtime exceptions.
    [Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
    both of these require authentication. To do this, before running the download script, add two `<server>`
    entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
-   your GitHub username and `PASSWORD` with a personal access token.
+   your GitHub username and `PASSWORD` with a personal access token. To the very least, the personal access token should allow read access.
    ```
    <servers>
      <server>
@@ -140,6 +140,10 @@ and run the command
 ```
 tkltest --config-file ./test/data/irs/tkltest_config.toml --verbose generate ctd-amplified
 ```
+
+Note that this command may take a few minutes to complete. The `verbose` option allows to view its progress in the standard output. 
+Note that during test sequence initialization phase, the output is not printed to the standard output but rather to logs files.
+You can open those logs to view the progress during this phase.
 
 ## Quick Start Guide
 
@@ -291,7 +295,7 @@ required, and the option description).
 |                                     |                                 |                                                                                                                                                     |
 | generate.ctd_amplified              |                                 | Use CTD for computing coverage goals                                                                                                                |
 | base_test_generator                 | -btg/--base-test-generator      | base test generator to use for creating building-block test sequences                                                                               |
-| ctd_coverage                        | -ctd/--ctd-coverage             | generate CTD coverage report                                                                                                                        |
+| no_ctd_coverage                     | -nctd/--no-ctd-coverage         | do not generate CTD coverage report                                                                                                                        |
 | interaction_level                   |                                 | CTD interaction level (strength) for test-plan generation                                                                                           |
 | num_seq_executions                  |                                 | number of executions to perform to determine pass/fail status of generated sequences                                                                |
 | refactored_app_path_prefix*         |                                 | path prefix to root directory of refactored app version                                                                                             |

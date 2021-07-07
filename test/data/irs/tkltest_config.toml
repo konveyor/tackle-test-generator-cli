@@ -37,7 +37,7 @@ name = "TKLTEST_CONFIG_FILE"
     refactored_app_path_prefix = "test/data/irs/refactored"
     refactored_app_path_suffix = ["target/classes"]
     interaction_level = 1
-    ctd_coverage = true
+    no_ctd_coverage = false
     num_seq_executions = 2
 
 # options for "tkltest execute" command

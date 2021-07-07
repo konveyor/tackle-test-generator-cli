@@ -140,7 +140,7 @@ def generate_ctd_amplified_tests(config):
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
 
-    if config['generate']['ctd_amplified']['ctd_coverage']:
+    if not config['generate']['ctd_amplified']['no_ctd_coverage']:
         app_name = config['general']['app_name']
 
         generate_ctd_coverage(os.path.abspath(constants.TKL_EXTENDER_COVERAGE_FILE),
