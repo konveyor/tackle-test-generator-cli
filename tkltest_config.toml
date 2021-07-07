@@ -1,0 +1,37 @@
+[general]
+app_name = ""
+app_classpath_file = ""
+monolith_app_path = []
+java_jdk_home = ""
+test_directory = ""
+reports_path = ""
+verbose = false
+
+[generate]
+jee_support = false
+no_diff_assertions = false
+partitions_file = ""
+target_class_list = []
+time_limit = 10
+
+[execute]
+app_packages = []
+build_type = "ant"
+code_coverage = false
+offline_instrumentation = false
+test_class = ""
+create_build_file = true
+
+[generate.ctd_amplified]
+base_test_generator = "combined"
+no_ctd_coverage = false
+interaction_level = 1
+num_seq_executions = 10
+refactored_app_path_prefix = ""
+refactored_app_path_suffix = []
+
+[generate.evosuite]
+criterion = [ "BRANCH",]
+
+[generate.randoop]
+no_error_revealing_tests = false
