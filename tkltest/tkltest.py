@@ -161,9 +161,9 @@ def main():
     __add_arguments_to_parser(parser, options_spec.pop('general'))
 
     # set default option values
-    default_config_file = [f for f in os.listdir('.') if os.path.isfile(f) and f == TKLTEST_DEFAULT_CONFIG_FILE][0]
+    default_config_file = [f for f in os.listdir('.') if os.path.isfile(f) and f == TKLTEST_DEFAULT_CONFIG_FILE]
     if default_config_file:
-        parser.set_defaults(config_file=default_config_file)
+        parser.set_defaults(config_file=default_config_file[0])
 
     # add parsers for all CLI commands
     subparser = parser.add_subparsers(dest='command')
