@@ -45,19 +45,28 @@ are those that cause the application to fail with runtime exceptions.
    both of these require authentication. To do this, before running the download script, add two `<server>`
    entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
    your GitHub username and `PASSWORD` with a personal access token. To the very least, the personal access token should allow read access.
+   Replacing `PASSWORD` with your GitHub password rather than a personal access token will not work.
    ```
-   <servers>
-     <server>
-       <id>github</id>
-       <username>USERNAME</username>
-       <password>PASSWORD</password>
-     </server>
-     <server>
-       <id>github-sinha108</id>
-       <username>USERNAME</username>
-       <password>PASSWORD</password>
-     </server>
-   </servers>
+   <settings>
+    
+    ...
+   
+    <servers>
+      <server>
+        <id>github</id>
+        <username>USERNAME</username>
+        <password>PASSWORD</password>
+      </server>
+      <server>
+        <id>github-sinha108</id>
+        <username>USERNAME</username>
+        <password>PASSWORD</password>
+      </server>
+    </servers>
+    
+    ...
+    
+   </settings>
    ```
    Alternatively, you can download the test-generator-core jar
    [here](https://github.com/konveyor/tackle-test-generator-core/packages) and the EvoSuite
