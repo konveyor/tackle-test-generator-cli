@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mvn download:wget@get-randoop-jar download:wget@get-replacecall-jar
-mvn dependency:copy-dependencies -DoutputDirectory=./download
+mvn -s ./settings.xml download:wget@get-randoop-jar download:wget@get-replacecall-jar
+mvn -s ./settings.xml dependency:copy-dependencies -DoutputDirectory=./download
