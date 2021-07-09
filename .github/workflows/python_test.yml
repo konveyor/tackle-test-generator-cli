@@ -41,7 +41,6 @@ jobs:
 #        ]'
     - name: Download Java libraries
       run: |
-#        cat ~/.m2/settings.xml
         cd lib
         sed -ie "s|GITHUB_USERNAME|$GITHUB_ACTOR|g" settings.xml
         sed -ie "s|GITHUB_TOKEN|${{ secrets.TKLTEST_PKGS_PAT }}|g" settings.xml
