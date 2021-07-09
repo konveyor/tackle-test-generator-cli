@@ -46,6 +46,7 @@ are those that cause the application to fail with runtime exceptions.
    entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
    your GitHub username and `PASSWORD` with a personal access token. To the very least, the personal access token should allow read access.
    Replacing `PASSWORD` with your GitHub password rather than a personal access token will not work.
+
    ```
    <settings>
     
