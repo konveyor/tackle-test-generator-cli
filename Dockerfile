@@ -28,4 +28,4 @@ RUN ./download_lib_jars.sh
 
 WORKDIR /app/tackle-test-cli
 
-CMD ["bash"]
+ENTRYPOINT ["tkltest"]
