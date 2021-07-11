@@ -66,3 +66,11 @@ jobs:
         which tkltest
         bats test/test_cli.bats
         bats test/test_cli_irs.bats
+    - name: Run CLI bats tests using docker-compose
+      env:
+        GITHUB_USERNAME: $GITHUB_ACTOR
+        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
+      run: |
+        pip uninstall .
+        alias tkltest='docker-compose run --rm tkltest-cli'
+        bats test/test_cli.bats
