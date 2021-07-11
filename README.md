@@ -47,8 +47,8 @@ Set the environment variables `GITHUB_USERNAME` to your GitHub username and `GIT
 personal access token that you created.
 
 To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command,
-which builds the docker image for the CLI (called `tkltest-cli`) cli and runs the command; the docker
-container is removed upon completion of the command.
+which builds the docker image for the CLI (called `tkltest-cli`) and then runs the CLI command; the docker
+container is removed upon completion of the CLI command.
 
 ```buildoutcfg
 docker-compose run --rm tkltest-cli --help
@@ -62,7 +62,17 @@ docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-c
 ```
 
 Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
-execution in the container are available in the CLI directory on the host machine.
+execution in the container are available in the CLI directory on the host machine. This also requires that the
+classes, the library dependencies, and the configuration file for the app under test be placed in a directory
+under the CLI directory, so that they are available in the container.
+
+For convenience in running the CLI via `docker-compose` or `docker`, you can create an alias, such as
+one of the following:
+
+```buildoutcfg
+alias tkltest='docker-compose run --rm tkltest-cli'
+alias tkltest='docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
+```
 
 ### Running the CLI from local installation
 
