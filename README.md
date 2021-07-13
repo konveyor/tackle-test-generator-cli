@@ -46,7 +46,7 @@ of the jar files; a personal access token must be used.
 Set the environment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the
 personal access token that you created.
 
-To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command,
+To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command in the CLI directory,
 which builds the docker image for the CLI (called `tkltest-cli`) and then runs the CLI command; the docker
 container is removed upon completion of the CLI command.
 
@@ -54,7 +54,8 @@ container is removed upon completion of the CLI command.
 docker-compose run --rm tkltest-cli --help
 ```
 
-Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands:
+Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands in the CLI
+directory:
 
 ```buildoutcfg
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
@@ -187,11 +188,11 @@ You can open those logs to view the progress during this phase.
 We list the minimal steps required to use the tool for its two main functions: generating unit tests
 and executing them. More detailed description is available in the [CLI user guide](doc/user_guide.md).
 
-1. Created an empty configuration file by running the command
+1. Created an empty configuration file, named `tkltest_config.toml`, by running the command
    ```
-   tkltest config init
+   tkltest config init --file tkltest_config.toml
    ````
-   A file named `tkltest_config.toml` will be created in the working directory.
+   `tkltest_config.toml` will be created in the working directory.
 
 2. Assign values to the following configuration options in the configuration file
    (details on all configuration options are available [here](#configuration-options)):

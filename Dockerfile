@@ -24,7 +24,9 @@ COPY lib/download_lib_jars.sh ./lib/
 WORKDIR /app/tackle-test-cli/lib
 RUN sed -ie "s|GITHUB_USERNAME|$GITHUB_USERNAME|g" settings.xml
 RUN sed -ie "s|GITHUB_TOKEN|$GITHUB_TOKEN|g" settings.xml
-RUN ./download_lib_jars.sh
+RUN mvn -s ./settings.xml download:wget@get-randoop-jar download:wget@get-replacecall-jar
+RUN mvn -s ./settings.xml dependency:copy-dependencies -DoutputDirectory=./download
+#RUN ./download_lib_jars.sh
 
 WORKDIR /app/tackle-test-cli
 
