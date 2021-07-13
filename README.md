@@ -46,7 +46,7 @@ of the jar files; a personal access token must be used.
 Set the environment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the
 personal access token that you created.
 
-To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command,
+To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command in the CLI directory,
 which builds the docker image for the CLI (called `tkltest-cli`) and then runs the CLI command; the docker
 container is removed upon completion of the CLI command.
 
@@ -54,7 +54,8 @@ container is removed upon completion of the CLI command.
 docker-compose run --rm tkltest-cli --help
 ```
 
-Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands:
+Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands in the CLI
+directory:
 
 ```buildoutcfg
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
@@ -79,16 +80,18 @@ alias tkltest='docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-tes
 To run the CLI from local installation, JDK, Ant, and Maven need to be installed. Additionally, Java library
 dependencies need to be downloaded.
 
-1. Install JDK 8. The JDK home directory has to be specified as a configuration option;
+1. Install Python 3.8
+
+2. Install JDK 8. The JDK home directory has to be specified as a configuration option;
    see the section [Configuration Options](#configuration-options).
    
-2. Install Ant. The Ant executable must be in the path. Along with generating JUnit test cases,
+3. Install Ant. The Ant executable must be in the path. Along with generating JUnit test cases,
    the CLI generates an Ant `build.xml`, which can be used for building and running the generated tests.
 
-3. Install Maven. The Maven executable must be in the path. Along with generating JUnit test cases,
+4. Install Maven. The Maven executable must be in the path. Along with generating JUnit test cases,
    the CLI generates a Maven `pom.xml`, which can be used for building and running the generated tests.
    
-4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
+5. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
    for the test-generator core is downloaded from the Maven registry on GitHub Packages
    ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
    specific builds of EvoSuite jars that are downloaded from another
@@ -118,7 +121,7 @@ dependencies need to be downloaded.
 
    CTD modeling and test-plan generation is done using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
 
-5. Finally, to install the CLI command `tkltest` in a virtual environment, follow these steps:
+6. Finally, to install the CLI command `tkltest` in a virtual environment, follow these steps:
    ```
    python3 -m venv venv
    source venv/bin/activate
@@ -187,11 +190,11 @@ You can open those logs to view the progress during this phase.
 We list the minimal steps required to use the tool for its two main functions: generating unit tests
 and executing them. More detailed description is available in the [CLI user guide](doc/user_guide.md).
 
-1. Created an empty configuration file by running the command
+1. Created an empty configuration file, named `tkltest_config.toml`, by running the command
    ```
-   tkltest config init
+   tkltest config init --file tkltest_config.toml
    ````
-   A file named `tkltest_config.toml` will be created in the working directory.
+   `tkltest_config.toml` will be created in the working directory.
 
 2. Assign values to the following configuration options in the configuration file
    (details on all configuration options are available [here](#configuration-options)):
