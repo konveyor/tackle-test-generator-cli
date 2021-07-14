@@ -18,7 +18,7 @@ import subprocess
 import sys
 import json
 
-from tkltest.util import constants, build_util
+from tkltest.util import constants, build_util, command_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -55,9 +55,9 @@ def generate_evosuite(config):
     evosuite_command += evosuite_flags
     logging.info(evosuite_command)
     try:
-        subprocess.run(evosuite_command, capture_output=not config['general']['verbose'], shell=True, check=True)
+        command_util.run_command(command=evosuite_command, verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
-        tkltest_status('Generating test suite using Evosuite failed: {}'.format(e), error=True)
+        tkltest_status('Generating test suite using Evosuite failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
     tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
 
@@ -126,9 +126,9 @@ def generate_randoop(config):
     randoop_command += __get_randoop_flags(config, time_limit)
     logging.info(randoop_command)
     try:
-        subprocess.run(randoop_command, capture_output=not config['general']['verbose'], shell=True, check=True)
+        command_util.run_command(command=randoop_command, verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
-        tkltest_status('Generating test suite using Randoop failed: {}'.format(e), error=True)
+        tkltest_status('Generating test suite using Randoop failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
     tkltest_status('Generated Randoop test suite written to {}'.format(output_dir))
 

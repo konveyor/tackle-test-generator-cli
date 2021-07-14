@@ -18,7 +18,7 @@ import sys
 
 import toml
 
-from tkltest.util import constants, build_util
+from tkltest.util import constants, build_util, command_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -149,13 +149,13 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
 
     try:
         if build_type == 'maven':
-            __run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
+            command_util.run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
         else:
             if collect_codecoverage:
-                __run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
+                command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
             else:
                 for partition in partitions:
-                    __run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
+                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
                             verbose=verbose)
 
         #else:
@@ -172,9 +172,9 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
                    #     verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
         if build_type == 'ant':
-            tkltest_status('Error executing junit ant: {}'.format(e), error=True)
+            tkltest_status('Error executing junit ant: {}\n{}'.format(e, e.stderr), error=True)
         else:
-            tkltest_status('Error executing junit maven: {}'.format(e), error=True)
+            tkltest_status('Error executing junit maven: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
 
 
@@ -198,23 +198,3 @@ def __get_generate_config(test_directory):
                        ), error=True)
         sys.exit(1)
     return toml.load(gen_config_file)
-
-
-def __run_command(command, verbose, env_vars=None):
-    """Runs a command using subprocess.
-    
-    Runs the given command using subprocess.run. If verbose is false, stdout and stderr are 
-    discarded; otherwise only stderr is discarded.
-    """
-    if verbose:
-        if env_vars:
-            subprocess.run(command, shell=True, check=True, stderr=subprocess.DEVNULL, env=env_vars)
-        else:
-            subprocess.run(command, shell=True, check=True, stderr=subprocess.DEVNULL)
-    else:
-        if env_vars:
-            subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT, env=env_vars)
-        else:
-            subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT)    

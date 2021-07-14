@@ -23,7 +23,7 @@ import toml
 from .ctd_coverage import create_ctd_report
 from .generate_standalone import generate_randoop, generate_evosuite
 from tkltest.util.logging_util import tkltest_status
-from tkltest.util import build_util, constants
+from tkltest.util import build_util, command_util, constants
 
 
 def process_generate_command(args, config):
@@ -238,9 +238,9 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     logging.info(modeling_command)
 
     try:
-        __run_command(command=modeling_command, verbose=verbose)
+        command_util.run_command(command=modeling_command, verbose=verbose)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Computing CTD coverage goals failed: {}'.format(e), error=True)
+        tkltest_status('Computing CTD coverage goals failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
 
 
@@ -278,7 +278,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "guava-29.0-jre.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "failureaccess-1.0.1.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "javax.json-1.0.4.jar")
-    tg_command += " org.konveyor.tackle.testgen.core.TestSequenceInitializer "
+    tg_command += " org.konveyor.tackle.testgen.core.TestSequenceInitializer"
     tg_command += " -app " + app_name
     tg_command += " -tp " + ctd_file
     tg_command += " -pt " + os.pathsep.join(monolith_app_path)
@@ -289,19 +289,19 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     # for verbose option, redirect evosuite and randoop stdout and stderr to files
     if verbose:
         output_file = app_name + "_" + test_generator_name + '_output.log'
-        error_file = app_name + "_" + test_generator_name + '_error.log'
-        tg_command += ' 1> ' + output_file + ' 2> ' + error_file
-        tkltest_status("Test generator output and error logs will be written to {} and {}".format(output_file,
-                                                                                                  error_file))
+        # error_file = app_name + "_" + test_generator_name + '_error.log'
+        tg_command += ' 1> ' + output_file #+ ' 2> ' + error_file
+        # tkltest_status("Test generator output and error logs will be written to {} and {}".format(output_file, error_file))
+        tkltest_status("Test generator output will be written to {}".format(output_file))
     logging.info(tg_command)
 
     try:
         # run command with verbose=false because, for the bb test generators, verbose option redirects
-        # stdout/stderr to a file, so nothing should be printed on command line irrespective of the
-        # value of verbose 
-        __run_command(command=tg_command, verbose=False)
+        # stdout to a file, so nothing should be printed on command line irrespective of the
+        # value of verbose
+        command_util.run_command(command=tg_command, verbose=False)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Generating basic block sequences failed: {}'.format(e), error=True)
+        tkltest_status('Generating basic block sequences failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
 
 
@@ -349,7 +349,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
             # remove new line from line
             te_command += os.path.abspath(line[:-1]) + os.pathsep
     te_command += os.pathsep.join(monolith_app_path)
-    te_command += " org.konveyor.tackle.testgen.core.extender.TestSequenceExtender "
+    te_command += " org.konveyor.tackle.testgen.core.extender.TestSequenceExtender"
     te_command += " -app " + app_name
     te_command += " -tp " + ctd_file
     te_command += " -ts " + bb_seq_file
@@ -360,15 +360,13 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         te_command += " -da"
     te_command += " -ne " + str(num_executions)
 
-    # if verbose:
-    #     tkltest_status("Extender currently does not support the verbose option due to scalability issues")
-
     logging.info(te_command)
 
     try:
-        __run_command(command=te_command, verbose=verbose)
+        command_util.run_command(command=te_command, verbose=verbose)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Extending sequences and generating JUnit tests failed: {}'.format(e), error=True)
+        tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
+                       format(e, e.stderr), error=True)
         sys.exit(1)
 
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
@@ -390,18 +388,6 @@ def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output
     tkltest_status("CTD coverage report is saved in "+
                    os.path.abspath(report_output_dir + os.sep + "ctd-summary.html"))
 
-def __run_command(command, verbose):
-    """Runs a command using subprocess.
-    
-    Runs the given command using subprocess.run. If verbose is false, stdout and stderr are 
-    discarded; otherwise only stderr is discarded.
-    """
-    if verbose:
-        subprocess.run(command, shell=True, check=True, stderr=subprocess.DEVNULL)
-    else:
-        subprocess.run(command, shell=True, check=True,
-            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    
 
 def __reset_test_directory(args, config):
     # clear contents of test directory
