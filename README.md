@@ -29,45 +29,74 @@ two application versions, but it can also result in some false failures when exp
 occur between the versions. If assertions are not added, the only differences detected by the test cases
 are those that cause the application to fail with runtime exceptions.
 
-## Installation Prerequisites and Dependencies
+## Installing and Running the CLI
+
+The CLI command can be installed locally to be run, or it can be run in a Docker container, in which case
+the various dependencies (Java, Ant, and Maven) need not be installed locally.
+
+### Prerequisite
+
+To run the CLI in either way, a few jar files need to be downloaded from Maven repositories hosted on GitHub, which
+requires authentication. To enable authentication, create a [GitHub personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token),
+with the permission `read:packages`. Note that using your GitHub password will not work for downloading one
+of the jar files; a personal access token must be used.
+
+### Running the CLI via Docker or Docker Compose
+
+Set the environment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the
+personal access token that you created.
+
+To run the CLI using `docker-compose` (to print the CLI `help` message), run the following command,
+which builds the docker image for the CLI (called `tkltest-cli`) and then runs the CLI command; the docker
+container is removed upon completion of the CLI command.
+
+```buildoutcfg
+docker-compose run --rm tkltest-cli --help
+```
+
+Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands:
+
+```buildoutcfg
+docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
+docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
+```
+
+Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
+execution in the container are available in the CLI directory on the host machine. This also requires that the
+classes, the library dependencies, and the configuration file for the app under test be placed in a directory
+under the CLI directory, so that they are available in the container.
+
+For convenience in running the CLI via `docker-compose` or `docker`, you can create an alias, such as
+one of the following:
+
+```buildoutcfg
+alias tkltest='docker-compose run --rm tkltest-cli'
+alias tkltest='docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
+```
+
+### Running the CLI from local installation
+
+To run the CLI from local installation, JDK, Ant, and Maven need to be installed. Additionally, Java library
+dependencies need to be downloaded.
 
 1. Install JDK 8. The JDK home directory has to be specified as a configuration option;
    see the section [Configuration Options](#configuration-options).
    
 2. Install Ant. The Ant executable must be in the path. Along with generating JUnit test cases,
-   the CLI generates an Ant `build.xml` that can be used for building and running the generated tests.
+   the CLI generates an Ant `build.xml`, which can be used for building and running the generated tests.
+
+3. Install Maven. The Maven executable must be in the path. Along with generating JUnit test cases,
+   the CLI generates a Maven `pom.xml`, which can be used for building and running the generated tests.
    
-3. Install Maven and download Java libraries using the script `lib/download_lib_jars.sh`. The jar for the
-   test generator core is downloaded from the Maven registry on GitHub Packages
+4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
+   for the test-generator core is downloaded from the Maven registry on GitHub Packages
    ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
-   specific builds of  EvoSuite jars that are downloaded from another
+   specific builds of EvoSuite jars that are downloaded from another
    [Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
-   both of these require authentication. To do this, before running the download script, add two `<server>`
-   entries for these registries to Maven `settings.xml` (`~/.m2/settings.xml`; create one if it doesn't exist), replacing `USERNAME` with
-   your GitHub username and `PASSWORD` with a personal access token. To the very least, the personal access token should allow read access.
-   Replacing `PASSWORD` with your GitHub password rather than a personal access token will not work.
-   ```
-   <settings>
-    
-    ...
+   both of these require authentication. To do this, before running the download script, update
+   [lib/settings.xml](lib/settings.xml) to replace `GITHUB_USERNAME` with your GitHub username and
+   `GITHUB_TOKEN` with the personal access token that you created.
    
-    <servers>
-      <server>
-        <id>github</id>
-        <username>USERNAME</username>
-        <password>PASSWORD</password>
-      </server>
-      <server>
-        <id>github-sinha108</id>
-        <username>USERNAME</username>
-        <password>PASSWORD</password>
-      </server>
-    </servers>
-    
-    ...
-    
-   </settings>
-   ```
    Alternatively, you can download the test-generator-core jar
    [here](https://github.com/konveyor/tackle-test-generator-core/packages) and the EvoSuite
    jars [here](https://github.com/sinha108/maven-packages/packages),
@@ -84,30 +113,29 @@ are those that cause the application to fail with runtime exceptions.
       ```buildoutcfg
     cd lib; download_lib_jars.sh 
     ```
-    
-    This downloads the Java libraries required by the CLI into the `lib/download` directory.
+   
+   This downloads the Java libraries required by the CLI into the `lib/download` directory.
 
-CTD modeling and test-plan generation is done using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
+   CTD modeling and test-plan generation is done using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
 
-## Developer Installation of the CLI
+5. Finally, to install the CLI command `tkltest` in a virtual environment, follow these steps:
+   ```
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install .
+   ```
 
-To install the CLI command `tkltest` in a virtual environment, follow these steps:
-```
-python3 -m venv venv
-source venv/bin/activate
-pip install --editable .
-```
+   Windows users should run:
 
-Windows users should run:
+   ```
+   python3 -m venv venv
+   venv\Scripts\activate.bat
+   pip install --editable .
+   ```
 
-```
-python3 -m venv venv
-venv\Scripts\activate.bat
-pip install --editable .
-```
-
-This will load the command from the current folder so that you can continue to develop it and
-make changes and just run the command without having to package and re-install it.
+To install the CLI for development, set the editable mode: `pip install --editable`.
+You can then continue to develop it and make changes and simply run the command without having to package
+and re-install it.
 
 ## Usage
 
