@@ -92,12 +92,16 @@ def generate_ctd_amplified_tests(config):
     if config['generate']['target_class_list']:
         target_class_list = config['generate']['target_class_list']
 
+    excluded_class_list = []
+    if config['generate']['excluded_class_list']:
+        excluded_class_list = config['generate']['excluded_class_list']
+
     start_time = time.time()
 
     # generate CTD models and test plans
-    generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, monolith_app_path, app_classpath_file,
-                                       app_prefix, app_suffix, config['generate']['ctd_amplified']['interaction_level'],
-                                       verbose)
+    generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
+                                       monolith_app_path, app_classpath_file, app_prefix, app_suffix,
+                                       config['generate']['ctd_amplified']['interaction_level'], verbose)
 
     tkltest_status("Computing test plans with CTD took "+str(round(time.time()-start_time,2))+" seconds")
 
@@ -180,7 +184,8 @@ def generate_ctd_amplified_tests(config):
 
 
 
-def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, monolith_app_path, app_classpath_file,
+def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
+                                       monolith_app_path, app_classpath_file,
                                        app_prefix, app_suffix, interaction_level, verbose=False):
     """Generates CTD models and test plans.
 
@@ -227,6 +232,9 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
         modeling_command += " -pf "+partitions_file
     elif target_class_list:
         modeling_command += " -cl " + '::'.join(target_class_list)
+
+    if excluded_class_list:
+        modeling_command += " -el " + '::'.join(excluded_class_list)
     modeling_command += " -pt " + os.pathsep.join(monolith_app_path)
     modeling_command += " -clpt " + app_classpath_file
     if app_prefix:

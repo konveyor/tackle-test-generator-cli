@@ -114,13 +114,16 @@ def generate_randoop(config):
     randoop_command += " randoop.main.Main gentests --junit-output-dir="+output_dir
     if config['generate']['partitions_file']:
         randoop_command += " --classlist=" + __generate_class_list_file(__parse_partitions_file(config['generate']['partitions_file']),
-                                                                        config['general']['app_name'])
+                                                                        config['general']['app_name'],
+                                                                        config['generate']['excluded_class_list'])
     elif config['generate']['target_class_list']:
         randoop_command += " --classlist=" + __generate_class_list_file(config['generate']['target_class_list'],
-                                                                        config['general']['app_name'])
+                                                                        config['general']['app_name'],
+                                                                        config['generate']['excluded_class_list'])
     else:
         randoop_command += " --classlist=" + __generate_class_list_all_app(monolith_app_path,
-                                                                           config['general']['app_name'])
+                                                                           config['general']['app_name'],
+                                                                           config['generate']['excluded_class_list'])
     if 'max_memory' in config['generate']['randoop'].keys():
         randoop_command += " --jvm-max-memory="+config['generate']['randoop']['max_memory']+"mb"
     randoop_command += __get_randoop_flags(config, time_limit)
@@ -159,7 +162,11 @@ def __arrange_folders_for_evosuite(paths_list,  config):
     elif config['generate']['target_class_list']:
         target_list = [f.replace(".", os.sep) + ".class" for f in config['generate']['target_class_list']]
     else:
+        for cl in config['generate']['excluded_class_list']:
+            os.remove(os.path.join(copy_dir_name, cl.replace(".",os.sep)+".class"))
         return os.path.abspath(copy_dir_name), ""
+
+    target_list = [cl for cl in target_list if not cl[:-len(".class")] in config['generate']['excluded_class_list']]
 
     target_dir_name = 'evosuite-test-targets'
 
@@ -218,20 +225,24 @@ def __parse_partitions_file(file):
     return flat_list_formatted
 
 
-def __generate_class_list_all_app(paths, app_name):
+def __generate_class_list_all_app(paths, app_name, excluded_class_list):
 
     class_list = []
     for path in paths:
         class_files = [os.path.relpath(os.path.join(root, name), path) for root, dirs, files in os.walk(path)
-                       for name in files if name.endswith(".class") and not name.endswith("package-info.class")]
+                       for name in files if name.endswith('.class') and not name.endswith("package-info.class")]
         class_files = [c.replace(os.sep, '.')[:-len('.class')] for c in class_files]
         class_files = list(set(class_files))
         class_list = class_list + class_files
 
+    class_list = [cl for cl in class_list if not cl in excluded_class_list]
+
     return __generate_class_list_file(class_list, app_name)
 
 
-def __generate_class_list_file(class_list, app_name):
+def __generate_class_list_file(class_list, app_name, excluded_class_list):
+
+    class_list = [cl for cl in class_list if not cl in excluded_class_list]
 
     tkltest_status('Generating test cases for {} classes'.format(len(class_list)))
     class_list_file_name = app_name + '_class_list.txt'
