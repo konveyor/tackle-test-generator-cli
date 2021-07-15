@@ -35,7 +35,8 @@ class GenerateExecuteTest(unittest.TestCase):
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
             'test_directory': '__irs-generated-tests',
             'partitions_file': os.path.join(test_data_dir, 'irs', 'refactored', 'PartitionsFile.json'),
-            'target_class_list': ["irs.IRS"]
+            'target_class_list': ["irs.IRS"],
+            'excluded_class_list': ["irs.Employer"]
         }
     }
 
@@ -129,6 +130,26 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+
+            # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
+    def test_generate_execute_ctdamplified_combined_allclasses_but_excluded_diffassert(self) -> None:
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes_but_excluded"""
+        for app_name in self.test_apps.keys():
+            app_info = self.test_apps[app_name]
+            config = app_info['config']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = []
+            config['generate']['excluded_class_list'] = app_info['excluded_class_list']
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created

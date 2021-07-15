@@ -295,6 +295,14 @@ __options_spec = {
             'default_value': [],
             'help_message': 'list of target classes to perform test generation on'
         },
+        'excluded_class_list': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': list,
+            'default_value': [],
+            'help_message': 'list of classes to exclude from test generation'
+        },
         'time_limit': {
             'required': False,
             'is_toml_option': True,
