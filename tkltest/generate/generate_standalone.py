@@ -235,9 +235,7 @@ def __generate_class_list_all_app(paths, app_name, excluded_class_list):
         class_files = list(set(class_files))
         class_list = class_list + class_files
 
-    class_list = [cl for cl in class_list if not cl in excluded_class_list]
-
-    return __generate_class_list_file(class_list, app_name)
+    return __generate_class_list_file(class_list, app_name, excluded_class_list)
 
 
 def __generate_class_list_file(class_list, app_name, excluded_class_list):
