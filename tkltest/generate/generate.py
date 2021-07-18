@@ -176,9 +176,7 @@ def generate_ctd_amplified_tests(config):
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
 
-    # prepend app name to names of summary and coverage files created by the extender
-    shutil.move(constants.TKL_EXTENDER_SUMMARY_FILE,
-        '{}_{}'.format(app_name, constants.TKL_EXTENDER_SUMMARY_FILE))
+    # prepend app name to the name of the coverage file created by the extender
     shutil.move(constants.TKL_EXTENDER_COVERAGE_FILE,
         '{}_{}'.format(app_name, constants.TKL_EXTENDER_COVERAGE_FILE))
 

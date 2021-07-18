@@ -49,7 +49,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # remove directories and files created during test generation
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
             shutil.rmtree(app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, ignore_errors=True)
-            shutil.rmtree(app_name+'_'+constants.TKL_EXTENDER_SUMMARY_FILE, ignore_errors=True)
+            shutil.rmtree(app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+'_'+constants.TKL_EXTENDER_COVERAGE_FILE, ignore_errors=True)
 
             # load and set config for app
@@ -606,7 +606,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def __assert_generate_resources(self, app_name, generate_subcmd):
         if generate_subcmd == 'ctd-amplified':
-            summary_file = app_name+'_'+constants.TKL_EXTENDER_SUMMARY_FILE
+            summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
             self.assertTrue(os.path.isfile(summary_file))
             with open(summary_file) as f:
                 testgen_summary = json.load(f)
