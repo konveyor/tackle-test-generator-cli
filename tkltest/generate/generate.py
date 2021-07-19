@@ -362,12 +362,43 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
 
     logging.info(te_command)
 
+    coverage_file_name = app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX
+
+    # remove existing coverage file - its presence will signal completion of extender
+    if os.path.exists(coverage_file_name):
+        os.remove(coverage_file_name)
+
+    proc = command_util.start_command(te_command, verbose=verbose)
     try:
-        command_util.run_command(command=te_command, verbose=verbose)
+        proc.wait(timeout=constants.EXTENDER_INITIAL_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        # extender process is still running and didn't create a coverage file yet
+        while not os.path.exists(coverage_file_name) and proc.poll() is None:
+            try:
+                proc.wait(timeout=constants.EXTENDER_REPEATED_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                pass
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
+                               format(e, e.stderr), error=True)
+                sys.exit(1)
+        poll = proc.poll()
+        # check if extender process is still running depsite creating a coverage file (its final step)
+        if poll is None:
+            tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
+            proc.kill()
+            proc.communicate()
     except subprocess.CalledProcessError as e:
         tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
                        format(e, e.stderr), error=True)
         sys.exit(1)
+
+    #try:
+    #    command_util.run_command(command=te_command, verbose=verbose)
+    #except subprocess.CalledProcessError as e:
+    #    tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
+    #                   format(e, e.stderr), error=True)
+    #    sys.exit(1)
 
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
 

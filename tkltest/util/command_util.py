@@ -13,7 +13,7 @@
 
 import subprocess
 import sys
-
+import os
 
 def run_command(command, verbose, env_vars=None):
     """Runs a command using subprocess.
@@ -38,3 +38,13 @@ def run_command(command, verbose, env_vars=None):
         else:
             subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL,
                            stderr=subprocess.PIPE, encoding=sys.getfilesystemencoding())
+
+def start_command(command, verbose):
+    if verbose:
+        proc = subprocess.Popen(command, shell=False, stderr=subprocess.PIPE,
+                      encoding=sys.getfilesystemencoding())
+    else:
+        proc = subprocess.Popen(command, shell=False, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.PIPE, encoding=sys.getfilesystemencoding())
+    return proc
+
