@@ -50,7 +50,7 @@ class GenerateExecuteTest(unittest.TestCase):
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
             shutil.rmtree(app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX, ignore_errors=True)
-            shutil.rmtree(app_name+'_'+constants.TKL_EXTENDER_COVERAGE_FILE, ignore_errors=True)
+            shutil.rmtree(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX, ignore_errors=True)
 
             # load and set config for app
             app_config = config_util.load_config(config_file=app_info['config_file'])
@@ -612,7 +612,7 @@ class GenerateExecuteTest(unittest.TestCase):
                 testgen_summary = json.load(f)
             self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
 
-            self.assertTrue(os.path.isfile(app_name+'_'+constants.TKL_EXTENDER_COVERAGE_FILE))
+            self.assertTrue(os.path.isfile(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX))
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
             self.assertTrue(os.path.isdir(main_report_dir))
             ctd_report_dir = os.path.join(main_report_dir, constants.TKL_CTD_REPORT_DIR)

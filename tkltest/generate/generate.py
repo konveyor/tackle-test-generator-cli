@@ -147,7 +147,7 @@ def generate_ctd_amplified_tests(config):
     if not config['generate']['ctd_amplified']['no_ctd_coverage']:
         app_name = config['general']['app_name']
 
-        generate_ctd_coverage(os.path.abspath(constants.TKL_EXTENDER_COVERAGE_FILE),
+        generate_ctd_coverage(os.path.abspath(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX),
                               os.path.abspath(app_name+"_ctd_models_and_test_plans.json"),
                               app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
                               constants.TKL_CTD_REPORT_DIR)
@@ -175,12 +175,6 @@ def generate_ctd_amplified_tests(config):
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
-
-    # prepend app name to the name of the coverage file created by the extender
-    shutil.move(constants.TKL_EXTENDER_COVERAGE_FILE,
-        '{}_{}'.format(app_name, constants.TKL_EXTENDER_COVERAGE_FILE))
-
-
 
 def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
                                        monolith_app_path, app_classpath_file,
