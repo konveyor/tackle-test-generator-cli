@@ -209,7 +209,7 @@ and executing them. More detailed description is available in the [CLI user guid
      app classes (jar files cannot be specified here). For example, see
      [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L6)
      
-   - `app_packages`: a list of app package prefixes, with wildcards allowed. For example, see
+   - `app_packages`: a list of app package prefixes, with wildcards at the end. For example, see
      [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L63)
 
 3. To generate test cases, run the command
@@ -349,7 +349,7 @@ required, and the option description).
 | no_error_revealing_tests            |                                 | do not generate error-revealing tests with randoop                                                                                                  |
 |                                     |                                 |                                                                                                                                                     |
 | execute                             |                                 | Execute generated tests on the application version under test                                                                                       |
-| app_packages*                       |                                 | list of app packages (wildcard allowed in names)                                                                                                    |
+| app_packages*                       |                                 | list of app packages (wildcard in names required when not describing a specific class)                                                              |
 | create_build_file                   | -nbf/--no-build-file-creation   | Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used             |  
 | build_type                          | -bt/--build-type                | build file type for compiling and running the tests - either ant or maven                                                                           |
 | code_coverage                       | -cc/--code-coverage             | generate code coverage report with JaCoCo agent                                                                                                     |
