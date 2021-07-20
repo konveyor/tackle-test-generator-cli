@@ -103,3 +103,11 @@ MAVEN_REPORTS_PLUGIN_VERSION = "3.0.0"
 # maven surfire plugin version used
 
 MAVEN_SURFIRE_VERSION = "3.0.0-M5"
+
+# Initial timeout for extender to complete before starting to check if it terminated
+
+EXTENDER_INITIAL_TIMEOUT = 300
+
+# Repeated timeout for extender completion after initial timeout is reached
+
+EXTENDER_REPEATED_TIMEOUT = 60

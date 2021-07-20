@@ -13,7 +13,8 @@
 
 import subprocess
 import sys
-
+import shlex
+import os
 
 def run_command(command, verbose, env_vars=None):
     """Runs a command using subprocess.
@@ -38,3 +39,18 @@ def run_command(command, verbose, env_vars=None):
         else:
             subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL,
                            stderr=subprocess.PIPE, encoding=sys.getfilesystemencoding())
+
+def start_command(command, verbose):
+    if os.name == 'nt':
+        exec_command = command
+    else:
+        exec_command = shlex.split(command)
+    if verbose:
+
+        proc = subprocess.Popen(exec_command, shell=False, stderr=subprocess.PIPE,
+                      encoding=sys.getfilesystemencoding())
+    else:
+        proc = subprocess.Popen(exec_command, shell=False, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.PIPE, encoding=sys.getfilesystemencoding())
+    return proc
+

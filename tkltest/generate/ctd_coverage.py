@@ -135,10 +135,15 @@ def __get_test_plan_for_method_row(ctd_coverage_data, class_name, method_name, t
 
     class_data = ctd_coverage_data["models_and_test_plans"][partition_name][class_name]
 
-    method_data = [item[1] for item in class_data.items() if method_name in item[1]['formatted_signature']]
+    method_data = [item[1] for item in class_data.items() if
+                   (' ' in item[1]['formatted_signature'] and
+                    method_name == item[1]['formatted_signature'][item[1]['formatted_signature'].index(' ')+1:]) or
+                   (' ' not in item[1]['formatted_signature'] and method_name == item[1]['formatted_signature'])]
 
     if len(method_data) != 1:
         logging.error("Found "+("more than one" if len(method_data) > 1 else "no")+" matching CTD test plan for "+class_name+"."+method_name+" in "+partition_name)
+        for data in method_data:
+            logging.error(data)
         sys.exit(1)
 
     method_model_test_plan = method_data[0]
