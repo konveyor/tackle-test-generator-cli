@@ -147,10 +147,13 @@ def generate_ctd_amplified_tests(config):
     if not config['generate']['ctd_amplified']['no_ctd_coverage']:
         app_name = config['general']['app_name']
 
-        generate_ctd_coverage(os.path.abspath(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX),
+        if os.path.exists(os.path.abspath(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX)):
+            generate_ctd_coverage(os.path.abspath(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX),
                               os.path.abspath(app_name+"_ctd_models_and_test_plans.json"),
                               app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
                               constants.TKL_CTD_REPORT_DIR)
+        else:
+            tkltest_status("Warning: skipping CTD coverage report generation because coverage file was not located")
 
     # generate ant build file
     test_dirs = [
