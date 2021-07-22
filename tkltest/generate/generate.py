@@ -114,7 +114,7 @@ def generate_ctd_amplified_tests(config):
 
     # generate building-block test sequences
     run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
-                         test_generator_name, time_limit, jdk_path, verbose)
+                          test_generator_name, time_limit, jdk_path, verbose)
 
     tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
           str(round(time.time() - start_time, 2)) + " seconds")
@@ -381,9 +381,9 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
                 proc.wait(timeout=constants.EXTENDER_REPEATED_TIMEOUT)
             except subprocess.TimeoutExpired:
                 pass
-            except subprocess.CalledProcessError as e:
+            except Exception as e:
                 tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                               format(e, e.stderr), error=True)
+                                format(e, e.stderr), error=True)
                 sys.exit(1)
         poll = proc.poll()
         # check if extender process is still running depsite creating a coverage file (its final step)
@@ -391,9 +391,9 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
             tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
             proc.kill()
             proc.communicate()
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                       format(e, e.stderr), error=True)
+                        format(e, e.stderr), error=True)
         sys.exit(1)
 
     #try:
