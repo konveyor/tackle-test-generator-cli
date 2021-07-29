@@ -58,9 +58,6 @@ def __get_test_classes(test_root_dir):
 
 def __execute_base(args, config):
 
-    # compute classpath for compiling and running test classes
-    classpath = build_util.get_build_classpath(config)
-
     # get list of test classes: either the specified class or the all test classes from the specified
     # test files dir
     test_root_dir = config['general']['test_directory']
@@ -69,6 +66,9 @@ def __execute_base(args, config):
 
     # read generate config from test directory
     gen_config = __get_generate_config(test_root_dir)
+
+    # compute classpath for compiling and running test classes
+    classpath = build_util.get_build_classpath(config, gen_config['subcommand'])
 
     logging.info('test root dir: {}'.format(test_root_dir))
     if 'test_class' in config['execute'].keys() and config['execute']['test_class']:

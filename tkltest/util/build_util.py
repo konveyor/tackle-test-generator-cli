@@ -22,7 +22,7 @@ from . import constants
 from tkltest.util.logging_util import tkltest_status
 
 
-def get_build_classpath(config, partition=None):
+def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
 
     Creates and returns build path in the Java CLASSPATH format, consisting of app library dependencies and
@@ -59,7 +59,7 @@ def get_build_classpath(config, partition=None):
         if os.path.splitext(f)[1] == '.jar'
     ])
 
-    if config['generate']['jee_support']:
+    if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
         class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
