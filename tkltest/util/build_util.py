@@ -14,6 +14,7 @@
 import json
 import logging
 import os
+import subprocess
 import sys
 
 from yattag import Doc, indent
@@ -290,6 +291,13 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
         line('version', constants.JACOCO_MAVEN_VERSION)
         with tag('dependencies'):
             for full_path in classpath_list:
+                if os.path.isdir(full_path):
+                    try:
+                        subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
+                    except subprocess.CalledProcessError as e:
+                        tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
+                        sys.exit(1)
+                    full_path += ".jar"
                 file_name = full_path.rsplit(os.path.sep,1)[1]
                 file_name = file_name.replace('.jar', '')
                 with tag('dependency'):
