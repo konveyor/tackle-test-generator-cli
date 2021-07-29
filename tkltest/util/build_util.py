@@ -14,6 +14,7 @@
 import json
 import logging
 import os
+import subprocess
 import sys
 
 from yattag import Doc, indent
@@ -22,7 +23,7 @@ from . import constants
 from tkltest.util.logging_util import tkltest_status
 
 
-def get_build_classpath(config, partition=None):
+def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
 
     Creates and returns build path in the Java CLASSPATH format, consisting of app library dependencies and
@@ -59,7 +60,7 @@ def get_build_classpath(config, partition=None):
         if os.path.splitext(f)[1] == '.jar'
     ])
 
-    if config['generate']['jee_support']:
+    if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
         class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
@@ -290,6 +291,13 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
         line('version', constants.JACOCO_MAVEN_VERSION)
         with tag('dependencies'):
             for full_path in classpath_list:
+                if os.path.isdir(full_path):
+                    try:
+                        subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
+                    except subprocess.CalledProcessError as e:
+                        tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
+                        sys.exit(1)
+                    full_path += ".jar"
                 file_name = full_path.rsplit(os.path.sep,1)[1]
                 file_name = file_name.replace('.jar', '')
                 with tag('dependency'):
