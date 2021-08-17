@@ -32,13 +32,13 @@ jobs:
         sudo apt-get install -y bats libxml2-utils
         bats --version
         xmllint --version
-#    - name: Create maven settings.xml
-#      uses: s4u/maven-settings-action@v2.4.0
-#      with:
-#        servers: '[
-#          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
-#          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
-#        ]'
+    - name: Create maven settings.xml
+      uses: s4u/maven-settings-action@v2.4.0
+      with:
+        servers: '[
+          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
+          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
+        ]'
     - name: Download Java libraries
       run: |
         cd lib
@@ -67,9 +67,9 @@ jobs:
         bats test/test_cli.bats
         bats test/test_cli_irs.bats
         deactivate
-    - name: Run CLI bats tests using docker-compose
-      env:
-        GITHUB_USERNAME: $GITHUB_ACTOR
-        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
-      run: |
-        bats test/test_cli_docker.bats
+#    - name: Run CLI bats tests using docker-compose
+#      env:
+#        GITHUB_USERNAME: $GITHUB_ACTOR
+#        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
+#      run: |
+#        bats test/test_cli_docker.bats
