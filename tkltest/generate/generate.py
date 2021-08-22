@@ -114,7 +114,7 @@ def generate_ctd_amplified_tests(config):
 
     # generate building-block test sequences
     run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
-                          test_generator_name, time_limit, jdk_path, verbose)
+                          test_generator_name, time_limit, jdk_path, partitions_file, verbose)
 
     tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
           str(round(time.time() - start_time, 2)) + " seconds")
@@ -249,7 +249,7 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
 
 
 def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file, test_generator_name,
-                          time_limit, jdk_path, verbose=False):
+                          time_limit, jdk_path, partitions_file, verbose=False):
     """Generates building-block test sequences.
 
     Generates building-block tests sequences using evosuite, randoop, or both tools in combination. Performs
@@ -289,6 +289,9 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += " -clpt " + app_classpath_file
     tg_command += " -tg " + test_generator_name
     tg_command += " -tl " + str(time_limit)
+
+    if partitions_file:
+        tg_command += " -tm"
 
     # for verbose option, redirect evosuite and randoop stdout and stderr to files
     if verbose:
