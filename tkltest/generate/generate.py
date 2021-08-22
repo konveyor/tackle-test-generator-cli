@@ -153,7 +153,8 @@ def generate_ctd_amplified_tests(config):
                                   app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
                                   constants.TKL_CTD_REPORT_DIR)
         else:
-            tkltest_status("Warning: skipping CTD coverage report generation because coverage file was not located")
+            tkltest_status('Cannot generate CTD coverage report because coverage file was not located', error=True)
+            sys.exit(1)
 
     # generate ant build file
     test_dirs = [
