@@ -301,7 +301,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of classes to exclude from test generation'
+            'help_message': 'list of classes or packages to exclude from test generation. Packages must end with a wildcard.'
         },
         'time_limit': {
             'required': False,
@@ -411,7 +411,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of app packages (wildcard allowed in names)'
+            'help_message': 'list of app packages. Must end with a wildcard'
         },
         'build_type': {
             'required': False,
