@@ -328,6 +328,16 @@ __options_spec = {
                     'default_value': 'combined',
                     'help_message': 'base test generator to use for creating building-block test sequences'
                 },
+                'augment_coverage': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-ac',
+                    'long_name': '--augment-coverage',
+                    'type': bool,
+                    'default_value': False,
+                    'help_message': 'augment CTD-guided tests with coverage-increasing base tests'
+                },
                 'no_ctd_coverage': {
                     'required': False,
                     'is_toml_option': True,

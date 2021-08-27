@@ -11,6 +11,7 @@
 # limitations under the License.
 # ***************************************************************************
 
+import argparse
 import logging
 import logging.handlers
 import os
@@ -20,10 +21,11 @@ import sys
 import time
 import toml
 
+from .augment import augment_with_code_coverage
 from .ctd_coverage import create_ctd_report
 from .generate_standalone import generate_randoop, generate_evosuite
+from tkltest.util import build_util, command_util, constants, config_util
 from tkltest.util.logging_util import tkltest_status
-from tkltest.util import build_util, command_util, constants
 
 
 def process_generate_command(args, config):
@@ -175,10 +177,22 @@ def generate_ctd_amplified_tests(config):
         test_dirs=test_dirs,
         partitions_file=partitions_file,
         target_class_list=target_class_list,
-        main_reports_dir=reports_dir
+        main_reports_dir=reports_dir,
+        app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
+        collect_codecoverage=True,  # for coverage-based augmentation
+        offline_instrumentation=True  # for coverage-based augmentation
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
+
+    # augment CTD-guided tests with coverage-increasing base tests
+    if config['generate']['ctd_amplified']['augment_coverage']:
+        start_time = time.time()
+        augment_with_code_coverage(config=config, ant_build_file=ant_build_file,
+                                   ctd_test_dir=test_directory, report_dir=reports_dir)
+        tkltest_status('Coverage-guided test-suite augmentation took {} seconds'.
+                       format(round(time.time() - start_time, 2)))
+
 
 def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
                                        monolith_app_path, app_classpath_file,
@@ -313,7 +327,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
 
 
 def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-    no_diff_assertions, jee_support, num_executions, test_directory, verbose=False):
+                     no_diff_assertions, jee_support, num_executions, test_directory, verbose=False):
     """Generates the final CTD-guided test cases.
 
     Generates extended test sequences for covering the CTD test plan rows that are written as JUnit
@@ -443,3 +457,12 @@ def __reset_test_directory(args, config):
     os.mkdir(test_directory)
     return test_directory
 
+
+if __name__ == '__main__':  # pragma: no cover
+    config_file = 'test/data/irs/tkltest_config.toml'
+    args = argparse.Namespace()
+    args.command = 'generate'
+    args.sub_command = 'ctd-amplified'
+    config = config_util.load_config(args=args, config_file=config_file)
+    config['generate']['ctd_amplified']['augment_coverage'] = True
+    process_generate_command(args=args, config=config)

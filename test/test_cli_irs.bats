@@ -329,3 +329,29 @@ setup_file() {
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 }
+
+@test "Test 13: CLI generate [all-classes] ctd-amplified --base-test-generator evosuite --augment-coverage irs" {
+    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE \
+        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
+        generate ctd-amplified --base-test-generator evosuite --augment-coverage
+    [ $status -eq 0 ]
+
+    # assert over test reports dir
+    [ -d ./$IRS_TEST_REPORTS_DIR/ctd-report ]
+
+    # assert over test plan file
+    [ -f $IRS_CTD_TEST_PLAN_FILE ]
+    class_count=`jq '.models_and_test_plans.monolithic | keys | length' $IRS_CTD_TEST_PLAN_FILE`
+    [ $class_count -eq 5 ]
+
+    # assert over generated test cases
+    [ -d $IRS_CTD_AMPLIFIED_TESTDIR ]
+    test_class_count=`find $IRS_CTD_AMPLIFIED_TESTDIR -name *.java | wc -l`
+    echo "# test_class_count=$test_class_count" >&3
+    [ $test_class_count -gt 5 ]
+    test_case_count=`find $IRS_CTD_AMPLIFIED_TESTDIR -name *.java -exec grep "@Test" {} \; | wc -l`
+    echo "# test_case_count=$test_case_count" >&3
+    [ $test_case_count -gt 20 ]
+}
