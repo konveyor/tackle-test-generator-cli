@@ -70,7 +70,7 @@ setup_file() {
     # assert over reports dirs and instrumented classes dir
     [ -d ./$IRS_TEST_REPORTS_DIR/jacoco-reports ]
     [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
-    [ ! -d $IRS_INSTR_CLASSES_DIR ]
+    # [ ! -d $IRS_INSTR_CLASSES_DIR ]
 
     # assert over test failures and errors
     partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
