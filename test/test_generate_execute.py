@@ -98,6 +98,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # execute tests
             config['execute']['build_type'] = 'maven'
+            config['execute']['online_instrumentation'] = True
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
