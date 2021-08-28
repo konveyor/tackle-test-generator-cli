@@ -70,7 +70,7 @@ setup_file() {
     # assert over reports dirs and instrumented classes dir
     [ -d ./$IRS_TEST_REPORTS_DIR/jacoco-reports ]
     [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
-    # [ ! -d $IRS_INSTR_CLASSES_DIR ]
+    [ -d $IRS_INSTR_CLASSES_DIR ]
 
     # assert over test failures and errors
     partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
@@ -94,18 +94,17 @@ setup_file() {
 }
 
 
-@test "Test 03: CLI execute --offline-instrumentation irs" {
+@test "Test 03: CLI execute --online-instrumentation irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute --offline-instrumentation
+        execute --online-instrumentation
     [ $status -eq 0 ]
 
     # assert over reports dirs and instrumented classes dir
     [ -d ./$IRS_TEST_REPORTS_DIR/jacoco-reports ]
     [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
-    [ -d $IRS_INSTR_CLASSES_DIR ]
 }
 
 @test "Test 04: CLI generate [all-classes] ctd-amplified [diff-assertions] irs" {
