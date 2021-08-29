@@ -72,7 +72,7 @@ teardown_file() {
 @test "Test 07: CLI execute command help" {
     run tkltest execute --help
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt {ant,maven}] [-nbf] [-cc] [-ofli]" ]
+    [ "${lines[0]}" = "usage: tkltest execute [-h] [-bt {ant,maven}] [-nbf] [-cc] [-onli]" ]
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {
@@ -144,4 +144,13 @@ teardown_file() {
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"Generate config file not found:"* ]]
     [[ "${lines[2]}" == *"To execute tests in $IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"* ]]
+}
+
+@test "Test 16: CLI generate ctd-amplified parameter constraint violation" {
+    run tkltest --config-file $IRS_CONFIG_FILE generate ctd-amplified \
+        --base-test-generator randoop --augment-coverage
+    [ $status -eq 1 ]
+    echo "# ${lines[@]}" >&3
+    [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
+    [[ "${lines[2]}" == *"Violated parameter constraint: To use option \"-ac/--augment-coverage\", base test generator must be \"combined\" or \"evosuite\""* ]]
 }

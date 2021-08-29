@@ -51,7 +51,7 @@ def load_config(args=None, config_file=None):
     __merge_config(tkltest_config, toml_config)
     logging.debug('config: {}'.format(tkltest_config))
 
-            # update general options with values specified in command line
+    # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
         options_spec=config_options.get_options_spec(command='general'),
         args=args)
@@ -150,7 +150,8 @@ def __validate_config(config, command=None, subcommand=None):
     val_errors = {
         scope: {
             'missing_required_params': [],
-            'invalid_enum_values': {}
+            'invalid_enum_values': {},
+            'param_constraint_violation': []
         } for scope in ['general', command, subcommand] if scope is not None
     }
 
@@ -172,6 +173,8 @@ def __validate_config(config, command=None, subcommand=None):
         if scope_val_errors['invalid_enum_values']:
             for opt_name, msg in scope_val_errors['invalid_enum_values'].items():
                 val_failure_msgs.append('\t- Value for option "{}" {}'.format(opt_name, msg))
+        for constraint_err in scope_val_errors['param_constraint_violation']:
+            val_failure_msgs.append('\t- Violated parameter constraint: {}\n'.format(constraint_err))
 
     return val_failure_msgs
 
@@ -206,6 +209,14 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
         if 'choices' in opt.keys() and opt_name in config.keys() and config[opt_name] not in opt['choices']:
             val_errors['invalid_enum_values'][opt_name] = 'must be one of {}: {}'.format(
                 opt['choices'], config[opt_name])
+
+        # check parameter dependency constraints
+        if opt_name == 'augment_coverage':
+            if config[opt_name] is True and config['base_test_generator'] == 'randoop':
+                val_errors['param_constraint_violation'].append(
+                    'To use option "{}/{}", base test generator must be "combined" or "evosuite"'.format(
+                        opt['short_name'], opt['long_name']
+                    ))
 
 
 def __init_options(options_spec):

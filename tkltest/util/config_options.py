@@ -328,6 +328,16 @@ __options_spec = {
                     'default_value': 'combined',
                     'help_message': 'base test generator to use for creating building-block test sequences'
                 },
+                'augment_coverage': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-ac',
+                    'long_name': '--augment-coverage',
+                    'type': bool,
+                    'default_value': False,
+                    'help_message': 'augment CTD-guided tests with coverage-increasing base tests'
+                },
                 'no_ctd_coverage': {
                     'required': False,
                     'is_toml_option': True,
@@ -444,16 +454,16 @@ __options_spec = {
             'default_value': False,
             'help_message': 'generate code coverage report with JaCoCo agent'
         },
-        'offline_instrumentation': {
+        'online_instrumentation': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': True,
-            'short_name': '-ofli',
-            'long_name': '--offline-instrumentation',
+            'short_name': '-onli',
+            'long_name': '--online-instrumentation',
             'type': bool,
             'default_value': False,
-            'help_message': 'perform offline instrumentation of app classes for measuring code coverage ' + \
-                            '(default: app classes are instrumented dynamically during class loading)'
+            'help_message': 'perform online instrumentation of app classes for measuring code coverage ' + \
+                            '(default: app classes are instrumented offline)'
         },
         'test_class': {
             'required': False,
