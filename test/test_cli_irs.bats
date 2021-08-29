@@ -184,8 +184,7 @@ setup_file() {
     [ `xmllint $partition_rep_dir/TEST-irs.irs_BusinessProcess_Test.xml -xpath 'string(testsuite/@failures)'` -eq 0 ]
 }
 
-@test "Test 06: CLI generate [all-classes] randoop irs" {
-    skip
+@test "Test 06: CLI generate execute [all-classes] randoop irs" {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_RANDOOP_TESTDIR \
@@ -201,10 +200,16 @@ setup_file() {
     # assert build file is generated
     [ -f $IRS_RANDOOP_TESTDIR/build.xml ]
     [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
+
+    # execute generated tests
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE \
+        --test-directory $IRS_RANDOOP_TESTDIR \
+        execute
+    [ $status -eq 0 ]
 }
 
-@test "Test 07: CLI generate [all-classes] evosuite irs" {
-    skip
+@test "Test 07: CLI generate execute [all-classes] evosuite irs" {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_EVOSUITE_TESTDIR \
@@ -219,7 +224,14 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_EVOSUITE_TESTDIR/build.xml ]
-    [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
+    [ -f $IRS_EVOSUITE_TESTDIR/pom.xml ]
+
+    # execute generated tests
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE \
+        --test-directory $IRS_EVOSUITE_TESTDIR \
+        execute
+    [ $status -eq 0 ]
 }
 
 @test "Test 08: CLI generate [target-class-list] ctd-amplified irs" {
