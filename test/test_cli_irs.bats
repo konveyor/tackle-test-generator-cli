@@ -234,8 +234,7 @@ setup_file() {
     [ $status -eq 0 ]
 }
 
-@test "Test 08: CLI generate [target-class-list] ctd-amplified irs" {
-    skip
+@test "Test 08: CLI generate execute [target-class-list] ctd-amplified irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
@@ -260,10 +259,16 @@ setup_file() {
     # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
+
+    # execute generated tests
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE2 \
+        --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
+        execute
+    [ $status -eq 0 ]
 }
 
 @test "Test 09: CLI generate [target-class-list] randoop irs" {
-    skip
     rm -rf $IRS_RANDOOP_TESTDIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
@@ -276,6 +281,13 @@ setup_file() {
     test_count=`find $IRS_RANDOOP_TESTDIR -name *.java -exec grep "@Test" {} \; | wc -l`
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
+
+    # execute generated tests
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE2 \
+        --test-directory $IRS_RANDOOP_TESTDIR \
+        execute
+    [ $status -eq 0 ]
 }
 
 @test "Test 10: CLI generate [target-class-list] evosuite irs" {
@@ -291,6 +303,13 @@ setup_file() {
     test_count=`find $IRS_EVOSUITE_TESTDIR -name *.java -exec grep "@Test" {} \; | wc -l`
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
+
+    # execute generated tests
+    run tkltest --log-level INFO \
+        --config-file $IRS_CONFIG_FILE2 \
+        --test-directory $IRS_EVOSUITE_TESTDIR \
+        execute
+    [ $status -eq 0 ]
 }
 
 @test "Test 11: CLI generate [all-classes] ctd-amplified --base-test-generator randoop irs" {
