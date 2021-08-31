@@ -141,7 +141,11 @@ def generate_ctd_amplified_tests(config):
                      config['generate']['no_diff_assertions'],
                      config['generate']['jee_support'],
                      config['generate']['ctd_amplified']['num_seq_executions'],
-                     test_directory, verbose)
+                     test_directory + constants.TKLTEST_TEMP_DIR_SUFFIX, verbose)
+    if True: #todo - extend success
+        if os.path.exists(test_directory):
+            shutil.rmtree(test_directory)
+        os.rename(test_directory + constants.TKLTEST_TEMP_DIR_SUFFIX, test_directory)
 
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
@@ -444,17 +448,19 @@ def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output
 def __reset_test_directory(args, config):
     # clear contents of test directory
     test_directory = config['general']['test_directory']
+    dir_suffix = ""
     if test_directory == '':
         app_name = config['general']['app_name']
         if args.sub_command == "ctd-amplified":
             test_directory = app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
+            dir_suffix = constants.TKLTEST_TEMP_DIR_SUFFIX
         elif args.sub_command == "randoop":
             test_directory = app_name + constants.TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX
         elif args.sub_command == "evosuite":
             test_directory = app_name + constants.TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX
 
-    shutil.rmtree(test_directory, ignore_errors=True)
-    os.mkdir(test_directory)
+    shutil.rmtree(test_directory + dir_suffix, ignore_errors=True)
+    os.mkdir(test_directory + dir_suffix)
     return test_directory
 
 
