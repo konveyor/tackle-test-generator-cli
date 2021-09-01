@@ -422,7 +422,7 @@ def extender_timeout(command, verbose):
     proc = command_util.start_command(command, verbose=verbose)
     output, error = proc.communicate()
 
-    if error:
+    if proc.returncode != 0:
         tkltest_status('Extending sequences and generating JUnit tests failed: {}\n'.
                                format(error), error=True)
         os._exit(1)
