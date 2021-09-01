@@ -136,12 +136,17 @@ def generate_ctd_amplified_tests(config):
     else:
         test_directory = config['general']['test_directory']
 
+    tmp_test_directory = test_directory + constants.TKLTEST_TEMP_DIR_SUFFIX
     # generate extended test sequences
     extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
                      config['generate']['no_diff_assertions'],
                      config['generate']['jee_support'],
                      config['generate']['ctd_amplified']['num_seq_executions'],
-                     test_directory, verbose)
+                     tmp_test_directory, verbose)
+
+    if os.path.exists(test_directory):
+        shutil.rmtree(test_directory)
+    os.rename(tmp_test_directory, test_directory)
 
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
@@ -459,8 +464,12 @@ def __reset_test_directory(args, config):
         elif args.sub_command == "evosuite":
             test_directory = app_name + constants.TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX
 
-    shutil.rmtree(test_directory, ignore_errors=True)
-    os.mkdir(test_directory)
+    directory_to_reset = test_directory;
+    if args.sub_command == "ctd-amplified":
+        directory_to_reset = directory_to_reset + constants.TKLTEST_TEMP_DIR_SUFFIX
+
+    shutil.rmtree(directory_to_reset, ignore_errors=True)
+    os.mkdir(directory_to_reset)
     return test_directory
 
 

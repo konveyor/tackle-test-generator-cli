@@ -36,7 +36,10 @@ TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX = "-randoop-standalone-tests"
 # EvoSuite standalone tests
 TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX = "-evosuite-standalone-tests"
 
-# suffix for the directory containing test reports (CTD, junit, jacoco); names of the 
+# suffix for the temporary test directory name
+TKLTEST_TEMP_DIR_SUFFIX = "-tkltest-tmp"
+
+# suffix for the directory containing test reports (CTD, junit, jacoco); names of the
 # sub-directories for different reports
 TKLTEST_MAIN_REPORT_DIR_SUFFIX = '-tkltest-reports'
 TKL_CTD_REPORT_DIR = 'ctd-report'
