@@ -20,6 +20,8 @@ import subprocess
 import sys
 import time
 import toml
+from threading import Thread
+
 
 from .augment import augment_with_code_coverage
 from .ctd_coverage import create_ctd_report
@@ -400,39 +402,30 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     if os.path.exists(coverage_file_name):
         os.remove(coverage_file_name)
 
-    proc = command_util.start_command(te_command, verbose=verbose)
-    try:
-        proc.wait(timeout=constants.EXTENDER_INITIAL_TIMEOUT)
-    except subprocess.TimeoutExpired:
-        # extender process is still running and didn't create a coverage file yet
-        while not os.path.exists(coverage_file_name) and proc.poll() is None:
-            try:
-                proc.wait(timeout=constants.EXTENDER_REPEATED_TIMEOUT)
-            except subprocess.TimeoutExpired:
-                pass
-            except Exception as e:
-                tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                                format(e, e.stderr), error=True)
-                sys.exit(1)
-        poll = proc.poll()
-        # check if extender process is still running depsite creating a coverage file (its final step)
-        if poll is None:
-            tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
-            proc.kill()
-            proc.communicate()
-    except Exception as e:
-        tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                        format(e, e.stderr), error=True)
-        sys.exit(1)
+    proc=None
 
-    #try:
-    #    command_util.run_command(command=te_command, verbose=verbose)
-    #except subprocess.CalledProcessError as e:
-    #    tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-    #                   format(e, e.stderr), error=True)
-    #    sys.exit(1)
+    thread = Thread(target=extender_timeout, args=[te_command, verbose])
+    thread.start()
+    thread.join(constants.EXTENDER_INITIAL_TIMEOUT)
+    while not os.path.exists(coverage_file_name) and thread.isAlive():
+        thread.join(constants.EXTENDER_REPEATED_TIMEOUT)
+
+    if thread.isAlive():
+        tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
+        proc.kill()
+        proc.communicate()
 
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
+
+def extender_timeout(command, verbose):
+    global proc
+    proc = command_util.start_command(command, verbose=verbose)
+    output, error = proc.communicate()
+
+    if error:
+        tkltest_status('Extending sequences and generating JUnit tests failed: {}\n'.
+                               format(error), error=True)
+        os._exit(1)
 
 
 def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output_dir):
