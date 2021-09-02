@@ -402,6 +402,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     if os.path.exists(coverage_file_name):
         os.remove(coverage_file_name)
 
+    global proc
     proc=None
 
     thread = Thread(target=extender_timeout, args=[te_command, verbose])
@@ -410,7 +411,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     while not os.path.exists(coverage_file_name) and thread.isAlive():
         thread.join(constants.EXTENDER_REPEATED_TIMEOUT)
 
-    if thread.isAlive():
+    if proc.poll() is None:
         tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
         proc.kill()
         proc.communicate()
