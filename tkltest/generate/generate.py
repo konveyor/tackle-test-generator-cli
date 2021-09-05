@@ -402,14 +402,18 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     if os.path.exists(coverage_file_name):
         os.remove(coverage_file_name)
 
-    global proc
+    global proc, thread_error
     proc=None
+    thread_error = False
 
     thread = Thread(target=extender_timeout, args=[te_command, verbose])
     thread.start()
     thread.join(constants.EXTENDER_INITIAL_TIMEOUT)
-    while not os.path.exists(coverage_file_name) and thread.isAlive():
+    while (not os.path.exists(coverage_file_name)) and thread.isAlive() and not thread_error:
         thread.join(constants.EXTENDER_REPEATED_TIMEOUT)
+
+    if thread_error:
+        sys.exit(1)
 
     if proc.poll() is None:
         tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
@@ -419,14 +423,16 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
 
 def extender_timeout(command, verbose):
-    global proc
+    global proc, thread_error
     proc = command_util.start_command(command, verbose=verbose)
     output, error = proc.communicate()
 
     if proc.returncode != 0:
         tkltest_status('Extending sequences and generating JUnit tests failed: {}\n'.
                                format(error), error=True)
-        os._exit(1)
+        thread_error = True
+        # sys.exit will cause only the thread to exit, hence we need thread_error to signal to main process
+        sys.exit(1)
 
 
 def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output_dir):
