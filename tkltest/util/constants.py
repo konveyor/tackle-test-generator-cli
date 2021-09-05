@@ -19,6 +19,7 @@ TKLTEST_DEFAULT_CONFIG_FILE='tkltest_config.toml'
 # name of (hidden) config file created by generate command (to be used by the execute command)
 TKLTEST_GENERATE_CONFIG_FILE='.tkltest_generate.toml'
 
+#TKLTEST_CLI_RELATIVE_DIR = os.path.join('..', '..')
 TKLTEST_CLI_RELATIVE_DIR = '..'
 
 # lib download dir
