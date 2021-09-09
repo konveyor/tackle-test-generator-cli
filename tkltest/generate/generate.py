@@ -409,7 +409,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     thread = Thread(target=extender_timeout, args=[te_command, coverage_file_name, verbose])
     thread.start()
     thread.join(constants.EXTENDER_INITIAL_TIMEOUT)
-    while (not os.path.exists(coverage_file_name)) and thread.isAlive() and not thread_error:
+    while (not os.path.exists(coverage_file_name)) and thread.is_alive() and not thread_error:
         thread.join(constants.EXTENDER_REPEATED_TIMEOUT)
 
     if thread_error:
