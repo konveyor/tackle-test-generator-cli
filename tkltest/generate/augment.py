@@ -44,7 +44,7 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
     tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
 
     # select initial and augmentation test suites between the CTD and evosuite test suites
-    test_class_augment_pool, base_test_coverage = __compute_base_and_augment_test_suites(
+    test_class_augment_pool, base_test_coverage, ctd_test_dir_bak = __compute_base_and_augment_test_suites(
         ctd_test_dir=ctd_test_dir,
         evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
         ant_build_file=ant_build_file,
@@ -81,6 +81,8 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
     final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
     final_cov_efficiency = final_inst_cov_rate / final_test_method_count
 
+    # remove backup directory created
+    shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
     if tests_with_coverage_gain:
         print('')
     tkltest_status(
@@ -118,6 +120,7 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
     Returns:
         list: test classes in the augmentation pool
         dict: coverage information for the base test suite
+        str: backup directory created for ctd tests
     """
     # get coverage info for CTD-guided test suite
     ctd_test_coverage, ctd_test_method_count, ctd_inst_cov_efficiency =\
@@ -136,7 +139,7 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
         __compute_coverage_efficiency(test_dir=ctd_test_dir, ant_build_file=ant_build_file, report_dir=report_dir,
                                       test_suite_name='EvoSuite')
 
-    if ctd_inst_cov_efficiency > evosuite_inst_cov_efficiency:
+    if ctd_inst_cov_efficiency < evosuite_inst_cov_efficiency:
         # if CTD test suite has higher efficient, it forms the initial suite and the augmentation pool
         # consists of evosuite tests
         tkltest_status('Creating initial test suite from CTD-guided tests: {} test methods, efficiency={}'
@@ -164,7 +167,7 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
         base_test_coverage = evosuite_test_coverage
 
     # return augmentation test pool and base test coverage
-    return augmentation_test_pool, base_test_coverage
+    return augmentation_test_pool, base_test_coverage, ctd_test_dir_bak
 
 
 def __compute_coverage_efficiency(test_dir, ant_build_file, report_dir, test_suite_name):
