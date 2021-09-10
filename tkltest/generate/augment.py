@@ -13,6 +13,8 @@
 
 import logging
 import os
+import re
+import shutil
 import subprocess
 import sys
 
@@ -39,43 +41,24 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
         ctd_test_dir (str): Root directory for CTD tests
         report_dir (str): Main reports directory, under which coverage report is generated
     """
-    tkltest_status('Augmenting CTD-guided tests with coverage-increasing base tests')
+    tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
 
-    # get coverage info for CTD-guided test suite
-    base_ctd_coverage = coverage_util.get_coverage_for_test_suite(ant_build_file=ant_build_file,
-                                                                  test_root_dir=ctd_test_dir,
-                                                                  report_dir=report_dir)
-    tkltest_status('Coverage rate for base CTD-guided test suite: instruction={}/{}({:.1%}), branch={}/{}({:.1%}), '.
-                   format(base_ctd_coverage['instruction_covered'], base_ctd_coverage['instruction_total'],
-                          base_ctd_coverage['instruction_covered'] / base_ctd_coverage['instruction_total'],
-                          base_ctd_coverage['branch_covered'], base_ctd_coverage['branch_total'],
-                          base_ctd_coverage['branch_covered'] / base_ctd_coverage['branch_total']
-                          ) +
-                   'line={}/{}({:.1%}), method={}/{}({:.1%})'.
-                   format(base_ctd_coverage['line_covered'], base_ctd_coverage['line_total'],
-                          base_ctd_coverage['line_covered'] / base_ctd_coverage['line_total'],
-                          base_ctd_coverage['method_covered'], base_ctd_coverage['method_total'],
-                          base_ctd_coverage['method_covered'] / base_ctd_coverage['method_total']
-                          )
-                   )
+    # select initial and augmentation test suites between the CTD and evosuite test suites
+    test_class_augment_pool, base_test_coverage = __compute_base_and_augment_test_suites(
+        ctd_test_dir=ctd_test_dir,
+        evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
+        ant_build_file=ant_build_file,
+        report_dir=report_dir
+    )
 
-    # read evosuite tests
-    evosuite_test_classes = coverage_util.get_test_classes(
-        config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX)
-    test_class_augment_pool = [
-        os.path.join(dir, file)
-        for dir, files in evosuite_test_classes.items()
-        for file in files if '_scaffolding' not in file
-    ]
-
-    tkltest_status('Collecting coverage gain for each of {} tests in the augment test pool'.format(
+    tkltest_status('Collecting coverage gain for each of {} tests in the augmentation test pool'.format(
         len(test_class_augment_pool)))
 
     # initialize map for test classes that provide coverage gain
     tests_with_coverage_gain, total_inst_cov_gain, total_branch_cov_gain = __compute_tests_with_coverage_gain(
         test_class_augment_pool=test_class_augment_pool,
         ctd_test_dir=ctd_test_dir,
-        base_ctd_coverage=base_ctd_coverage,
+        base_ctd_coverage=base_test_coverage,
         ant_build_file=ant_build_file,
         report_dir=report_dir
     )
@@ -86,32 +69,172 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
         len(tests_with_coverage_gain.keys()), len(test_class_augment_pool), total_inst_cov_gain, total_branch_cov_gain
     ))
 
+    # augment initial test suite with coverage-contributing tests from the augmentation pool
     augmented_coverage, added_test_classes = __augment_ctd_test_suite(
         tests_with_coverage_gain=tests_with_coverage_gain,
         ctd_test_dir=ctd_test_dir,
-        base_ctd_coverage=base_ctd_coverage,
+        base_ctd_coverage=base_test_coverage,
         ant_build_file=ant_build_file,
         report_dir=report_dir
     )
+    final_test_method_count = __get_test_method_count(ctd_test_dir)
+    final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
+    final_cov_efficiency = final_inst_cov_rate / final_test_method_count
 
     if tests_with_coverage_gain:
         print('')
     tkltest_status(
         f'Summary of coverage-based augmentation of "{ctd_test_dir}": test_classes_added={added_test_classes}, ' +
-        f'instruction_cov_gain={augmented_coverage["instruction_covered"] - base_ctd_coverage["instruction_covered"]}, ' +
-        f'branch_cov_gain={augmented_coverage["branch_covered"] - base_ctd_coverage["branch_covered"]}'
+        f'instruction_cov_gain={augmented_coverage["instruction_covered"] - base_test_coverage["instruction_covered"]}, ' +
+        f'branch_cov_gain={augmented_coverage["branch_covered"] - base_test_coverage["branch_covered"]}'
     )
     tkltest_status('Final test-suite coverage rate: instruction={}/{}({:.1%}), branch={}/{}({:.1%}), '.format(
         augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'],
-        augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total'],
+        final_inst_cov_rate,
         augmented_coverage['branch_covered'], augmented_coverage['branch_total'],
         augmented_coverage['branch_covered'] / augmented_coverage['branch_total']
-    ) + 'line={}/{}({:.1%}), method={}/{}({:.1%})'.format(
+    ) + 'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.format(
         augmented_coverage['line_covered'], augmented_coverage['line_total'],
         augmented_coverage['line_covered'] / augmented_coverage['line_total'],
         augmented_coverage['method_covered'], augmented_coverage['method_total'],
-        augmented_coverage['method_covered'] / augmented_coverage['method_total']
+        augmented_coverage['method_covered'] / augmented_coverage['method_total'],
+        final_cov_efficiency, final_test_method_count
     ))
+
+
+def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_build_file, report_dir):
+    """Computes base test suite and augment test suite for coverage-based augmentation.
+
+    Given the CTD test suite and the evosuite test suite, computes coverage efficiency of both test suites
+    and selects the more efficient test suite as the base suite (and the other as the augment test suite)
+    for performing coverage-based augmentation.
+
+    Args:
+        ctd_test_dir (str): Root directory for CTD tests
+        evosuite_test_dir (str): Root directory for evosuite tests
+        ant_build_file (str): Build file to use for running tests
+        report_dir (str): Main reports directory, under which coverage report is generated
+
+    Returns:
+        list: test classes in the augmentation pool
+        dict: coverage information for the base test suite
+    """
+    # get coverage info for CTD-guided test suite
+    ctd_test_coverage, ctd_test_method_count, ctd_inst_cov_efficiency =\
+        __compute_coverage_efficiency(test_dir=ctd_test_dir, ant_build_file=ant_build_file, report_dir=report_dir,
+                                      test_suite_name='CTD-guided')
+    # create backup of CTD-guided tests
+    ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
+    shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
+    shutil.copytree(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
+
+    # initialize CTD test directory with evosuite tests for coverage data collection
+    __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=evosuite_test_dir)
+
+    # get coverage info for evosuite tests
+    evosuite_test_coverage, evosuite_test_method_count, evosuite_inst_cov_efficiency =\
+        __compute_coverage_efficiency(test_dir=ctd_test_dir, ant_build_file=ant_build_file, report_dir=report_dir,
+                                      test_suite_name='EvoSuite')
+
+    if ctd_inst_cov_efficiency > evosuite_inst_cov_efficiency:
+        # if CTD test suite has higher efficient, it forms the initial suite and the augmentation pool
+        # consists of evosuite tests
+        tkltest_status('Creating initial test suite from CTD-guided tests: {} test methods, efficiency={}'
+                       .format(ctd_test_method_count, ctd_inst_cov_efficiency))
+
+        # reinitialize CTD test directory with CTD tests from the backup directory
+        __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
+
+        # set evosuite tests as the augmentation pool and CTD coverage as the base coverage
+        augmentation_test_pool = [
+            os.path.join(dir, file)
+            for dir, files in coverage_util.get_test_classes(evosuite_test_dir).items()
+            for file in files if '_scaffolding' not in file
+        ]
+        base_test_coverage = ctd_test_coverage
+    else:
+        # otherwise, set CTD tests as the augmentation pool and evosuite coverage as the base coverage
+        tkltest_status('Creating initial test suite from EvoSuite tests: {} test methods, efficiency={}'
+                       .format(evosuite_test_method_count, evosuite_inst_cov_efficiency))
+        augmentation_test_pool = [
+            os.path.join(dir, file)
+            for dir, files in coverage_util.get_test_classes(ctd_test_dir_bak).items()
+            for file in files if '_scaffolding' not in file
+        ]
+        base_test_coverage = evosuite_test_coverage
+
+    # return augmentation test pool and base test coverage
+    return augmentation_test_pool, base_test_coverage
+
+
+def __compute_coverage_efficiency(test_dir, ant_build_file, report_dir, test_suite_name):
+    """Computes and returns coverage efficiency of the given test suite.
+
+    Computes coverage efficiency of the given test suite as instruction coverage rate per test method
+    in the test suite.
+
+    Args:
+        test_dir (str): test suite to compute coverage efficiency for
+    """
+    test_coverage = coverage_util.get_coverage_for_test_suite(ant_build_file=ant_build_file,
+                                                              test_root_dir=test_dir,
+                                                              report_dir=report_dir)
+    inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
+    test_method_count = __get_test_method_count(test_dir)
+    inst_cov_efficiency = inst_cov_rate / test_method_count
+    tkltest_status('Coverage information for {} tests: instruction={}/{}({:.1%}), branch={}/{}({:.1%}), '.
+                   format(test_suite_name,
+                          test_coverage['instruction_covered'], test_coverage['instruction_total'],
+                          inst_cov_rate,
+                          test_coverage['branch_covered'], test_coverage['branch_total'],
+                          test_coverage['branch_covered'] / test_coverage['branch_total']
+                          ) +
+                   'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.
+                   format(test_coverage['line_covered'], test_coverage['line_total'],
+                          test_coverage['line_covered'] / test_coverage['line_total'],
+                          test_coverage['method_covered'], test_coverage['method_total'],
+                          test_coverage['method_covered'] / test_coverage['method_total'],
+                          inst_cov_efficiency, test_method_count
+                          )
+                   )
+
+    return test_coverage, test_method_count, inst_cov_efficiency
+
+
+def __initialize_test_directory(ctd_test_dir, source_test_dir):
+    """Clears CTD test directory and adds test classes from the given source test directory to the CTD test directory"""
+    # clear the target (ctd) directory
+    target_test_dir = ctd_test_dir + os.sep + 'monolithic'
+    shutil.rmtree(target_test_dir, ignore_errors=True)
+    os.makedirs(target_test_dir)
+
+    # copy test classes from the source directory
+    copy_test_classes = [
+        os.path.join(dir, file)
+        for dir, files in coverage_util.get_test_classes(source_test_dir).items()
+        for file in files if '_scaffolding' not in file
+    ]
+    for test_class in copy_test_classes:
+        coverage_util.add_test_class_to_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+
+
+def __get_test_method_count(test_dir):
+    """Returns count of test methods in all test classes in the given test directory"""
+    test_classes = [
+        os.path.join(dir, file)
+        for dir, files in coverage_util.get_test_classes(test_dir).items()
+        for file in files if '_scaffolding' not in file
+    ]
+    test_method_count = 0
+    for test_class in test_classes:
+        with open(test_class) as f:
+            test_lines = f.readlines()
+        r = re.compile(r'[\t ]*@Test(?:\(timeout ?= ?[0-9]+\))?[\t ]*')
+        for line in test_lines:
+            if r.match(line):
+                test_method_count += 1
+    return test_method_count
+
 
 
 def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, ant_build_file,
@@ -194,7 +317,8 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
     # shutil.copytree(ctd_test_dir, augmented_test_dir)
 
     if tests_with_coverage_gain:
-        tkltest_status('Augmenting "{}" with base tests that contribute to coverage gain'.format(ctd_test_dir))
+        tkltest_status('Augmenting "{}" with tests from the augmentation pool that contribute to coverage gain'
+                       .format(ctd_test_dir))
 
     # group test cases by (instruction+branch) coverage gain and create reverse sorted list of gain values
     grouped_tests_with_cov_gain, ordered_cov_gain_values = __group_tests_by_coverage_gain(tests_with_coverage_gain)
