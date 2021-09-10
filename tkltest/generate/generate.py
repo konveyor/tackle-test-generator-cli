@@ -197,7 +197,7 @@ def generate_ctd_amplified_tests(config):
         start_time = time.time()
         augment_with_code_coverage(config=config, ant_build_file=ant_build_file,
                                    ctd_test_dir=test_directory, report_dir=reports_dir)
-        tkltest_status('Coverage-guided test-suite augmentation took {} seconds'.
+        tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
 
 
@@ -482,6 +482,8 @@ if __name__ == '__main__':  # pragma: no cover
     args = argparse.Namespace()
     args.command = 'generate'
     args.sub_command = 'ctd-amplified'
+    args.base_test_generator = 'evosuite'
+    args.verbose = True
     config = config_util.load_config(args=args, config_file=config_file)
     config['generate']['ctd_amplified']['augment_coverage'] = True
     process_generate_command(args=args, config=config)
