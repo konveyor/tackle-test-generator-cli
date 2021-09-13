@@ -117,11 +117,13 @@ def generate_ctd_amplified_tests(config):
     ctd_file = app_name+constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX
 
     # generate building-block test sequences
-    run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
+    if config['generate']['ctd_amplified']['reuse_base_tests']:
+        tkltest_status("Reusing existing basic block test sequences")
+    else:
+        run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
                           test_generator_name, time_limit, jdk_path, partitions_file, verbose)
-
-    tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
-          str(round(time.time() - start_time, 2)) + " seconds")
+        tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
+            str(round(time.time() - start_time, 2)) + " seconds")
 
     if test_generator_name == constants.COMBINED_TEST_GENERATOR_NAME:
         bb_seq_file = app_name+"_RandoopTestGenerator"+constants.TKL_BB_SEQ_FILE_SUFFIX+"," + \
