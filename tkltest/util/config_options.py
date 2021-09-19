@@ -381,7 +381,17 @@ __options_spec = {
                     'type': list,
                     'default_value': [],
                     'help_message': 'list of paths to refactored app classes'
-                }
+                },
+                'reuse_base_tests': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-rbt',
+                    'long_name': '--reuse-base-tests',
+                    'type': bool,
+                    'default_value': False,
+                    'help_message': 'reuse existing base test cases'
+                },
             },
 
             # "generate evosuite" command options

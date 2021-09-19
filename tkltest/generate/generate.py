@@ -20,6 +20,8 @@ import subprocess
 import sys
 import time
 import toml
+from threading import Thread
+
 
 from .augment import augment_with_code_coverage
 from .ctd_coverage import create_ctd_report
@@ -115,11 +117,13 @@ def generate_ctd_amplified_tests(config):
     ctd_file = app_name+constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX
 
     # generate building-block test sequences
-    run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
+    if config['generate']['ctd_amplified']['reuse_base_tests']:
+        tkltest_status("Reusing existing basic block test sequences")
+    else:
+        run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
                           test_generator_name, time_limit, jdk_path, partitions_file, verbose)
-
-    tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
-          str(round(time.time() - start_time, 2)) + " seconds")
+        tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
+            str(round(time.time() - start_time, 2)) + " seconds")
 
     if test_generator_name == constants.COMBINED_TEST_GENERATOR_NAME:
         bb_seq_file = app_name+"_RandoopTestGenerator"+constants.TKL_BB_SEQ_FILE_SUFFIX+"," + \
@@ -195,7 +199,7 @@ def generate_ctd_amplified_tests(config):
         start_time = time.time()
         augment_with_code_coverage(config=config, ant_build_file=ant_build_file,
                                    ctd_test_dir=test_directory, report_dir=reports_dir)
-        tkltest_status('Coverage-guided test-suite augmentation took {} seconds'.
+        tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
 
 
@@ -224,7 +228,7 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     tkltest_status('Computing coverage goals using CTD')
 
     # build java command to be executed
-    modeling_command = "java -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
+    modeling_command = "java -Xmx2048m -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "acts_"+constants.ACTS_VERSION+".jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-"+constants.SOOT_VERSION+".jar") + os.pathsep
@@ -289,7 +293,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tkltest_status('Generating basic block test sequences using '+test_generator_name)
 
     # build the java command to be executed
-    tg_command = "\""+jdk_path+"\" -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
+    tg_command = "\""+jdk_path+"\" -Xmx2048m -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-standalone-runtime-"
                                +constants.EVOSUITE_VERSION+".jar") + os.pathsep
@@ -358,7 +362,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     tkltest_status('Extending sequences to reach coverage goals and generating junit tests')
 
     te_command = "\"" + jdk_path + "\""
-    te_command += " -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+\
+    te_command += " -Xmx2048m -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+\
                   ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+".jar"
     te_command += " -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR) + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
@@ -400,39 +404,41 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     if os.path.exists(coverage_file_name):
         os.remove(coverage_file_name)
 
-    proc = command_util.start_command(te_command, verbose=verbose)
-    try:
-        proc.wait(timeout=constants.EXTENDER_INITIAL_TIMEOUT)
-    except subprocess.TimeoutExpired:
-        # extender process is still running and didn't create a coverage file yet
-        while not os.path.exists(coverage_file_name) and proc.poll() is None:
-            try:
-                proc.wait(timeout=constants.EXTENDER_REPEATED_TIMEOUT)
-            except subprocess.TimeoutExpired:
-                pass
-            except Exception as e:
-                tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                                format(e, e.stderr), error=True)
-                sys.exit(1)
-        poll = proc.poll()
-        # check if extender process is still running depsite creating a coverage file (its final step)
-        if poll is None:
-            tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
-            proc.kill()
-            proc.communicate()
-    except Exception as e:
-        tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-                        format(e, e.stderr), error=True)
+    global proc, thread_error
+    proc=None
+    thread_error = False
+
+    thread = Thread(target=extender_timeout, args=[te_command, coverage_file_name, verbose])
+    thread.start()
+    thread.join(constants.EXTENDER_INITIAL_TIMEOUT)
+    while (not os.path.exists(coverage_file_name)) and thread.is_alive() and not thread_error:
+        thread.join(constants.EXTENDER_REPEATED_TIMEOUT)
+
+    if thread_error:
         sys.exit(1)
 
-    #try:
-    #    command_util.run_command(command=te_command, verbose=verbose)
-    #except subprocess.CalledProcessError as e:
-    #    tkltest_status('Extending sequences and generating JUnit tests failed: {}\n{}'.
-    #                   format(e, e.stderr), error=True)
-    #    sys.exit(1)
+    if proc.poll() is None:
+        tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
+        proc.kill()
 
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
+
+def extender_timeout(command, coverage_file_name, verbose):
+    global proc, thread_error
+    proc = command_util.start_command(command, verbose=verbose)
+    output, error = proc.communicate()
+
+    # return code might not be zero when the extender completed but some threads are still running,
+    # hence if coverage file exists we treat the run as succeeded regardless of the return code
+    if os.path.exists(coverage_file_name):
+        return
+
+    if proc.returncode != 0:
+        tkltest_status('Extending sequences and generating JUnit tests failed with return code {}: {}\n'.
+                               format(proc.returncode, error), error=True)
+        thread_error = True
+        # sys.exit will cause only the thread to exit, hence we need thread_error to signal to main process
+        sys.exit(1)
 
 
 def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output_dir):
@@ -478,6 +484,8 @@ if __name__ == '__main__':  # pragma: no cover
     args = argparse.Namespace()
     args.command = 'generate'
     args.sub_command = 'ctd-amplified'
+    args.base_test_generator = 'evosuite'
+    args.verbose = True
     config = config_util.load_config(args=args, config_file=config_file)
     config['generate']['ctd_amplified']['augment_coverage'] = True
     process_generate_command(args=args, config=config)

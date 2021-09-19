@@ -273,7 +273,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_ctdamplified_combined_classlist_nodiffassert(self) -> None:
+    def test_generate_execute_ctdamplified_combined_classlist_nodiffassert_reuse(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list no_diff_assertions"""
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
@@ -282,6 +282,14 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+
+            # regenerate while reusing previously generated basic block files
+            config['generate']['ctd_amplified']['reuse_base_tests'] = True
+
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
