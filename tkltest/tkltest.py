@@ -103,28 +103,6 @@ def __add_arguments_to_parser(parser, options_spec):
         parser.add_argument(*[option['short_name'], option['long_name']], **add_arg_params)
 
 
-def __fix_relative_path(path):
-    if path != "" and not os.path.isabs(path):
-        return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
-    return path
-
-def __fix_relative_pathes(tkltest_config):
-    for key in [("general", "app_classpath_file"),]:
-        tkltest_config[key[0]][key[1]] = __fix_relative_path(tkltest_config[key[0]][key[1]])
-    for key in [("general", "monolith_app_path"),]:
-        tkltest_config[key[0]][key[1]] = [__fix_relative_path(path) for path in tkltest_config[key[0]][key[1]]]
-
-    for key in [("general", "app_classpath_file"),]:
-        classpath_file = tkltest_config[key[0]][key[1]]
-        with open(classpath_file) as file:
-            lines = file.readlines()
-        lines = [__fix_relative_path(path) for path in lines]
-        correct_file = os.path.basename(classpath_file)
-        with open(correct_file, 'w') as f:
-            f.writelines(lines)
-        tkltest_config[key[0]][key[1]] = correct_file
-
-
 def __unjar_path(tkltest_config):
     unjar_paths = list()
     for path in tkltest_config['general']['monolith_app_path']:
@@ -193,13 +171,12 @@ def main():
 
     # parse arguments
     args = parser.parse_args()
-    #todo: fix relative path in args
 
     #todo: get_work_dir()
     work_dir = "tkltest-work-dir"
     if not os.path.isdir(work_dir):
         os.mkdir(work_dir)
-    #todo - resolve the following code
+    #todo - resolve the following code. BTW, soft links do not work on windows
     shutil.rmtree(os.path.join(work_dir,"lib"))
     os.mkdir(os.path.join(work_dir,"lib"))
     os.mkdir(os.path.join(work_dir, "lib", "download"))
@@ -223,10 +200,11 @@ def main():
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
     tkltest_config = config_util.load_config(args)
-    __fix_relative_pathes(tkltest_config)
     logging.info('config_file: {}'.format(tkltest_config))
 
     unjar_paths = __unjar_path(tkltest_config)
+
+    # todo: should we need to fix relative path in args?
 
     # process other commands
     try:

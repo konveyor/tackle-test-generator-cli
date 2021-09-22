@@ -18,6 +18,7 @@ import sys
 
 from . import constants, config_options
 from .logging_util import tkltest_status
+from .constants import *
 
 
 def load_config(args=None, config_file=None):
@@ -88,6 +89,7 @@ def load_config(args=None, config_file=None):
         tkltest_config[args.command][subcommand]['base_test_generator'] = \
             constants.BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
 
+    __fix_relative_pathes(tkltest_config)
     logging.debug('validated config: {}'.format(tkltest_config))
     return tkltest_config
 
@@ -257,6 +259,36 @@ def __merge_config(base_config, update_config):
             __merge_config(baseval, val)
         else:
             base_config[key] = val
+
+
+def __fix_relative_path(path):
+    if path != "" and not os.path.isabs(path):
+        return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
+    return path
+
+def __fix_relative_pathes(tkltest_config):
+
+
+    options_spec = config_options.get_options_spec()
+
+    for section_name, options in options_spec.items():
+        options.pop('help_message', None)
+        for option_name in options.keys():
+            fix_type = options_spec[section_name][option_name].get('relative_fix_type', 'none')
+            if fix_type == 'path':
+                tkltest_config[section_name][option_name] = __fix_relative_path(tkltest_config[section_name][option_name])
+            if fix_type == 'paths_list':
+                tkltest_config[section_name][option_name] = [__fix_relative_path(path) for path in tkltest_config[section_name][option_name]]
+            if fix_type == 'paths_list_file':
+                classpath_file = tkltest_config[section_name][option_name]
+                with open(classpath_file) as file:
+                    lines = file.readlines()
+                lines = [__fix_relative_path(path) for path in lines]
+                correct_file = os.path.basename(classpath_file)
+                #todo - what if file exist
+                with open(correct_file, 'w') as f:
+                    f.writelines(lines)
+                tkltest_config[section_name][option_name] = correct_file
 
 
 if __name__ == '__main__':
