@@ -89,7 +89,6 @@ def load_config(args=None, config_file=None):
         tkltest_config[args.command][subcommand]['base_test_generator'] = \
             constants.BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
 
-    __fix_relative_pathes(tkltest_config)
     logging.debug('validated config: {}'.format(tkltest_config))
     return tkltest_config
 
@@ -266,11 +265,9 @@ def __fix_relative_path(path):
         return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
     return path
 
-def __fix_relative_pathes(tkltest_config):
-
+def fix_relative_pathes(tkltest_config):
 
     options_spec = config_options.get_options_spec()
-
     for section_name, options in options_spec.items():
         options.pop('help_message', None)
         for option_name in options.keys():
@@ -280,15 +277,16 @@ def __fix_relative_pathes(tkltest_config):
             if fix_type == 'paths_list':
                 tkltest_config[section_name][option_name] = [__fix_relative_path(path) for path in tkltest_config[section_name][option_name]]
             if fix_type == 'paths_list_file':
-                classpath_file = tkltest_config[section_name][option_name]
+                classpath_file = __fix_relative_path(tkltest_config[section_name][option_name])
                 with open(classpath_file) as file:
                     lines = file.readlines()
                 lines = [__fix_relative_path(path) for path in lines]
-                correct_file = os.path.basename(classpath_file)
-                #todo - what if file exist
-                with open(correct_file, 'w') as f:
+                new_file = os.path.basename(classpath_file)
+                #todo - we will have a bug if the users uses too different files with the same name
+                with open(new_file, 'w') as f:
                     f.writelines(lines)
-                tkltest_config[section_name][option_name] = correct_file
+                tkltest_config[section_name][option_name] = new_file
+
 
 
 if __name__ == '__main__':
