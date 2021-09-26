@@ -265,27 +265,41 @@ def __fix_relative_path(path):
         return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
     return path
 
-def fix_relative_pathes(tkltest_config):
-
+def fix_relative_paths(tkltest_config):
     options_spec = config_options.get_options_spec()
-    for section_name, options in options_spec.items():
-        options.pop('help_message', None)
-        for option_name in options.keys():
-            fix_type = options_spec[section_name][option_name].get('relative_fix_type', 'none')
-            if fix_type == 'path':
-                tkltest_config[section_name][option_name] = __fix_relative_path(tkltest_config[section_name][option_name])
-            if fix_type == 'paths_list':
-                tkltest_config[section_name][option_name] = [__fix_relative_path(path) for path in tkltest_config[section_name][option_name]]
-            if fix_type == 'paths_list_file':
-                classpath_file = __fix_relative_path(tkltest_config[section_name][option_name])
-                with open(classpath_file) as file:
-                    lines = file.readlines()
-                lines = [__fix_relative_path(path) for path in lines]
-                new_file = os.path.basename(classpath_file)
-                #todo - we will have a bug if the users uses too different files with the same name
-                with open(new_file, 'w') as f:
-                    f.writelines(lines)
-                tkltest_config[section_name][option_name] = new_file
+    __fix_relative_paths_recursively(options_spec, tkltest_config)
+    with open('tkltest_config_fixed.toml', "w") as f:
+        toml.dump(tkltest_config, f)
+        f.close()
+
+def __fix_relative_paths_recursively(options_spec, config):
+
+    for option_name, options in options_spec.items():
+        if type(options) is not dict:
+            return
+        if option_name == 'subcommands':
+            for subcommands_option_name, subcommands_option in options.items():
+                __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name])
+            return
+        if option_name not in config.keys():
+            continue
+        __fix_relative_paths_recursively(options, config[option_name])
+        fix_type = options_spec[option_name].get('relative_fix_type', 'none')
+        if fix_type == 'path':
+            config[option_name] = __fix_relative_path(config[option_name])
+        if fix_type == 'paths_list':
+            config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
+        if fix_type == 'paths_list_file':
+            classpath_file = __fix_relative_path(config[option_name])
+            with open(classpath_file) as file:
+                lines = file.readlines()
+            lines = [__fix_relative_path(path) for path in lines]
+            new_file = os.path.basename(classpath_file)
+            #todo - we will have a bug if the users uses two different files with the same name
+            with open(new_file, 'w') as f:
+                f.writelines(lines)
+            config[option_name] = new_file
+
 
 
 

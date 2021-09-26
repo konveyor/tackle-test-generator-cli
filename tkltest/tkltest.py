@@ -120,9 +120,8 @@ def __unjar_path(tkltest_config):
     return unjar_paths
 
 
-
-def __set_work_dir(tkltest_config):
-    app_name = tkltest_config['general']['app_name']
+#todo: should it remove to the utils code dir:
+def __set_work_dir(app_name):
     if not os.path.isdir(TKLTEST_WORK_DIR):
         os.mkdir(TKLTEST_WORK_DIR)
     work_dir = os.path.join(TKLTEST_WORK_DIR, app_name)
@@ -206,9 +205,10 @@ def main():
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
     tkltest_config = config_util.load_config(args)
-    __set_work_dir(tkltest_config)
-    config_util.fix_relative_pathes(tkltest_config)
+    __set_work_dir(tkltest_config['general']['app_name'])
+    config_util.fix_relative_paths(tkltest_config)
     logging.info('config_file: {}'.format(tkltest_config))
+
     unjar_paths = __unjar_path(tkltest_config)
 
     # todo: should we need to fix relative path in args?
