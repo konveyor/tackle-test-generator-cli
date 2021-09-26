@@ -268,6 +268,7 @@ def __fix_relative_path(path):
 def fix_relative_paths(tkltest_config):
     options_spec = config_options.get_options_spec()
     __fix_relative_paths_recursively(options_spec, tkltest_config)
+    #todo - to remove:
     with open('tkltest_config_fixed.toml', "w") as f:
         toml.dump(tkltest_config, f)
         f.close()
@@ -276,20 +277,20 @@ def __fix_relative_paths_recursively(options_spec, config):
 
     for option_name, options in options_spec.items():
         if type(options) is not dict:
-            return
+            continue
         if option_name == 'subcommands':
             for subcommands_option_name, subcommands_option in options.items():
                 __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name])
             return
         if option_name not in config.keys():
             continue
-        __fix_relative_paths_recursively(options, config[option_name])
         fix_type = options_spec[option_name].get('relative_fix_type', 'none')
         if fix_type == 'path':
-            config[option_name] = __fix_relative_path(config[option_name])
-        if fix_type == 'paths_list':
-            config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
-        if fix_type == 'paths_list_file':
+            if options_spec[option_name].get('type') == str:
+                config[option_name] = __fix_relative_path(config[option_name])
+            else:
+                config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
+        elif fix_type == 'paths_list_file':
             classpath_file = __fix_relative_path(config[option_name])
             with open(classpath_file) as file:
                 lines = file.readlines()
@@ -299,8 +300,8 @@ def __fix_relative_paths_recursively(options_spec, config):
             with open(new_file, 'w') as f:
                 f.writelines(lines)
             config[option_name] = new_file
-
-
+        else:
+            __fix_relative_paths_recursively(options, config[option_name])
 
 
 if __name__ == '__main__':

@@ -181,7 +181,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'relative_fix_type': 'paths_list',
+            'relative_fix_type': 'path',
             'help_message': 'list of paths to application classes'
         },
         'java_jdk_home': {
@@ -388,7 +388,7 @@ __options_spec = {
                     'is_cli_option': False,
                     'type': list,
                     'default_value': [],
-                    'relative_fix_type': 'paths_list',
+                    'relative_fix_type': 'path',
                     'help_message': 'list of paths to refactored app classes'
                 },
                 'reuse_base_tests': {

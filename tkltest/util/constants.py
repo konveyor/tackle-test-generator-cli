@@ -21,7 +21,7 @@ TKLTEST_GENERATE_CONFIG_FILE='.tkltest_generate.toml'
 
 TKLTEST_CLI_RELATIVE_DIR = os.path.join('..', '..')
 #TKLTEST_CLI_RELATIVE_DIR = '..'
-TKLTEST_WORK_DIR = 'tkltest-work-dir'
+TKLTEST_WORK_DIR = 'tkltest-output-dir'
 
 # lib download dir
 TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_RELATIVE_DIR, 'lib')
