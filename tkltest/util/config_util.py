@@ -265,13 +265,6 @@ def __fix_relative_path(path):
         return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
     return path
 
-def fix_relative_paths(tkltest_config):
-    options_spec = config_options.get_options_spec()
-    __fix_relative_paths_recursively(options_spec, tkltest_config)
-    #todo - to remove:
-    with open('tkltest_config_fixed.toml', "w") as f:
-        toml.dump(tkltest_config, f)
-        f.close()
 
 def __fix_relative_paths_recursively(options_spec, config):
 
@@ -302,6 +295,20 @@ def __fix_relative_paths_recursively(options_spec, config):
             config[option_name] = new_file
         else:
             __fix_relative_paths_recursively(options, config[option_name])
+
+
+def fix_relative_paths(tkltest_config):
+    options_spec = config_options.get_options_spec()
+    if tkltest_config.get('relative_fixed', False) == True:
+        return
+    __fix_relative_paths_recursively(options_spec, tkltest_config)
+    tkltest_config['relative_fixed'] = True
+    #todo - to remove:
+    with open('tkltest_config_fixed.toml', "w") as f:
+        toml.dump(tkltest_config, f)
+        f.close()
+
+
 
 
 if __name__ == '__main__':

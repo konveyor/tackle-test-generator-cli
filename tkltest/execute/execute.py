@@ -18,7 +18,7 @@ import sys
 
 import toml
 
-from tkltest.util import constants, build_util, command_util
+from tkltest.util import constants, build_util, command_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -31,7 +31,9 @@ def process_execute_command(args, config):
         args: command-line arguments
         config: loaded configuration options
     """
+    dir_util.prepare_to_run(config)
     __execute_base(args, config)
+    dir_util.return_to_cli_dir()
 
 
 def __get_test_classes(test_root_dir):

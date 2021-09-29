@@ -26,7 +26,7 @@ from threading import Thread
 from .augment import augment_with_code_coverage
 from .ctd_coverage import create_ctd_report
 from .generate_standalone import generate_randoop, generate_evosuite
-from tkltest.util import build_util, command_util, constants, config_util
+from tkltest.util import build_util, command_util, constants, config_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -41,7 +41,7 @@ def process_generate_command(args, config):
         config: loaded configuration options
     """
     logging.info('Processing generate command')
-
+    dir_util.prepare_to_run(config)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
@@ -65,6 +65,7 @@ def process_generate_command(args, config):
     generate_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
+    dir_util.return_to_cli_dir()
 
 
 def generate_ctd_amplified_tests(config):

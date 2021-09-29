@@ -120,27 +120,6 @@ def __unjar_path(tkltest_config):
     return unjar_paths
 
 
-#todo: should it remove to the utils code dir:
-def __set_work_dir(app_name):
-    if not os.path.isdir(TKLTEST_WORK_DIR):
-        os.mkdir(TKLTEST_WORK_DIR)
-    work_dir = os.path.join(TKLTEST_WORK_DIR, app_name)
-    if not os.path.isdir(work_dir):
-        os.mkdir(work_dir)
-
-    # todo - resolve the following code. BTW, soft links do not work on windows
-    if os.path.isdir(os.path.join(work_dir, "lib")):
-        shutil.rmtree(os.path.join(work_dir, "lib"))
-    os.mkdir(os.path.join(work_dir, "lib"))
-    os.mkdir(os.path.join(work_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(work_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(work_dir, "lib", "download"))
-    # end of todo
-
-    os.chdir(work_dir)
-
-
-
 def __process_config_commands(args):
     """Processes config commands
 
@@ -205,8 +184,6 @@ def main():
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
     tkltest_config = config_util.load_config(args)
-    __set_work_dir(tkltest_config['general']['app_name'])
-    config_util.fix_relative_paths(tkltest_config)
     logging.info('config_file: {}'.format(tkltest_config))
 
     unjar_paths = __unjar_path(tkltest_config)
