@@ -26,6 +26,8 @@ def __create_output_dir(app_name):
     output_dir = os.path.join(TKLTEST_OUTPUT_DIR, app_name)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
+        #todo: WTF
+        os.mkdir(os.path.join(output_dir,app_name+"randoop-tests"))
 
     # todo - resolve the following code. BTW, soft links do not work on windows
     if os.path.isdir(os.path.join(output_dir, "lib")):
