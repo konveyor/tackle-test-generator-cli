@@ -42,10 +42,11 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     # add app libraries specified in classpath file to classpath
     with open(classpath_file) as file:
         for line in file:
-            if line.endswith('\n'):
-                class_paths.append(os.path.abspath(line[:-1]))
-            else:
-                class_paths.append(os.path.abspath(line))
+            if line.strip():
+                if line.endswith('\n'):
+                    class_paths.append(os.path.abspath(line[:-1]))
+                else:
+                    class_paths.append(os.path.abspath(line))
 
     # add path for app classes for mono or micro version
     if partition is not None:
