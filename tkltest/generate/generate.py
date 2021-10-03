@@ -65,7 +65,7 @@ def process_generate_command(args, config):
     generate_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
-    dir_util.return_to_cli_dir()
+    dir_util.ch_cli_dir()
 
 
 def generate_ctd_amplified_tests(config):

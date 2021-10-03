@@ -45,9 +45,10 @@ class GenerateExecuteTest(unittest.TestCase):
     def setUp(self) -> None:
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
-
+            dir_util.ch_cli_dir()
             # remove directories and files created during test generation
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
+            dir_util.clear_output_dir(app_name)
             shutil.rmtree(app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX, ignore_errors=True)
@@ -641,7 +642,7 @@ class GenerateExecuteTest(unittest.TestCase):
             ctd_report_dir = os.path.join(main_report_dir, constants.TKL_CTD_REPORT_DIR)
             self.assertTrue(os.path.isdir(ctd_report_dir))
 
-        dir_util.return_to_cli_dir()
+        dir_util.ch_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
     def __assert_execute_resources(self, app_name, code_coverage=True, reports_path=''):
@@ -659,7 +660,7 @@ class GenerateExecuteTest(unittest.TestCase):
         else:
             self.assertFalse(os.path.isdir(cov_report_dir))
         if not reports_path:
-            dir_util.return_to_cli_dir()
+            dir_util.ch_cli_dir()
 
     def __process_generate(self, subcommand, config):
         self.args.command = 'generate'

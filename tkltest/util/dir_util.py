@@ -17,17 +17,21 @@ import shutil
 from . import constants, config_util
 from .constants import *
 
+def __get_output_dir(app_name):
+    return os.path.join(TKLTEST_OUTPUT_DIR, app_name)
 
+def clear_output_dir(app_name):
+    output_dir = __get_output_dir(app_name)
+    if os.path.isdir(output_dir):
+        shutil.rmtree(output_dir)
 
 
 def __create_output_dir(app_name):
     if not os.path.isdir(TKLTEST_OUTPUT_DIR):
         os.mkdir(TKLTEST_OUTPUT_DIR)
-    output_dir = os.path.join(TKLTEST_OUTPUT_DIR, app_name)
+    output_dir = __get_output_dir(app_name)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-        #todo: WTF
-        os.mkdir(os.path.join(output_dir,app_name+"randoop-tests"))
 
     # todo - resolve the following code. BTW, soft links do not work on windows
     if os.path.isdir(os.path.join(output_dir, "lib")):
@@ -40,13 +44,13 @@ def __create_output_dir(app_name):
 
 
 def cd_output_dir(app_name):
-    output_dir = os.path.join(TKLTEST_OUTPUT_DIR, app_name)
+    output_dir = __get_output_dir(app_name)
     os.chdir(output_dir)
 
 
-def return_to_cli_dir():
-    os.chdir(TKLTEST_CLI_RELATIVE_DIR)
-
+def ch_cli_dir():
+    os.chdir(ch_cli_dir.cli_dir)
+ch_cli_dir.cli_dir = os.getcwd()
 
 def prepare_to_run(tkltest_config):
     app_name = tkltest_config['general']['app_name']

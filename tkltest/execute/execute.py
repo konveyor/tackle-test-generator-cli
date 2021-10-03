@@ -33,7 +33,7 @@ def process_execute_command(args, config):
     """
     dir_util.prepare_to_run(config)
     __execute_base(args, config)
-    dir_util.return_to_cli_dir()
+    dir_util.ch_cli_dir()
 
 
 def __get_test_classes(test_root_dir):
