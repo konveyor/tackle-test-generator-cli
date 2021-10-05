@@ -58,5 +58,16 @@ def prepare_to_run(tkltest_config):
     cd_output_dir(app_name)
     config_util.fix_relative_paths(tkltest_config)
 
-def clean_app_output():
-    aa=3
+def delete_app_output(app_name):
+    for filename in os.listdir('.'):
+        if filename.startswith(app_name):
+            continue
+        if filename.startswith('evosuite'):
+            continue
+        try:
+            if os.path.isfile(filename) or os.path.islink(filename):
+                os.unlink(filename)
+            elif os.path.isdir(filename):
+                shutil.rmtree(filename)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (filename, e))

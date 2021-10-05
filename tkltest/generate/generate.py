@@ -65,6 +65,7 @@ def process_generate_command(args, config):
     generate_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
+    dir_util.delete_app_output(config['general']['app_name'])
     dir_util.ch_cli_dir()
 
 
