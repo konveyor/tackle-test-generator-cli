@@ -48,7 +48,7 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.ch_cli_dir()
             # remove directories and files created during test generation
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
-            dir_util.clear_output_dir(app_name)
+            dir_util.clear_output_dir(app_name)#todo remove?
             shutil.rmtree(app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX, ignore_errors=True)
             shutil.rmtree(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX, ignore_errors=True)

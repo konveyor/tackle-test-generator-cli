@@ -492,7 +492,6 @@ __options_spec = {
             'long_name': '--test-class',
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'path',
             'help_message': 'path to a test class file (.java) to compile and run'
         }
     }

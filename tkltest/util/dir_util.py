@@ -18,7 +18,7 @@ from . import constants, config_util
 from .constants import *
 
 def __get_output_dir(app_name):
-    return os.path.join(TKLTEST_OUTPUT_DIR, app_name)
+    return os.path.join(TKLTEST_OUTPUT_DIR_PREFIX + app_name)
 
 def clear_output_dir(app_name):
     output_dir = __get_output_dir(app_name)
@@ -27,13 +27,12 @@ def clear_output_dir(app_name):
 
 
 def __create_output_dir(app_name):
-    if not os.path.isdir(TKLTEST_OUTPUT_DIR):
-        os.mkdir(TKLTEST_OUTPUT_DIR)
     output_dir = __get_output_dir(app_name)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
-    # todo - resolve the following code. BTW, soft links do not work on windows
+    # todo - consider resolve the following code. BTW, soft links do not work on windows.
+    # currently, at the core, the location is hard coded
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
     os.mkdir(os.path.join(output_dir, "lib"))
@@ -50,9 +49,10 @@ def cd_output_dir(app_name):
 
 def ch_cli_dir():
     os.chdir(ch_cli_dir.cli_dir)
-ch_cli_dir.cli_dir = os.getcwd()
+ch_cli_dir.cli_dir = os.getcwd() #todo - move to main
 
-def prepare_to_run(tkltest_config):
+
+def prepare_to_run(tkltest_config): #todo - change the name
     app_name = tkltest_config['general']['app_name']
     __create_output_dir(app_name)
     cd_output_dir(app_name)
@@ -62,7 +62,7 @@ def delete_app_output(app_name):
     for filename in os.listdir('.'):
         if filename.startswith(app_name):
             continue
-        if filename.startswith('evosuite'):
+        if filename.startswith('evosuite'): #todo - try to reconstract
             continue
         try:
             if os.path.isfile(filename) or os.path.islink(filename):
