@@ -42,6 +42,7 @@ def cd_output_dir(app_name):
     #entering output dir
     os.chdir(output_dir)
 
+
 def delete_app_output(app_name):
     for filename in os.listdir('.'):
         if filename.startswith(app_name):
