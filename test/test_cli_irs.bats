@@ -30,7 +30,7 @@ setup_file() {
 
     # assert over test plan file
     [ -f ./tkltest-output-dir-irs/$IRS_CTD_TEST_PLAN_FILE ]
-    class_count=`jq '.models_and_test_plans.monolithic | keys | length' $IRS_CTD_TEST_PLAN_FILE`
+    class_count=`jq '.models_and_test_plans.monolithic | keys | length' ./tkltest-output-dir-irs/$IRS_CTD_TEST_PLAN_FILE`
     [ $class_count -eq 5 ]
 
     # assert over test generation report
@@ -73,7 +73,7 @@ setup_file() {
     [ -d $IRS_INSTR_CLASSES_DIR ]
 
     # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
+    partition_rep_dir=./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
 
     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs.irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
@@ -95,7 +95,7 @@ setup_file() {
 
 
 @test "Test 03: CLI execute --online-instrumentation irs" {
-    rm -rf $IRS_TEST_REPORTS_DIR
+    rm -rf ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -108,7 +108,7 @@ setup_file() {
 }
 
 @test "Test 04: CLI generate [all-classes] ctd-amplified [diff-assertions] irs" {
-    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
+    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -146,7 +146,7 @@ setup_file() {
 }
 
 @test "Test 05: CLI execute irs" {
-    rm -rf $IRS_TEST_REPORTS_DIR
+    rm -rf ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -158,7 +158,7 @@ setup_file() {
     [ -d ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/junit-reports ]
 
     # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
+    partition_rep_dir=./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
 
     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs.irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
@@ -235,7 +235,7 @@ setup_file() {
 }
 
 @test "Test 08: CLI generate execute [target-class-list] ctd-amplified irs" {
-    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
+    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -314,7 +314,7 @@ setup_file() {
 
 @test "Test 11: CLI generate [all-classes] ctd-amplified --base-test-generator randoop irs" {
     skip
-    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
+    rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -322,7 +322,7 @@ setup_file() {
     [ $status -eq 0 ]
 
     # assert over test reports dir
-    [ -d ./$IRS_TEST_REPORTS_DIR/ctd-report ]
+    [ -d ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/ctd-report ]
 
     # assert over test plan file
     [ -f $IRS_CTD_TEST_PLAN_FILE ]
@@ -373,7 +373,7 @@ setup_file() {
 
     # assert over test plan file
     [ -f ./tkltest-output-dir-irs/$IRS_CTD_TEST_PLAN_FILE ]
-    class_count=`jq '.models_and_test_plans.monolithic | keys | length' ./tkltest-output-dir/irs/$IRS_CTD_TEST_PLAN_FILE`
+    class_count=`jq '.models_and_test_plans.monolithic | keys | length' ./tkltest-output-dir-irs/$IRS_CTD_TEST_PLAN_FILE`
     [ $class_count -eq 5 ]
 
     # assert over generated test cases
