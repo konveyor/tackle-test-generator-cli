@@ -29,12 +29,12 @@ setup_file() {
     [ -d ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/ctd-report ]
 
     # assert over test plan file
-    [ -f $IRS_CTD_TEST_PLAN_FILE ]
+    [ -f ./tkltest-output-dir-irs/$IRS_CTD_TEST_PLAN_FILE ]
     class_count=`jq '.models_and_test_plans.monolithic | keys | length' $IRS_CTD_TEST_PLAN_FILE`
     [ $class_count -eq 5 ]
 
     # assert over test generation report
-    [ -f $IRS_TESTGEN_SUMMARY_FILE ]
+    [ -f ./tkltest-output-dir-irs/$IRS_TESTGEN_SUMMARY_FILE ]
     [ `jq .building_block_sequences_info.base_sequences $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
     [ `jq .building_block_sequences_info.parsed_base_sequences_full $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
     [ `jq .building_block_sequences_info.parsed_base_sequences_partial $IRS_TESTGEN_SUMMARY_FILE` -eq 0 ]
@@ -70,7 +70,7 @@ setup_file() {
     # assert over reports dirs and instrumented classes dir
     [ -d ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/jacoco-reports ]
     [ -d ./tkltest-output-dir-irs/$IRS_TEST_REPORTS_DIR/junit-reports ]
-    [ -d ./tkltest-output-dir-irs/$IRS_INSTR_CLASSES_DIR ]
+    [ -d $IRS_INSTR_CLASSES_DIR ]
 
     # assert over test failures and errors
     partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
