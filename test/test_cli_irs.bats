@@ -373,7 +373,7 @@ setup_file() {
 
     # assert over test plan file
     [ -f ./tkltest-output-dir/irs/$IRS_CTD_TEST_PLAN_FILE ]
-    class_count=`jq '.models_and_test_plans.monolithic | keys | length' $IRS_CTD_TEST_PLAN_FILE`
+    class_count=`jq '.models_and_test_plans.monolithic | keys | length' ./tkltest-output-dir/irs/$IRS_CTD_TEST_PLAN_FILE`
     [ $class_count -eq 5 ]
 
     # assert over generated test cases
