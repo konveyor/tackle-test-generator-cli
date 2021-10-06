@@ -41,7 +41,8 @@ def process_generate_command(args, config):
         config: loaded configuration options
     """
     logging.info('Processing generate command')
-    dir_util.prepare_to_run(config)
+    dir_util.cd_output_dir(config['general']['app_name'])
+    config_util.fix_relative_paths(config)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
@@ -66,7 +67,7 @@ def process_generate_command(args, config):
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
     dir_util.delete_app_output(config['general']['app_name'])
-    dir_util.ch_cli_dir()
+    dir_util.cd_cli_dir()
 
 
 def generate_ctd_amplified_tests(config):

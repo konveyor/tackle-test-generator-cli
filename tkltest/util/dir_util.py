@@ -17,52 +17,34 @@ import shutil
 from . import constants, config_util
 from .constants import *
 
-def __get_output_dir(app_name):
-    return os.path.join(TKLTEST_OUTPUT_DIR_PREFIX + app_name)
 
-def clear_output_dir(app_name):
-    output_dir = __get_output_dir(app_name)
-    if os.path.isdir(output_dir):
-        shutil.rmtree(output_dir)
+cli_dir = os.getcwd()
+def cd_cli_dir():
+    os.chdir(cli_dir)
 
-
-def __create_output_dir(app_name):
-    output_dir = __get_output_dir(app_name)
-    if not os.path.isdir(output_dir):
-        os.mkdir(output_dir)
-
-    # todo - consider resolve the following code. BTW, soft links do not work on windows.
-    # currently, at the core, the location is hard coded
-    if os.path.isdir(os.path.join(output_dir, "lib")):
-        shutil.rmtree(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
-    # end of todo
 
 
 def cd_output_dir(app_name):
-    output_dir = __get_output_dir(app_name)
+    #first we make sure we are at the cli dir:
+    if os.getcwd() != cli_dir:
+        cd_cli_dir()
+    output_dir = TKLTEST_OUTPUT_DIR_PREFIX + app_name
+    #creating output dir if not exist
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+        # todo - consider resolve the following code. BTW, soft links do not work on windows.
+        # currently, at the core, the locations of these jars are hard coded
+        os.mkdir(os.path.join(output_dir, "lib"))
+        os.mkdir(os.path.join(output_dir, "lib", "download"))
+        shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
+        shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
+        # end of todo
+    #entering output dir
     os.chdir(output_dir)
-
-
-def ch_cli_dir():
-    os.chdir(ch_cli_dir.cli_dir)
-ch_cli_dir.cli_dir = os.getcwd() #todo - move to main
-
-
-def prepare_to_run(tkltest_config): #todo - change the name
-    app_name = tkltest_config['general']['app_name']
-    __create_output_dir(app_name)
-    cd_output_dir(app_name)
-    config_util.fix_relative_paths(tkltest_config)
 
 def delete_app_output(app_name):
     for filename in os.listdir('.'):
         if filename.startswith(app_name):
-            continue
-        if filename.startswith('evosuite'): #todo - try to reconstract
             continue
         try:
             if os.path.isfile(filename) or os.path.islink(filename):
