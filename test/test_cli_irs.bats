@@ -369,10 +369,10 @@ setup_file() {
     [ $status -eq 0 ]
 
     # assert over test reports dir
-    [ -d ./$IRS_TEST_REPORTS_DIR/ctd-report ]
+    [ -d ./tkltest-output-dir/irs/$IRS_TEST_REPORTS_DIR/ctd-report ]
 
     # assert over test plan file
-    [ -f $IRS_CTD_TEST_PLAN_FILE ]
+    [ -f ./tkltest-output-dir/irs/$IRS_CTD_TEST_PLAN_FILE ]
     class_count=`jq '.models_and_test_plans.monolithic | keys | length' $IRS_CTD_TEST_PLAN_FILE`
     [ $class_count -eq 5 ]
 
