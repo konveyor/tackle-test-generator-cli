@@ -25,15 +25,18 @@ def cd_cli_dir():
 
 
 def cd_output_dir(app_name):
-    #first we make sure we are at the cli dir:
+    # first we make sure that:
+    # 1. the cli dir is set (by referring to it)
+    # 2. we are at the cli dir
     if os.getcwd() != cli_dir:
         cd_cli_dir()
     output_dir = TKLTEST_OUTPUT_DIR_PREFIX + app_name
-    #creating output dir if not exist
+    # creating output dir if not exist
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
+
     # todo - consider resolve the following code. BTW, soft links do not work on windows.
-    # currently, at the core, the locations of these jars are hard coded
+    # (currently, at the core, the locations of these jars are hard coded)
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
     os.mkdir(os.path.join(output_dir, "lib"))
@@ -41,7 +44,7 @@ def cd_output_dir(app_name):
     shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
     shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
-    #entering output dir
+    # cd output dir
     os.chdir(output_dir)
 
 
