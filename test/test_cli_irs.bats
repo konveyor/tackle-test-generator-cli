@@ -1,4 +1,4 @@
-IRS_OUTPUT_DIR=./tkltest-output-dir-irs
+IRS_OUTPUT_DIR=./tkltest-output-irs
 IRS_CONFIG_FILE=./test/data/irs/tkltest_config.toml
 IRS_CONFIG_FILE2=./test/data/irs/tkltest_config2.toml
 IRS_CTD_TEST_PLAN_FILE=$IRS_OUTPUT_DIR/irs_ctd_models_and_test_plans.json

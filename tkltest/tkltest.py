@@ -188,8 +188,6 @@ def main():
 
     unjar_paths = __unjar_path(tkltest_config)
 
-    # todo: should we need to fix relative path in args?
-
     # process other commands
     try:
         if args.command == 'execute':

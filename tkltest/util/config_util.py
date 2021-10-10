@@ -303,12 +303,6 @@ def fix_relative_paths(tkltest_config):
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)
     tkltest_config['relative_fixed'] = True
-    #todo - to remove:
-    with open('tkltest_config_relative_fixed.toml', "w") as f:
-        toml.dump(tkltest_config, f)
-        f.close()
-
-
 
 
 if __name__ == '__main__':

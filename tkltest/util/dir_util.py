@@ -23,7 +23,6 @@ def cd_cli_dir():
     os.chdir(cli_dir)
 
 
-
 def cd_output_dir(app_name):
     # first we make sure that:
     # 1. the cli dir is set (by referring to it)
@@ -35,7 +34,7 @@ def cd_output_dir(app_name):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
-    # todo - consider resolve the following code. BTW, soft links do not work on windows.
+    # todo - consider resolve the following code. (BTW, soft links do not work on windows).
     # (currently, at the core, the locations of these jars are hard coded)
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
