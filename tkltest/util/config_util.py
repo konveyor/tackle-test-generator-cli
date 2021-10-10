@@ -262,7 +262,7 @@ def __merge_config(base_config, update_config):
 
 def __fix_relative_path(path):
     if path != "" and not os.path.isabs(path):
-        return os.path.join(TKLTEST_CLI_RELATIVE_DIR, path)
+        return os.path.join('..', path)
     return path
 
 
@@ -304,7 +304,7 @@ def fix_relative_paths(tkltest_config):
     __fix_relative_paths_recursively(options_spec, tkltest_config)
     tkltest_config['relative_fixed'] = True
     #todo - to remove:
-    with open('tkltest_config_fixed.toml', "w") as f:
+    with open('tkltest_config_relative_fixed.toml', "w") as f:
         toml.dump(tkltest_config, f)
         f.close()
 
