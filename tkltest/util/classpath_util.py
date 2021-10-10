@@ -17,7 +17,7 @@ import posixpath
 import xml.etree.ElementTree as ElementTree
 
 
-def __create_classpath_from_ant_build_file(ant_build_file, classpath_filename):
+def __create_classpath_from_ant_build_file(ant_build_file, classpath_filename, application_base_dir):
     """ Creates classpath file named classpath_filename.
         Paths are relative to the start_dir directory.
     """
@@ -25,13 +25,13 @@ def __create_classpath_from_ant_build_file(ant_build_file, classpath_filename):
     root = tree.getroot()
     content = ""
 
-    for location_node in root.findall(".//path[@id='classpath']//pathelement[@location]"):
+    for location_node in root.findall("./path[@id='classpath']/pathelement[@location]"):
         location = location_node.get('location')
         if os.path.isabs(location):
             content += (location + '\n')
         else:
-            # constructs a path relative to *util* dir, because this is the test in main. todo change relativeness
-            content += (posixpath.normpath(posixpath.dirname(ant_build_file) + posixpath.sep + location) + '\n')
+            # The location attribute is relative to the app's project base directory
+            content += (posixpath.normpath(application_base_dir + posixpath.sep + location) + '\n')
 
     with open(classpath_filename, 'w') as classpath_file:
         classpath_file.write(content)
@@ -39,4 +39,5 @@ def __create_classpath_from_ant_build_file(ant_build_file, classpath_filename):
 
 if __name__ == '__main__':
     __create_classpath_from_ant_build_file("../../TEST_71_ext4j_1l/TEST_71_ext4j_1l-ctd-amplified-tests/build.xml",
-                                           "../../TEST_71_new_classpath.xml")
+                                           "../../TEST_71_new_classpath.xml",
+                                           "/home/victoria/testing/tackle-test-generator-cli/TEST_71_ext4j_1l/TEST_71_ext4j_1l-ctd-amplified-tests")
