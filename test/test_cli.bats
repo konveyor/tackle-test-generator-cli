@@ -143,7 +143,7 @@ teardown_file() {
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"Generate config file not found:"* ]]
-    [[ "${lines[2]}" == *"To execute tests in $IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"* ]]
+    [[ "${lines[2]}" == *"To execute tests in ../$IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"* ]]
 }
 
 @test "Test 16: CLI generate ctd-amplified parameter constraint violation" {
