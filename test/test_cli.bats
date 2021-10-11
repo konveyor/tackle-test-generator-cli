@@ -16,6 +16,12 @@ teardown_file() {
     rm -f $TEST_CONFIG_FILE1 $TEST_CONFIG_FILE2
 }
 
+@test "Test 00: CLI main no args" {
+    run tkltest
+    [ $status -eq 0 ]
+    [ "${lines[0]}" = "usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]" ]
+}
+
 @test "Test 01: CLI main help" {
     run tkltest --help
     [ $status -eq 0 ]
@@ -108,7 +114,14 @@ teardown_file() {
     [[ "${lines[3]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
-@test "Test 13: CLI generate ctd-amplified invalid spec in toml" {
+@test "Test 13: CLI generate ctd-amplified no config" {
+    run tkltest generate ctd-amplified
+    [ $status -eq 1 ]
+    echo "# ${lines[@]}" >&3
+    [[ "${lines[0]}" == *"ERROR: No config file specified"* ]]
+}
+
+@test "Test 14: CLI generate ctd-amplified invalid spec in toml" {
     run tkltest --config-file $IRS_CONFIG_FILE_ERR \
         generate --partitions-file $IRS_PARTITIONS_FILE ctd-amplified
     [ $status -eq 1 ]
@@ -119,7 +132,7 @@ teardown_file() {
     [[ "${lines[4]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
-@test "Test 14: CLI execute invalid spec in toml" {
+@test "Test 15: CLI execute invalid spec in toml" {
     run tkltest --config-file $IRS_CONFIG_FILE_ERR execute
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
@@ -129,7 +142,7 @@ teardown_file() {
     [[ "${lines[4]}" == *"Value for option \"build_type\" must be one of ['ant', 'maven']: gradle"* ]]
 }
 
-@test "Test 15: CLI execute missing generate config" {
+@test "Test 16: CLI execute missing generate config" {
     if [ ! -d $IRS_CTD_AMPLIFIED_TESTDIR ];  then
         echo "# creating $IRS_CTD_AMPLIFIED_TESTDIR" >&3
         mkdir $IRS_CTD_AMPLIFIED_TESTDIR
@@ -146,7 +159,7 @@ teardown_file() {
     [[ "${lines[2]}" == *"To execute tests in ../$IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"* ]]
 }
 
-@test "Test 16: CLI generate ctd-amplified parameter constraint violation" {
+@test "Test 17: CLI generate ctd-amplified parameter constraint violation" {
     run tkltest --config-file $IRS_CONFIG_FILE generate ctd-amplified \
         --base-test-generator randoop --augment-coverage
     [ $status -eq 1 ]
