@@ -42,7 +42,7 @@ def process_generate_command(args, config):
     """
     logging.info('Processing generate command')
     dir_util.cd_output_dir(config['general']['app_name'])
-    config_util.fix_relative_paths(config)
+    config_util.fix_config(config)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 

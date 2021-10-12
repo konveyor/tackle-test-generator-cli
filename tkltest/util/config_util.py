@@ -13,12 +13,16 @@
 
 import logging
 import os
+import shutil
 import toml
 import sys
+import subprocess
+import pathlib
 
 from . import constants, config_options
 from .logging_util import tkltest_status
 from .constants import *
+from tkltest.util import command_util
 
 
 def load_config(args=None, config_file=None):
@@ -285,24 +289,97 @@ def __fix_relative_paths_recursively(options_spec, config):
                 config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
         elif fix_type == 'paths_list_file':
             classpath_file = __fix_relative_path(config[option_name])
-            with open(classpath_file) as file:
-                lines = file.readlines()
-            lines = [__fix_relative_path(path) for path in lines]
-            new_file = os.path.basename(classpath_file)
-            #todo - we will have a bug if the users uses two different files with the same name
-            with open(new_file, 'w') as f:
-                f.writelines(lines)
-            config[option_name] = new_file
+            if classpath_file != "":
+                with open(classpath_file) as file:
+                    lines = file.readlines()
+                lines = [__fix_relative_path(path) for path in lines]
+                new_file = os.path.basename(classpath_file)
+                #todo - we will have a bug if the users uses two different files with the same name
+                with open(new_file, 'w') as f:
+                    f.writelines(lines)
+                config[option_name] = new_file
         else:
             __fix_relative_paths_recursively(options, config[option_name])
 
 
-def fix_relative_paths(tkltest_config):
+
+def __fix_relative_pathes(tkltest_config):
     options_spec = config_options.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)
     tkltest_config['relative_fixed'] = True
+
+
+def __resolve_claaspath(tkltest_config):
+    app_name = tkltest_config['general']['app_name']
+    if tkltest_config['general']['app_classpath_file'] != "":
+        #todo - check that there is no build files
+        return
+    elif tkltest_config['general']['gradle_build_file'] != "":
+        gradle_file = tkltest_config['general']['gradle_build_file']
+        orig_gradle_file = gradle_file + ".orig"
+        if os.path.isfile(orig_gradle_file):
+            shutil.copy(orig_gradle_file, gradle_file)
+            print("orig_gradle_file exist")
+            #todo error??
+            #todo - resolve the cases that user overrite the gradle file we created, and now we override his file
+        else:
+            shutil.copyfile(gradle_file,orig_gradle_file)
+        dependencies_dir = os.path.join(os.getcwd(), app_name + "-dependencies")
+        posix_dependencies_dir = pathlib.PureWindowsPath(dependencies_dir).as_posix()
+        if os.path.isdir(dependencies_dir):
+            shutil.rmtree(dependencies_dir)
+
+        tkltest_gradle_file = os.path.join(os.path.dirname(gradle_file), "tkltest.getDep.gradle")
+        f = open(tkltest_gradle_file, "w")
+        f.write("task getDependencies(type: Copy) {\n")
+        f.write("    from sourceSets.main.runtimeClasspath\n")
+        f.write("    into '" + posix_dependencies_dir + "'\n")
+        f.write("}\n")
+        f.close()
+
+        f = open(gradle_file, "a")
+        f.write(" apply from:'tkltest.getDep.gradle'\n")
+        f.close()
+
+        gradle_command = "gradle -q -b " + gradle_file + " getDependencies"
+        logging.info(gradle_command)
+
+        try:
+            command_util.run_command(command=gradle_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('gradle command failed: {}\n{}'.format(e, e.stderr), error=True)
+            shutil.move(orig_gradle_file, gradle_file)
+            os.remove(tkltest_gradle_file)
+            sys.exit(1)
+
+        shutil.move(orig_gradle_file, gradle_file)
+        os.remove(tkltest_gradle_file)
+        classpath_file = os.path.join(os.getcwd(), app_name + "_gradle_classpath.txt")
+        classpath_fd = open(classpath_file, "w")
+        if os.path.isdir(dependencies_dir):
+            for jar_file in os.listdir(dependencies_dir):
+                if jar_file.endswith(".jar"):
+                    classpath_fd.write(os.path.join(dependencies_dir, jar_file)+"\n")
+                else:
+                    shutil.rmtree(os.path.join(dependencies_dir, jar_file))
+            classpath_fd.close()
+            tkltest_config['general']['app_classpath_file'] = classpath_file
+
+        else:
+            #todo: error? empty file?
+            print("error no dependencies")
+            tkltest_config['general']['app_classpath_file'] = "../emptyFile.txt"
+    else:
+        print("error no classpathfile")
+        # todo: error? empty file?
+        tkltest_config['general']['app_classpath_file'] = "../emptyFile.txt"
+
+
+def fix_config(tkltest_config):
+    __fix_relative_pathes(tkltest_config)
+    __resolve_claaspath(tkltest_config)
 
 
 if __name__ == '__main__':

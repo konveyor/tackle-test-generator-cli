@@ -145,13 +145,22 @@ __options_spec = {
             'help_message': 'name of the application being tested'
         },
         'app_classpath_file': {
-            'required': True,
+            'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
             'relative_fix_type': 'paths_list_file',
             'help_message': 'file containing paths to jar files that represent the library dependencies of app'
+        },
+        'gradle_build_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relative_fix_type': 'path',
+            'help_message': 'gradle build file, needed for getting the library dependencies of the app'
         },
         'config_file': {
             'required': False,
