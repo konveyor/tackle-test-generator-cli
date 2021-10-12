@@ -327,7 +327,7 @@ def __resolve_claaspath(tkltest_config):
         else:
             shutil.copyfile(gradle_file,orig_gradle_file)
         dependencies_dir = os.path.join(os.getcwd(), app_name + "-dependencies")
-        posix_dependencies_dir = pathlib.PureWindowsPath(dependencies_dir).as_posix()
+        posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
         if os.path.isdir(dependencies_dir):
             shutil.rmtree(dependencies_dir)
 
