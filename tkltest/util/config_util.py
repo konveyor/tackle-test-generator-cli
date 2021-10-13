@@ -318,32 +318,27 @@ def __resolve_claaspath(tkltest_config):
         return
     elif tkltest_config['general']['gradle_build_file'] != "":
         gradle_file = tkltest_config['general']['gradle_build_file']
-        orig_gradle_file = gradle_file + ".orig"
-        if os.path.isfile(orig_gradle_file):
-            shutil.copy(orig_gradle_file, gradle_file)
-            print("orig_gradle_file exist")
-            #todo error??
-            #todo - resolve the cases that user overrite the gradle file we created, and now we override his file
-        else:
-            shutil.copyfile(gradle_file,orig_gradle_file)
         dependencies_dir = os.path.join(os.getcwd(), app_name + "-dependencies")
         posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
         if os.path.isdir(dependencies_dir):
             shutil.rmtree(dependencies_dir)
 
-        tkltest_gradle_file = os.path.join(os.path.dirname(gradle_file), "tkltest.getDep.gradle")
+        tkltest_gradle_file = os.path.join(os.path.dirname(gradle_file), "tkltest_get_dependencies.gradle")
         f = open(tkltest_gradle_file, "w")
-        f.write("task getDependencies(type: Copy) {\n")
+        f.write("task tkltest_get_dependencies(type: Copy) {\n")
         f.write("    from sourceSets.main.runtimeClasspath\n")
         f.write("    into '" + posix_dependencies_dir + "'\n")
         f.write("}\n")
         f.close()
 
+        # todo try-catch this code?
+        orig_gradle_file = gradle_file + ".orig"
+        shutil.copyfile(gradle_file,orig_gradle_file)
         f = open(gradle_file, "a")
-        f.write(" apply from:'tkltest.getDep.gradle'\n")
+        f.write(" apply from:'tkltest_get_dependencies.gradle'\n")
         f.close()
 
-        gradle_command = "gradle -q -b " + gradle_file + " getDependencies"
+        gradle_command = "gradle -q -b " + gradle_file + " tkltest_get_dependencies"
         logging.info(gradle_command)
 
         try:
