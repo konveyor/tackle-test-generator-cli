@@ -125,7 +125,7 @@ def main(config):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Run TackleTest Experiments',
+    parser = argparse.ArgumentParser(description='Run TackleTest experiment',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     # GENERAL

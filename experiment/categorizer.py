@@ -240,7 +240,7 @@ def histogramize(config):
             texttemplate='%{y}',
             textposition='auto',  # or 'outside'
         )
-        df.to_csv(os.path.join(output_dir, f'{categorizer_output}_histogram_{target.lower()}.csv'))
+        # df.to_csv(os.path.join(output_dir, f'{categorizer_output}_histogram_{target.lower()}.csv'))
         bars.write_image(os.path.join(output_dir, 'images', f'{categorizer_output}_histogram_{target.lower()}.png'), format='png')
         print(f"Written histogram image {os.path.join(output_dir, 'images', f'{categorizer_output}_histogram_{target.lower()}.png')}")
 
