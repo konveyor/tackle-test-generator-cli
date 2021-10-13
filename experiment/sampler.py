@@ -153,7 +153,7 @@ def __execute_samples(config, build_xml_from, sampled_testdir, app_conf, conf_di
     if not os.path.exists(build_xml_old := os.path.join(sampled_testdir, 'build.xml.old')):
         shutil.copy(build_xml, build_xml_old)
     for line in fileinput.input(build_xml, inplace=True):
-        line_changed = re.sub(rf'(?<=Experiments/){constants.TKLTEST_OUTPUT_DIR_PREFIX}{app_conf}', conf_dir + os.sep + app_conf, line)
+        line_changed = re.sub(rf'(?<=Experiments/){constants.TKLTEST_OUTPUT_DIR_PREFIX}{app_conf}{os.sep}{app_conf}', conf_dir + os.sep + app_conf, line)
         line_changed = re.sub(rf'{app_conf}[a-z-]+-tests', test_conf, line_changed)
         if line_changed != line:
             changed = True

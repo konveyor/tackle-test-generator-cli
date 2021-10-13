@@ -128,7 +128,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     # short_app_name = outdir + os.sep + short_app_name
     # shutil.rmtree(outdir, ignore_errors=True)
 
-    first_time = False
+    first_time = True
     tkltest_outdir = constants.TKLTEST_OUTPUT_DIR_PREFIX + short_app_name if first_time else outdir
     os.makedirs(tkltest_outdir, exist_ok=True)
 
