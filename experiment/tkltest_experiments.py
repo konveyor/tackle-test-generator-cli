@@ -71,7 +71,7 @@ def experiments_separate(app, config):
     print('\n*** set app packages to {} ***'.format(*tkltest_config['execute']['app_packages'], sep=', '))
     tkltest_config['execute']['offline_instrumentation'] = True
 
-    # old_cwd = os.getcwd()
+    old_cwd = os.getcwd()
     # if not os.path.exists(os.path.join(output_dir, app, os.path.basename(old_cwd))):
     #     os.makedirs(os.path.join(output_dir, app), exist_ok=True)
     #     os.symlink(old_cwd, os.path.join(output_dir, app, os.path.basename(old_cwd)))  # classpath reasons
@@ -100,7 +100,7 @@ def experiments_separate(app, config):
                 except SystemExit as se:
                     print('ERROR_TRIAL: {} failed with error {}'.format(short_app_name, se))
 
-                # os.chdir(old_cwd)
+                os.chdir(old_cwd)
 
 
 def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, generate_standalone, verbose=True):
@@ -128,9 +128,10 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     # short_app_name = outdir + os.sep + short_app_name
     # shutil.rmtree(outdir, ignore_errors=True)
 
-    first_time = True
+    first_time = not os.path.exists(outdir)
     tkltest_outdir = constants.TKLTEST_OUTPUT_DIR_PREFIX + short_app_name if first_time else outdir
     os.makedirs(tkltest_outdir, exist_ok=True)
+    os.makedirs(outdir, exist_ok=True)
 
     # write config file to output directory
     with open(os.path.join(tkltest_outdir, 'tkltest_config.toml'), 'w') as f:
@@ -161,7 +162,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
         print('[!!] WARNING: Evosuite testdir does not exist...', file=sys.stderr)
     else:
         shutil.copy(gen_config_file, evosuite_testdir)
-        tkltest_config['general']['test_directory'] = os.path.basename(evosuite_testdir)
+        tkltest_config['general']['test_directory'] = os.path.basename(evosuite_testdir) if first_time else os.path.abspath(evosuite_testdir)
         tkltest_config['execute']['create_build_file'] = False
         build_util.generate_build_xml(short_app_name, tkltest_config['general']['monolith_app_path'], build_util.get_build_classpath(tkltest_config),
                                       evosuite_testdir, [evosuite_testdir], None, [],
@@ -178,7 +179,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
         print('[!!] WARNING: Randoop testdir does not exist...', file=sys.stderr)
     else:
         shutil.copy(gen_config_file, randoop_testdir)
-        tkltest_config['general']['test_directory'] = os.path.basename(randoop_testdir)
+        tkltest_config['general']['test_directory'] = os.path.basename(randoop_testdir) if first_time else os.path.abspath(randoop_testdir)
         tkltest_config['execute']['create_build_file'] = False
         build_util.generate_build_xml(short_app_name, tkltest_config['general']['monolith_app_path'], build_util.get_build_classpath(tkltest_config),
                                       randoop_testdir, [randoop_testdir], None, [],
@@ -209,7 +210,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     if generate_standalone:
         # generate and execute standalone evosuite tests
         evosuite_standalone_testdir = f'{tkltest_outdir}/{short_app_name}-evosuite-standalone-tests'
-        tkltest_config['general']['test_directory'] = os.path.basename(evosuite_standalone_testdir)
+        tkltest_config['general']['test_directory'] = os.path.basename(evosuite_standalone_testdir) if first_time else os.path.abspath(evosuite_standalone_testdir)
         tkltest_config['execute']['create_build_file'] = False
         __run_generate(config=tkltest_config, subcommand='evosuite', verbose=verbose)
         shutil.copy(gen_config_file, evosuite_standalone_testdir)
@@ -224,7 +225,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
 
         # generate and execute standalone randoop tests
         randoop_standalone_testdir = f'{tkltest_outdir}/{short_app_name}-randoop-standalone-tests'
-        tkltest_config['general']['test_directory'] = os.path.basename(randoop_standalone_testdir)
+        tkltest_config['general']['test_directory'] = os.path.basename(randoop_standalone_testdir) if first_time else os.path.abspath(randoop_standalone_testdir)
         tkltest_config['execute']['create_build_file'] = False
         tkltest_config['generate']['randoop']['no_error_revealing_tests'] = True
         __run_generate(config=tkltest_config, subcommand='randoop', verbose=verbose)
@@ -252,21 +253,21 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     combined_testdir = f'{tkltest_outdir}/{short_app_name}-evosuite-randoop-tests'
     __run_combined_test_suite(short_app_name, combined_testdir=combined_testdir, gen_config_file=gen_config_file, config=tkltest_config,
                               evosuite_testdir=evosuite_testdir, randoop_testdir=randoop_testdir, verbose=verbose,
-                              skip_execute=skip_exec)
+                              skip_execute=skip_exec, tkltest_outdir=tkltest_outdir, first_time=first_time)
 
     # 2. execute ctd_amplified + evosuite combined test suite
     print('\n*** ctd_amplified + evosuite execute --- {} ***'.format(short_app_name))
     combined_testdir = f'{tkltest_outdir}/{short_app_name}-ctdamplified-evosuite-tests'
     __run_combined_test_suite(short_app_name, combined_testdir=combined_testdir, gen_config_file=gen_config_file, config=tkltest_config,
                               ctd_amplified_testdir=ctd_amplified_testdir, evosuite_testdir=evosuite_testdir, verbose=verbose,
-                              skip_execute=True)
+                              skip_execute=True, tkltest_outdir=tkltest_outdir, first_time=first_time)
 
     # 3. execute ctd_amplified + randoop combined test suite
     print('\n*** ctd_amplified + randoop execute --- {} ***'.format(short_app_name))
     combined_testdir = f'{tkltest_outdir}/{short_app_name}-ctdamplified-randoop-tests'
     __run_combined_test_suite(short_app_name, combined_testdir=combined_testdir, gen_config_file=gen_config_file, config=tkltest_config,
                               ctd_amplified_testdir=ctd_amplified_testdir, randoop_testdir=randoop_testdir, verbose=verbose,
-                              skip_execute=True)
+                              skip_execute=True, tkltest_outdir=tkltest_outdir, first_time=first_time)
 
     # 4. execute ctd_amplified + evosuite + randoop combined test suite
     print('\n*** ctd_amplified + evosuite + randoop execute --- {} ***'.format(short_app_name))
@@ -274,7 +275,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     __run_combined_test_suite(short_app_name, combined_testdir=combined_testdir, gen_config_file=gen_config_file, config=tkltest_config,
                               ctd_amplified_testdir=ctd_amplified_testdir, evosuite_testdir=evosuite_testdir,
                               randoop_testdir=randoop_testdir, verbose=verbose,
-                              skip_execute=skip_exec)
+                              skip_execute=skip_exec, tkltest_outdir=tkltest_outdir, first_time=first_time)
 
     # move generated artifacts to output directory
     if first_time:
@@ -293,7 +294,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
 
 
 def __run_combined_test_suite(app_name, combined_testdir, gen_config_file, config, ctd_amplified_testdir=None,
-                              evosuite_testdir=None, randoop_testdir=None, verbose=True, skip_execute=False):
+                              evosuite_testdir=None, randoop_testdir=None, verbose=True, skip_execute=False, tkltest_outdir='.', first_time=True):
     shutil.rmtree(combined_testdir, ignore_errors=True)
     for testdir in [ctd_amplified_testdir, evosuite_testdir, randoop_testdir]:
         if testdir is not None and not os.path.exists(testdir):
@@ -310,10 +311,10 @@ def __run_combined_test_suite(app_name, combined_testdir, gen_config_file, confi
         if os.path.isdir(os.path.join(combined_testdir, dir)) and not dir.startswith('.')
     ]
     shutil.copy(gen_config_file, combined_testdir)
-    config['general']['test_directory'] = os.path.basename(combined_testdir)
+    config['general']['test_directory'] = os.path.basename(combined_testdir) if first_time else os.path.abspath(combined_testdir)
     config['execute']['create_build_file'] = False
     build_util.generate_build_xml(app_name, config['general']['monolith_app_path'], build_util.get_build_classpath(config), combined_testdir,
-                                  test_dirs, None, [], app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
+                                  test_dirs, None, [], os.path.join(tkltest_outdir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX),
                                   config['execute']['app_packages'], True, True)
     if not skip_execute:
         __run_execute(config=config, verbose=verbose)
@@ -323,7 +324,9 @@ def __run_generate(subcommand, config, verbose=True):
     args.command = 'generate'
     args.sub_command = subcommand
     config['general']['verbose'] = verbose
+    old_classpath = config['general']['app_classpath_file']
     generate.process_generate_command(args=args, config=config)
+    config['general']['app_classpath_file'] = old_classpath
 
 
 def __run_execute(config, subcommand=None, verbose=True):

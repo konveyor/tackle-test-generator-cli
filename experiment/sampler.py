@@ -124,7 +124,7 @@ def __execute_samples(config, build_xml_from, sampled_testdir, app_conf, conf_di
         return
     # __randoop_empty_test_fix(sampled_testdir, verbose)
     print('\n*** {} execute ***'.format(sampled_testdir))
-    config['general']['test_directory'] = sampled_testdir
+    config['general']['test_directory'] = os.path.abspath(sampled_testdir)
     config['general']['reports_path'] = os.path.join(conf_dir, app_conf + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
     config['execute']['create_build_file'] = False
     build_xml = os.path.join(sampled_testdir, 'build.xml')
@@ -153,7 +153,7 @@ def __execute_samples(config, build_xml_from, sampled_testdir, app_conf, conf_di
     if not os.path.exists(build_xml_old := os.path.join(sampled_testdir, 'build.xml.old')):
         shutil.copy(build_xml, build_xml_old)
     for line in fileinput.input(build_xml, inplace=True):
-        line_changed = re.sub(rf'(?<=Experiments/){constants.TKLTEST_OUTPUT_DIR_PREFIX}{app_conf}{os.sep}{app_conf}', conf_dir + os.sep + app_conf, line)
+        line_changed = re.sub(rf'(?<=experiment/){constants.TKLTEST_OUTPUT_DIR_PREFIX}{app_conf}{os.sep}{app_conf}', conf_dir + os.sep + app_conf, line)
         line_changed = re.sub(rf'{app_conf}[a-z-]+-tests', test_conf, line_changed)
         if line_changed != line:
             changed = True
@@ -253,3 +253,6 @@ def sample(test_suites, conf_dir, app_conf, config):
             __run_standalone(app_conf=app_conf, conf_dir=conf_dir, build_xml_from=build_xml_from, testdir=testdir,
                              verbose=verbose, verbose_execute=verbose_execute)
         print('Execution took {}'.format(datetime.now() - begin_time))
+        # remove the redundant directory containing only the two jars randoop-all and replace-call
+        shutil.rmtree(constants.TKLTEST_OUTPUT_DIR_PREFIX + app_conf)
+        print(f'Removed the redundant directory created after each execution: {constants.TKLTEST_OUTPUT_DIR_PREFIX + app_conf}')

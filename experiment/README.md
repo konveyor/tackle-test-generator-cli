@@ -156,11 +156,14 @@ This file can then be given to methods in `tkl_coverage_analysis.py` to plot the
 ## The SF110 Benchmark
 
 To try out the benchmark used in the paper, the SF110 benchmark, first please download the binaries from the [EvoSuite website here](https://www.evosuite.org/experimental-data/sf110/).
-We have supplied two Bash scripts, `tkltest_run_59.sh` and `tkltest_run_35.sh`.
-The first script runs the evaluation on 59 apps (called _SF110<sub>59</sub>_ in the paper) with 3 time limits, 3 interaction levels, and 5 trials each.
-The second script runs the evaluation on 35 apps (_SF110<sub>35</sub>_) with 3 time limits, 3 interaction levels and 5 trials, where one trial is sampled 10 times.
+For your convenience, we have supplied a Zip file containing the `classpath.txt` files for all apps.
 
-You can find the app names used for _SF110<sub>59</sub>_ and _SF110<sub>35</sub>_ inside the respective Bash scripts.
+In addition, we have supplied two Bash scripts, `tkltest_run_59.sh` and `tkltest_run_35.sh`.
+The first script runs the evaluation on a set of 59 apps (called _SF110<sub>59</sub>_ in the paper) with 3 time limits, 3 interaction levels, and 5 trials each.
+The second script runs the evaluation on a set of 35 apps (_SF110<sub>35</sub>_) with 3 time limits, 3 interaction levels and 5 trials, where one trial is sampled 10 times.
+Do not forget to set the path where the SF110 apps are located, with the `-a (--apps-dir)` flag. 
+
+You can find the app names used for _SF110<sub>59</sub>_ and _SF110<sub>35</sub>_ inside the text files `SF110_subset59.txt` and `SF110_subset35.txt`.
 
 The reasons for passing over the other apps vary: some apps were developed without a package structure, 
 on which Randoop fails to run; some do not compile; some face execution errors, most notably errors triggered by Abstract Window Toolkit (\texttt{java.awt}); 

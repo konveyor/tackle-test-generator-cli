@@ -199,7 +199,7 @@ def run_coverage_analysis_separate(app: str, config, categorizer_output):
             print('Loaded DataFrame from saved intermediate file')
         else:
             for app_config in os.listdir(app_dir):
-                if '.' in app_config or 'Experiments' in app_config:
+                if '.' in app_config or 'experiment' in app_config:
                     continue
                 short_config = app_config[app_config.find(app + '_') + len(app + '_'):]
                 time_limit = short_config[:short_config.find('s_')]
