@@ -635,8 +635,7 @@ class GenerateExecuteTest(unittest.TestCase):
                 testgen_summary = json.load(f)
             self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
 
-            self.assertTrue(os.path.isfile(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name,
-                                                        app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
+            self.assertTrue(os.path.isfile(os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
                                                         constants.TKL_CTD_REPORT_DIR,
                                                         app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX)))
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
