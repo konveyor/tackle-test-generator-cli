@@ -16,9 +16,9 @@ import os
 import sys
 import operator
 import logging
+from tkltest.util import constants
 
-
-def create_ctd_report(ctd_coverage_file, ctd_test_plans_file, report_output_dir):
+def create_test_plan_report(ctd_coverage_file, ctd_test_plans_file, report_output_dir):
     """Creates CTD coverage report.
 
     Creates HTML coverage report showing coverage of CTD test plan rows by the generated ctd-amplified
@@ -100,7 +100,7 @@ def create_ctd_report(ctd_coverage_file, ctd_test_plans_file, report_output_dir)
     if not os.path.exists(report_output_dir):
         os.makedirs(report_output_dir)
 
-    ctd_file = report_output_dir + os.sep + 'ctd-summary.html'
+    ctd_file = report_output_dir + os.sep + constants.TEST_PLAN_SUMMARY_NAME
 
     with open(ctd_file, 'w') as f:
         f.write(
