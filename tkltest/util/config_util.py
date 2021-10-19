@@ -18,6 +18,7 @@ import toml
 import sys
 import subprocess
 import pathlib
+import zipfile
 
 from . import constants, config_options
 from .logging_util import tkltest_status
@@ -314,62 +315,105 @@ def __fix_relative_pathes(tkltest_config):
 def __resolve_claaspath(tkltest_config):
     app_name = tkltest_config['general']['app_name']
     if tkltest_config['general']['app_classpath_file'] != "":
-        #todo - check that there is no build files
+        #todo - check that there is no build files?
         return
-    elif tkltest_config['general']['gradle_build_file'] != "":
-        gradle_file = tkltest_config['general']['gradle_build_file']
-        dependencies_dir = os.path.join(os.getcwd(), app_name + "-dependencies")
-        posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
-        if os.path.isdir(dependencies_dir):
-            shutil.rmtree(dependencies_dir)
 
-        tkltest_gradle_file = os.path.join(os.path.dirname(gradle_file), "tkltest_get_dependencies.gradle")
-        f = open(tkltest_gradle_file, "w")
-        f.write("task tkltest_get_dependencies(type: Copy) {\n")
-        f.write("    from sourceSets.main.runtimeClasspath\n")
-        f.write("    into '" + posix_dependencies_dir + "'\n")
-        f.write("}\n")
-        f.close()
-
-        # todo try-catch this code?
-        orig_gradle_file = gradle_file + ".orig"
-        shutil.copyfile(gradle_file,orig_gradle_file)
-        f = open(gradle_file, "a")
-        f.write(" apply from:'tkltest_get_dependencies.gradle'\n")
-        f.close()
-
-        gradle_command = "gradle -q -b " + gradle_file + " tkltest_get_dependencies"
-        logging.info(gradle_command)
-
-        try:
-            command_util.run_command(command=gradle_command, verbose=tkltest_config['general']['verbose'])
-        except subprocess.CalledProcessError as e:
-            tkltest_status('gradle command failed: {}\n{}'.format(e, e.stderr), error=True)
-            shutil.move(orig_gradle_file, gradle_file)
-            os.remove(tkltest_gradle_file)
-            sys.exit(1)
-
-        shutil.move(orig_gradle_file, gradle_file)
-        os.remove(tkltest_gradle_file)
-        classpath_file = os.path.join(os.getcwd(), app_name + "_gradle_classpath.txt")
-        classpath_fd = open(classpath_file, "w")
-        if os.path.isdir(dependencies_dir):
-            for jar_file in os.listdir(dependencies_dir):
-                if jar_file.endswith(".jar"):
-                    classpath_fd.write(os.path.join(dependencies_dir, jar_file)+"\n")
-                else:
-                    shutil.rmtree(os.path.join(dependencies_dir, jar_file))
-            classpath_fd.close()
-            tkltest_config['general']['app_classpath_file'] = classpath_file
-
-        else:
-            #todo: error? empty file?
-            print("error no dependencies")
-            tkltest_config['general']['app_classpath_file'] = "../emptyFile.txt"
-    else:
-        print("error no classpathfile")
+    if tkltest_config['general']['gradle_build_file'] == "":
+        print("error no classpath file")
         # todo: error? empty file?
-        tkltest_config['general']['app_classpath_file'] = "../emptyFile.txt"
+        return
+
+    #create dependencies directory
+    dependencies_dir = os.path.join(os.getcwd(), app_name + "-dependencies")
+    posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
+    if os.path.isdir(dependencies_dir):
+        shutil.rmtree(dependencies_dir)
+    os.mkdir(dependencies_dir)
+
+    #create build and settings gradle files
+    gradle_file = tkltest_config['general']['gradle_build_file']
+    tkltest_gradle_file = os.path.join(os.path.dirname(gradle_file), "tkltest_build.gradle")
+    shutil.copyfile(gradle_file, tkltest_gradle_file)
+    f = open(tkltest_gradle_file, "a")
+    f.write("\ntask tkltest_get_dependencies(type: Copy) {\n")
+    f.write("    from sourceSets.main.runtimeClasspath\n")
+    f.write("    into '" + posix_dependencies_dir + "'\n")
+    f.write("}\n")
+    f.close()
+
+    gradle_settings_file = tkltest_config['general']['gradle_settings_file']
+    if gradle_settings_file:
+        tkltest_gradle_settings_file = os.path.join(os.path.dirname(gradle_settings_file), "tkltest_settings.gradle")
+        relative_gradle_file = pathlib.PurePath(os.path.relpath(tkltest_gradle_file,os.path.dirname(gradle_settings_file))).as_posix()
+        shutil.copyfile(gradle_settings_file, tkltest_gradle_settings_file)
+        f = open(tkltest_gradle_settings_file, "a")
+        f.write("\nrootProject.buildFileName = '"+relative_gradle_file+"'\n")
+        f.close()
+
+    #run gradle
+    gradle_command = "gradle -q -b " + os.path.abspath(tkltest_gradle_file)
+    if gradle_settings_file:
+        gradle_command += " -c " + os.path.abspath(tkltest_gradle_settings_file)
+    gradle_command += " tkltest_get_dependencies"
+    logging.info(gradle_command)
+
+    try:
+        command_util.run_command(command=gradle_command, verbose=tkltest_config['general']['verbose'])
+    except subprocess.CalledProcessError as e:
+        tkltest_status('gradle command failed: {}\n{}'.format(e, e.stderr), error=True)
+        #todo - exit?
+
+    os.remove(tkltest_gradle_file)
+    if gradle_settings_file:
+        os.remove(tkltest_gradle_settings_file)
+
+    #remove non jar entries
+    for jar_file in os.listdir(dependencies_dir):
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        if os.path.isdir(jar_file_path):
+            shutil.rmtree(jar_file_path)
+        elif not jar_file_path.endswith(".jar"):
+            os.remove(jar_file_path)
+
+    #collect monolit modules
+    monolith_app_paths = tkltest_config['general']['monolith_app_path']
+    app_paths_modules = dict()
+    for monolith_app_path in monolith_app_paths:
+        app_path_modules = set()
+        for root, dirs, files in os.walk(monolith_app_path):
+            if len([file for file in files if file.endswith(".class")]):
+                posix_module_path = pathlib.PurePath(root.replace(monolith_app_path, "")).as_posix()
+                posix_module_path = "/".join(posix_module_path.split('/'))
+                app_path_modules.add(posix_module_path)
+        app_paths_modules[monolith_app_path] = app_path_modules
+
+    #collect jars modules modules
+    jars_modules = dict()
+    for jar_file in os.listdir(dependencies_dir):
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        if jar_file_path.endswith(".jar"):
+            archive = zipfile.ZipFile(jar_file_path, 'r')
+            class_files = set([file for file in archive.namelist() if file.endswith(".class")])
+            archive.close()
+            jars_modules[jar_file] = set([os.path.dirname(class_file) for class_file in class_files])
+
+    #compare jars modules to monolit modules, remove matching jars
+    for jar_file, jar_modules in jars_modules.items():
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        for app_path, app_path_modules in app_paths_modules.items():
+            if len(jar_modules) and jar_modules == app_path_modules:
+                print(jar_file + " is " + app_path + " not adding to gradle classpath")
+                os.remove(jar_file_path)
+                break
+
+    #write the classpath file
+    classpath_file = os.path.join(os.getcwd(), app_name + "_gradle_classpath.txt")
+    classpath_fd = open(classpath_file, "w")
+    for jar_file in os.listdir(dependencies_dir):
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        classpath_fd.write(jar_file_path+"\n")
+    classpath_fd.close()
+    tkltest_config['general']['app_classpath_file'] = classpath_file
 
 
 def fix_config(tkltest_config):

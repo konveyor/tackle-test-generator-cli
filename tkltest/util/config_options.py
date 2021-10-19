@@ -160,7 +160,16 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relative_fix_type': 'path',
-            'help_message': 'gradle build file, needed for getting the library dependencies of the app'
+            'help_message': 'gradle build file'
+        },
+        'gradle_settings_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relative_fix_type': 'path',
+            'help_message': 'gradle settings file'
         },
         'config_file': {
             'required': False,
