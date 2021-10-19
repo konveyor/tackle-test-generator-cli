@@ -24,7 +24,8 @@ from tkltest.util.logging_util import tkltest_status
 
 
 def augment_with_code_coverage(config, ctd_build_file, ctd_test_dir, dev_build_file,
-                               dev_written_test_dir, evosuite_test_dir, augment_dir, report_dir):
+                               dev_written_test_dir, evosuite_test_dir, augment_dir, report_dir,
+                               cli_repo_path):
     """Augments CTD-guided tests with coverage-increasing base tests.
 
     Starting with the CTD-guided and base test suites, iteratively augments the CTD-guided test
@@ -77,7 +78,10 @@ def augment_with_code_coverage(config, ctd_build_file, ctd_test_dir, dev_build_f
     print(classes)
 
     for class_name in classes:
-        command_util.run_command(f'ant -f {evosuite_test_dir}/my_own_build.xml execute-tests -Dclass={class_name}',
+        command_util.run_command(f'ant -f {cli_repo_path}/experiment/generic_build.xml execute-tests'
+                                 f' -Dapp={config["general"]["app_name"]}'
+                                 f' -Dclass={class_name}'
+                                 f' -Dcli_repo_path={cli_repo_path}',
                                  verbose=True)
 
     # TODO:

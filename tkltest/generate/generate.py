@@ -220,7 +220,7 @@ def generate_ctd_amplified_tests(config):
                                    dev_build_file=dev_build_file, dev_written_test_dir=dev_written_test_dir,
                                    evosuite_test_dir=app_name + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
                                    augment_dir=app_name + constants.TKLTEST_DEFAULT_AUGMENTED_TEST_DIR_SUFFIX,
-                                   report_dir=reports_dir)
+                                   report_dir=reports_dir, cli_repo_path=os.path.dirname(os.getcwd()))
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
 
