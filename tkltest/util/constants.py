@@ -37,6 +37,8 @@ TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX = "-ctd-amplified-tests"
 TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX = "-randoop-standalone-tests"
 # EvoSuite standalone tests
 TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX = "-evosuite-standalone-tests"
+# Augmented test suite
+TKLTEST_DEFAULT_AUGMENTED_TEST_DIR_SUFFIX = "-augmented-tests"
 
 # suffix for the temporary test directory name
 TKLTEST_TEMP_DIR_SUFFIX = "-tkltest-tmp"

@@ -95,28 +95,27 @@ def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_
         }
 
 
-def add_test_class_to_ctd_suite(test_class, test_directory):
-    """Adds a test class to a CTD test suite directory.
+def add_test_class_to_suite(test_class, test_directory, dest_directory):
+    """Adds a test class to a test suite directory.
 
-    Adds the given test class (specified as a file path) to the test directory representing CTD-guided
-    test suite (i.e., assuming the particular directory structure with "monolithic" in the directory path).
+    Adds the given test class (specified as a file path) to the base test directory.
     Along with the test class, also adds other classes with the same base name; these could be EvoSuite
     scaffolding or JEE-support classes.
 
     Args:
         test_class (str): Test class to add
-        test_directory (str): Test directory to add the class to
+        test_directory (str): Test directory containing the test already
+        dest_directory (str): Test directory to add the class to
     """
     test_base, test_ext = os.path.splitext(test_class)
-    test_path, _ = os.path.split(test_class)
-    test_path_comp = os.path.normpath(test_path).split(os.sep)
     for test_file in glob.glob(test_base+'*.java'):
-        dst_dir = os.path.join(test_directory, 'monolithic', os.sep.join(test_path_comp[1:]))
-        os.makedirs(dst_dir, exist_ok=True)
-        shutil.copy(test_file, dst_dir)
+        rel_path = os.path.relpath(test_file, test_directory)
+        dst_path = os.path.join(dest_directory, rel_path)
+        os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+        shutil.copy(test_file, dst_path)
 
 
-def remove_test_class_from_ctd_suite(test_class, test_directory):
+def remove_test_class_from_suite(test_class, test_directory):
     """Removes a test class from a CTD test suite directory.
 
     Removes the given test class (specified as a file path) to the test directory representing CTD-guided
@@ -129,12 +128,17 @@ def remove_test_class_from_ctd_suite(test_class, test_directory):
         test_directory (str): Test directory to remove the class from
     """
     test_base, test_ext = os.path.splitext(test_class)
-    test_path, _ = os.path.split(test_class)
-    test_path_comp = os.path.normpath(test_path).split(os.sep)
     for test_file in glob.glob(test_base+'*.java'):
-        test_suite_file = os.path.join(test_directory, 'monolithic',
-                                       os.sep.join(test_path_comp[1:]), os.path.split(test_file)[1])
-        os.remove(test_suite_file)
+        os.remove(test_file)
+        print(f'Removed file {test_file}')
+    dir_name = os.path.dirname(test_base)
+    while dir_name != test_directory:
+        if not os.listdir(dir_name):
+            os.rmdir(dir_name)
+            print(f'Removed dir {dir_name}')
+            dir_name = os.path.dirname(dir_name)
+        else:
+            break
 
 
 def get_test_classes(test_root_dir):

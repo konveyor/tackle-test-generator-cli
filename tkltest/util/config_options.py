@@ -332,7 +332,7 @@ __options_spec = {
                     'long_name': '--base-test-generator',
                     'type': str,
                     'choices': ['combined', 'evosuite', 'randoop'],
-                    'default_value': 'combined',
+                    'default_value': constants.BASE_TEST_GENERATORS['combined'],
                     'help_message': 'base test generator to use for creating building-block test sequences'
                 },
                 'augment_coverage': {
@@ -344,6 +344,27 @@ __options_spec = {
                     'type': bool,
                     'default_value': False,
                     'help_message': 'augment CTD-guided tests with coverage-increasing base tests'
+                },
+                'dev_written_tests_path': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-dwsp',
+                    'long_name': '--dev-written-tests-path',
+                    'type': str,
+                    'default_value': '',
+                    'help_message': 'set path of developer-written tests to use as seed for augmentation with coverage-increasing tests'
+                },
+                'dev_written_build_path': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-dwbp',
+                    'long_name': '--dev-written-build-path',
+                    'type': str,
+                    'default_value': '',
+                    'relative_fix_type': 'path',
+                    'help_message': 'set path of build file for the tests specified with `-dwsp (--dev-written-tests-path)` used for augmentation'
                 },
                 'no_ctd_coverage': {
                     'required': False,

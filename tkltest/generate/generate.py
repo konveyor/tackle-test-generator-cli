@@ -213,8 +213,14 @@ def generate_ctd_amplified_tests(config):
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:
         start_time = time.time()
-        augment_with_code_coverage(config=config, ant_build_file=ant_build_file,
-                                   ctd_test_dir=test_directory, report_dir=reports_dir)
+        dev_written_test_dir = config['generate']['ctd_amplified']['dev_written_tests_path']
+        dev_build_file = config['generate']['ctd_amplified']['dev_written_build_path']
+        augment_with_code_coverage(config=config,
+                                   ctd_build_file=ant_build_file, ctd_test_dir=test_directory,
+                                   dev_build_file=dev_build_file, dev_written_test_dir=dev_written_test_dir,
+                                   evosuite_test_dir=app_name + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
+                                   augment_dir=app_name + constants.TKLTEST_DEFAULT_AUGMENTED_TEST_DIR_SUFFIX,
+                                   report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
 
