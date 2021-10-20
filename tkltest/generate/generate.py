@@ -24,9 +24,9 @@ from threading import Thread
 
 
 from .augment import augment_with_code_coverage
-from .ctd_coverage import create_ctd_report
+from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
-from tkltest.util import build_util, command_util, constants, config_util
+from tkltest.util import build_util, command_util, constants, config_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -41,7 +41,8 @@ def process_generate_command(args, config):
         config: loaded configuration options
     """
     logging.info('Processing generate command')
-
+    dir_util.cd_output_dir(config['general']['app_name'])
+    config_util.fix_relative_paths(config)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
@@ -65,6 +66,8 @@ def process_generate_command(args, config):
     generate_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
+    dir_util.delete_app_output(config['general']['app_name'])
+    dir_util.cd_cli_dir()
 
 
 def generate_ctd_amplified_tests(config):
@@ -144,6 +147,8 @@ def generate_ctd_amplified_tests(config):
     # generate extended test sequences
     extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
                      config['generate']['no_diff_assertions'],
+                     config['generate']['ctd_amplified']['no_ctd_coverage'],
+                     config['generate']['ctd_amplified']['interaction_level'],
                      config['generate']['jee_support'],
                      config['generate']['ctd_amplified']['num_seq_executions'],
                      tmp_test_directory, verbose)
@@ -166,6 +171,17 @@ def generate_ctd_amplified_tests(config):
         else:
             tkltest_status('Cannot generate CTD coverage report because coverage file was not located', error=True)
             sys.exit(1)
+
+        shutil.move(app_name + constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX,
+                    os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
+                                  constants.TKL_CTD_REPORT_DIR,
+                                 app_name + constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX))
+
+        # combinatorial coverage file may not exist if no methods have more than one test plan row
+        if os.path.exists(app_name + constants.TKL_EXTENDER_CTD_COVERAGE_FILE_SUFFIX):
+            shutil.move(app_name + constants.TKL_EXTENDER_CTD_COVERAGE_FILE_SUFFIX,
+                    os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
+                    constants.TKL_CTD_REPORT_DIR, app_name + constants.TKL_EXTENDER_CTD_COVERAGE_FILE_SUFFIX))
 
     # generate ant build file
     test_dirs = [
@@ -340,7 +356,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
 
 
 def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     no_diff_assertions, jee_support, num_executions, test_directory, verbose=False):
+                     no_diff_assertions, no_ctd_coverage, interaction_level, jee_support, num_executions, test_directory, verbose=False):
     """Generates the final CTD-guided test cases.
 
     Generates extended test sequences for covering the CTD test plan rows that are written as JUnit
@@ -394,6 +410,8 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         te_command += " -jee"
     if not no_diff_assertions:
         te_command += " -da"
+    if not no_ctd_coverage:
+        te_command += " -oc " + str(interaction_level)
     te_command += " -ne " + str(num_executions)
 
     logging.info(te_command)
@@ -452,10 +470,10 @@ def generate_ctd_coverage(ctd_report_file_abs, ctd_model_file_abs, report_output
         report_output_dir (str): name of directory to create report files in
     """
 
-    create_ctd_report(ctd_report_file_abs, ctd_model_file_abs, report_output_dir)
+    create_test_plan_report(ctd_report_file_abs, ctd_model_file_abs, report_output_dir)
 
-    tkltest_status("CTD coverage report is saved in "+
-                   os.path.abspath(report_output_dir + os.sep + "ctd-summary.html"))
+    tkltest_status("Test plan coverage report is saved in "+
+                   os.path.abspath(report_output_dir + os.sep + constants.TEST_PLAN_SUMMARY_NAME))
 
 
 def __reset_test_directory(args, config):

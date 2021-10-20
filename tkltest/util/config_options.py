@@ -150,6 +150,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
+            'relative_fix_type': 'paths_list_file',
             'help_message': 'file containing paths to jar files that represent the library dependencies of app'
         },
         'config_file': {
@@ -160,6 +161,7 @@ __options_spec = {
             'long_name': '--config-file',
             'type': argparse.FileType('r'),
             'default_value': constants.TKLTEST_DEFAULT_CONFIG_FILE,
+            'relative_fix_type': 'path',
             'help_message': 'path to TOML file containing configuration options'
         },
         'log_level': {
@@ -179,6 +181,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
+            'relative_fix_type': 'path',
             'help_message': 'list of paths to application classes'
         },
         'java_jdk_home': {
@@ -187,6 +190,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
+            'relative_fix_type': 'path',
             'help_message': 'root directory for JDK installation (must be JDK; JRE will not suffice); '
                             'can be set as environment variable JAVA_HOME'
         },
@@ -198,6 +202,7 @@ __options_spec = {
             'long_name': '--test-directory',
             'type': str,
             'default_value': '',
+            'relative_fix_type': 'path',
             'help_message': 'name of root test directory containing the generated JUnit test classes'
         },
         'reports_path': {
@@ -208,6 +213,7 @@ __options_spec = {
             'long_name': '--reports-path',
             'type': str,
             'default_value': '',
+            'relative_fix_type': 'path',
             'help_message': 'path to the reports directory'
         },
         'verbose': {
@@ -285,6 +291,7 @@ __options_spec = {
             'long_name': '--partitions-file',
             'type': str,
             'default_value': '',
+            'relative_fix_type': 'path',
             'help_message': 'path to file containing specification of partitions'
         },
         'target_class_list': {
@@ -371,6 +378,7 @@ __options_spec = {
                     'is_cli_option': False,
                     'type': str,
                     'default_value': '',
+                    'relative_fix_type': 'path',
                     'help_message': 'path prefix to root directory of refactored app version'
                 },
                 'refactored_app_path_suffix': {
@@ -380,6 +388,7 @@ __options_spec = {
                     'is_cli_option': False,
                     'type': list,
                     'default_value': [],
+                    'relative_fix_type': 'path',
                     'help_message': 'list of paths to refactored app classes'
                 },
                 'reuse_base_tests': {

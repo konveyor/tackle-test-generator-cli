@@ -18,6 +18,7 @@ import sys
 
 from . import constants, config_options
 from .logging_util import tkltest_status
+from .constants import *
 
 
 def load_config(args=None, config_file=None):
@@ -257,6 +258,51 @@ def __merge_config(base_config, update_config):
             __merge_config(baseval, val)
         else:
             base_config[key] = val
+
+
+def __fix_relative_path(path):
+    if path != "" and not os.path.isabs(path):
+        return os.path.join('..', path)
+    return path
+
+
+def __fix_relative_paths_recursively(options_spec, config):
+
+    for option_name, options in options_spec.items():
+        if type(options) is not dict:
+            continue
+        if option_name == 'subcommands':
+            for subcommands_option_name, subcommands_option in options.items():
+                __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name])
+            return
+        if option_name not in config.keys():
+            continue
+        fix_type = options_spec[option_name].get('relative_fix_type', 'none')
+        if fix_type == 'path':
+            if options_spec[option_name].get('type') == str:
+                config[option_name] = __fix_relative_path(config[option_name])
+            else:
+                config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
+        elif fix_type == 'paths_list_file':
+            classpath_file = __fix_relative_path(config[option_name])
+            with open(classpath_file) as file:
+                lines = file.readlines()
+            lines = [__fix_relative_path(path) for path in lines]
+            new_file = os.path.basename(classpath_file)
+            #todo - we will have a bug if the users uses two different files with the same name
+            with open(new_file, 'w') as f:
+                f.writelines(lines)
+            config[option_name] = new_file
+        else:
+            __fix_relative_paths_recursively(options, config[option_name])
+
+
+def fix_relative_paths(tkltest_config):
+    options_spec = config_options.get_options_spec()
+    if tkltest_config.get('relative_fixed', False) == True:
+        return
+    __fix_relative_paths_recursively(options_spec, tkltest_config)
+    tkltest_config['relative_fixed'] = True
 
 
 if __name__ == '__main__':

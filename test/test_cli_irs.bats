@@ -1,12 +1,13 @@
+IRS_OUTPUT_DIR=./tkltest-output-irs
 IRS_CONFIG_FILE=./test/data/irs/tkltest_config.toml
 IRS_CONFIG_FILE2=./test/data/irs/tkltest_config2.toml
-IRS_CTD_TEST_PLAN_FILE=./irs_ctd_models_and_test_plans.json
-IRS_TESTGEN_SUMMARY_FILE=./irs_test_generation_summary.json
+IRS_CTD_TEST_PLAN_FILE=$IRS_OUTPUT_DIR/irs_ctd_models_and_test_plans.json
+IRS_TESTGEN_SUMMARY_FILE=$IRS_OUTPUT_DIR//irs_test_generation_summary.json
 
 IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
 IRS_RANDOOP_TESTDIR=./irs-randoop-standalone-tests
 IRS_EVOSUITE_TESTDIR=./irs-evosuite-standalone-tests
-IRS_TEST_REPORTS_DIR=./irs-tkltest-reports
+IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR//irs-tkltest-reports
 IRS_INSTR_CLASSES_DIR=./irs-instrumented-classes
 
 # setup commands run befeore execution of tests in file
