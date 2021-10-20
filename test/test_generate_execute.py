@@ -635,11 +635,14 @@ class GenerateExecuteTest(unittest.TestCase):
                 testgen_summary = json.load(f)
             self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
 
-            self.assertTrue(os.path.isfile(app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX))
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
             self.assertTrue(os.path.isdir(main_report_dir))
             ctd_report_dir = os.path.join(main_report_dir, constants.TKL_CTD_REPORT_DIR)
             self.assertTrue(os.path.isdir(ctd_report_dir))
+            self.assertTrue(os.path.isfile(os.path.join(ctd_report_dir,
+                                                        app_name + constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX)))
+            self.assertTrue(os.path.isfile(os.path.join(ctd_report_dir,
+                                                        constants.TEST_PLAN_SUMMARY_NAME)))
 
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
