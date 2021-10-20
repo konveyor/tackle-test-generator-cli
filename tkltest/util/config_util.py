@@ -320,7 +320,8 @@ def __resolve_claaspath(tkltest_config):
 
     if tkltest_config['general']['gradle_build_file'] == "":
         print("error no classpath file")
-        # todo: error? empty file?
+        # todo: need to check ant and maven
+        # todo: error? create empty file?
         return
 
     #create dependencies directory
