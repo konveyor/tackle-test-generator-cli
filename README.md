@@ -300,6 +300,12 @@ For details on the `execute` command options, see the section [Configuration Opt
 
 2. Coverage in JEE apps could be low because of limited JEE mocking support.
 
+3. A known issue on Windows OS is that Tackle-test might exceed Windows limit of 260 characters for a file system folder path name length. 
+ Tackle-test mimics the structure of the application under its output directory, to enable generating 
+tests in the same package as the class under test, and gaining access to all its non-private members and methods. 
+If your application has a deep package hierarchy, these paths might exceed the 260 characters length limit. For Windows 10,
+there are online instructions available on how to enable long paths and avoid this limitation.
+
 ## Configuration Options
 
 All configuration options for `tkltest` commands  can be specified in a [toml](https://toml.io/en/)
