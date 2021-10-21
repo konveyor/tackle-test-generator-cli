@@ -318,7 +318,8 @@ def __resolve_claaspath(tkltest_config):
     app_classpath_file = tkltest_config['general']['app_classpath_file']
     if app_classpath_file:
         if gradle_build_file or gradle_settings_file:
-            tkltest_status('Setting app_classpath_file with gradle_build_file or gradle_settings_file is not allowd, \n', error=True)
+            tkltest_status('Setting app_classpath_file with gradle_build_file or gradle_settings_file is not allowed, \n', error=True)
+            print(app_classpath_file)
             sys.exit(1)
         return
 
