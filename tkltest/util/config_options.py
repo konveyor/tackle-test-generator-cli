@@ -131,6 +131,23 @@ def __conditionally_required(opt_name, config):
         else:
             return False
 
+    #todo - debug
+    return False
+
+    if opt_name == 'app_classpath_file':
+        if config['generate']['app_build']['app_build_file'] == "":
+            return True
+        else:
+            return False
+
+    elif opt_name in ['app_build_file', 'app_build_type']:
+        if config['general']['app_classpath_file'] == '':
+            return True
+        elif config['generate']['app_build']['app_settings_file'] != '':
+            return True
+        else:
+            return False
+
 
 __options_spec = {
 
@@ -145,31 +162,13 @@ __options_spec = {
             'help_message': 'name of the application being tested'
         },
         'app_classpath_file': {
-            'required': False,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
             'relative_fix_type': 'paths_list_file',
             'help_message': 'file containing paths to jar files that represent the library dependencies of app'
-        },
-        'gradle_build_file': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'relative_fix_type': 'path',
-            'help_message': 'gradle build file'
-        },
-        'gradle_settings_file': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'relative_fix_type': 'path',
-            'help_message': 'gradle settings file'
         },
         'config_file': {
             'required': False,
@@ -444,6 +443,38 @@ __options_spec = {
                     'type': bool,
                     'default_value': False,
                     'help_message': 'do not generate error-revealing tests with randoop'
+                }
+            },
+
+            # "generate app_build" command options
+            'app_build': {
+                'help_message': 'use application build to get dependencies',
+                'app_build_type': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': False,
+                    'type': str,
+                    'choices': ['ant', 'maven', 'gradle'],
+                    'default_value': 'ant',
+                    'help_message': 'build type for collect app dependencies - either ant maven or gradle'
+                },
+                'app_build_file': {
+                    'required': __conditionally_required,
+                    'is_toml_option': True,
+                    'is_cli_option': False,
+                    'type': str,
+                    'default_value': '',
+                    'relative_fix_type': 'path',
+                    'help_message': 'build file'
+                },
+                'app_settings_file': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': False,
+                    'type': str,
+                    'default_value': '',
+                    'relative_fix_type': 'path',
+                    'help_message': 'settings file'
                 }
             }
         }
