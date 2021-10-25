@@ -16,10 +16,9 @@ target_class_list = []
 excluded_class_list = []
 time_limit = 10
 
-[generate.app_build]
 app_build_type = 'gradle'
-app_build_file = "test/data/demo/app/build.gradle"
-app_settings_file = "test/data/demo/settings.gradle"
+app_build_config_file = "test/data/demo/app/build.gradle"
+app_build_settings_file = "test/data/demo/settings.gradle"
 
 [execute]
 app_packages = ['']

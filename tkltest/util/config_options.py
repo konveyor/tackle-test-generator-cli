@@ -128,25 +128,13 @@ def __conditionally_required(opt_name, config):
     if opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
         if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
             return True
-        else:
-            return False
-
-    #todo - debug
+    elif opt_name == 'app_classpath_file':
+        if config['generate']['app_build_config_file'] == '' and config['generate']['app_build_settings_file'] == '':
+            return True
+    elif opt_name == 'app_build_config_file':
+        if config['general']['app_classpath_file'] == '' and config['generate']['app_build_settings_file'] != '':
+            return True
     return False
-
-    if opt_name == 'app_classpath_file':
-        if config['generate']['app_build']['app_build_file'] == "":
-            return True
-        else:
-            return False
-
-    elif opt_name in ['app_build_file', 'app_build_type']:
-        if config['general']['app_classpath_file'] == '':
-            return True
-        elif config['generate']['app_build']['app_settings_file'] != '':
-            return True
-        else:
-            return False
 
 
 __options_spec = {
@@ -335,6 +323,33 @@ __options_spec = {
             'default_value': 10,
             'help_message': 'time limit (in seconds) for evosuite/randoop test generation'
         },
+        'app_build_type': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['ant', 'maven', 'gradle'],
+            'default_value': 'ant',
+            'help_message': 'build type for collect app dependencies - either ant maven or gradle'
+        },
+        'app_build_config_file': {
+            'required': __conditionally_required,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relative_fix_type': 'path',
+            'help_message': 'app build file'
+        },
+        'app_build_settings_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relative_fix_type': 'path',
+            'help_message': 'app build settings file'
+        },
 
         # subcommands for the generate command
         'subcommands': {
@@ -446,37 +461,6 @@ __options_spec = {
                 }
             },
 
-            # "generate app_build" command options
-            'app_build': {
-                'help_message': 'use application build to get dependencies',
-                'app_build_type': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': str,
-                    'choices': ['ant', 'maven', 'gradle'],
-                    'default_value': 'ant',
-                    'help_message': 'build type for collect app dependencies - either ant maven or gradle'
-                },
-                'app_build_file': {
-                    'required': __conditionally_required,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': str,
-                    'default_value': '',
-                    'relative_fix_type': 'path',
-                    'help_message': 'build file'
-                },
-                'app_settings_file': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': str,
-                    'default_value': '',
-                    'relative_fix_type': 'path',
-                    'help_message': 'settings file'
-                }
-            }
         }
     },
 

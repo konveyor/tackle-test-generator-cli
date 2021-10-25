@@ -167,7 +167,9 @@ def __validate_config(config, command=None, subcommand=None):
             __validate_config_scope(config[command][scope], options_spec[scope], val_errors[scope],
                                     loaded_config=config)
         else:
-            __validate_config_scope(config[scope], options_spec[scope], val_errors[scope])
+            #todo - is this change save?
+            #__validate_config_scope(config[scope], options_spec[scope], val_errors[scope])
+            __validate_config_scope(config[scope], options_spec[scope], val_errors[scope], loaded_config=config)
 
     # if validation errors are detected, print error message and exit
     val_failure_msgs = []
@@ -329,9 +331,9 @@ def __resolve_claaspath(tkltest_config, command):
          tkltest_config - the configuration - to get the relevant build files, and to update the classpath_file
     """
     app_name = tkltest_config['general']['app_name']
-    app_build_type = tkltest_config['generate']['app_build']['app_build_type']
-    app_build_file = tkltest_config['generate']['app_build']['app_build_file']
-    app_settings_file = tkltest_config['generate']['app_build']['app_settings_file']
+    app_build_type = tkltest_config['generate']['app_build_type']
+    app_build_file = tkltest_config['generate']['app_build_config_file']
+    app_settings_file = tkltest_config['generate']['app_build_settings_file']
     app_classpath_file = tkltest_config['general']['app_classpath_file']
     build_classpath_file = os.path.join(os.getcwd(), app_name + "_build_classpath.txt")
     if command not in ["generate", 'execute']:
@@ -345,12 +347,7 @@ def __resolve_claaspath(tkltest_config, command):
     if command == 'execute' and os.path.isfile(build_classpath_file):
         tkltest_config['general']['app_classpath_file'] = build_classpath_file
         return
-
-
-    # todo - what to do in case of execute without classpath?
-
-    # todo - resolve __conditionally_required(). is it command depended?
-
+    # todo - what to do in case of execute without build_classpath_file?
 
     #create dependencies directory
     dependencies_dir = os.path.join(os.getcwd(), app_name + "-app-dependencies")
