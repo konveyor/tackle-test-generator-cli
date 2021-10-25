@@ -110,7 +110,7 @@ teardown_file() {
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
-    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'monolith_app_path']"* ]]
+    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'app_classpath_file', 'monolith_app_path']"* ]]
     [[ "${lines[3]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
 
@@ -127,7 +127,7 @@ teardown_file() {
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
-    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'monolith_app_path']"* ]]
+    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'app_classpath_file', 'monolith_app_path']"* ]]
     [[ "${lines[3]}" == *"Missing required options for \"generate ctd-amplified\": ['refactored_app_path_prefix', 'refactored_app_path_suffix']"* ]]
     [[ "${lines[4]}" == *"Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"* ]]
 }
@@ -137,7 +137,7 @@ teardown_file() {
     [ $status -eq 1 ]
     echo "# ${lines[@]}" >&3
     [[ "${lines[1]}" == *"ERROR: configuration options validation failed:"* ]]
-    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'monolith_app_path']"* ]]
+    [[ "${lines[2]}" == *"Missing required options for \"general\": ['app_name', 'app_classpath_file', 'monolith_app_path']"* ]]
     [[ "${lines[3]}" == *"Missing required options for \"execute\": ['app_packages']"* ]]
     [[ "${lines[4]}" == *"Value for option \"build_type\" must be one of ['ant', 'maven']: gradle"* ]]
 }
