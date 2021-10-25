@@ -459,8 +459,7 @@ __options_spec = {
                     'default_value': False,
                     'help_message': 'do not generate error-revealing tests with randoop'
                 }
-            },
-
+            }
         }
     },
 

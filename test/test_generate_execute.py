@@ -30,7 +30,6 @@ class GenerateExecuteTest(unittest.TestCase):
     test_data_dir = os.path.join('test', 'data')
     # test_data_dir = os.path.join('data')
 
-
     test_apps = {
         'irs': {
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
