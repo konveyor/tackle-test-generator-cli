@@ -167,8 +167,6 @@ def __validate_config(config, command=None, subcommand=None):
             __validate_config_scope(config[command][scope], options_spec[scope], val_errors[scope],
                                     loaded_config=config)
         else:
-            #todo - is this change save?
-            #__validate_config_scope(config[scope], options_spec[scope], val_errors[scope])
             __validate_config_scope(config[scope], options_spec[scope], val_errors[scope], loaded_config=config)
 
     # if validation errors are detected, print error message and exit
@@ -344,10 +342,12 @@ def __resolve_claaspath(tkltest_config, command):
         tkltest_status('Getting app dependencies using {} is not supported yet\n'.format(app_build_type), error=True)
         sys.exit(1)
 
-    if command == 'execute' and os.path.isfile(build_classpath_file):
-        tkltest_config['general']['app_classpath_file'] = build_classpath_file
-        return
-    # todo - what to do in case of execute without build_classpath_file?
+    if command == 'execute':
+        if os.path.isfile(build_classpath_file):
+            tkltest_config['general']['app_classpath_file'] = build_classpath_file
+        else:
+            tkltest_status('app_classpath_file is missing for execute run\n', error=True)
+            sys.exit(1)
 
     #create dependencies directory
     dependencies_dir = os.path.join(os.getcwd(), app_name + "-app-dependencies")
