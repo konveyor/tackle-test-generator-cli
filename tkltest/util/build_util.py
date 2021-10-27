@@ -287,15 +287,25 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))
-    inst_app_path = os.path.join(os.path.dirname(test_root_dir), app_name + "-instrumented-classes")
     with tag('project', xmlns="http://maven.apache.org/POM/"+constants.MAVEN_VERSION):
         line('modelVersion', constants.MAVEN_VERSION)
         line('groupId', 'org.jacoco')
         line('artifactId', 'Jacoco')
         line('version', constants.JACOCO_MAVEN_VERSION)
+        with tag('properties'):
+            line('maven.compiler.source', '1.8')
+            line('maven.compiler.target', '1.8')
+            if offline_instrumentation:
+                line('jacoco.skip.instrument', 'true')
         with tag('dependencies'):
+            with tag('dependency'):
+                line('groupId', 'org.glassfish.main.extras')
+                line('artifactId', 'glassfish-embedded-all')
+                line('version', '3.1.2.2')
+                line('scope', 'test')
             for full_path in classpath_list:
-                if os.path.isdir(full_path):
+                if full_path.strip() and os.path.isdir(full_path):
+                    print(full_path)
                     try:
                         subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
                     except subprocess.CalledProcessError as e:
@@ -305,19 +315,24 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                 file_name = full_path.rsplit(os.path.sep,1)[1]
                 file_name = file_name.replace('.jar', '')
                 with tag('dependency'):
-                    line('groupId', file_name)
-                    line('artifactId', file_name)
-                    line('version', '1.0')
-                    line('scope', 'system')
-                    line('systemPath', full_path)
+                    if offline_instrumentation and 'org.jacoco.agent' in file_name:
+                        line('groupId', 'org.jacoco')
+                        line('artifactId', 'org.jacoco.agent')
+                        line('version', constants.JACOCO_MAVEN_VERSION)
+                        line('scope', 'test')
+                        line('classifier', 'runtime')
+                    else:
+                        line('groupId', file_name)
+                        line('artifactId', file_name)
+                        line('version', '1.0')
+                        line('scope', 'system')
+                        line('systemPath', full_path)
+
         with tag('build'):
             with tag('resources'):
                 for app_path in monolith_app_paths:
                     with tag('resource'):
-                        if offline_instrumentation:
-                            line('directory', os.path.abspath(inst_app_path))
-                        else:
-                            line('directory', os.path.abspath(app_path))
+                        line('directory', os.path.abspath(app_path))
             for test_src_dir in test_dirs:
                 if os.path.basename(test_src_dir) == 'target':
                     continue # skip compilation output directory
@@ -340,20 +355,27 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                             line('groupId', 'org.jacoco')
                             line('artifactId', 'jacoco-maven-plugin')
                             line('version', constants.JACOCO_MAVEN_VERSION)
-                            #with tag('configuration'):
-                                #with tag('includes'):
-                                 #   for collected_package in app_packages:
-                                  #      if collected_package == '*':
-                                   #         line('include', '**/*')
-                                    #    else:
-                                     #       line('include', collected_package)
                             with tag('executions'):
-                                with tag('execution'):
-                                    line('id', 'jacoco-initialize')
-                                    with tag('goals'):
-                                        line('goal', 'prepare-agent')
-                                    with tag('configuration'):
-                                        line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                if offline_instrumentation:
+                                    with tag('execution'):
+                                        line('id', 'default-instrument')
+                                        with tag('goals'):
+                                            line('goal', 'instrument')
+                                            line('goal', 'restore-instrumented-classes')
+                                        with tag('configuration'):
+                                            line('skip', '${jacoco.skip.instrument}')
+                                    with tag('execution'):
+                                        line('id', 'default-restore-instrumented-classes')
+                                        line('phase', 'prepare-package')
+                                        with tag('goals'):
+                                            line('goal', 'restore-instrumented-classes')
+                                else:
+                                    with tag('execution'):
+                                        line('id', 'jacoco-initialize')
+                                        with tag('goals'):
+                                            line('goal', 'prepare-agent')
+                                        with tag('configuration'):
+                                            line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
                                 with tag('execution'):
                                     line('id', 'generate-code-coverage-report')
                                     line('phase', 'test')
@@ -378,6 +400,8 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                         line('version', constants.MAVEN_SURFIRE_VERSION)
                         with tag('configuration'):
                             line('reportsDirectory', junit_output_dir + '/raw')
+                            with tag('systemPropertyVariables'):
+                                line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
                         with tag('dependencies'):
                            with tag('dependency'):
                                 line('groupId', 'org.apache.maven.surefire')

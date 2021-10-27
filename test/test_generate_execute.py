@@ -97,7 +97,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            # config['execute']['build_type'] = 'maven'
+            config['execute']['build_type'] = 'maven'
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
