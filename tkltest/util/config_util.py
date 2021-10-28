@@ -157,6 +157,7 @@ def __validate_config(config, command=None, subcommand=None):
     val_errors = {
         scope: {
             'missing_required_params': [],
+            'missing_conditionally_required_params': {},
             'invalid_enum_values': {},
             'param_constraint_violation': []
         } for scope in ['general', command, subcommand] if scope is not None
@@ -176,6 +177,11 @@ def __validate_config(config, command=None, subcommand=None):
             val_failure_msgs.append('\t- Missing required options for "{}": {}\n'.format(
                 scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
                 scope_val_errors['missing_required_params']
+            ))
+        for opt, msg in scope_val_errors['missing_conditionally_required_params'].items():
+            val_failure_msgs.append('\t- Missing conditionally required option for "{}": {} ({})\n'.format(
+                scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
+                opt, msg
             ))
         if scope_val_errors['invalid_enum_values']:
             for opt_name, msg in scope_val_errors['invalid_enum_values'].items():
@@ -203,8 +209,10 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
         # if "required" spec is a callable, which occurs for conditionally required options, call the
         # checker to determine whether the option is required in the context of the loaded config
         is_required = opt['required']
+        cond_rqd_msg = ''
         if callable(opt['required']):
-            is_required = opt['required'](opt_name, loaded_config)
+            cond_rqd_msg = opt['required'](opt_name, loaded_config)
+            is_required = (cond_rqd_msg != '')
         if is_required and config[opt_name] == opt['default_value']:
             # for java_jdk_path check whether it can be read from env var JAVA_HOME
             if opt_name == 'java_jdk_home':
@@ -212,7 +220,10 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
                 if env_java_home:
                     config[opt_name] = env_java_home
                     continue
-            val_errors['missing_required_params'].append(opt_name)
+            if cond_rqd_msg:
+                val_errors['missing_conditionally_required_params'][opt_name] = cond_rqd_msg
+            else:
+                val_errors['missing_required_params'].append(opt_name)
         if 'choices' in opt.keys() and opt_name in config.keys() and config[opt_name] not in opt['choices']:
             val_errors['invalid_enum_values'][opt_name] = 'must be one of {}: {}'.format(
                 opt['choices'], config[opt_name])
@@ -283,7 +294,7 @@ def __fix_relative_paths_recursively(options_spec, config):
             return
         if option_name not in config.keys():
             continue
-        fix_type = options_spec[option_name].get('relative_fix_type', 'none')
+        fix_type = options_spec[option_name].get('relpath_fix_type', 'none')
         if fix_type == 'path':
             if options_spec[option_name].get('type') == str:
                 config[option_name] = __fix_relative_path(config[option_name])
@@ -304,7 +315,7 @@ def __fix_relative_paths_recursively(options_spec, config):
             __fix_relative_paths_recursively(options, config[option_name])
 
 
-def __fix_relative_pathes(tkltest_config):
+def __fix_relative_paths(tkltest_config):
     """
     since we run the cli on a dedicated directory, we need to fix all the relative paths at the config
     Args:
@@ -319,7 +330,7 @@ def __fix_relative_pathes(tkltest_config):
     tkltest_config['relative_fixed'] = True
 
 
-def __resolve_claaspath(tkltest_config, command):
+def __resolve_classpath(tkltest_config, command):
     """
     1.creates a directories all all the app dependencies
     using the app build files
@@ -462,8 +473,8 @@ def fix_config(tkltest_config, command):
     Returns:
 
     """
-    __fix_relative_pathes(tkltest_config)
-    __resolve_claaspath(tkltest_config, command)
+    __fix_relative_paths(tkltest_config)
+    __resolve_classpath(tkltest_config, command)
 
 
 if __name__ == '__main__':
