@@ -59,6 +59,8 @@ directory:
 
 ```buildoutcfg
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
+```
+```buildoutcfg
 docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
 ```
 
@@ -72,33 +74,34 @@ one of the following:
 
 ```buildoutcfg
 alias tkltest='docker-compose run --rm tkltest-cli'
+```
+```buildoutcfg
 alias tkltest='docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
 ```
 
 ### Running the CLI from local installation
 
-To run the CLI from local installation, JDK, Ant, and Maven need to be installed. Additionally, Java library
-dependencies need to be downloaded.
+To run the CLI from local installation, JDK and one or more of Ant, Maven, and Gradle need to be installed. Additionally, Java library dependencies have to be downloaded.
 
 1. Install Python 3.8
 
 2. Install JDK 8. The JDK home directory has to be specified as a configuration option;
    see the section [Configuration Options](#configuration-options).
    
-3. Install Ant. The Ant executable must be in the path. Along with generating JUnit test cases,
-   the CLI generates an Ant `build.xml`, which can be used for building and running the generated tests.
+3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems are used in two ways:
 
-4. Install Maven. The Maven executable must be in the path. Along with generating JUnit test cases,
-   the CLI generates a Maven `pom.xml`, which can be used for building and running the generated tests.
+   - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml` or a Maven `pom.xml`, which can be used for building and running the generated tests (support for running using gradle tests  will be added). The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
    
+   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). Currently, this feature is supported for Gradle only; Ant and Maven support will be added. Install Gradle if you plan to use the dependency computation feature.
+
 5. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
-   for the test-generator core is downloaded from the Maven registry on GitHub Packages
-   ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
-   specific builds of EvoSuite jars that are downloaded from another
-   [Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
-   both of these require authentication. To do this, before running the download script, update
-   [lib/settings.xml](lib/settings.xml) to replace `GITHUB_USERNAME` with your GitHub username and
-   `GITHUB_TOKEN` with the personal access token that you created.
+for the test-generator core is downloaded from the Maven registry on GitHub Packages
+([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
+specific builds of EvoSuite jars that are downloaded from another
+[Maven registry on GitHub Packages](https://github.com/sinha108/maven-packages/packages);
+both of these require authentication. To do this, before running the download script, update
+[lib/settings.xml](lib/settings.xml) to replace `GITHUB_USERNAME` with your GitHub username and
+`GITHUB_TOKEN` with the personal access token that you created.
    
    Alternatively, you can download the test-generator-core jar
    [here](https://github.com/konveyor/tackle-test-generator-core/packages) and the EvoSuite
@@ -348,6 +351,9 @@ required, and the option description).
 | target_class_list                   |                                | list of target classes to perform test generation on                                                                                    |
 | excluded_class_list                 |                                | list of classes or packages to exclude from test generation. Packages must end with a wildcard.                                         |
 | time_limit                          |                                | time limit (in seconds) for evosuite/randoop test generation                                                                            |
+| app_build_type                      |                                | build type for collect app dependencies - either ant maven or gradle                                                                    |
+| app_build_config_file*              |                                | app build file                                                                                                                          |
+| app_build_settings_file             |                                | app build settings file                                                                                                                 |
 |                                     |                                |                                                                                                                                         |
 | generate.ctd_amplified              |                                | Use CTD for computing coverage goals                                                                                                    |
 | base_test_generator                 | -btg/--base-test-generator     | base test generator to use for creating building-block test sequences                                                                   |
@@ -357,8 +363,7 @@ required, and the option description).
 | num_seq_executions                  |                                | number of executions to perform to determine pass/fail status of generated sequences                                                    |
 | refactored_app_path_prefix*         |                                | path prefix to root directory of refactored app version                                                                                 |
 | refactored_app_path_suffix*         |                                | list of paths to refactored app classes                                                                                                 |
-| reuse_base_tests                    | -rbt/--reuse-base-tests        | assume existence of base sequences generated by randoop/evosuite from a previous run, and reuse them instead of generating them         | 
-|                                     |                                | from scratch                                                                                                                            | 
+| reuse_base_tests                    | -rbt/--reuse-base-tests        | reuse existing base test cases                                                                                                          |
 |                                     |                                |                                                                                                                                         |
 | generate.evosuite                   |                                | Use EvoSuite for generating a test suite                                                                                                |
 | criterion                           |                                | coverage criterion for evosuite                                                                                                         |

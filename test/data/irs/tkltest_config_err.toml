@@ -4,7 +4,7 @@ name = "TKLTEST_CONFIG_FILE"
 [general]
     # app_name = "irs"
     # monolith_app_path = ["test/data/irs/monolith/target/classes"]
-    # app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
+    app_classpath_file ="test/data/irs/irsMonoClasspath.txt"
     # test_directory = "irs-ctd-amplified-tests"
 
     # JDK home directory

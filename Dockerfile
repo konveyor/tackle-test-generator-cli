@@ -11,6 +11,10 @@ ARG GITHUB_TOKEN
 RUN mkdir -p /usr/share/man/man1
 RUN apt-get update && apt-get install -y ant
 
+# install gradle
+RUN apt-get install -y gradle
+RUN gradle --version
+
 # copy cli code and install tkltest command
 WORKDIR /app/tackle-test-cli
 COPY tkltest ./tkltest
