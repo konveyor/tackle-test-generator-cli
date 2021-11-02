@@ -172,6 +172,11 @@ def main():
     # parse arguments
     args = parser.parse_args()
 
+    # if no args specified, print help message and exit
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
     # initialize logging
     logging_util.init_logging('./tkltest.log', args.log_level)
     logging.debug('args: {}'.format(args))
@@ -180,6 +185,11 @@ def main():
     if args.command == 'config':
         __process_config_commands(args)
         sys.exit(0)
+
+    # if config file not specified, print help and exit
+    if not args.config_file:
+        logging_util.tkltest_status('No config file specified\n', error=True)
+        sys.exit(1)
 
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
