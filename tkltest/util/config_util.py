@@ -302,10 +302,11 @@ def __fix_relative_paths_recursively(options_spec, config):
                 config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
         elif fix_type == 'paths_list_file':
             classpath_file = __fix_relative_path(config[option_name])
+
             if classpath_file != "":
                 with open(classpath_file) as file:
                     lines = file.readlines()
-                lines = [__fix_relative_path(path) for path in lines]
+                lines = [__fix_relative_path(path) for path in lines if path.strip()]
                 new_file = os.path.basename(classpath_file)
                 #todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
