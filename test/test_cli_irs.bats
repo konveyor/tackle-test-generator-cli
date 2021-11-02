@@ -10,7 +10,7 @@ IRS_EVOSUITE_TESTDIR=./irs-evosuite-standalone-tests
 IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR//irs-tkltest-reports
 IRS_INSTR_CLASSES_DIR=./irs-instrumented-classes
 
-# setup commands run befeore execution of tests in file
+# setup commands run before execution of tests in file
 setup_file() {
     echo "# setup_file: removing irs tests, test reports, and test plan" >&3
     rm -rf $IRS_CTD_AMPLIFIED_TESTDIR $IRS_RANDOOP_TESTDIR $IRS_EVOSUITE_TESTDIR \

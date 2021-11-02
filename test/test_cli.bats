@@ -85,7 +85,7 @@ teardown_file() {
 @test "Test 07: CLI execute command help" {
     run tkltest execute --help
     assert_success
-    assert_output --partial 'usage: tkltest execute [-h] [-bt {ant,maven}] [-nbf] [-cc] [-onli]'
+    assert_output --partial 'usage: tkltest execute [-h] [-nbf] [-cc]'
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {

@@ -20,14 +20,15 @@ import shutil
 from tkltest.util import command_util, constants
 
 
-def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_coverage=None):
+def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir, base_coverage=None):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
     coverage file, and returns dictionary containing instruction, line, and branch coverage data.
 
     Args:
-        ant_build_file (str): Build file to use for running tests
+        build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant or maven)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
         base_coverage (dict): base coverage to compute coverage gain (delta) against
@@ -47,8 +48,11 @@ def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_
     except OSError:
         pass
 
-    # run tests using ant build file
-    command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=False)
+    # run tests using build file
+    if build_type == 'ant':
+        command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
+    else: #maven
+        command_util.run_command("mvn -f {} clean test site".format(build_file), verbose=False)
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0;

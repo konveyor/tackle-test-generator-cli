@@ -22,7 +22,7 @@ from tkltest.util import constants, coverage_util
 from tkltest.util.logging_util import tkltest_status
 
 
-def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir):
+def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, report_dir):
     """Augments CTD-guided tests with coverage-increasing base tests.
 
     Starting with the CTD-guided and base test suites, iteratively augments the CTD-guided test
@@ -37,7 +37,8 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
 
     Args:
         config (dict): loaded and validated config information
-        ant_build_file (str): Build file to use for running tests
+        build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant or maven)
         ctd_test_dir (str): Root directory for CTD tests
         report_dir (str): Main reports directory, under which coverage report is generated
     """
@@ -47,7 +48,8 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
     test_class_augment_pool, base_test_coverage, ctd_test_dir_bak = __compute_base_and_augment_test_suites(
         ctd_test_dir=ctd_test_dir,
         evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
-        ant_build_file=ant_build_file,
+        build_file=build_file,
+        build_type=build_type,
         report_dir=report_dir
     )
 
@@ -59,7 +61,8 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
         test_class_augment_pool=test_class_augment_pool,
         ctd_test_dir=ctd_test_dir,
         base_ctd_coverage=base_test_coverage,
-        ant_build_file=ant_build_file,
+        build_file=build_file,
+        build_type=build_type,
         report_dir=report_dir
     )
 
@@ -74,7 +77,8 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
         tests_with_coverage_gain=tests_with_coverage_gain,
         ctd_test_dir=ctd_test_dir,
         base_ctd_coverage=base_test_coverage,
-        ant_build_file=ant_build_file,
+        build_file=build_file,
+        build_type=build_type,
         report_dir=report_dir
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
@@ -104,7 +108,7 @@ def augment_with_code_coverage(config, ant_build_file, ctd_test_dir, report_dir)
     ))
 
 
-def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_build_file, report_dir):
+def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, build_file, build_type, report_dir):
     """Computes base test suite and augment test suite for coverage-based augmentation.
 
     Given the CTD test suite and the evosuite test suite, computes coverage efficiency of both test suites
@@ -114,7 +118,8 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
     Args:
         ctd_test_dir (str): Root directory for CTD tests
         evosuite_test_dir (str): Root directory for evosuite tests
-        ant_build_file (str): Build file to use for running tests
+        build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
 
     Returns:
@@ -124,8 +129,8 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
     """
     # get coverage info for CTD-guided test suite
     ctd_test_coverage, ctd_test_method_count, ctd_inst_cov_efficiency =\
-        __compute_coverage_efficiency(test_dir=ctd_test_dir, ant_build_file=ant_build_file, report_dir=report_dir,
-                                      test_suite_name='CTD-guided')
+        __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
+                                      report_dir=report_dir, test_suite_name='CTD-guided')
     # create backup of CTD-guided tests
     ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
@@ -136,8 +141,8 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
 
     # get coverage info for evosuite tests
     evosuite_test_coverage, evosuite_test_method_count, evosuite_inst_cov_efficiency =\
-        __compute_coverage_efficiency(test_dir=ctd_test_dir, ant_build_file=ant_build_file, report_dir=report_dir,
-                                      test_suite_name='EvoSuite')
+        __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
+                                      report_dir=report_dir, test_suite_name='EvoSuite')
 
     if ctd_inst_cov_efficiency < evosuite_inst_cov_efficiency:
         # if CTD test suite has higher efficient, it forms the initial suite and the augmentation pool
@@ -170,7 +175,7 @@ def __compute_base_and_augment_test_suites(ctd_test_dir, evosuite_test_dir, ant_
     return augmentation_test_pool, base_test_coverage, ctd_test_dir_bak
 
 
-def __compute_coverage_efficiency(test_dir, ant_build_file, report_dir, test_suite_name):
+def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name):
     """Computes and returns coverage efficiency of the given test suite.
 
     Computes coverage efficiency of the given test suite as instruction coverage rate per test method
@@ -179,7 +184,7 @@ def __compute_coverage_efficiency(test_dir, ant_build_file, report_dir, test_sui
     Args:
         test_dir (str): test suite to compute coverage efficiency for
     """
-    test_coverage = coverage_util.get_coverage_for_test_suite(ant_build_file=ant_build_file,
+    test_coverage = coverage_util.get_coverage_for_test_suite(build_file=build_file, build_type=build_type,
                                                               test_root_dir=test_dir,
                                                               report_dir=report_dir)
     inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
@@ -240,8 +245,8 @@ def __get_test_method_count(test_dir):
 
 
 
-def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, ant_build_file,
-                                       report_dir):
+def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, build_file,
+                                       build_type, report_dir):
     """Computes coverage delta for each test class in the augment pool of tests.
 
     Computes for each test class in the test augment pool additional instruction, line, and branch coverage that
@@ -253,7 +258,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
         test_class_augment_pool (list): Pool of candidates tests to augment the CTD-guided test suite with
         ctd_test_dir (str): Root directory for CTD tests
         base_ctd_coverage (dict): Coverage achieved by the CTD tests
-        ant_build_file (str): Build file to use for running tests
+        build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
 
     Returns:
@@ -276,7 +282,7 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
         # get coverage delta for test class against base CTD coverage
         try:
             coverage_delta = coverage_util.get_coverage_for_test_suite(
-                ant_build_file=ant_build_file, test_root_dir=ctd_test_dir,
+                build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
                 report_dir=report_dir, base_coverage=base_ctd_coverage)
             if coverage_delta['instruction_cov_delta'] > 0 or coverage_delta['branch_cov_delta'] > 0:
                 logging.info('Coverage gain from test class {}: instruction={}, branch={}'.format(
@@ -295,7 +301,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
     return tests_with_coverage_gain, total_inst_cov_gain, total_branch_cov_gain
 
 
-def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, ant_build_file, report_dir):
+def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, build_file, build_type,
+                             report_dir):
     """Augments CTD test suite with tests that contribute to additional coverage.
 
     Iterates over test classes that contribute to coverage gain, and adds them to the augmented test suite
@@ -308,6 +315,7 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
         ctd_test_dir (str): Root directory for CTD tests
         base_ctd_coverage (dict): Coverage achieved by the CTD tests
         ant_build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
 
     Returns:
@@ -338,7 +346,7 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
 
             try:
                 augmented_coverage = coverage_util.get_coverage_for_test_suite(
-                    ant_build_file=ant_build_file, test_root_dir=ctd_test_dir, report_dir=report_dir)
+                    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir, report_dir=report_dir)
             except subprocess.CalledProcessError as e:
                 logging.error('Error running augmented test suite with class {}: {}'.format(test_class, e))
 
