@@ -205,7 +205,7 @@ def generate_ctd_amplified_tests(config):
         main_reports_dir=reports_dir,
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
         collect_codecoverage=True,  # for coverage-based augmentation
-        offline_instrumentation=True  # for coverage-based augmentation
+        offline_instrumentation=config['general']['offline_instrumentation']  # for coverage-based augmentation
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))

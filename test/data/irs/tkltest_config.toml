@@ -8,6 +8,8 @@ name = "TKLTEST_CONFIG_FILE"
     # test_directory = "irs-ctd-amplified-tests"
     # JDK home directory
     java_jdk_home = ""
+    offline_instrumentation = false
+    build_type = "ant"
 
 # options for "tkltest generate" command
 [generate]
@@ -19,7 +21,7 @@ name = "TKLTEST_CONFIG_FILE"
     # partitions_file = "test/data/irs/refactored/PartitionsFile.json"
 
     # list of target classes for test generation. If unspecified, targets all application classes
-    # target_class_list = []
+    target_class_list = []
 
 # options for "tkltest generate randoop" command
 [generate.randoop]
@@ -45,3 +47,6 @@ name = "TKLTEST_CONFIG_FILE"
     test_class = ""
     code_coverage = true
     app_packages = ["irs.*"]
+
+
+

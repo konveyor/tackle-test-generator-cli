@@ -246,6 +246,28 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'print CLI version number'
+        },
+        'offline_instrumentation': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-offli',
+            'long_name': '--offline-instrumentation',
+            'type': bool,
+            'default_value': False,
+            'help_message': 'perform offline instrumentation of app classes for measuring code coverage ' + \
+                            '(default: app classes are instrumented online)'
+        },
+        'build_type': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-bt',
+            'long_name': '--build-type',
+            'type': str,
+            'choices': ['ant', 'maven'],
+            'default_value': 'ant',
+            'help_message': 'build file type for compiling and running the tests - either ant or maven'
         }
     },
 
@@ -480,17 +502,6 @@ __options_spec = {
             'default_value': [],
             'help_message': 'list of app packages. Must end with a wildcard'
         },
-        'build_type': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-bt',
-            'long_name': '--build-type',
-            'type': str,
-            'choices': ['ant', 'maven'],
-            'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests - either ant or maven'
-        },
         'create_build_file': {
             'required': False,
             'is_toml_option': True,
@@ -510,17 +521,6 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'generate code coverage report with JaCoCo agent'
-        },
-        'online_instrumentation': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-onli',
-            'long_name': '--online-instrumentation',
-            'type': bool,
-            'default_value': False,
-            'help_message': 'perform online instrumentation of app classes for measuring code coverage ' + \
-                            '(default: app classes are instrumented offline)'
         },
         'test_class': {
             'required': False,
