@@ -122,7 +122,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
 
     maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
     __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
+                  app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
     return ant_build_xml_file, maven_build_xml_file
 
@@ -279,7 +279,7 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
 
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, report_output_dir,
+                  app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
                   build_xml_file):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
@@ -293,10 +293,8 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
         line('artifactId', 'Jacoco')
         line('version', constants.JACOCO_MAVEN_VERSION)
         with tag('properties'):
-            line('maven.compiler.source', '1.8')
-            line('maven.compiler.target', '1.8')
-            if offline_instrumentation:
-                line('jacoco.skip.instrument', 'true')
+            line('maven.compiler.source', constants.JAVA_VERSION_FOR_MAVEN)
+            line('maven.compiler.target', constants.JAVA_VERSION_FOR_MAVEN)
         with tag('dependencies'):
             with tag('dependency'):
                 line('groupId', 'org.glassfish.main.extras')
@@ -315,7 +313,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                 file_name = full_path.rsplit(os.path.sep,1)[1]
                 file_name = file_name.replace('.jar', '')
                 with tag('dependency'):
-                    if offline_instrumentation and 'org.jacoco.agent' in file_name:
+                    if 'org.jacoco.agent' in file_name:
                         line('groupId', 'org.jacoco')
                         line('artifactId', 'org.jacoco.agent')
                         line('version', constants.JACOCO_MAVEN_VERSION)
@@ -361,12 +359,11 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                         line('id', 'default-instrument')
                                         with tag('goals'):
                                             line('goal', 'instrument')
-                                            line('goal', 'restore-instrumented-classes')
-                                        with tag('configuration'):
-                                            line('skip', '${jacoco.skip.instrument}')
+                                            #line('goal', 'prepare-agent')
+                                        #with tag('configuration'):
+                                        #    line('skip', '${jacoco.skip.instrument}')
                                     with tag('execution'):
                                         line('id', 'default-restore-instrumented-classes')
-                                        line('phase', 'prepare-package')
                                         with tag('goals'):
                                             line('goal', 'restore-instrumented-classes')
                                 else:
@@ -384,15 +381,18 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                     with tag('configuration'):
                                         line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
                                         line('outputDirectory', main_coverage_dir)
-                                        with tag('rules'):
-                                            with tag('rule'):
-                                                line('element', 'package')
-                                                with tag('includes'):
-                                                    for collected_package in app_packages:
-                                                        if collected_package == '*':
-                                                            line('include', '**/*')
-                                                        else:
-                                                            line('include', collected_package)
+                                if app_reported_packages:
+                                    with tag('execution'):
+                                        line('id', 'check-coverage')
+                                        with tag('goals'):
+                                            line('goal', 'check')
+                                        with tag('configuration'):
+                                            with tag('rules'):
+                                                with tag('rule'):
+                                                    line('element', 'CLASS')
+                                                    with tag('includes'):
+                                                        for reported_class in app_reported_packages:
+                                                            line('include', reported_class.replace('.','/')+".class")
 
                     with tag('plugin'):
                         line('groupId', 'org.apache.maven.plugins')
@@ -402,6 +402,9 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                             line('reportsDirectory', junit_output_dir + '/raw')
                             with tag('systemPropertyVariables'):
                                 line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                            for package in app_collected_packages:
+                                if package != '*':
+                                    line('include', package.replace('.','/')+"*/*.class")
                         with tag('dependencies'):
                            with tag('dependency'):
                                 line('groupId', 'org.apache.maven.surefire')

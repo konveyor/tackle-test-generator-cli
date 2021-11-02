@@ -123,3 +123,7 @@ EXTENDER_REPEATED_TIMEOUT = 60
 # Name of test plan summary report
 
 TEST_PLAN_SUMMARY_NAME = "test-plan-summary.html"
+
+# Java version enforced in maven build files
+
+JAVA_VERSION_FOR_MAVEN = 1.8
