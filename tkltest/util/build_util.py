@@ -381,18 +381,23 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                     with tag('configuration'):
                                         line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
                                         line('outputDirectory', main_coverage_dir)
-                                if app_reported_packages:
-                                    with tag('execution'):
-                                        line('id', 'check-coverage')
-                                        with tag('goals'):
-                                            line('goal', 'check')
-                                        with tag('configuration'):
+                                        if app_reported_packages:
                                             with tag('rules'):
                                                 with tag('rule'):
                                                     line('element', 'CLASS')
                                                     with tag('includes'):
                                                         for reported_class in app_reported_packages:
-                                                            line('include', reported_class.replace('.','/')+".class")
+                                                            line('include', reported_class.replace('.', '/')+".*")
+                                        else:
+                                            with tag('rules'):
+                                                with tag('rule'):
+                                                    line('element', 'PACKAGE')
+                                                    with tag('includes'):
+                                                        for package in app_collected_packages:
+                                                            if package != '*':
+                                                                line('include', package.replace('.', '/') + "*/*.class")
+                                                            else:
+                                                                line('include', '**/*')
 
                     with tag('plugin'):
                         line('groupId', 'org.apache.maven.plugins')
@@ -402,9 +407,6 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                             line('reportsDirectory', junit_output_dir + '/raw')
                             with tag('systemPropertyVariables'):
                                 line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
-                            for package in app_collected_packages:
-                                if package != '*':
-                                    line('include', package.replace('.','/')+"*/*.class")
                         with tag('dependencies'):
                            with tag('dependency'):
                                 line('groupId', 'org.apache.maven.surefire')
