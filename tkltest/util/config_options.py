@@ -127,9 +127,20 @@ def __conditionally_required(opt_name, config):
 
     if opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
         if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
-            return True
-        else:
-            return False
+            return 'required if "partitions_file" is specified'
+    elif opt_name == 'app_classpath_file':
+        # required if app_build_type is not specified
+        if config['generate']['app_build_type'] == __options_spec['generate']['app_build_type']['default_value']:
+            return 'required if "app_build_type" is not specified'
+    elif opt_name == 'app_build_type':
+        # required if app_classpath_file is not specified
+        if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
+            return 'required if "app_classpath_file" is not specified'
+    elif opt_name == 'app_build_config_file':
+        # required if app_build_type is specified
+        if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
+            return 'required if "app_build_type" is specified'
+    return ''
 
 
 __options_spec = {
@@ -145,12 +156,12 @@ __options_spec = {
             'help_message': 'name of the application being tested'
         },
         'app_classpath_file': {
-            'required': True,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'paths_list_file',
+            'relpath_fix_type': 'paths_list_file',
             'help_message': 'file containing paths to jar files that represent the library dependencies of app'
         },
         'config_file': {
@@ -161,7 +172,7 @@ __options_spec = {
             'long_name': '--config-file',
             'type': argparse.FileType('r'),
             'default_value': constants.TKLTEST_DEFAULT_CONFIG_FILE,
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'path to TOML file containing configuration options'
         },
         'log_level': {
@@ -181,7 +192,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'list of paths to application classes'
         },
         'java_jdk_home': {
@@ -190,7 +201,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'root directory for JDK installation (must be JDK; JRE will not suffice); '
                             'can be set as environment variable JAVA_HOME'
         },
@@ -202,7 +213,7 @@ __options_spec = {
             'long_name': '--test-directory',
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'name of root test directory containing the generated JUnit test classes'
         },
         'reports_path': {
@@ -213,7 +224,7 @@ __options_spec = {
             'long_name': '--reports-path',
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'path to the reports directory'
         },
         'verbose': {
@@ -291,7 +302,7 @@ __options_spec = {
             'long_name': '--partitions-file',
             'type': str,
             'default_value': '',
-            'relative_fix_type': 'path',
+            'relpath_fix_type': 'path',
             'help_message': 'path to file containing specification of partitions'
         },
         'target_class_list': {
@@ -317,6 +328,33 @@ __options_spec = {
             'type': int,
             'default_value': 10,
             'help_message': 'time limit (in seconds) for evosuite/randoop test generation'
+        },
+        'app_build_type': {
+            'required': __conditionally_required,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['gradle', None],
+            'default_value': None,
+            'help_message': 'build type for collecting app dependencies: gradle (support for maven and ant to be added)'
+        },
+        'app_build_config_file': {
+            'required': __conditionally_required,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relpath_fix_type': 'path',
+            'help_message': 'path to app build file for the specified app build type'
+        },
+        'app_build_settings_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relpath_fix_type': 'path',
+            'help_message': 'path to app build settings file for the specified app build type'
         },
 
         # subcommands for the generate command
@@ -378,7 +416,7 @@ __options_spec = {
                     'is_cli_option': False,
                     'type': str,
                     'default_value': '',
-                    'relative_fix_type': 'path',
+                    'relpath_fix_type': 'path',
                     'help_message': 'path prefix to root directory of refactored app version'
                 },
                 'refactored_app_path_suffix': {
@@ -388,7 +426,7 @@ __options_spec = {
                     'is_cli_option': False,
                     'type': list,
                     'default_value': [],
-                    'relative_fix_type': 'path',
+                    'relpath_fix_type': 'path',
                     'help_message': 'list of paths to refactored app classes'
                 },
                 'reuse_base_tests': {

@@ -1,0 +1,43 @@
+name = "TKLTEST_CONFIG_FILE"
+
+# general options
+[general]
+    app_name = "demo"
+    monolith_app_path = ["test/data/demo/app/build/classes/java/main/","test/data/demo/utilities/build/classes/java/main/","test/data/demo/list/build/classes/java/main/"]
+    # JDK home directory
+    java_jdk_home = ""
+
+
+[generate]
+jee_support = false
+no_diff_assertions = false
+partitions_file = ""
+target_class_list = []
+excluded_class_list = []
+time_limit = 10
+
+app_build_type = 'gradle'
+app_build_config_file = "test/data/demo/app/build.gradle"
+app_build_settings_file = "test/data/demo/settings.gradle"
+
+[execute]
+app_packages = ['']
+build_type = "ant"
+create_build_file = true
+code_coverage = true
+offline_instrumentation = false
+test_class = ""
+
+[generate.ctd_amplified]
+base_test_generator = "combined"
+no_ctd_coverage = false
+interaction_level = 1
+num_seq_executions = 10
+refactored_app_path_prefix = ""
+refactored_app_path_suffix = []
+
+[generate.evosuite]
+criterion = [ "BRANCH",]
+
+[generate.randoop]
+no_error_revealing_tests = false
