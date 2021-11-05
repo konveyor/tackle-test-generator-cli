@@ -33,22 +33,28 @@ jobs:
           cat ./settings.xml
           ./download_lib_jars.sh
           cd ..; ls lib/*
-      - name: Create Archive Release (zip) with all Dependencies
+      - name: Get release tag
+        id: get_release_tag
+        run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
+      - name: Set archive file name
+        id: set_file_name
+        run: echo ::set-output name=file_name::${{ github.event.repository.name }}-${{ steps.get_release_tag.outputs.tag_name }}-all-deps
+      - name: Create archive release (zip) with all dependencies
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: 'release-with-all-jars-${{ github.event.ref }}.zip'
+          filename: '${{ steps.set_file_name.outputs.file_name }}.zip'
           exclusions: '*.git*'
-      - name: Create Archive Release (tar.gz) with all Dependencies
+      - name: Create archive release (tar.gz) with all dependencies
         uses: thedoctor0/zip-release@master
         with:
           type: 'tar'
-          filename: 'release-with-all-jars-${{ github.event.ref }}.tar.gz'
+          filename: '${{ steps.set_file_name.outputs.file_name }}.tar.gz'
           exclusions: '*.git*'
       - name: Release
         uses: softprops/action-gh-release@v1
 #        uses: ncipollo/release-action@v1
         with:
           files: |
-            release-with-all-jars-${{ github.event.ref }}.zip
-            release-with-all-jars-${{ github.event.ref }}.tar.gz
+            ${{ steps.set_file_name.outputs.file_name }}.zip
+            ${{ steps.set_file_name.outputs.file_name }}.tar.gz
