@@ -44,13 +44,13 @@ jobs:
         with:
           type: 'zip'
           filename: '${{ steps.set_file_name.outputs.file_name }}.zip'
-          exclusions: '*.git*'
+          exclusions: '*.git* test'
       - name: Create archive release (tar.gz) with all dependencies
         uses: thedoctor0/zip-release@master
         with:
           type: 'tar'
           filename: '${{ steps.set_file_name.outputs.file_name }}.tar.gz'
-          exclusions: '*.git*'
+          exclusions: '.github .gitignore .gitmodules test'
       - name: Release
         uses: softprops/action-gh-release@v1
 #        uses: ncipollo/release-action@v1
