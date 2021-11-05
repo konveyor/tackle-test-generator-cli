@@ -32,4 +32,5 @@ jobs:
           ./download_lib_jars.sh
           cd ..; ls lib/*
       - name: Release
-        uses: softprops/action-gh-release@v1
+#        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1
