@@ -47,7 +47,7 @@ jobs:
           exclusions: '*.git*'
       - name: Create archive release (.tgz) with all dependencies
         run: |
-          tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*"
+          tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" .
       - name: Release
         uses: softprops/action-gh-release@v1
 #        uses: ncipollo/release-action@v1
