@@ -33,14 +33,22 @@ jobs:
           cat ./settings.xml
           ./download_lib_jars.sh
           cd ..; ls lib/*
-      - name: Create Archive Release with all Dependencies
+      - name: Create Archive Release (zip) with all Dependencies
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: 'release-with-all-jars.zip'
+          filename: 'release-with-all-jars-${{ github.event.ref }}.zip'
+          exclusions: '*.git*'
+      - name: Create Archive Release (tar.gz) with all Dependencies
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'tar'
+          filename: 'release-with-all-jars-${{ github.event.ref }}.tar.gz'
           exclusions: '*.git*'
       - name: Release
         uses: softprops/action-gh-release@v1
 #        uses: ncipollo/release-action@v1
         with:
-          files: 'release-with-all-jars.zip'
+          files: |
+            release-with-all-jars-${{ github.event.ref }}.zip
+            release-with-all-jars-${{ github.event.ref }}.tar.gz
