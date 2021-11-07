@@ -16,8 +16,10 @@ import logging
 import os
 import subprocess
 import sys
+import pathlib
 
 from yattag import Doc, indent
+from jinja2 import Environment, FileSystemLoader
 
 from . import constants
 from tkltest.util.logging_util import tkltest_status
@@ -124,7 +126,13 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
     __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
-    return ant_build_xml_file, maven_build_xml_file
+
+    gradle_build_file = test_root_dir + os.sep + 'build.gradle'
+    __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, main_reports_dir, gradle_build_file)
+
+
+    return ant_build_xml_file, maven_build_xml_file, gradle_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
@@ -403,3 +411,30 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
     )
     with open(build_xml_file, 'w') as outfile:
         outfile.write(result)
+
+
+def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file):
+
+    classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
+    jacoco_ant = pathlib.PurePath(os.path.abspath(os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "org.jacoco.ant-0.8.7-nodeps.jar"))).as_posix()
+    inst_app_path = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
+    test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs]
+    monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
+    app_packages = [pathlib.PurePath(os.path.abspath(app_package)).as_posix() for app_package in app_packages]
+    report_output_dir = pathlib.PurePath(os.path.abspath(report_output_dir)).as_posix()
+    env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
+    template = env.get_template('build_template.gradle')
+    if offline_instrumentation and False:
+        # todo - resolve gradle offline inst
+        report_task_dependencies = 'build, instrument'
+        report_task_directories = [inst_app_path]
+    else:
+        report_task_dependencies = 'build'
+        report_task_directories = monolith_app_paths
+
+    s = template.render(classpath_list=classpath_list, monolith_app_paths=monolith_app_paths, app_packages=app_packages, test_dirs=test_dirs,
+                        inst_app_path=inst_app_path, jacoco_ant=jacoco_ant, report_task_dependencies=report_task_dependencies,
+                        report_task_directories=report_task_directories, report_output_dir=report_output_dir)
+    with open(build_gradle_file, 'w') as outfile:
+        outfile.write(s)
