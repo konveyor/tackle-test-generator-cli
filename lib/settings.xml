@@ -5,13 +5,13 @@
   <servers>
     <server>
       <id>github</id>
-      <username>haim-kermany</username>
-      <password>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</password>
+      <username>GITHUB_USERNAME</username>
+      <password>GITHUB_TOKEN</password>
     </server>
     <server>
       <id>github-sinha108</id>
-      <username>haim-kermany</username>
-      <password>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</password>
+      <username>GITHUB_USERNAME</username>
+      <password>GITHUB_TOKEN</password>
     </server>
   </servers>
 
