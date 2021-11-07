@@ -21,11 +21,11 @@ app_build_config_file = "test/data/demo/app/build.gradle"
 app_build_settings_file = "test/data/demo/settings.gradle"
 
 [execute]
-app_packages = ['']
-build_type = "ant"
+app_packages = ['demo.*']
+build_type = "gradle"
 create_build_file = true
 code_coverage = true
-offline_instrumentation = false
+online_instrumentation = true
 test_class = ""
 
 [generate.ctd_amplified]
