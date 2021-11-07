@@ -117,7 +117,8 @@ teardown_file() {
     assert_failure 1
     assert_line --index 1 --partial 'ERROR: configuration options validation failed:'
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name', 'monolith_app_path']"
-    assert_line --index 3 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
+    assert line --index 3 --partial "Value for option "build_type" must be one of ['ant', 'maven']: gradle"
+    assert_line --index 4 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
 @test "Test 13: CLI generate ctd-amplified no config" {
@@ -132,9 +133,10 @@ teardown_file() {
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name', 'monolith_app_path']"
-    assert_line --index 3 --partial "refactored_app_path_prefix (required if \"partitions_file\" is specified)"
-    assert_line --index 4 --partial "refactored_app_path_suffix (required if \"partitions_file\" is specified)"
-    assert_line --index 5 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
+    assert line --index 3 --partial "Value for option "build_type" must be one of ['ant', 'maven']: gradle"
+    assert_line --index 4 --partial "refactored_app_path_prefix (required if \"partitions_file\" is specified)"
+    assert_line --index 5 --partial "refactored_app_path_suffix (required if \"partitions_file\" is specified)"
+    assert_line --index 6 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
 @test "Test 15: CLI execute invalid spec in toml" {
