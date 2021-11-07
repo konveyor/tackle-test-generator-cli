@@ -1,0 +1,75 @@
+
+plugins {
+    id 'application'
+    id 'java'
+    id 'jacoco'
+}
+
+tasks.withType(Zip).all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.withType(Tar).all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+
+dependencies {
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+//dependencies from class files:
+{% for item in classpath_list %}
+  implementation files('{{ item }}')  {% endfor %}
+//we compile the testing, so we depend on the app modules:
+{% for item in monolith_app_paths %}
+    implementation files('{{ item }}') {% endfor %}
+}
+
+sourceSets.test.java.srcDirs = [
+{% for item in test_dirs %}
+    '{{ item }}', {% endfor %}
+]
+
+task cleanInstrumentDir(){
+    delete '{{ inst_app_path }}'
+}
+task cleanJacoco(){
+    delete '{{ report_output_dir }}'
+}
+task instrument() {
+    dependsOn cleanInstrumentDir
+    ext.outputDir = '{{ inst_app_path }}'
+    doLast {
+        ant.taskdef(name: 'instrument',
+                classname: 'org.jacoco.ant.InstrumentTask',
+                classpath: '{{ jacoco_ant }}')
+        ant.instrument(destdir: outputDir) {
+        {% for item in monolith_app_paths %}
+            fileset(dir: '{{ item }}') {% endfor %}
+        }
+    }
+}
+
+jacoco{
+    reportsDirectory = file('{{ report_output_dir }}')
+}
+
+jacocoTestReport {
+    dependsOn {{ report_task_dependencies }},cleanJacoco
+    afterEvaluate {
+        classDirectories.setFrom(
+        {% for item in report_task_directories %}
+            fileTree(dir:'{{ item }}' , include: '/**/*.class' ),  {% endfor %}
+        )
+    }
+}
+
+
+task tklest_task(){
+    dependsOn jacocoTestReport
+}
