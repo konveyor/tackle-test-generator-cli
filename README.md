@@ -351,9 +351,9 @@ required, and the option description).
 | target_class_list                   |                                | list of target classes to perform test generation on                                                                                    |
 | excluded_class_list                 |                                | list of classes or packages to exclude from test generation. Packages must end with a wildcard.                                         |
 | time_limit                          |                                | time limit (in seconds) for evosuite/randoop test generation                                                                            |
-| app_build_type                      |                                | build type for collect app dependencies - either ant maven or gradle                                                                    |
-| app_build_config_file*              |                                | app build file                                                                                                                          |
-| app_build_settings_file             |                                | app build settings file                                                                                                                 |
+| app_build_type*                     |                                | build type for collecting app dependencies: gradle (support for maven and ant to be added)                                              |
+| app_build_config_file*              |                                | path to app build file for the specified app build type                                                                                 |
+| app_build_settings_file             |                                | path to app build settings file for the specified app build type                                                                        |
 |                                     |                                |                                                                                                                                         |
 | generate.ctd_amplified              |                                | Use CTD for computing coverage goals                                                                                                    |
 | base_test_generator                 | -btg/--base-test-generator     | base test generator to use for creating building-block test sequences                                                                   |
@@ -373,7 +373,7 @@ required, and the option description).
 |                                     |                                |                                                                                                                                         |
 | execute                             |                                | Execute generated tests on the application version under test                                                                           |
 | app_packages*                       |                                | list of app packages. Must end with a wildcard                                                                                          |
-| build_type                          | -bt/--build-type               | build file type for compiling and running the tests - either ant or maven                                                               |
+| build_type                          | -bt/--build-type               | build file type for compiling and running the tests - either ant, maven or gradle                                                       |
 | create_build_file                   | -nbf/--no-build-file-creation  | Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used |
 | code_coverage                       | -cc/--code-coverage            | generate code coverage report with JaCoCo agent                                                                                         |
 | online_instrumentation              | -onli/--online-instrumentation | perform online instrumentation of app classes for measuring code coverage (default: app classes are instrumented offline)               |
