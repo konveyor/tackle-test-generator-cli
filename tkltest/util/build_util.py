@@ -447,23 +447,43 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
 
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
     jacoco_ant = pathlib.PurePath(os.path.abspath(os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "org.jacoco.ant-0.8.7-nodeps.jar"))).as_posix()
-    inst_app_path = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
+    inst_classes = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
     test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs]
     monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
     app_packages = [pathlib.PurePath(os.path.abspath(app_package)).as_posix() for app_package in app_packages]
-    report_output_dir = pathlib.PurePath(os.path.abspath(report_output_dir)).as_posix()
+    main_junit_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
+    main_coverage_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
+                                        os.path.basename(test_root_dir))).as_posix()
+
+    #todo - how to fix the following reference:
     env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
     template = env.get_template('build_template.gradle')
-    if offline_instrumentation and False:
-        # todo - resolve gradle offline inst
-        report_task_dependencies = 'build, instrument'
-        report_task_directories = [inst_app_path]
-    else:
-        report_task_dependencies = 'build'
-        report_task_directories = monolith_app_paths
 
-    s = template.render(classpath_list=classpath_list, monolith_app_paths=monolith_app_paths, app_packages=app_packages, test_dirs=test_dirs,
-                        inst_app_path=inst_app_path, jacoco_ant=jacoco_ant, report_task_dependencies=report_task_dependencies,
-                        report_task_directories=report_task_directories, report_output_dir=report_output_dir)
+    coverage_dependencies = ''
+    coverage_app_classes = 'monolith_app_paths'
+    if offline_instrumentation:
+        tkltest_status('Running Jacoco under gradle on offline instrumented classes is not supported yet\n', error=True)
+        sys.exit(1)
+        # todo - resolve gradle offline inst
+        #coverage_dependencies = ',instrument'
+        #coverage_app_classes = [inst_classes]
+
+    if collect_codecoverage:
+        final_task = 'jacocoTestReport'
+    else:
+        final_task = 'test'
+
+    s = template.render(classpath_list=classpath_list,
+                        monolith_app_paths=monolith_app_paths,
+                        app_packages=app_packages,
+                        test_dirs=test_dirs,
+                        inst_classes=inst_classes,
+                        jacoco_ant=jacoco_ant,
+                        coverage_app_classes=coverage_app_classes,
+                        main_junit_dir=main_junit_dir,
+                        main_coverage_dir=main_coverage_dir,
+                        coverage_dependencies=coverage_dependencies,
+                        final_task=final_task)
+
     with open(build_gradle_file, 'w') as outfile:
         outfile.write(s)

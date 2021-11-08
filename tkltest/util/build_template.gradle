@@ -35,15 +35,29 @@ sourceSets.test.java.srcDirs = [
     '{{ item }}', {% endfor %}
 ]
 
+task cleanUnitDir(){
+    delete '{{ main_junit_dir }}'
+}
+
+task cleanCoverageDir(){
+    delete '{{ main_coverage_dir }}'
+}
+
+test {
+  dependsOn cleanUnitDir
+  reports {
+    html.destination = file('{{ main_junit_dir }}')
+    junitXml.destination = file('{{ main_junit_dir }}')
+  }
+}
+
 task cleanInstrumentDir(){
-    delete '{{ inst_app_path }}'
+    delete '{{ inst_classes }}'
 }
-task cleanJacoco(){
-    delete '{{ report_output_dir }}'
-}
+
 task instrument() {
     dependsOn cleanInstrumentDir
-    ext.outputDir = '{{ inst_app_path }}'
+    ext.outputDir = '{{ inst_classes }}'
     doLast {
         ant.taskdef(name: 'instrument',
                 classname: 'org.jacoco.ant.InstrumentTask',
@@ -56,14 +70,14 @@ task instrument() {
 }
 
 jacoco{
-    reportsDirectory = file('{{ report_output_dir }}')
+    reportsDirectory = file('{{ main_coverage_dir }}')
 }
 
 jacocoTestReport {
-    dependsOn {{ report_task_dependencies }},cleanJacoco
+    dependsOn cleanCoverageDir, test {{coverage_dependencies}}
     afterEvaluate {
         classDirectories.setFrom(
-        {% for item in report_task_directories %}
+        {% for item in coverage_app_classes %}
             fileTree(dir:'{{ item }}' , include: '/**/*.class' ),  {% endfor %}
         )
     }
@@ -71,5 +85,5 @@ jacocoTestReport {
 
 
 task tklest_task(){
-    dependsOn jacocoTestReport
+    dependsOn {{final_task}}
 }
