@@ -462,11 +462,9 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     coverage_dependencies = ''
     coverage_app_classes = 'monolith_app_paths'
     if offline_instrumentation:
-        tkltest_status('Running Jacoco under gradle on offline instrumented classes is not supported yet\n', error=True)
-        sys.exit(1)
         # todo - resolve gradle offline inst
-        #coverage_dependencies = ',instrument'
-        #coverage_app_classes = [inst_classes]
+        coverage_dependencies = ',instrument'
+        coverage_app_classes = [inst_classes]
 
     if collect_codecoverage:
         final_task = 'jacocoTestReport'

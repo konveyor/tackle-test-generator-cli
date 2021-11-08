@@ -56,6 +56,8 @@ task cleanInstrumentDir(){
 }
 
 task instrument() {
+    //todo - resolve offline instrumentation
+    project.logger.error('ERROR: Running Jacoco under gradle on offline instrumented classes is not supported yet')
     dependsOn cleanInstrumentDir
     ext.outputDir = '{{ inst_classes }}'
     doLast {
