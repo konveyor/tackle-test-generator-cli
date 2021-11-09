@@ -142,8 +142,8 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
         )
     else:
         ant_build_file = test_root_dir + os.sep + "build.xml"
-        maven_build_file  = test_root_dir + os.sep + "pom.xml"
-        gradle_build_file  = test_root_dir + os.sep + "build.gradle"
+        maven_build_file = test_root_dir + os.sep + "pom.xml"
+        gradle_build_file = test_root_dir + os.sep + "build.gradle"
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
