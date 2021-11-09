@@ -65,6 +65,7 @@ setup_file() {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
+        --offline-instrumentation \
         execute
     [ $status -eq 0 ]
 
@@ -100,7 +101,7 @@ setup_file() {
     run tkltest --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        execute --online-instrumentation
+        execute
     [ $status -eq 0 ]
 
     # assert over reports dirs and instrumented classes dir
