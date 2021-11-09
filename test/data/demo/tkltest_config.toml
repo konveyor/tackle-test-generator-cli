@@ -25,7 +25,7 @@ app_packages = ['demo.*']
 build_type = "gradle"
 create_build_file = true
 code_coverage = true
-online_instrumentation = true
+online_instrumentation = false
 test_class = ""
 
 [generate.ctd_amplified]

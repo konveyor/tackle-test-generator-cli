@@ -155,7 +155,7 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
         if build_type == 'maven':
             command_util.run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
         elif build_type == 'gradle':
-                command_util.run_command("gradle -b {} tklest_task".format(gradle_build_file), verbose=verbose)
+                command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=verbose)
         else:
             if collect_codecoverage:
                 command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)

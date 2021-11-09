@@ -16,39 +16,19 @@ repositories {
     mavenCentral()
 }
 
+buildDir = '{{build_dir}}'
 
 
 dependencies {
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 //dependencies from class files:
 {% for item in classpath_list %}
   implementation files('{{ item }}')  {% endfor %}
 //we compile the testing, so we depend on the app modules:
 {% for item in monolith_app_paths %}
-    implementation files('{{ item }}') {% endfor %}
-}
-
-sourceSets.test.java.srcDirs = [
-{% for item in test_dirs %}
-    '{{ item }}', {% endfor %}
-]
-
-task cleanUnitDir(){
-    delete '{{ main_junit_dir }}'
-}
-
-task cleanCoverageDir(){
-    delete '{{ main_coverage_dir }}'
-}
-
-test {
-  dependsOn cleanUnitDir
-  reports {
-    html.destination = file('{{ main_junit_dir }}')
-    junitXml.destination = file('{{ main_junit_dir }}')
-  }
+    testCompileOnly files('{{ item }}') {% endfor %}
+{% for item in app_classes_for_tests %}
+    testRuntimeOnly files('{{ item }}') {% endfor %}
 }
 
 task cleanInstrumentDir(){
@@ -56,8 +36,6 @@ task cleanInstrumentDir(){
 }
 
 task instrument() {
-    //todo - resolve offline instrumentation
-    project.logger.error('ERROR: Running Jacoco under gradle on offline instrumented classes is not supported yet')
     dependsOn cleanInstrumentDir
     ext.outputDir = '{{ inst_classes }}'
     doLast {
@@ -71,20 +49,40 @@ task instrument() {
     }
 }
 
+task cleanUnitReportDir(){
+    delete '{{ main_junit_report_dir }}'
+}
+
+sourceSets.test.java.srcDirs = [
+{% for item in test_dirs %}
+    '{{ item }}', {% endfor %}
+]
+
+test {
+  dependsOn cleanUnitReportDir {{test_dependsOn}}
+  reports {
+    html.destination = file('{{ main_junit_report_dir }}')
+    junitXml.destination = file('{{ main_junit_report_dir }}')
+  }
+}
+
 jacoco{
-    reportsDirectory = file('{{ main_coverage_dir }}')
+    reportsDirectory = file('{{ main_coverage_report_dir }}')
+}
+
+task cleanCoverageReportDir(){
+    delete '{{ main_coverage_report_dir }}'
 }
 
 jacocoTestReport {
-    dependsOn cleanCoverageDir, test {{coverage_dependencies}}
+    dependsOn cleanCoverageReportDir, test
     afterEvaluate {
         classDirectories.setFrom(
-        {% for item in coverage_app_classes %}
+        {% for item in monolith_app_paths %}
             fileTree(dir:'{{ item }}' , include: '/**/*.class' ),  {% endfor %}
         )
     }
 }
-
 
 task tklest_task(){
     dependsOn {{final_task}}

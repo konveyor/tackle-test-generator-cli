@@ -126,11 +126,9 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
     __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
-
     gradle_build_file = test_root_dir + os.sep + 'build.gradle'
     __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, main_reports_dir, gradle_build_file)
-
 
     return ant_build_xml_file, maven_build_xml_file, gradle_build_file
 
@@ -445,42 +443,43 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
 def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, offline_instrumentation, report_output_dir, build_gradle_file):
 
+    build_dir = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-gradle-build-dir")).as_posix()
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
     jacoco_ant = pathlib.PurePath(os.path.abspath(os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "org.jacoco.ant-0.8.7-nodeps.jar"))).as_posix()
     inst_classes = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
     test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs]
     monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
     app_packages = [pathlib.PurePath(os.path.abspath(app_package)).as_posix() for app_package in app_packages]
-    main_junit_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
-    main_coverage_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
+    main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
+    main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))).as_posix()
 
     #todo - how to fix the following reference:
     env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
     template = env.get_template('build_template.gradle')
 
-    coverage_dependencies = ''
-    coverage_app_classes = 'monolith_app_paths'
+    test_dependsOn = ''
+    app_classes_for_tests = monolith_app_paths
     if offline_instrumentation:
-        # todo - resolve gradle offline inst
-        coverage_dependencies = ',instrument'
-        coverage_app_classes = [inst_classes]
+        test_dependsOn = ',instrument'
+        app_classes_for_tests = [inst_classes]
 
     if collect_codecoverage:
         final_task = 'jacocoTestReport'
     else:
         final_task = 'test'
 
-    s = template.render(classpath_list=classpath_list,
+    s = template.render(build_dir=build_dir,
+                        classpath_list=classpath_list,
                         monolith_app_paths=monolith_app_paths,
                         app_packages=app_packages,
                         test_dirs=test_dirs,
                         inst_classes=inst_classes,
                         jacoco_ant=jacoco_ant,
-                        coverage_app_classes=coverage_app_classes,
-                        main_junit_dir=main_junit_dir,
-                        main_coverage_dir=main_coverage_dir,
-                        coverage_dependencies=coverage_dependencies,
+                        app_classes_for_tests=app_classes_for_tests,
+                        main_junit_report_dir=main_junit_report_dir,
+                        main_coverage_report_dir=main_coverage_report_dir,
+                        test_dependsOn=test_dependsOn,
                         final_task=final_task)
 
     with open(build_gradle_file, 'w') as outfile:
