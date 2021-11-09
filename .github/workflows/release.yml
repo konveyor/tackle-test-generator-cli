@@ -33,8 +33,6 @@ jobs:
           cat ./settings.xml
           ./download_lib_jars.sh
           cd ..; ls lib/*
-          zip --help
-          tar --help
       - name: Get release tag
         id: get_release_tag
         run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
@@ -52,7 +50,7 @@ jobs:
       - name: Create archive release (.tgz and .zip) with all dependencies
         run: |
           cd ..; ls -l
-          zip -9 -r -x ".git*" ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }}
+          zip -9 -r ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }} -x ".git*"
           tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" ${{ github.event.repository.name }}
           ls -l
       - name: Release
