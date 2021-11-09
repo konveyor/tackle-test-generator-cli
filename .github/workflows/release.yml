@@ -33,6 +33,8 @@ jobs:
           cat ./settings.xml
           ./download_lib_jars.sh
           cd ..; ls lib/*
+          zip --help
+          tar --help
       - name: Get release tag
         id: get_release_tag
         run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
@@ -43,10 +45,13 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
+          directory: '..'
+          path: ${{ github.event.repository.name }}
           filename: '${{ steps.set_file_name.outputs.file_name }}.zip'
           exclusions: '*.git*'
       - name: Create archive release (.tgz) with all dependencies
         run: |
+          pwd
           tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" .
       - name: Release
         uses: softprops/action-gh-release@v1
