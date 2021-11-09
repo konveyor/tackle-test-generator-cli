@@ -1,0 +1,14 @@
+
+plugins {
+    id 'java'
+    id 'application'
+}
+dependencies {
+    implementation project(':list')
+    implementation project(':utilities')
+}
+
+application {
+    mainClass = 'split_join.app.App'
+}
+

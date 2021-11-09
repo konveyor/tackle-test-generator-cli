@@ -1,0 +1,3 @@
+
+rootProject.name = 'split_join'
+include('app', 'list', 'utilities')
