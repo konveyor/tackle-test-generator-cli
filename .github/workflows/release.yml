@@ -39,19 +39,11 @@ jobs:
       - name: Set archive file name
         id: set_file_name
         run: echo ::set-output name=file_name::${{ github.event.repository.name }}-${{ steps.get_release_tag.outputs.tag_name }}-all-deps
-#      - name: Create archive release (zip) with all dependencies
-#        uses: thedoctor0/zip-release@master
-#        with:
-#          type: 'zip'
-#          directory: '..'
-#          path: ${{ github.event.repository.name }}
-#          filename: '${{ steps.set_file_name.outputs.file_name }}.zip'
-#          exclusions: '*.git*'
       - name: Create archive release (.tgz and .zip) with all dependencies
         run: |
           cd ..; ls -l
-          zip -9 -r ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }} -x ".git*"
           tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" ${{ github.event.repository.name }}
+          zip -9 -r ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }} -x "*.git*"
           ls -l
       - name: Release
         uses: softprops/action-gh-release@v1
