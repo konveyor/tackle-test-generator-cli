@@ -21,7 +21,7 @@ configurations {
 }
 dependencies {
 
-jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.7.9', classifier: 'nodeps'
+jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.7', classifier: 'nodeps'
 
 //dependencies from class files:
 {% for item in classpath_list %}
