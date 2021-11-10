@@ -1,6 +1,6 @@
 # Tackle-Test CLI User Guide
 
-The core capability provided by the CLI is automated generation of unit test cases for Java classes. The tests can be generated using different tools/strategies, and with or without assertions. The generated tests can be executed in different ways: (1) via the CLI, (2) using `ant` or `maven`, or (3) in an IDE.
+The core capability provided by the CLI is automated generation of unit test cases for Java classes. The tests can be generated using different tools/strategies, and with or without assertions. The generated tests can be executed in different ways: (1) via the CLI, (2) using `ant`, `maven` or `gradle`, or (3) in an IDE.
 
 In this guide, we provide detailed description of the test-generation and test-execution capabilities, along with explanation of various configuration options that control the behavior of the CLI and the core test-generation engine.
 
@@ -92,7 +92,7 @@ For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.
 The CLI `execute` command automatically creates a build script to compile the test cases, execute them, 
 and create junit and (optionally) code coverage reports. Different configuration options exist to control the behavior of this command.
 
-1. `build_type` - can be either `ant` (default) or `maven`. Indicates the type of build script that will be generated.
+1. `build_type` - can be either `ant` (default), `maven` or `gradle`. Indicates the type of build script that will be generated.
 2. `code_coverage` - whether to create Jacoco code coverage reports for the executed test cases. Default is false.
 3. `offline_instrumentation` - whether to use offline instrumentation for the code coverage collection. Default is false, 
                                 meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.

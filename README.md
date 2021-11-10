@@ -90,7 +90,7 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
    
 3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems are used in two ways:
 
-   - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml` or a Maven `pom.xml`, which can be used for building and running the generated tests (support for running using gradle tests  will be added). The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
+   - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
    
    - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). Currently, this feature is supported for Gradle only; Ant and Maven support will be added. Install Gradle if you plan to use the dependency computation feature.
 
@@ -272,14 +272,14 @@ options `monolith_app_path` (list of paths to application classes) and `app_clas
 (file containing paths to jar files that  represent the library dependencies of app).
 
 ```
-usage: tkltest execute [-h] [-bt {ant,maven}] [-nbf] [-cc] [-onli]
+usage: tkltest execute [-h] [-bt {ant,maven,gradle}] [-nbf] [-cc] [-onli]
                        [-tc TEST_CLASS]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -bt {ant,maven}, --build-type {ant,maven}
+  -bt {ant,maven,gradle}, --build-type {ant,maven,gradle}
                         build file type for compiling and running the tests -
-                        either ant or maven
+                        either ant, maven or gradle
   -nbf, --no-build-file-creation
                         Whether to generate build files. If set to false, a
                         build file (of type set in build_type option) should
