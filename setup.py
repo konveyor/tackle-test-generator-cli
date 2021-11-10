@@ -14,7 +14,8 @@ setup(
         'tabulate==0.8.9',
         'textile==4.0.1',
         'toml==0.10.2',
-        'yattag==1.14.0'
+        'yattag==1.14.0',
+        'jinja2==3.0.2'
     ],
     entry_points={
         "console_scripts": [

@@ -16,8 +16,10 @@ import logging
 import os
 import subprocess
 import sys
+import pathlib
 
 from yattag import Doc, indent
+from jinja2 import Environment, FileSystemLoader
 
 from . import constants
 from tkltest.util.logging_util import tkltest_status
@@ -124,7 +126,11 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
     __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                   app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
 
-    return ant_build_xml_file, maven_build_xml_file
+    gradle_build_file = test_root_dir + os.sep + 'build.gradle'
+    __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, main_reports_dir, gradle_build_file)
+
+    return ant_build_xml_file, maven_build_xml_file, gradle_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
@@ -432,3 +438,45 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
     )
     with open(build_xml_file, 'w') as outfile:
         outfile.write(result)
+
+
+def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
+                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file):
+
+    #gradle accept only posix paths, so we uses PurePath to convert:
+    classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
+    inst_classes = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
+    test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs if not os.path.basename(test_dir) == 'build']
+    monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
+    app_packages = [pathlib.PurePath(os.path.abspath(app_package)).as_posix() for app_package in app_packages]
+    main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
+    main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
+                                        os.path.basename(test_root_dir))).as_posix()
+
+    #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
+    env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
+    template = env.get_template('build_template.gradle')
+
+    test_dependsOn = ''
+    app_classes_for_tests = monolith_app_paths
+    if collect_codecoverage:
+        if offline_instrumentation:
+            test_dependsOn = ',instrument'
+            app_classes_for_tests = [inst_classes]
+        final_task = 'jacocoTestReport'
+    else:
+        final_task = 'test'
+
+    s = template.render(classpath_list=classpath_list,
+                        monolith_app_paths=monolith_app_paths,
+                        app_packages=app_packages,
+                        test_dirs=test_dirs,
+                        inst_classes=inst_classes,
+                        app_classes_for_tests=app_classes_for_tests,
+                        main_junit_report_dir=main_junit_report_dir,
+                        main_coverage_report_dir=main_coverage_report_dir,
+                        test_dependsOn=test_dependsOn,
+                        final_task=final_task)
+
+    with open(build_gradle_file, 'w') as outfile:
+        outfile.write(s)

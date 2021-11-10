@@ -85,7 +85,7 @@ teardown_file() {
 @test "Test 07: CLI execute command help" {
     run tkltest execute --help
     assert_success
-    assert_output --partial 'usage: tkltest execute [-h] [-bt {ant,maven}] [-nbf] [-cc] [-onli]'
+    assert_output --partial 'usage: tkltest execute [-h] [-bt {ant,maven,gradle}] [-nbf] [-cc] [-onli]'
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {
@@ -143,7 +143,7 @@ teardown_file() {
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name', 'monolith_app_path']"
     assert_line --index 3 --partial "Missing required options for \"execute\": ['app_packages']"
-    assert_line --index 4 --partial "Value for option \"build_type\" must be one of ['ant', 'maven']: gradle"
+    assert_line --index 4 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
 }
 
 @test "Test 16: CLI execute missing generate config" {

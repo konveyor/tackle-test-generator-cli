@@ -1,0 +1,94 @@
+
+plugins {
+    id 'application'
+    id 'java'
+    id 'jacoco'
+}
+
+tasks.withType(Zip).all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.withType(Tar).all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    jacocoInstrumentation
+}
+dependencies {
+
+jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.7', classifier: 'nodeps'
+
+//dependencies from class files:
+{% for item in classpath_list %}
+  implementation files('{{ item }}')  {% endfor %}
+//we compile only the test files, so during compilation time, we add dependencies to the app class path:
+{% for item in monolith_app_paths %}
+    testCompileOnly files('{{ item }}') {% endfor %}
+//when running the tests, we use the app classes, can be instrumented/not-instrumented classes
+{% for item in app_classes_for_tests %}
+    testRuntimeOnly files('{{ item }}') {% endfor %}
+}
+
+task cleanInstrumentDir(){
+    delete '{{ inst_classes }}'
+}
+
+//we are using jacoco.ant to do the offline instrumentation
+task instrument() {
+    dependsOn cleanInstrumentDir
+    ext.outputDir = '{{ inst_classes }}'
+    doLast {
+        ant.taskdef(name: 'instrument',
+                classname: 'org.jacoco.ant.InstrumentTask',
+                classpath: configurations.jacocoInstrumentation.asPath)
+        ant.instrument(destdir: outputDir) {
+        {% for item in monolith_app_paths %}
+            fileset(dir: '{{ item }}') {% endfor %}
+        }
+    }
+}
+
+task cleanUnitReportDir(){
+    delete '{{ main_junit_report_dir }}'
+}
+
+sourceSets.test.java.srcDirs = [
+{% for item in test_dirs %}
+    '{{ item }}', {% endfor %}
+]
+
+test {
+//with offline instrumentation, the test also depend on the instrument class:
+  dependsOn cleanUnitReportDir {{test_dependsOn}}
+  reports {
+    html.destination = file('{{ main_junit_report_dir }}')
+    junitXml.destination = file('{{ main_junit_report_dir }}')
+  }
+}
+
+task cleanCoverageReportDir(){
+    delete '{{ main_coverage_report_dir }}'
+}
+
+jacoco{
+    reportsDirectory = file('{{ main_coverage_report_dir }}')
+}
+
+jacocoTestReport {
+    dependsOn cleanCoverageReportDir, test
+    afterEvaluate {
+        classDirectories.setFrom(
+        {% for item in monolith_app_paths %}
+            fileTree(dir:'{{ item }}' , include: '/**/*.class' ),  {% endfor %}
+        )
+    }
+}
+
+task tklest_task(){
+    dependsOn {{final_task}}
+}

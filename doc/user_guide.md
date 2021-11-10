@@ -1,6 +1,6 @@
 # Tackle-Test CLI User Guide
 
-The core capability provided by the CLI is automated generation of unit test cases for Java classes. The tests can be generated using different tools/strategies, and with or without assertions. The generated tests can be executed in different ways: (1) via the CLI, (2) using `ant` or `maven`, or (3) in an IDE.
+The core capability provided by the CLI is automated generation of unit test cases for Java classes. The tests can be generated using different tools/strategies, and with or without assertions. The generated tests can be executed in different ways: (1) via the CLI, (2) using `ant`, `maven` or `gradle`, or (3) in an IDE.
 
 In this guide, we provide detailed description of the test-generation and test-execution capabilities, along with explanation of various configuration options that control the behavior of the CLI and the core test-generation engine.
 
@@ -18,7 +18,7 @@ The specification of the app under test is provided using the following configur
    
 3. `app_classpath_file`. The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../test/data/irs/irsMonoClasspath.txt). 
 
-    If your Java project has a Gradle build file, you can alternatively specify that build file and Tackle-Test will automatically collect the application's library dependencies and create the classpath file. To do this, the `generate` command options `app_build_type`, `app_build_config_file`, and `app_build_settings_file` can be used; for example, see the [demo app build specification](../test/data/demo/tkltest_config.toml). This feature is currently supported for Gradle only; Ant and Maven support will be added in the future.
+    If your Java project has a Gradle build file, you can alternatively specify that build file and Tackle-Test will automatically collect the application's library dependencies and create the classpath file. To do this, the `generate` command options `app_build_type`, `app_build_config_file`, and `app_build_settings_file` can be used; for example, see the [splitNjoin app build specification](../test/data/splitNjoin/tkltest_config.toml). This feature is currently supported for Gradle only; Ant and Maven support will be added in the future.
 
 ### Selecting the test-generation strategy
 
@@ -92,7 +92,7 @@ For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.
 The CLI `execute` command automatically creates a build script to compile the test cases, execute them, 
 and create junit and (optionally) code coverage reports. Different configuration options exist to control the behavior of this command.
 
-1. `build_type` - can be either `ant` (default) or `maven`. Indicates the type of build script that will be generated.
+1. `build_type` - can be either `ant` (default), `maven` or `gradle`. Indicates the type of build script that will be generated.
 2. `code_coverage` - whether to create Jacoco code coverage reports for the executed test cases. Default is false.
 3. `offline_instrumentation` - whether to use offline instrumentation for the code coverage collection. Default is false, 
                                 meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.
