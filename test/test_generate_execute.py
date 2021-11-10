@@ -38,13 +38,13 @@ class GenerateExecuteTest(unittest.TestCase):
             'target_class_list': ["irs.IRS"],
             'excluded_class_list': ["irs.Employer"]
         },
-        'demo': {
-            'config_file': os.path.join(test_data_dir, 'demo', 'tkltest_config.toml'),
-            'test_directory': '__demo-generated-tests',
+        'split_join': {
+            'config_file': os.path.join(test_data_dir, 'split_join', 'tkltest_config.toml'),
+            'test_directory': '__split_join-generated-tests',
         }
     }
     test_list1 = ['irs']
-    test_list2 = ['demo']
+    test_list2 = ['split_join']
 
     args = argparse.Namespace()
 

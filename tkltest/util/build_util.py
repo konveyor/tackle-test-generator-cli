@@ -459,11 +459,10 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
 
     test_dependsOn = ''
     app_classes_for_tests = monolith_app_paths
-    if offline_instrumentation:
-        test_dependsOn = ',instrument'
-        app_classes_for_tests = [inst_classes]
-
     if collect_codecoverage:
+        if offline_instrumentation:
+            test_dependsOn = ',instrument'
+            app_classes_for_tests = [inst_classes]
         final_task = 'jacocoTestReport'
     else:
         final_task = 'test'

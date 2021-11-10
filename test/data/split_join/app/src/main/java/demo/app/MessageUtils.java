@@ -5,6 +5,6 @@ package split_join.app;
 
 class MessageUtils {
     public static String getMessage() {
-        return "Hello      World!";
+        return "hello      world!";
     }
 }

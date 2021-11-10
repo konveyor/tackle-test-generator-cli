@@ -21,7 +21,7 @@ configurations {
 }
 dependencies {
 
-jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.7', classifier: 'nodeps'
+jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.7.9', classifier: 'nodeps'
 
 //dependencies from class files:
 {% for item in classpath_list %}
@@ -45,7 +45,7 @@ task instrument() {
     doLast {
         ant.taskdef(name: 'instrument',
                 classname: 'org.jacoco.ant.InstrumentTask',
-                classpath: 'configurations.jacocoInstrumentation.asPath')
+                classpath: configurations.jacocoInstrumentation.asPath)
         ant.instrument(destdir: outputDir) {
         {% for item in monolith_app_paths %}
             fileset(dir: '{{ item }}') {% endfor %}

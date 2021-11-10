@@ -9,11 +9,13 @@ import static split_join.utilities.StringUtils.join;
 import static split_join.utilities.StringUtils.split;
 import static split_join.app.MessageUtils.getMessage;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class App {
     public static void main(String[] args) {
         LinkedList tokens;
         tokens = split(getMessage());
         String result = join(tokens);
-        System.out.println(result);
+        System.out.println(StringUtils.capitalize(result));
     }
 }
