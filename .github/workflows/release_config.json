@@ -1,0 +1,23 @@
+{
+    "categories": [
+      {
+        "title": "## 🚀 Features",
+        "labels": ["feature", "enhancement"]
+      },
+      {
+        "title": "## 🐛 Fixes",
+        "labels": ["fix"]
+      },
+      {
+        "title": "## 🧪 Tests",
+        "labels": ["test"]
+      },
+      {
+        "title": "## Other Updates",
+        "labels": ["other"]
+      }
+    ],
+    "ignore_labels": [
+      "ignore"
+    ]
+}
