@@ -10,6 +10,9 @@ venv/
 *.iml
 .code
 .vscode
+.classpath
+.project
+.settings/
 .DS_Store
 *.log
 *.bak
@@ -24,6 +27,7 @@ __tkltest.cfg
 __*-generated-tests/
 randoop-*.txt
 *-ctd-amplified-*/
+tkltest-output-*/
 *-instrumented-classes/
 *evosuite-*/
 *-randoop-*/

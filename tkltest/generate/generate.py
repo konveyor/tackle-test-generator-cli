@@ -42,7 +42,7 @@ def process_generate_command(args, config):
     """
     logging.info('Processing generate command')
     dir_util.cd_output_dir(config['general']['app_name'])
-    config_util.fix_relative_paths(config)
+    config_util.fix_config(config, args.command)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
@@ -194,7 +194,7 @@ def generate_ctd_amplified_tests(config):
     else:
         reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
-    ant_build_file, maven_build_file = build_util.generate_build_xml(
+    ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
@@ -209,6 +209,7 @@ def generate_ctd_amplified_tests(config):
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
+    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))
 
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:

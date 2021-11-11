@@ -60,6 +60,8 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
+        git submodule init
+        git submodule update
         python -m venv venv
         source venv/bin/activate
         pip install .

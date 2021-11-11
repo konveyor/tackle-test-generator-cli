@@ -37,8 +37,14 @@ class GenerateExecuteTest(unittest.TestCase):
             'partitions_file': os.path.join(test_data_dir, 'irs', 'refactored', 'PartitionsFile.json'),
             'target_class_list': ["irs.IRS"],
             'excluded_class_list': ["irs.Employer"]
+        },
+        'splitNjoin': {
+            'config_file': os.path.join(test_data_dir, 'splitNjoin', 'tkltest_config.toml'),
+            'test_directory': '__splitNjoin-generated-tests',
         }
     }
+    test_list1 = ['irs']
+    test_list2 = ['splitNjoin']
 
     args = argparse.Namespace()
 
@@ -61,7 +67,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_combined_classlist_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -83,7 +89,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_randoop_classlist_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -97,7 +103,9 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            # config['execute']['build_type'] = 'maven'
+            #TODO For now restrict maven to online instrumentation, until offline one is added
+            config['execute']['online_instrumentation'] = True
+            config['execute']['build_type'] = 'maven'
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
@@ -105,7 +113,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_evosuite_classlist_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=target_class_list"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -124,7 +132,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_combined_allclasses_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -143,7 +151,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_combined_allclasses_but_excluded_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes_but_excluded"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -163,7 +171,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_randoop_allclasses_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
@@ -182,7 +190,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -201,7 +209,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_ctdamplified_evosuite_allclasses_augmentcoverage(self) -> None:
         """Test "generate ctd-amplified": base_test_generator=evosuite scope=all_classes augment_coverage=true"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -216,7 +224,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -236,7 +244,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_randoop_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
@@ -256,7 +264,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_evosuite_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -275,7 +283,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_combined_classlist_nodiffassert_reuse(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -303,7 +311,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_randoop_classlist_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
@@ -323,7 +331,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_evosuite_classlist_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=target_class_list no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -343,7 +351,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_combined_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -360,7 +368,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_randoop_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
@@ -381,7 +389,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -399,7 +407,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -420,7 +428,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_randoop_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=partitions_file no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
@@ -442,7 +450,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_ctdamplified_evosuite_partitions_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=partitions_file no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
@@ -462,7 +470,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_randoop_classlist_diffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=target_class_list"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -482,7 +490,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_randoop_allclasses_diffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=all_classes"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -502,7 +510,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_randoop_classlist_nodiffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=target_class_list no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -523,7 +531,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_randoop_allclasses_nodiffassert(self) -> None:
         """Test "generate randoop" and "execute": scope=all_classes no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -545,7 +553,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_evosuite_classlist_diffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=target_class_list"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -565,7 +573,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_evosuite_allclasses_diffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=all_classes"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -586,7 +594,7 @@ class GenerateExecuteTest(unittest.TestCase):
     @unittest.skip('')
     def test_generate_execute_evosuite_classlist_nodiffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=target_class_list no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -607,7 +615,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def test_generate_execute_evosuite_allclasses_nodiffassert(self) -> None:
         """Test "generate evosuite" and "execute": scope=all_classes no_diff_assertions"""
-        for app_name in self.test_apps.keys():
+        for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
@@ -621,6 +629,26 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='evosuite')
 
             # execute tests
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
+
+    def test_generate_execute_gradle(self) -> None:
+        """Test getting dependencies using gradle build"""
+        for app_name in self.test_list2:
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+
+            # execute tests
+            config['general']['app_classpath_file'] = ''
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
