@@ -140,6 +140,10 @@ def __conditionally_required(opt_name, config):
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is specified'
+    elif opt_name == 'app_build_targets':
+        # required if app_build_type is 'ant'
+        if config['generate']['app_build_type'] == 'ant':
+            return 'required if "app_build_type" is ant'
     return ''
 
 
@@ -334,9 +338,9 @@ __options_spec = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
-            'choices': ['gradle', None],
+            'choices': ['gradle', 'ant', None],
             'default_value': None,
-            'help_message': 'build type for collecting app dependencies: gradle (support for maven and ant to be added)'
+            'help_message': 'build type for collecting app dependencies: gradle or ant (support for maven to be added)'
         },
         'app_build_config_file': {
             'required': __conditionally_required,
@@ -355,6 +359,14 @@ __options_spec = {
             'default_value': '',
             'relpath_fix_type': 'path',
             'help_message': 'path to app build settings file for the specified app build type'
+        },
+        'app_build_targets': {
+            'required': __conditionally_required,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': list,
+            'default_value': [],
+            'help_message': 'list of targets that are built using Ant from command-line when building the app'
         },
 
         # subcommands for the generate command

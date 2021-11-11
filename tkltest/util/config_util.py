@@ -20,6 +20,7 @@ import subprocess
 import pathlib
 import zipfile
 import re
+import xml.etree.ElementTree as ElementTree
 
 from . import constants, config_options
 from .logging_util import tkltest_status
@@ -332,7 +333,7 @@ def __fix_relative_paths(tkltest_config):
 
 def __resolve_classpath(tkltest_config, command):
     """
-    1.creates a directories all all the app dependencies
+    1. creates a directory of all the app dependencies
     using the app build files
     2. creates a classpath file pointing to the jars in the directory
 
@@ -349,7 +350,7 @@ def __resolve_classpath(tkltest_config, command):
         return
     if app_classpath_file:
         return
-    if app_build_type != 'gradle':
+    if app_build_type not in ['gradle', 'ant']:
         tkltest_status('Getting app dependencies using {} is not supported yet\n'.format(app_build_type), error=True)
         sys.exit(1)
 
@@ -360,49 +361,127 @@ def __resolve_classpath(tkltest_config, command):
             tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
 
-    #create dependencies directory
+    # create dependencies directory
     dependencies_dir = os.path.join(os.getcwd(), app_name + "-app-dependencies")
     posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
     os.mkdir(dependencies_dir)
 
-    #create build and settings files
-    get_dependencies_task = 'tkltest_get_dependencies'
-    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.gradle")
-    shutil.copyfile(app_build_file, tkltest_app_build_file)
-    with open(tkltest_app_build_file, "a") as f:
-        f.write("\ntask " + get_dependencies_task + "(type: Copy) {\n")
-        f.write("    from sourceSets.main.runtimeClasspath\n")
-        f.write("    into '" + posix_dependencies_dir + "'\n")
-        f.write("}\n")
+    if app_build_type == 'gradle':
+        # create build and settings files
+        get_dependencies_task = 'tkltest_get_dependencies'
+        tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.gradle")
+        shutil.copyfile(app_build_file, tkltest_app_build_file)
+        with open(tkltest_app_build_file, "a") as f:
+            f.write("\ntask " + get_dependencies_task + "(type: Copy) {\n")
+            f.write("    from sourceSets.main.runtimeClasspath\n")
+            f.write("    into '" + posix_dependencies_dir + "'\n")
+            f.write("}\n")
+    
+        if app_settings_file:
+            tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), "tkltest_settings.gradle")
+            shutil.copyfile(app_settings_file, tkltest_app_settings_file)
+            relative_app_build_file = pathlib.PurePath(os.path.relpath(tkltest_app_build_file, os.path.dirname(app_settings_file))).as_posix()
+            with open(tkltest_app_settings_file, "a") as f:
+                f.write("\nrootProject.buildFileName = '" + relative_app_build_file+"'\n")
+    
+        # run gradle
+        get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
+        if app_settings_file:
+            get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
+        get_dependencies_command += " " +get_dependencies_task
+        logging.info(get_dependencies_command)
+    
+        try:
+            command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
+            os.remove(tkltest_app_build_file)
+            if app_settings_file:
+                os.remove(tkltest_app_settings_file)
+            sys.exit(1)
 
-    if app_settings_file:
-        tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), "tkltest_settings.gradle")
-        shutil.copyfile(app_settings_file, tkltest_app_settings_file)
-        relative_app_build_file = pathlib.PurePath(os.path.relpath(tkltest_app_build_file, os.path.dirname(app_settings_file))).as_posix()
-        with open(tkltest_app_settings_file, "a") as f:
-            f.write("\nrootProject.buildFileName = '" + relative_app_build_file+"'\n")
-
-    #run gradle
-    get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
-    if app_settings_file:
-        get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
-    get_dependencies_command += " " +get_dependencies_task
-    logging.info(get_dependencies_command)
-
-    try:
-        command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
-    except subprocess.CalledProcessError as e:
-        tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
         os.remove(tkltest_app_build_file)
         if app_settings_file:
             os.remove(tkltest_app_settings_file)
-        sys.exit(1)
 
-    os.remove(tkltest_app_build_file)
-    if app_settings_file:
-        os.remove(tkltest_app_settings_file)
+    elif app_build_type == 'ant':
+        # todo search recursively also in targets the target depends on?
+        app_build_targets_list = tkltest_config['generate']['app_build_targets']  # todo add to readme
+        if not app_build_targets_list:
+            tkltest_status('app_build_targets list is missing for analyzing ant build file\n', error=True)
+
+        # tree and root of original build file
+        orig_build_file_tree = ElementTree.parse(app_build_file)
+        orig_project_root = orig_build_file_tree.getroot()
+
+        # create a copy of the build file
+        tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.xml")
+        shutil.copyfile(app_build_file, tkltest_app_build_file)
+
+        # tree and root of the copy of build file
+        copy_build_file_tree = ElementTree.parse(app_build_file)
+        copy_project_root = copy_build_file_tree.getroot()
+
+        # paths of the dummy program to compile in the copy of the build
+        dummy_program_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__),"dummy_program"))
+        dummy_program_destdir_path = os.path.join(dummy_program_dir_path, "dummy_destdir")
+
+        # create a dummy target for every build target
+        for target in app_build_targets_list:
+            target_search_tag = "./target[@name='"+target+"']"
+            target_node = orig_project_root.find(target_search_tag)
+            if target_node is None:
+                tkltest_status('Ant build file is missing target {}\n'.format(target))  # todo error?
+                continue
+            javac_node = target_node.find("./javac")
+            if javac_node is None:
+                tkltest_status('Target {} is missing a javac task\n'.format(target))  # todo error?
+                continue
+
+            dummy_target_name = target+"-tkltest-dummy"
+            dummy_target_javac_attributes = {'srcdir': dummy_program_dir_path,
+                                             'sourcepath': dummy_program_dir_path,
+                                             'destdir': dummy_program_destdir_path,
+                                             'includeantruntime': "no",
+                                             'verbose': "yes"}
+
+            # case 1: class path passed to javac as classpath attribute
+            classpath_value = javac_node.get('classpath')
+            if classpath_value is not None:
+                dummy_target_javac_attributes['classpath'] = classpath_value
+
+            # case 2: class path passed to javac as classpathref attribute
+            classpathref_value = javac_node.get('classpathref')
+            if classpathref_value is not None:
+                dummy_target_javac_attributes['classpathref'] = classpathref_value
+
+            dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes, None)
+
+            # case 3: class path passed to javac as classpath nested element
+            classpath_node = javac_node.find("./classpath")
+            if classpath_node is not None:
+                dummy_target_javac_element.append(classpath_node)
+
+            # constructing the dummy target
+            dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': dummy_target_name}, None)
+            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}, None))
+            dummy_target_element.append(ElementTree.Element('mkdir', {'dir': dummy_program_destdir_path}, None))
+            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}, None))
+            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}, None))
+            dummy_target_element.append(dummy_target_javac_element)
+            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}, None))
+
+            copy_build_file_tree.write(tkltest_app_build_file)
+            print("Great Success!")
+            return
+
+        # run all dummy targets, each time redirect output to a different file
+        # parse outputs to get lists of dependencies
+        # delete outputs files and temp build file
+        # copy all relevant jars to dependencies_dir
+        # list the existing jars to create classpath file - Haim wrote the code for this
 
     """
     the dependencies directory contains files to remove:
@@ -419,7 +498,7 @@ def __resolve_classpath(tkltest_config, command):
      (a jar file is represent as a list of directories) 
     """
 
-    #collect monolit modules
+    # collect monolith modules
     monolith_app_paths = tkltest_config['general']['monolith_app_path']
     app_paths_modules = dict()
     for monolith_app_path in monolith_app_paths:
@@ -430,8 +509,8 @@ def __resolve_classpath(tkltest_config, command):
                 app_path_modules.add(posix_module_path)
         app_paths_modules[monolith_app_path] = app_path_modules
 
-    #remove non jar entries
-    #collect jars modules
+    # remove non jar entries
+    # collect jars modules
     jars_modules = dict()
     for jar_file in os.listdir(dependencies_dir):
         jar_file_path = os.path.join(dependencies_dir, jar_file)
@@ -445,7 +524,7 @@ def __resolve_classpath(tkltest_config, command):
             archive.close()
             jars_modules[jar_file] = set(["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
 
-    #compare jars modules to monolit modules, remove matching jars
+    # compare jars modules to monolith modules, remove matching jars
     for app_path, app_path_modules in app_paths_modules.items():
         for jar_file, jar_modules in jars_modules.items():
             if len(jar_modules) and jar_modules == app_path_modules:
@@ -454,7 +533,7 @@ def __resolve_classpath(tkltest_config, command):
                 os.remove(jar_file_path)
                 break
 
-    #write the classpath file
+    # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
     for jar_file in jars_modules.keys():
         jar_file_path = os.path.join(dependencies_dir, jar_file)
