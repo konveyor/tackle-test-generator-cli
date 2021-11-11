@@ -9,6 +9,14 @@
         "labels": ["fix"]
       },
       {
+        "title": "## 🧪 Performance Optimizations",
+        "labels": ["perf-optim"]
+      },
+      {
+        "title": "## 🧪 Documentation",
+        "labels": ["documentation"]
+      },
+      {
         "title": "## 🧪 Tests",
         "labels": ["test"]
       },
