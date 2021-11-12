@@ -38,13 +38,13 @@ class GenerateExecuteTest(unittest.TestCase):
             'target_class_list': ["irs.IRS"],
             'excluded_class_list': ["irs.Employer"]
         },
-        'demo': {
-            'config_file': os.path.join(test_data_dir, 'demo', 'tkltest_config.toml'),
-            'test_directory': '__demo-generated-tests',
+        'splitNjoin': {
+            'config_file': os.path.join(test_data_dir, 'splitNjoin', 'tkltest_config.toml'),
+            'test_directory': '__splitNjoin-generated-tests',
         }
     }
     test_list1 = ['irs']
-    test_list2 = ['demo']
+    test_list2 = ['splitNjoin']
 
     args = argparse.Namespace()
 
@@ -103,7 +103,9 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            # config['execute']['build_type'] = 'maven'
+            #TODO For now restrict maven to online instrumentation, until offline one is added
+            config['execute']['online_instrumentation'] = True
+            config['execute']['build_type'] = 'maven'
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created

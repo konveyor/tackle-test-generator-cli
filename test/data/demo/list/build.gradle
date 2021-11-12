@@ -1,8 +1,0 @@
-
-plugins {
-    id 'demo.java-library-conventions'
-}
-task getDeps(type: Copy) {
-    from sourceSets.main.runtimeClasspath
-    into './dependencies/'
-}

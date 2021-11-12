@@ -1,0 +1,13 @@
+
+plugins {
+    id 'java'
+    id 'application'
+
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':list')
+}

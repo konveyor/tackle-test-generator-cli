@@ -40,4 +40,4 @@ name = "TKLTEST_CONFIG_FILE"
     test_class = ""
     code_coverage = true
     # app_packages = ["irs.*"]
-    build_type = "gradle"
+    build_type = "cpp"
