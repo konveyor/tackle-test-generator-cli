@@ -378,21 +378,21 @@ def __resolve_classpath(tkltest_config, command):
             f.write("    from sourceSets.main.runtimeClasspath\n")
             f.write("    into '" + posix_dependencies_dir + "'\n")
             f.write("}\n")
-    
+
         if app_settings_file:
             tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), "tkltest_settings.gradle")
             shutil.copyfile(app_settings_file, tkltest_app_settings_file)
             relative_app_build_file = pathlib.PurePath(os.path.relpath(tkltest_app_build_file, os.path.dirname(app_settings_file))).as_posix()
             with open(tkltest_app_settings_file, "a") as f:
                 f.write("\nrootProject.buildFileName = '" + relative_app_build_file+"'\n")
-    
+
         # run gradle
         get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
         if app_settings_file:
             get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
         get_dependencies_command += " " +get_dependencies_task
         logging.info(get_dependencies_command)
-    
+
         try:
             command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
         except subprocess.CalledProcessError as e:
@@ -440,7 +440,7 @@ def __resolve_classpath(tkltest_config, command):
                 tkltest_status('Target {} is missing a javac task\n'.format(target))  # todo error?
                 continue
 
-            dummy_target_name = target+"-tkltest-dummy"
+            dummy_target_name = target+"-tkltest"
             dummy_target_javac_attributes = {'srcdir': dummy_program_dir_path,
                                              'sourcepath': dummy_program_dir_path,
                                              'destdir': dummy_program_destdir_path,
@@ -457,7 +457,7 @@ def __resolve_classpath(tkltest_config, command):
             if classpathref_value is not None:
                 dummy_target_javac_attributes['classpathref'] = classpathref_value
 
-            dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes, None)
+            dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes)
 
             # case 3: class path passed to javac as classpath nested element
             classpath_node = javac_node.find("./classpath")
@@ -465,16 +465,16 @@ def __resolve_classpath(tkltest_config, command):
                 dummy_target_javac_element.append(classpath_node)
 
             # constructing the dummy target
-            dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': dummy_target_name}, None)
-            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}, None))
-            dummy_target_element.append(ElementTree.Element('mkdir', {'dir': dummy_program_destdir_path}, None))
-            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}, None))
-            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}, None))
+            dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': dummy_target_name})
+            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}))
+            dummy_target_element.append(ElementTree.Element('mkdir', {'dir': dummy_program_destdir_path}))
+            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
+            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
             dummy_target_element.append(dummy_target_javac_element)
-            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}, None))
+            dummy_target_element.append(ElementTree.Element('delete', {'dir': dummy_program_destdir_path}))
 
             copy_build_file_tree.write(tkltest_app_build_file)
-            print("Great Success!")
+            # write command that will run the written target dummy_target_name, set output to different files
             return
 
         # run all dummy targets, each time redirect output to a different file

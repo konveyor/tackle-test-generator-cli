@@ -25,8 +25,7 @@ from tkltest.util import config_util, constants, dir_util
 class UnitTests(unittest.TestCase):
 
     def setUp(self) -> None:
-        # dir_util.cd_cli_dir()
-        os.chdir('..')  # todo remove before pushing!
+        dir_util.cd_cli_dir()
 
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build"""
@@ -38,8 +37,9 @@ class UnitTests(unittest.TestCase):
         different_compile_types_targets = ["compile-classpath-attribute",
                                            "compile-classpathref-attribute",
                                            "compile-classpath-element"]
+        dir_util.cd_output_dir('irs')
         for target_name in different_compile_types_targets:
             config['generate']['app_build_targets'] = [target_name]
-            config_util.__resolve_classpath(config, 'generate')
+            config_util.fix_config(config, 'generate')
 
         self.assertTrue(True)

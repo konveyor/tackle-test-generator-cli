@@ -17,8 +17,10 @@ import shutil
 from . import constants, config_util
 from .constants import *
 
+# cli_dir = os.getcwd()
+cli_dir = os.path.join(os.getcwd(), '..')  # todo delete before pushing
 
-cli_dir = os.getcwd()
+
 def cd_cli_dir():
     os.chdir(cli_dir)
 
