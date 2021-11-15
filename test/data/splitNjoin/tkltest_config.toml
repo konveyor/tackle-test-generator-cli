@@ -2,8 +2,8 @@ name = "TKLTEST_CONFIG_FILE"
 
 # general options
 [general]
-    app_name = "demo"
-    monolith_app_path = ["test/data/demo/app/build/classes/java/main/","test/data/demo/utilities/build/classes/java/main/","test/data/demo/list/build/classes/java/main/"]
+    app_name = "splitNjoin"
+    monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
     # JDK home directory
     java_jdk_home = ""
 
@@ -17,15 +17,15 @@ excluded_class_list = []
 time_limit = 10
 
 app_build_type = 'gradle'
-app_build_config_file = "test/data/demo/app/build.gradle"
-app_build_settings_file = "test/data/demo/settings.gradle"
+app_build_config_file = "test/data/splitNjoin/app/build.gradle"
+app_build_settings_file = "test/data/splitNjoin/settings.gradle"
 
 [execute]
-app_packages = ['']
-build_type = "ant"
+app_packages = ['splitNjoin.*']
+build_type = "gradle"
 create_build_file = true
 code_coverage = true
-offline_instrumentation = false
+online_instrumentation = false
 test_class = ""
 
 [generate.ctd_amplified]

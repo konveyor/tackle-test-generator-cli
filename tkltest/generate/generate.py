@@ -194,7 +194,7 @@ def generate_ctd_amplified_tests(config):
     else:
         reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
-    ant_build_file_offline, maven_build_file_offline = build_util.generate_build_xml(
+    ant_build_file_offline, maven_build_file_offline, gradle_build_file_offline = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
@@ -209,13 +209,19 @@ def generate_ctd_amplified_tests(config):
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file_offline))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file_offline))))
+    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file_offline))))
 
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:
         build_type = config['general']['build_type']
         start_time = time.time()
-        augment_with_code_coverage(config=config, build_file=ant_build_file_offline if build_type == 'ant' else 'maven',
-                                   build_type=build_type,
+        if build_type == 'ant':
+            build_file = ant_build_file_offline
+        elif build_type == 'maven':
+            build_file = maven_build_file_offline
+        else:
+            build_file = gradle_build_file_offline
+        augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                    ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))

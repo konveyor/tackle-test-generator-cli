@@ -127,7 +127,7 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
 
     # generate build files
     if create_build:
-        ant_build_file, maven_build_file = build_util.generate_build_xml(
+        ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
             app_name=app_name,
             monolith_app_path=monolith_app_path,
             app_classpath=app_classpath,
@@ -142,7 +142,8 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
         )
     else:
         ant_build_file = test_root_dir + os.sep + "build.xml"
-        maven_build_file  = test_root_dir + os.sep + "pom.xml"
+        maven_build_file = test_root_dir + os.sep + "pom.xml"
+        gradle_build_file = test_root_dir + os.sep + "build.gradle"
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
@@ -153,6 +154,8 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
     try:
         if build_type == 'maven':
             command_util.run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
+        elif build_type == 'gradle':
+                command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=verbose)
         else:
             if collect_codecoverage:
                 command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
@@ -174,10 +177,7 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
                   #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
                    #     verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
-        if build_type == 'ant':
-            tkltest_status('Error executing junit ant: {}\n{}'.format(e, e.stderr), error=True)
-        else:
-            tkltest_status('Error executing junit maven: {}\n{}'.format(e, e.stderr), error=True)
+        tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
         sys.exit(1)
 
 
