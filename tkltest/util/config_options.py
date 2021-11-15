@@ -265,9 +265,9 @@ __options_spec = {
             'short_name': '-bt',
             'long_name': '--build-type',
             'type': str,
-            'choices': ['ant', 'maven'],
+            'choices': ['ant', 'maven',  'gradle'],
             'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests - either ant or maven'
+            'help_message': 'build file type for compiling and running the tests - either ant, maven, or gradle'
         }
     },
 
