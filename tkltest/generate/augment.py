@@ -46,7 +46,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
 
     # compute initial coverage of CTD test suite and of each evosuite test file
 
-    test_class_augment_pool, base_test_coverage, ctd_test_dir_bak = __compute_base_and_augmenting_tests_coverage(
+    test_class_augment_pool, base_test_coverage = __compute_base_and_augmenting_tests_coverage(
         ctd_test_dir=ctd_test_dir,
         evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
         build_file=build_file,
@@ -87,7 +87,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     final_cov_efficiency = final_inst_cov_rate / final_test_method_count
 
     # remove backup directory created
-    shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
+    #shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
     if tests_with_coverage_gain:
         print('')
     tkltest_status(
