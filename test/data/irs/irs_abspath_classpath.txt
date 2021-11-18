@@ -1,0 +1,7 @@
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\commons-logging-1.1.2.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\javax.annotation-api-1.3.2.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\javax.json-api-1.0.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\javax.servlet-api-3.1.0.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\javax.ws.rs-api-2.0.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\resteasy-client-3.0.8.Final.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-irs\irs-app-dependencies\resteasy-jaxrs-3.0.8.Final.jar

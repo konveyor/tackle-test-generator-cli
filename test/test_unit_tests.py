@@ -30,6 +30,7 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build"""
         irs_dir = os.path.join('test', 'data', 'irs')
+        irs_standard_classpath = os.path.abspath(os.path.join(irs_dir, 'irs_abspath_classpath.txt'))
         config = config_util.load_config(config_file=os.path.join(irs_dir, 'tkltest_config.toml'))
         config['generate']['app_build_type'] = 'ant'
         config['general']['app_classpath_file'] = ''
@@ -41,5 +42,21 @@ class UnitTests(unittest.TestCase):
         for target_name in different_compile_types_targets:
             config['generate']['app_build_targets'] = [target_name]
             config_util.fix_config(config, 'generate')
+            generated_classpath = config['general']['app_classpath_file']
+            self.assertTrue(generated_classpath != '')
+            self.__assert_classpath(irs_standard_classpath, generated_classpath)
 
-        self.assertTrue(True)
+    def __assert_classpath(self, standard_classpath, generated_classpath):
+        with open(standard_classpath, 'r') as file:
+            lines_standard = file.read()
+        line_list_standard = lines_standard.splitlines()
+
+        with open(generated_classpath, 'r') as file:
+            lines_generated = file.read()
+        line_list_generated = lines_generated.splitlines()
+
+        self.assertTrue(len(line_list_generated) == len(line_list_standard))
+
+        for path in line_list_standard:
+            self.assertTrue(path in line_list_generated)
+            self.assertTrue(os.path.isfile(path))

@@ -358,7 +358,7 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'path to app build settings file for the specified app build type'
+            'help_message': 'path to app build settings file or property file for the specified app build type'
         },
         'app_build_targets': {
             'required': __conditionally_required,

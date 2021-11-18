@@ -13,13 +13,17 @@
   <!-- The dependency libraries -->
   <path id="source.lib">
       <fileset dir="${lib.dir}">
-         <include name="**/*.jar"/>
+         <include name="*.jar"/>
       </fileset>
   </path>
+  
+  <pathconvert refid="source.lib"
+               property="source.lib.property" />
+  
 
   <path id="source.lib.only.javax">
       <fileset dir="${lib.dir}">
-          <include name="javax.*.jar"/>
+          <include name="javax*.jar"/>
       </fileset>
   </path>
 
@@ -56,7 +60,7 @@
     <javac  srcdir="${source.java}"
            destdir="${build.classes}"
             includeantruntime="no"
-            classpath="${source.lib}">
+            classpath="${source.lib.property}">
     </javac>
   </target>
 
@@ -80,10 +84,10 @@
            destdir="${build.classes}"
             includeantruntime="no">
           <classpath>
-              <pathelement path="${source.lib.only.javax}"/>
+              <path refid="source.lib.only.javax"/>
               <fileset dir="${lib.dir}">
-                  <include name="**.jar"/>
-                  <exclude name="javax.*.jar"/>
+                  <include name="resteasy-*.jar"/>
+                  <include name="commons-logging-1.1.2.jar"/>
               </fileset>
           </classpath>
     </javac>          
