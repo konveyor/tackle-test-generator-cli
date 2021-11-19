@@ -407,65 +407,6 @@ def __resolve_classpath(tkltest_config, command):
         if app_settings_file:
             os.remove(tkltest_app_settings_file)
 
-        """
-            the dependencies directory contains files to remove:
-             1. app class files
-             2. directories
-             3. jar files with app modules
-
-            so we:
-             1. delete directories and non jars files
-             2. collect the app modules in a dict: monolit_path -> set of modules name
-             3. collect the app modules in a dict: jar files -> set of modules name
-
-             if the set of a monolit_path equal to the set of the jar file, we delete the jar file
-             (a jar file is represent as a list of directories) 
-            """
-
-        # collect monolith modules
-        monolith_app_paths = tkltest_config['general']['monolith_app_path']
-        app_paths_modules = dict()
-        for monolith_app_path in monolith_app_paths:
-            app_path_modules = set()
-            for root, dirs, files in os.walk(monolith_app_path):
-                if len([file for file in files if file.endswith(".class")]):
-                    posix_module_path = "-".join(re.split("[\\\\/]+", root.replace(monolith_app_path, "")))
-                    app_path_modules.add(posix_module_path)
-            app_paths_modules[monolith_app_path] = app_path_modules
-
-        # remove non jar entries
-        # collect jars modules
-        jars_modules = dict()
-        for jar_file in os.listdir(dependencies_dir):
-            jar_file_path = os.path.join(dependencies_dir, jar_file)
-            if os.path.isdir(jar_file_path):
-                shutil.rmtree(jar_file_path)
-            elif not jar_file_path.endswith(".jar"):
-                os.remove(jar_file_path)
-            else:
-                archive = zipfile.ZipFile(jar_file_path, 'r')
-                class_files = set([file for file in archive.namelist() if file.endswith(".class")])
-                archive.close()
-                jars_modules[jar_file] = set(
-                    ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
-
-        # compare jars modules to monolith modules, remove matching jars
-        for app_path, app_path_modules in app_paths_modules.items():
-            for jar_file, jar_modules in jars_modules.items():
-                if len(jar_modules) and jar_modules == app_path_modules:
-                    del jars_modules[jar_file]
-                    jar_file_path = os.path.join(dependencies_dir, jar_file)
-                    os.remove(jar_file_path)
-                    break
-
-        # write the classpath file
-        classpath_fd = open(build_classpath_file, "w")
-        for jar_file in jars_modules.keys():
-            jar_file_path = os.path.join(dependencies_dir, jar_file)
-            classpath_fd.write(jar_file_path + "\n")
-        classpath_fd.close()
-        tkltest_config['general']['app_classpath_file'] = build_classpath_file
-
     elif app_build_type == 'ant':
         app_build_targets_list = tkltest_config['generate']['app_build_targets']  # todo add to readme
         if not app_build_targets_list:
@@ -490,7 +431,7 @@ def __resolve_classpath(tkltest_config, command):
         ant_output_filename = "tkltest_ant_output.txt"
 
         # a list for the united dependencies of all the input targets
-        targets_classpath = []
+        targets_classpath = set()
 
         # create a dummy target for every build target
         for target in app_build_targets_list:
@@ -583,23 +524,78 @@ def __resolve_classpath(tkltest_config, command):
             javac_class_files_line = [s for s in line_list if output_lines_dict['javac_class_files'] in s][0].lstrip()
             javac_class_files_list = javac_class_files_line[len(output_lines_dict['java_class_path']):-1].split(',')
 
-            target_classpath = [s for s in javac_class_files_list if (
-                                (s not in java_class_path_list) and
-                                (java_home_path not in s) and
-                                (s.endswith('.jar')))]
-            targets_classpath.extend(target_classpath)
+            # collect all relevant jars
+            for item in javac_class_files_list:
+                if (item not in java_class_path_list) and (java_home_path not in item) and (item.endswith('.jar')):
+                    targets_classpath.add(item)
 
             os.remove(ant_output_filename)
 
-        with open(build_classpath_file, "w") as classpath_fd:
-            for jar_path in targets_classpath:
-                jar_name_index = jar_path.rfind(os.sep)
-                jar_name = jar_path[jar_name_index + 1:]
-                jar_copy_path = os.path.join(dependencies_dir, jar_name)
-                if not os.path.isfile(jar_copy_path):  # targets_classpath might contain duplicates
-                    shutil.copyfile(jar_path, jar_copy_path)
-                    classpath_fd.write(jar_copy_path + "\n")
-        tkltest_config['general']['app_classpath_file'] = build_classpath_file
+        # copy classpath jars to dependencies directory
+        for jar_path in targets_classpath:
+            jar_name_index = jar_path.rfind(os.sep)
+            jar_name = jar_path[jar_name_index + 1:]
+            jar_copy_path = os.path.join(dependencies_dir, jar_name)
+            shutil.copyfile(jar_path, jar_copy_path)
+
+    """
+    the dependencies directory contains files to remove:
+     1. app class files
+     2. directories
+     3. jar files with app modules
+
+    so we:
+     1. delete directories and non jars files
+     2. collect the app modules in a dict: monolit_path -> set of modules name
+     3. collect the app modules in a dict: jar files -> set of modules name
+
+     if the set of a monolit_path equal to the set of the jar file, we delete the jar file
+     (a jar file is represent as a list of directories)
+    """
+
+    # collect monolith modules
+    monolith_app_paths = tkltest_config['general']['monolith_app_path']
+    app_paths_modules = dict()
+    for monolith_app_path in monolith_app_paths:
+        app_path_modules = set()
+        for root, dirs, files in os.walk(monolith_app_path):
+            if len([file for file in files if file.endswith(".class")]):
+                posix_module_path = "-".join(re.split("[\\\\/]+", root.replace(monolith_app_path, "")))
+                app_path_modules.add(posix_module_path)
+        app_paths_modules[monolith_app_path] = app_path_modules
+
+    # remove non jar entries
+    # collect jars modules
+    jars_modules = dict()
+    for jar_file in os.listdir(dependencies_dir):
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        if os.path.isdir(jar_file_path):
+            shutil.rmtree(jar_file_path)
+        elif not jar_file_path.endswith(".jar"):
+            os.remove(jar_file_path)
+        else:
+            archive = zipfile.ZipFile(jar_file_path, 'r')
+            class_files = set([file for file in archive.namelist() if file.endswith(".class")])
+            archive.close()
+            jars_modules[jar_file] = set(
+                ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+
+    # compare jars modules to monolith modules, remove matching jars
+    for app_path, app_path_modules in app_paths_modules.items():
+        for jar_file, jar_modules in jars_modules.items():
+            if len(jar_modules) and jar_modules == app_path_modules:
+                del jars_modules[jar_file]
+                jar_file_path = os.path.join(dependencies_dir, jar_file)
+                os.remove(jar_file_path)
+                break
+
+    # write the classpath file
+    classpath_fd = open(build_classpath_file, "w")
+    for jar_file in jars_modules.keys():
+        jar_file_path = os.path.join(dependencies_dir, jar_file)
+        classpath_fd.write(jar_file_path + "\n")
+    classpath_fd.close()
+    tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
 def fix_config(tkltest_config, command):
