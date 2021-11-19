@@ -332,6 +332,147 @@ def __fix_relative_paths(tkltest_config):
     tkltest_config['relative_fixed'] = True
 
 
+def __get_ant_target_classpath(target,
+                               app_build_targets_list,
+                               app_settings_file,
+                               compiled_tasks,
+                               closed_targets,
+                               open_targets,
+                               tkltest_app_build_file,
+                               copy_build_file_tree,
+                               orig_project_root,
+                               copy_project_root,
+                               toy_program_dir_path,  # todo refactor to const?
+                               toy_program_destdir_path,  # todo refactor to const?
+                               ant_output_filename,  # todo refactor to const?
+                               targets_classpath):
+    """
+        Extracts the jars that the target and its dependencies need for compiling the target.
+        Parameters:
+            target - the current main target to run.
+            app_build_targets_list - the main targets list provided in the toml.
+            app_settings_file - the property file to use when running ant.
+            compiled_tasks - a list of all the targets containing javac task that were found recursively.
+            closed_targets - a list of all the targets that were found recursively.
+            open_targets - a list of the current recursive path of targets (to avoid circular loop).
+            tkltest_app_build_file - edited copy of the build file used to run dummy targets.
+            copy_build_file_tree - ElementTree of tkltest_app_build_file.
+            orig_project_root - the root Element of the original build file.
+            copy_project_root - the root Element of tkltest_app_build_file.
+            toy_program_dir_path - dir path for the toy program used for the dummy targets.
+            toy_program_destdir_path - destination directory for compiling the toy program.
+            ant_output_filename - output filename for the output of running ant commands.
+            targets_classpath - set of all the jars that the target depends on for compiling.
+    """
+    if target in open_targets:
+        tkltest_status('Found circular dependency with target {}.\n'.format(target), error=True)
+        return
+
+    target_search_tag = "./target[@name='" + target + "']"
+    target_node = orig_project_root.find(target_search_tag)  # todo how to search for it in other ant files????
+    if target_node is None and target in app_build_targets_list:
+        tkltest_status('Ant build file is missing target {}\n'.format(target), error=True)
+        return
+
+    open_targets.append(target)
+
+    # todo if has dependencies - get list, get nodes and run on them if they are not in closed list
+
+    javac_node = target_node.find("./javac")
+    if javac_node is None:
+        open_targets.remove(target)
+        closed_targets.append(target)
+        return
+    compiled_tasks.append(target)
+
+    tkltest_target_name = target + "-tkltest"
+    dummy_target_javac_attributes = {'srcdir': toy_program_dir_path,
+                                     'sourcepath': toy_program_dir_path,
+                                     'destdir': toy_program_destdir_path,
+                                     'includeantruntime': "no",
+                                     'verbose': "yes"}
+
+    # case 1: class path passed to javac as classpath attribute
+    classpath_value = javac_node.get('classpath')
+    if classpath_value is not None:
+        dummy_target_javac_attributes['classpath'] = classpath_value
+
+    # case 2: class path passed to javac as classpathref attribute
+    classpathref_value = javac_node.get('classpathref')
+    if classpathref_value is not None:
+        dummy_target_javac_attributes['classpathref'] = classpathref_value
+
+    dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes)
+
+    # case 3: class path passed to javac as classpath nested element
+    classpath_node = javac_node.find("./classpath")
+    if classpath_node is not None:
+        dummy_target_javac_element.append(classpath_node)
+
+    # constructing the dummy target
+    dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
+    dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+    dummy_target_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
+    dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
+    dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
+    dummy_target_element.append(dummy_target_javac_element)
+    dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+
+    copy_build_file_tree.write(tkltest_app_build_file)
+
+    # create output file or override previous output
+    with open(ant_output_filename, "w") as output_file:
+        output_file.write("")
+
+    # write command that will run the written target tkltest_target_name, set output to different files
+    run_ant_command = "ant -f " + tkltest_app_build_file
+    if app_settings_file:
+        run_ant_command += " -propertyfile " + os.path.abspath(app_settings_file)
+    run_ant_command += " " + tkltest_target_name + " >> " + ant_output_filename
+
+    # execute ant command
+    try:
+        command_util.run_command(command=run_ant_command, verbose=True)
+    except subprocess.CalledProcessError as e:
+        tkltest_status(
+            'running ant task {} failed: {}\n{}'.format(run_ant_command, e, e.stderr),
+            error=True)
+        os.remove(tkltest_app_build_file)
+        sys.exit(1)
+    os.remove(tkltest_app_build_file)
+
+    # parse ant output
+    # todo: refactor to const string?
+    output_lines_dict = {'java_home': '[echo] Java home: ',
+                         'java_class_path': '[echo] Java class path: ',
+                         'javac_class_files': '[javac] [search path for class files: '}
+
+    with open(ant_output_filename, "r") as output_file:
+        lines = output_file.read()
+    line_list = lines.splitlines()
+
+    # parse java_home path, because some jars are imported from here to javac_class_files.
+    java_home_line = [s for s in line_list if output_lines_dict['java_home'] in s][0].lstrip()
+    java_home_path = java_home_line[len(output_lines_dict['java_home']):]
+
+    # parse java_class_path, because some of those jars are imported from here to javac_class_files.
+    java_class_path_line = [s for s in line_list if output_lines_dict['java_class_path'] in s][0].lstrip()
+    java_class_path_list = java_class_path_line[len(output_lines_dict['java_class_path']):].split(';')
+
+    # parse javac_class_files, those are the actual locations and jars that ant uses for compiling the target.
+    javac_class_files_line = [s for s in line_list if output_lines_dict['javac_class_files'] in s][0].lstrip()
+    javac_class_files_list = javac_class_files_line[len(output_lines_dict['java_class_path']):-1].split(',')
+
+    # collect all relevant jars
+    for item in javac_class_files_list:
+        if (item not in java_class_path_list) and (java_home_path not in item) and (item.endswith('.jar')):
+            targets_classpath.add(item)
+
+    os.remove(ant_output_filename)
+    open_targets.remove(target)
+    closed_targets.append(target)
+
+
 def __resolve_classpath(tkltest_config, command):
     """
     1. creates a directory of all the app dependencies
@@ -428,108 +569,38 @@ def __resolve_classpath(tkltest_config, command):
         toy_program_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "toy_program"))
         toy_program_destdir_path = os.path.join(toy_program_dir_path, "toy_destdir")
 
-        ant_output_filename = "tkltest_ant_output.txt"
+        ant_output_filename = "tkltest_ant_output.txt"  # todo convert to const?
 
         # a list for the united dependencies of all the input targets
         targets_classpath = set()
 
-        # create a dummy target for every build target
+        compiled_tasks = []
+        closed_targets = []
+        open_targets = []
+
+        # create a dummy target for every build target and their dependencies (if running javac)
         for target in app_build_targets_list:
+            __get_ant_target_classpath(target,
+                                       app_build_targets_list,
+                                       app_settings_file,
+                                       compiled_tasks,
+                                       closed_targets,
+                                       open_targets,
+                                       tkltest_app_build_file,
+                                       copy_build_file_tree,
+                                       orig_project_root,
+                                       copy_project_root,
+                                       toy_program_dir_path,
+                                       toy_program_destdir_path,
+                                       ant_output_filename,
+                                       targets_classpath)
 
-            target_search_tag = "./target[@name='"+target+"']"
-            target_node = orig_project_root.find(target_search_tag)
-            if target_node is None:
-                tkltest_status('Ant build file is missing target {}\n'.format(target))  # todo error?
-                continue
-            javac_node = target_node.find("./javac")
-            if javac_node is None:
-                tkltest_status('Target {} is missing a javac task\n'.format(target))  # todo error?
-                continue
+        if len(compiled_tasks) == 0:
+            tkltest_status('There were no javac tasks found from the given build file and list of targets to run.\n',
+                           error=True)
+            exit(1)
 
-            tkltest_target_name = target+"-tkltest"
-            dummy_target_javac_attributes = {'srcdir': toy_program_dir_path,
-                                             'sourcepath': toy_program_dir_path,
-                                             'destdir': toy_program_destdir_path,
-                                             'includeantruntime': "no",
-                                             'verbose': "yes"}
-
-            # case 1: class path passed to javac as classpath attribute
-            classpath_value = javac_node.get('classpath')
-            if classpath_value is not None:
-                dummy_target_javac_attributes['classpath'] = classpath_value
-
-            # case 2: class path passed to javac as classpathref attribute
-            classpathref_value = javac_node.get('classpathref')
-            if classpathref_value is not None:
-                dummy_target_javac_attributes['classpathref'] = classpathref_value
-
-            dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes)
-
-            # case 3: class path passed to javac as classpath nested element
-            classpath_node = javac_node.find("./classpath")
-            if classpath_node is not None:
-                dummy_target_javac_element.append(classpath_node)
-
-            # constructing the dummy target
-            dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
-            dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
-            dummy_target_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
-            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
-            dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
-            dummy_target_element.append(dummy_target_javac_element)
-            dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
-
-            copy_build_file_tree.write(tkltest_app_build_file)
-
-            # create output file or override previous output
-            with open(ant_output_filename, "w") as output_file:
-                output_file.write("")
-
-            # write command that will run the written target tkltest_target_name, set output to different files
-            run_ant_command = "ant -f " + tkltest_app_build_file
-            if app_settings_file:
-                run_ant_command += " -propertyfile " + os.path.abspath(app_settings_file)
-            run_ant_command += " " + tkltest_target_name + " >> " + ant_output_filename
-
-            # execute ant command
-            try:
-                command_util.run_command(command=run_ant_command, verbose=True)
-            except subprocess.CalledProcessError as e:
-                tkltest_status(
-                    'running {} task {} failed: {}\n{}'.format(app_build_type, run_ant_command, e, e.stderr),
-                    error=True)
-                os.remove(tkltest_app_build_file)
-                sys.exit(1)
-            os.remove(tkltest_app_build_file)
-
-            # parse ant output
-            # todo: refactor to const string?
-            output_lines_dict = {'java_home': '[echo] Java home: ',
-                                 'java_class_path': '[echo] Java class path: ',
-                                 'javac_class_files': '[javac] [search path for class files: '}
-
-            with open(ant_output_filename, "r") as output_file:
-                lines = output_file.read()
-            line_list = lines.splitlines()
-
-            # parse java_home path, because some jars are imported from here to javac_class_files.
-            java_home_line = [s for s in line_list if output_lines_dict['java_home'] in s][0].lstrip()
-            java_home_path = java_home_line[len(output_lines_dict['java_home']):]
-
-            # parse java_class_path, because some of those jars are imported from here to javac_class_files.
-            java_class_path_line = [s for s in line_list if output_lines_dict['java_class_path'] in s][0].lstrip()
-            java_class_path_list = java_class_path_line[len(output_lines_dict['java_class_path']):].split(';')
-
-            # parse javac_class_files, those are the actual locations and jars that ant uses for compiling the target.
-            javac_class_files_line = [s for s in line_list if output_lines_dict['javac_class_files'] in s][0].lstrip()
-            javac_class_files_list = javac_class_files_line[len(output_lines_dict['java_class_path']):-1].split(',')
-
-            # collect all relevant jars
-            for item in javac_class_files_list:
-                if (item not in java_class_path_list) and (java_home_path not in item) and (item.endswith('.jar')):
-                    targets_classpath.add(item)
-
-            os.remove(ant_output_filename)
+        tkltest_status('Identified targets that contained javac tasks: ', compiled_tasks)
 
         # copy classpath jars to dependencies directory
         for jar_path in targets_classpath:
