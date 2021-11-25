@@ -29,7 +29,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
     Args:
         build_file (str): Build file to use for running tests
-        build_type (str): Type of build file (either ant or maven)
+        build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
 
@@ -51,10 +51,11 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     if build_type == 'ant':
         command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
         jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
-    else: #maven
+    elif build_type == 'maven':
         command_util.run_command("mvn -f {} clean test site".format(build_file), verbose=False)
         jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
-
+    else: #gradle
+        command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)

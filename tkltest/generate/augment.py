@@ -51,13 +51,18 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
 
     # compute initial coverage of CTD test suite and of each evosuite test file
 
-    test_class_augment_pool, base_test_coverage, raw_cov_data_dir = __compute_base_and_augmenting_tests_coverage(
-        ctd_test_dir=ctd_test_dir,
-        evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
-        build_file=build_file,
-        build_type=build_type,
-        report_dir=report_dir
+    test_class_augment_pool, base_test_coverage, raw_cov_data_dir, has_coverage = \
+        __compute_base_and_augmenting_tests_coverage(
+            ctd_test_dir=ctd_test_dir,
+            evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
+            build_file=build_file,
+            build_type=build_type,
+            report_dir=report_dir
     )
+
+    if not has_coverage:
+        tkltest_status('Failed to collect coverage for tests in the augmentation test pool, no tests are added.')
+        return False
 
     tkltest_status('Collecting coverage gain for each of {} tests in the augmentation test pool'.format(
         len(test_class_augment_pool)))
@@ -110,6 +115,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         augmented_coverage['method_covered'] / augmented_coverage['method_total'],
         final_cov_efficiency, final_test_method_count
     ))
+
+    return True
 
 
 def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir, build_file, build_type, report_dir):
@@ -171,36 +178,27 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     ]
 
     counter = 1
+    has_coverage = False
     for test in augmentation_test_pool:
         coverage_util.add_test_class_to_ctd_suite(test_class=test, test_directory=ctd_test_dir)
         __print_test_counter(counter)
         counter += 1
-        __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
+        test_coverage, test_method_count, inst_cov_efficiency = \
+            __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
                                       report_dir=report_dir, test_suite_name=os.path.basename(test)[:-5],
                                       raw_cov_data_dir=raw_cov_data_dir)
+        if test_coverage['instruction_covered'] > 0:
+            has_coverage = True
         coverage_util.remove_test_class_from_ctd_suite(test_class=test, test_directory=ctd_test_dir)
 
 
-    #else:
-        # otherwise, set CTD tests as the augmentation pool and evosuite coverage as the base coverage
-    #    tkltest_status('Creating initial test suite from EvoSuite tests: {} test methods, efficiency={}'
-    #                   .format(evosuite_test_method_count, evosuite_inst_cov_efficiency))
-    #    augmentation_test_pool = [
-    #        os.path.join(dir, file)
-    #        for dir, files in coverage_util.get_test_classes(ctd_test_dir_bak).items()
-    #        for file in files if '_scaffolding' not in file
-    #    ]
-    #    base_test_coverage = evosuite_test_coverage
 
-    # return augmentation test pool and base test coverage
-
-    # reinitialize CTD test directory with CTD tests from the backup directory
     __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
 
     # remove backup directory created
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
 
-    return augmentation_test_pool, ctd_test_coverage, raw_cov_data_dir
+    return augmentation_test_pool, ctd_test_coverage, raw_cov_data_dir, has_coverage
 
 
 def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name,
