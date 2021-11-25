@@ -140,7 +140,7 @@ def __conditionally_required(opt_name, config):
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is specified'
-    elif opt_name == 'app_build_targets':
+    elif opt_name == 'app_build_target':
         # required if app_build_type is 'ant'
         if config['generate']['app_build_type'] == 'ant':
             return 'required if "app_build_type" is ant'
@@ -360,13 +360,13 @@ __options_spec = {
             'relpath_fix_type': 'path',
             'help_message': 'path to app build settings file or property file for the specified app build type'
         },
-        'app_build_targets': {
+        'app_build_target': {
             'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
-            'type': list,
-            'default_value': [],
-            'help_message': 'list of targets that are built using Ant from command-line when building the app'
+            'type': str,
+            'default_value': '',
+            'help_message': 'name of the ant target that is used to build the app from the given build file'
         },
 
         # subcommands for the generate command

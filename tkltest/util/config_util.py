@@ -61,8 +61,8 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-        options_spec=config_options.get_options_spec(command='general'),
-        args=args)
+                                   options_spec=config_options.get_options_spec(command='general'),
+                                   args=args)
 
     # if args specified, get command and subcommand
     command = None
@@ -76,14 +76,15 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-            options_spec=config_options.get_options_spec(command=command),
-            args=args)
+                                       options_spec=config_options.get_options_spec(command=command),
+                                       args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand),
-            args=args)
+                                       options_spec=config_options.get_options_spec(command=command,
+                                                                                    subcommand=subcommand),
+                                       args=args)
 
     # validate loaded config information, exit if validation errors occur
     val_failure_msgs = __validate_config(config=tkltest_config, command=command, subcommand=subcommand)
@@ -176,12 +177,12 @@ def __validate_config(config, command=None, subcommand=None):
     for scope, scope_val_errors in val_errors.items():
         if scope_val_errors['missing_required_params']:
             val_failure_msgs.append('\t- Missing required options for "{}": {}\n'.format(
-                scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
+                scope if scope in ['general', command] else command + ' ' + subcommand.replace('_', '-'),
                 scope_val_errors['missing_required_params']
             ))
         for opt, msg in scope_val_errors['missing_conditionally_required_params'].items():
             val_failure_msgs.append('\t- Missing conditionally required option for "{}": {} ({})\n'.format(
-                scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
+                scope if scope in ['general', command] else command + ' ' + subcommand.replace('_', '-'),
                 opt, msg
             ))
         if scope_val_errors['invalid_enum_values']:
@@ -285,7 +286,6 @@ def __fix_relative_path(path):
 
 
 def __fix_relative_paths_recursively(options_spec, config):
-
     for option_name, options in options_spec.items():
         if type(options) is not dict:
             continue
@@ -309,7 +309,7 @@ def __fix_relative_paths_recursively(options_spec, config):
                     lines = file.readlines()
                 lines = [__fix_relative_path(path) for path in lines if path.strip()]
                 new_file = os.path.basename(classpath_file)
-                #todo - we will have a bug if the users uses two different files with the same name
+                # todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
                     f.writelines(lines)
                 config[option_name] = new_file
@@ -333,7 +333,6 @@ def __fix_relative_paths(tkltest_config):
 
 
 def __get_ant_target_classpath(target,
-                               app_build_targets_list,
                                app_settings_file,
                                compiled_tasks,
                                closed_targets,
@@ -350,16 +349,15 @@ def __get_ant_target_classpath(target,
         Extracts the jars that the target and its dependencies need for compiling the target.
         Parameters:
             target - the current main target to run.
-            app_build_targets_list - the main targets list provided in the toml.
             app_settings_file - the property file to use when running ant.
             compiled_tasks - a list of all the targets containing javac task that were found recursively.
             closed_targets - a list of all the targets that were found recursively.
             open_targets - a list of the current recursive path of targets (to avoid circular loop).
-            tkltest_app_build_file - edited copy of the build file used to run dummy targets.
+            tkltest_app_build_file - edited copy of the build file used to run dummy/tkltest targets.
             copy_build_file_tree - ElementTree of tkltest_app_build_file.
             orig_project_root - the root Element of the original build file.
             copy_project_root - the root Element of tkltest_app_build_file.
-            toy_program_dir_path - dir path for the toy program used for the dummy targets.
+            toy_program_dir_path - dir path for the toy program used for the dummy/tkltest targets.
             toy_program_destdir_path - destination directory for compiling the toy program.
             ant_output_filename - output filename for the output of running ant commands.
             targets_classpath - set of all the jars that the target depends on for compiling.
@@ -369,14 +367,30 @@ def __get_ant_target_classpath(target,
         return
 
     target_search_tag = "./target[@name='" + target + "']"
-    target_node = orig_project_root.find(target_search_tag)  # todo how to search for it in other ant files????
-    if target_node is None and target in app_build_targets_list:
+    target_node = orig_project_root.find(target_search_tag)
+    if target_node is None:
         tkltest_status('Ant build file is missing target {}\n'.format(target), error=True)
         return
 
     open_targets.append(target)
 
-    # todo if has dependencies - get list, get nodes and run on them if they are not in closed list
+    # from every dependent-on target (if it is not in closed list) - get their classpath
+    if 'depends' in target_node.attrib:
+        dependencies_list = target_node.attrib['depends'].split(',')
+        for dependent_on_target in dependencies_list:
+            __get_ant_target_classpath(dependent_on_target.strip(),
+                                       app_settings_file,
+                                       compiled_tasks,
+                                       closed_targets,
+                                       open_targets,
+                                       tkltest_app_build_file,
+                                       copy_build_file_tree,
+                                       orig_project_root,
+                                       copy_project_root,
+                                       toy_program_dir_path,  # todo refactor to const?
+                                       toy_program_destdir_path,  # todo refactor to const?
+                                       ant_output_filename,  # todo refactor to const?
+                                       targets_classpath)
 
     javac_node = target_node.find("./javac")
     if javac_node is None:
@@ -386,37 +400,37 @@ def __get_ant_target_classpath(target,
     compiled_tasks.append(target)
 
     tkltest_target_name = target + "-tkltest"
-    dummy_target_javac_attributes = {'srcdir': toy_program_dir_path,
-                                     'sourcepath': toy_program_dir_path,
-                                     'destdir': toy_program_destdir_path,
-                                     'includeantruntime': "no",
-                                     'verbose': "yes"}
+    tkltest_target_javac_attributes = {'srcdir': toy_program_dir_path,
+                                       'sourcepath': toy_program_dir_path,
+                                       'destdir': toy_program_destdir_path,
+                                       'includeantruntime': "no",
+                                       'verbose': "yes"}
 
     # case 1: class path passed to javac as classpath attribute
     classpath_value = javac_node.get('classpath')
     if classpath_value is not None:
-        dummy_target_javac_attributes['classpath'] = classpath_value
+        tkltest_target_javac_attributes['classpath'] = classpath_value
 
     # case 2: class path passed to javac as classpathref attribute
     classpathref_value = javac_node.get('classpathref')
     if classpathref_value is not None:
-        dummy_target_javac_attributes['classpathref'] = classpathref_value
+        tkltest_target_javac_attributes['classpathref'] = classpathref_value
 
-    dummy_target_javac_element = ElementTree.Element('javac', dummy_target_javac_attributes)
+    tkltest_target_javac_element = ElementTree.Element('javac', tkltest_target_javac_attributes)
 
     # case 3: class path passed to javac as classpath nested element
     classpath_node = javac_node.find("./classpath")
     if classpath_node is not None:
-        dummy_target_javac_element.append(classpath_node)
+        tkltest_target_javac_element.append(classpath_node)
 
-    # constructing the dummy target
-    dummy_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
-    dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
-    dummy_target_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
-    dummy_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
-    dummy_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
-    dummy_target_element.append(dummy_target_javac_element)
-    dummy_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+    # constructing the tkltest target
+    tkltest_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
+    tkltest_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+    tkltest_target_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
+    tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
+    tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
+    tkltest_target_element.append(tkltest_target_javac_element)
+    tkltest_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
 
     copy_build_file_tree.write(tkltest_app_build_file)
 
@@ -549,9 +563,9 @@ def __resolve_classpath(tkltest_config, command):
             os.remove(tkltest_app_settings_file)
 
     elif app_build_type == 'ant':
-        app_build_targets_list = tkltest_config['generate']['app_build_targets']  # todo add to readme
-        if not app_build_targets_list:
-            tkltest_status('app_build_targets list is missing for analyzing ant build file\n', error=True)
+        app_build_target = tkltest_config['generate']['app_build_target']  # todo add to readme
+        if not app_build_target:
+            tkltest_status('app_build_target is missing for analyzing ant build file\n', error=True)
 
         # tree and root of original build file
         orig_build_file_tree = ElementTree.parse(app_build_file)
@@ -579,21 +593,19 @@ def __resolve_classpath(tkltest_config, command):
         open_targets = []
 
         # create a dummy target for every build target and their dependencies (if running javac)
-        for target in app_build_targets_list:
-            __get_ant_target_classpath(target,
-                                       app_build_targets_list,
-                                       app_settings_file,
-                                       compiled_tasks,
-                                       closed_targets,
-                                       open_targets,
-                                       tkltest_app_build_file,
-                                       copy_build_file_tree,
-                                       orig_project_root,
-                                       copy_project_root,
-                                       toy_program_dir_path,
-                                       toy_program_destdir_path,
-                                       ant_output_filename,
-                                       targets_classpath)
+        __get_ant_target_classpath(app_build_target.strip(),
+                                   app_settings_file,
+                                   compiled_tasks,
+                                   closed_targets,
+                                   open_targets,
+                                   tkltest_app_build_file,
+                                   copy_build_file_tree,
+                                   orig_project_root,
+                                   copy_project_root,
+                                   toy_program_dir_path,
+                                   toy_program_destdir_path,
+                                   ant_output_filename,
+                                   targets_classpath)
 
         if len(compiled_tasks) == 0:
             tkltest_status('There were no javac tasks found from the given build file and list of targets to run.\n',

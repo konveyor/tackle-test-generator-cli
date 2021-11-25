@@ -1,0 +1,4 @@
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-84_ifx-framework\84_ifx-framework-app-dependencies\jdom.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-84_ifx-framework\84_ifx-framework-app-dependencies\poolman.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-84_ifx-framework\84_ifx-framework-app-dependencies\velocity-dep-1.4.jar
+C:\Users\015510756\Documents\AppModWorkspace\tackle-test-generator-cli\tkltest-output-84_ifx-framework\84_ifx-framework-app-dependencies\xercesImpl.jar

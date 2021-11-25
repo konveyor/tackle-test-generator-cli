@@ -29,22 +29,44 @@ class UnitTests(unittest.TestCase):
 
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build"""
-        irs_dir = os.path.join('test', 'data', 'irs')
-        irs_standard_classpath = os.path.abspath(os.path.join(irs_dir, 'irs_abspath_classpath.txt'))
-        config = config_util.load_config(config_file=os.path.join(irs_dir, 'tkltest_config.toml'))
-        config['generate']['app_build_type'] = 'ant'
-        config['general']['app_classpath_file'] = ''
-        config['generate']['app_build_config_file'] = os.path.join(irs_dir, 'monolith', 'build.xml')
-        different_compile_types_targets = ["compile-classpath-attribute",
-                                           "compile-classpathref-attribute",
-                                           "compile-classpath-element"]
-        dir_util.cd_output_dir('irs')
-        for target_name in different_compile_types_targets:
-            config['generate']['app_build_targets'] = [target_name]
-            config_util.fix_config(config, 'generate')
-            generated_classpath = config['general']['app_classpath_file']
-            self.assertTrue(generated_classpath != '')
-            self.__assert_classpath(irs_standard_classpath, generated_classpath)
+        # dict with apps params for test
+        ant_test_apps = {  # todo move params to be taken from toml?
+            'irs': {
+                'standard_classpath': os.path.join('test', 'data', 'irs', 'irs_abspath_classpath.txt'),
+                'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
+                'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
+                'properties_file': '',
+                'targets_to_test': ["compile-classpath-attribute", "compile-classpathref-attribute", "compile-classpath-element"]
+            },
+            '84_ifx-framework': {
+                'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-framework_abspath_classpath.txt'),
+                'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
+                'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
+                'properties_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
+                'targets_to_test': ["compile"]
+            },
+        }
+
+        for app_name in ant_test_apps.keys():
+            dir_util.cd_cli_dir()
+
+            config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
+            config['generate']['app_build_type'] = 'ant'
+            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['properties_file']
+            config['general']['app_classpath_file'] = ''
+            config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
+            standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
+
+            dir_util.cd_output_dir(app_name)
+
+            for target_name in ant_test_apps[app_name]['targets_to_test']:
+                config['generate']['app_build_target'] = target_name
+                config_util.fix_config(config, 'generate')
+                generated_classpath = config['general']['app_classpath_file']
+                self.assertTrue(generated_classpath != '')
+                self.assertTrue(os.path.isfile(generated_classpath))
+                self.__assert_classpath(standard_classpath, generated_classpath)
+                print('passed: target ' + target_name)
 
     def __assert_classpath(self, standard_classpath, generated_classpath):
         with open(standard_classpath, 'r') as file:
