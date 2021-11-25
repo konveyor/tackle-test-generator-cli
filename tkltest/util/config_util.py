@@ -612,7 +612,10 @@ def __resolve_classpath(tkltest_config, command):
                            error=True)
             exit(1)
 
-        tkltest_status('Identified targets that contained javac tasks: ', compiled_tasks)
+        compiled_tasks_str = ""
+        for p in compiled_tasks:
+            compiled_tasks_str += p + ", "
+        tkltest_status('Identified targets that contained javac tasks: ' + compiled_tasks_str[:-2])
 
         # copy classpath jars to dependencies directory
         for jar_path in targets_classpath:

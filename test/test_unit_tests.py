@@ -53,7 +53,6 @@ class UnitTests(unittest.TestCase):
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
             config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['properties_file']
-            config['general']['app_classpath_file'] = ''
             config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
 
@@ -61,12 +60,12 @@ class UnitTests(unittest.TestCase):
 
             for target_name in ant_test_apps[app_name]['targets_to_test']:
                 config['generate']['app_build_target'] = target_name
+                config['general']['app_classpath_file'] = ''
                 config_util.fix_config(config, 'generate')
                 generated_classpath = config['general']['app_classpath_file']
                 self.assertTrue(generated_classpath != '')
                 self.assertTrue(os.path.isfile(generated_classpath))
                 self.__assert_classpath(standard_classpath, generated_classpath)
-                print('passed: target ' + target_name)
 
     def __assert_classpath(self, standard_classpath, generated_classpath):
         with open(standard_classpath, 'r') as file:
