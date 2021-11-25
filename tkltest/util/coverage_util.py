@@ -20,21 +20,21 @@ import shutil
 from tkltest.util import command_util, constants
 
 
-def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_coverage=None):
+def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
+                                raw_cov_data_dir, raw_cov_data_file_pref):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
     coverage file, and returns dictionary containing instruction, line, and branch coverage data.
 
     Args:
-        ant_build_file (str): Build file to use for running tests
+        build_file (str): Build file to use for running tests
+        build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
-        base_coverage (dict): base coverage to compute coverage gain (delta) against
 
     Returns:
-        dict: Information about instructions, lines, and branches covered and missed (if base_coverage
-            not specified), or delta instruction, line, branch coverage (if base_coverage specified)
+        dict: Information about instructions, lines, and branches covered and missed
     """
 
     # remove existing coverage file
@@ -47,8 +47,20 @@ def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_
     except OSError:
         pass
 
-    # run tests using ant build file
-    command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=False)
+    # run tests using build file
+    if build_type == 'ant':
+        command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
+        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+    elif build_type == 'maven':
+        command_util.run_command("mvn -f {} clean test site".format(build_file), verbose=False)
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    else: #gradle
+        command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
+
+    jacoco_new_file_name = os.path.join(raw_cov_data_dir,
+                                            raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
+    os.rename(jacoco_raw_date_file, jacoco_new_file_name)
+
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0;
@@ -73,17 +85,7 @@ def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_
 
     logging.info('total_inst_cov={}. total_line_cov={}, total_branch_cov={}'.format(
         total_inst_covered, total_line_covered, total_branch_covered))
-
-    # if base coverage specified, return the additional coverage (delta); otherwise return coverage achieved
-    if base_coverage is not None:
-        return {
-            'instruction_cov_delta': (total_inst_covered - base_coverage['instruction_covered']),
-            'line_cov_delta': (total_line_covered - base_coverage['line_covered']),
-            'branch_cov_delta': (total_branch_covered - base_coverage['branch_covered']),
-            'method_cov_delta': (total_branch_covered - base_coverage['method_covered'])
-        }
-    else:
-        return {
+    return {
             'instruction_covered': total_inst_covered,
             'line_covered': total_line_covered,
             'branch_covered': total_branch_covered,
@@ -91,8 +93,94 @@ def get_coverage_for_test_suite(ant_build_file, test_root_dir, report_dir, base_
             'instruction_total': total_inst_covered + total_inst_missed,
             'line_total': total_line_covered + total_line_missed,
             'branch_total': total_branch_covered + total_branch_missed,
-            'method_total': total_method_covered + total_method_missed
-        }
+            'method_total': total_method_covered + total_method_missed,
+    }
+
+
+
+def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_dir, base_coverage, class_files,
+                       remove_merged_cov_file):
+
+    """Merges two raw coverage data files and returns delta coverage information between respective test suites
+
+        Runs jacoco cli merge and report commands between two given raw jacoco.exec data files,
+        reads coverage information from the Jacoco CSV coverage file, and returns dictionary
+        containing instruction, line, and branch delta coverage data.
+
+        Args:
+            test (str): the name of the test class whose delta coverage is being computed
+            test_raw_cov_file (str): the jacoco.exec coverage data file of the test
+            ctd_raw_cov_file (str): he jacoco.exec coverage data file of the ctd test suite we are comparing against
+            main_coverage_dir (str): Main directory in which coverage report is generated
+            base_coverage (dict): base coverage to compute coverage gain (delta) against
+            remove_merged_cov_file (bool): whether to remove existing merged coverage file
+
+        Returns:
+            dict: delta instruction, line, branch coverage
+            dict:
+        """
+
+    # run jacoco cli merge command
+
+    output_exec_file = os.path.join(os.path.dirname(ctd_raw_cov_file), constants.JACOCO_MERGED_DATA_FOR_AUGMENTATION);
+
+    if remove_merged_cov_file:
+        try:
+            os.remove(output_exec_file)
+        except OSError:
+            pass
+
+    jacoco_cli_file = os.path.join('..', 'lib', 'download', constants.JACOCO_CLI_JAR_NAME)
+
+    command_util.run_command("java -jar {} merge {} {} --destfile {}".
+                             format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
+                                    output_exec_file), verbose=True)
+
+    # run jacoco cli report command
+
+    coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
+
+    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {}".
+                             format(jacoco_cli_file, output_exec_file, os.path.pathsep.join(class_files),
+                                    coverage_csv_file, main_coverage_dir), verbose=True)
+
+    # read the coverage CSV file and compute total instruction, line, and branch coverage
+    total_inst_covered = 0;
+    total_line_covered = 0
+    total_branch_covered = 0
+    total_method_covered = 0
+    total_inst_missed = 0;
+    total_line_missed = 0
+    total_branch_missed = 0
+    total_method_missed = 0
+    with open(coverage_csv_file, newline='') as f:
+        coverage_info = csv.DictReader(f)
+        for row in coverage_info:
+            total_inst_covered += int(row['INSTRUCTION_COVERED'])
+            total_line_covered += int(row['LINE_COVERED'])
+            total_branch_covered += int(row['BRANCH_COVERED'])
+            total_method_covered += int(row['METHOD_COVERED'])
+            total_inst_missed += int(row['INSTRUCTION_MISSED'])
+            total_line_missed += int(row['LINE_MISSED'])
+            total_branch_missed += int(row['BRANCH_MISSED'])
+            total_method_missed += int(row['METHOD_MISSED'])
+
+    return {
+        'instruction_cov_delta': (total_inst_covered - base_coverage['instruction_covered']),
+        'line_cov_delta': (total_line_covered - base_coverage['line_covered']),
+        'branch_cov_delta': (total_branch_covered - base_coverage['branch_covered']),
+        'method_cov_delta': (total_branch_covered - base_coverage['method_covered']),
+    },{
+            'instruction_covered': total_inst_covered,
+            'line_covered': total_line_covered,
+            'branch_covered': total_branch_covered,
+            'method_covered': total_method_covered,
+            'instruction_total': total_inst_covered + total_inst_missed,
+            'line_total': total_line_covered + total_line_missed,
+            'branch_total': total_branch_covered + total_branch_missed,
+            'method_total': total_method_covered + total_method_missed,
+    }
+
 
 
 def add_test_class_to_ctd_suite(test_class, test_directory):

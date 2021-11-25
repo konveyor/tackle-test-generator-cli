@@ -205,7 +205,7 @@ def generate_ctd_amplified_tests(config):
         main_reports_dir=reports_dir,
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
         collect_codecoverage=True,  # for coverage-based augmentation
-        offline_instrumentation=True  # for coverage-based augmentation
+        offline_instrumentation=True if config['generate']['ctd_amplified']['augment_coverage'] else False
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
@@ -213,9 +213,35 @@ def generate_ctd_amplified_tests(config):
 
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:
+        build_type = config['general']['build_type']
         start_time = time.time()
-        augment_with_code_coverage(config=config, ant_build_file=ant_build_file,
+        if build_type == 'ant':
+            build_file = ant_build_file
+        elif build_type == 'maven':
+            build_file = maven_build_file
+        else:
+            build_file = gradle_build_file
+        has_coverage = augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                    ctd_test_dir=test_directory, report_dir=reports_dir)
+        if not has_coverage:
+            # try augmentation again with online instrumentation.
+            # Build files have fixed names hence no need to update the name.
+            tkltest_status('Re-running Coverage-driven test-suite augmentation with online instrumentation')
+            build_util.generate_build_xml(
+                app_name=app_name,
+                monolith_app_path=monolith_app_path,
+                app_classpath=build_util.get_build_classpath(config),
+                test_root_dir=test_directory,
+                test_dirs=test_dirs,
+                partitions_file=partitions_file,
+                target_class_list=target_class_list,
+                main_reports_dir=reports_dir,
+                app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
+                collect_codecoverage=True,  # for coverage-based augmentation
+                offline_instrumentation=False
+            )
+            augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
+                                       ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
 
