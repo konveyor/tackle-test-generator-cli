@@ -35,6 +35,11 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     test class in the sorted order and adding the test class to the test suite if it increases
     the coverage of the augmented test suite.
 
+    Rather than executing the tests at each step to obtain updated coverage, the raw coverage output file (jacoco.exec)
+    of each test from the augmentation pool is kept, and at each step is merged with the current test suite raw
+    coverage file to obtain the new raw coverage file. This way we execute each test only once instead of up to n times,
+    where n is the number of tests in the augmentation pool.
+
     Args:
         config (dict): loaded and validated config information
         build_file (str): Build file to use for running tests
@@ -46,7 +51,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
 
     # compute initial coverage of CTD test suite and of each evosuite test file
 
-    test_class_augment_pool, base_test_coverage = __compute_base_and_augmenting_tests_coverage(
+    test_class_augment_pool, base_test_coverage, raw_cov_data_dir = __compute_base_and_augmenting_tests_coverage(
         ctd_test_dir=ctd_test_dir,
         evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
         build_file=build_file,
@@ -62,8 +67,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         test_class_augment_pool=test_class_augment_pool,
         ctd_test_dir=ctd_test_dir,
         base_ctd_coverage=base_test_coverage,
-        build_file=build_file,
-        build_type=build_type,
+        class_files=config['general']['monolith_app_path'],
+        raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir
     )
 
@@ -78,16 +83,14 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         tests_with_coverage_gain=tests_with_coverage_gain,
         ctd_test_dir=ctd_test_dir,
         base_ctd_coverage=base_test_coverage,
-        build_file=build_file,
-        build_type=build_type,
+        class_files=config['general']['monolith_app_path'],
+        raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
     final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
     final_cov_efficiency = final_inst_cov_rate / final_test_method_count
 
-    # remove backup directory created
-    #shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
     if tests_with_coverage_gain:
         print('')
     tkltest_status(
@@ -126,16 +129,25 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     Returns:
         list: test classes in the augmentation pool
         dict: coverage information for the base test suite
-        str: backup directory created for ctd tests
+        str:  directory containing raw coverage data files for CTD test suite and for each of the
     """
+
+    # create a folder that will contain all raw coverage data files
+
+    raw_cov_data_dir = "cov-data-augmentation"
+
+    shutil.rmtree(raw_cov_data_dir, ignore_errors=True)
+    os.mkdir(raw_cov_data_dir)
+
     # get coverage info for CTD-guided test suite
     ctd_test_coverage, ctd_test_method_count, ctd_inst_cov_efficiency =\
         __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
-                                      report_dir=report_dir, test_suite_name='CTD-guided')
+                                      report_dir=report_dir, test_suite_name='CTD-guided',
+                                      raw_cov_data_dir=raw_cov_data_dir)
     # create backup of CTD-guided tests
-    #ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
-    #shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
-    #shutil.copytree(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
+    ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
+    shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
+    shutil.copytree(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
 
     # initialize CTD test directory with evosuite tests for coverage data collection
     #__initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=evosuite_test_dir)
@@ -151,9 +163,6 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     tkltest_status('Creating initial test suite from CTD-guided tests: {} test methods, efficiency={}'
                        .format(ctd_test_method_count, ctd_inst_cov_efficiency))
 
-        # reinitialize CTD test directory with CTD tests from the backup directory
-        #__initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
-
         # set evosuite tests as the augmentation pool and CTD coverage as the base coverage
     augmentation_test_pool = [
         os.path.join(dir, file)
@@ -161,9 +170,15 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         for file in files if '_scaffolding' not in file
     ]
 
+    counter = 1
     for test in augmentation_test_pool:
+        coverage_util.add_test_class_to_ctd_suite(test_class=test, test_directory=ctd_test_dir)
+        __print_test_counter(counter)
+        counter += 1
         __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
-                                      report_dir=report_dir, test_suite_name='CTD-guided')
+                                      report_dir=report_dir, test_suite_name=os.path.basename(test)[:-5],
+                                      raw_cov_data_dir=raw_cov_data_dir)
+        coverage_util.remove_test_class_from_ctd_suite(test_class=test, test_directory=ctd_test_dir)
 
 
     #else:
@@ -178,10 +193,18 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     #    base_test_coverage = evosuite_test_coverage
 
     # return augmentation test pool and base test coverage
-    return augmentation_test_pool, ctd_test_coverage
+
+    # reinitialize CTD test directory with CTD tests from the backup directory
+    __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
+
+    # remove backup directory created
+    shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
+
+    return augmentation_test_pool, ctd_test_coverage, raw_cov_data_dir
 
 
-def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name):
+def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name,
+                                  raw_cov_data_dir):
     """Computes and returns coverage efficiency of the given test suite.
 
     Computes coverage efficiency of the given test suite as instruction coverage rate per test method
@@ -192,7 +215,9 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
     """
     test_coverage = coverage_util.get_coverage_for_test_suite(build_file=build_file, build_type=build_type,
                                                               test_root_dir=test_dir,
-                                                              report_dir=report_dir)
+                                                              report_dir=report_dir,
+                                                              raw_cov_data_dir=raw_cov_data_dir,
+                                                              raw_cov_data_file_pref=test_suite_name)
     inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
     test_method_count = __get_test_method_count(test_dir)
     inst_cov_efficiency = inst_cov_rate / test_method_count
@@ -251,8 +276,8 @@ def __get_test_method_count(test_dir):
 
 
 
-def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, build_file,
-                                       build_type, report_dir):
+def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, class_files,
+                                       raw_cov_dir, report_dir):
     """Computes coverage delta for each test class in the augment pool of tests.
 
     Computes for each test class in the test augment pool additional instruction, line, and branch coverage that
@@ -264,8 +289,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
         test_class_augment_pool (list): Pool of candidates tests to augment the CTD-guided test suite with
         ctd_test_dir (str): Root directory for CTD tests
         base_ctd_coverage (dict): Coverage achieved by the CTD tests
-        build_file (str): Build file to use for running tests
-        build_type (str): Type of build file (either ant or maven)
+        class_files (list): App classes paths
+        raw_cov_dir (str): Directory containing raw coverage data files
         report_dir (str): Main reports directory, under which coverage report is generated
 
     Returns:
@@ -278,18 +303,35 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
     total_branch_cov_gain = 0
     counter = 1
     # iterate over evosuite test classes and compute coverage delta over base ctd coverage
+
+    main_coverage_dir = os.path.abspath(os.path.join(report_dir,
+                                                     constants.TKL_CODE_COVERAGE_REPORT_DIR,
+                                                     os.path.basename(ctd_test_dir)))
+
+    ctd_raw_cov_file = os.path.join(raw_cov_dir, "CTD-guided"+constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
+
     for test_class in test_class_augment_pool:
 
         # add test class to test suite
-        coverage_util.add_test_class_to_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+        #coverage_util.add_test_class_to_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
         __print_test_counter(counter)
         counter += 1
 
+        test_raw_cov_file = os.path.join(raw_cov_dir,
+                                         os.path.basename(test_class)[:-5]+constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
+
         # get coverage delta for test class against base CTD coverage
         try:
-            coverage_delta = coverage_util.get_coverage_for_test_suite(
-                build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
-                report_dir=report_dir, base_coverage=base_ctd_coverage)
+            coverage_delta, total_coverage = coverage_util.get_delta_coverage(test=test_class,
+                                                                              test_raw_cov_file=test_raw_cov_file,
+                                                                              ctd_raw_cov_file=ctd_raw_cov_file,
+                                                                              main_coverage_dir=main_coverage_dir,
+                                                                              class_files=class_files,
+                                                                              base_coverage=base_ctd_coverage,
+                                                                              remove_merged_cov_file=True)
+            #coverage_delta = coverage_util.get_coverage_for_test_suite(
+            #    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
+            #    report_dir=report_dir, base_coverage=base_ctd_coverage)
             if coverage_delta['instruction_cov_delta'] > 0 or coverage_delta['branch_cov_delta'] > 0:
                 logging.info('Coverage gain from test class {}: instruction={}, branch={}'.format(
                     test_class, coverage_delta['instruction_cov_delta'], coverage_delta['branch_cov_delta']))
@@ -302,13 +344,13 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
             logging.error('Error running augmented test suite with class {}: {}'.format(test_class, e))
 
         # remove test class from test suite
-        coverage_util.remove_test_class_from_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+        #coverage_util.remove_test_class_from_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
 
     return tests_with_coverage_gain, total_inst_cov_gain, total_branch_cov_gain
 
 
-def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, build_file, build_type,
-                             report_dir):
+def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, class_files,
+                             raw_cov_dir, report_dir):
     """Augments CTD test suite with tests that contribute to additional coverage.
 
     Iterates over test classes that contribute to coverage gain, and adds them to the augmented test suite
@@ -320,8 +362,8 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
         tests_with_coverage_gain (dict): Tests that provide coverage gain over base CTD coverage
         ctd_test_dir (str): Root directory for CTD tests
         base_ctd_coverage (dict): Coverage achieved by the CTD tests
-        ant_build_file (str): Build file to use for running tests
-        build_type (str): Type of build file (either ant or maven)
+        class_files (list): App classes paths
+        raw_cov_dir (str): Directory containing raw coverage data files
         report_dir (str): Main reports directory, under which coverage report is generated
 
     Returns:
@@ -337,6 +379,12 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
         tkltest_status('Augmenting "{}" with tests from the augmentation pool that contribute to coverage gain'
                        .format(ctd_test_dir))
 
+    main_coverage_dir = os.path.abspath(os.path.join(report_dir,
+                                                     constants.TKL_CODE_COVERAGE_REPORT_DIR,
+                                                     os.path.basename(ctd_test_dir)))
+
+    current_raw_cov_file = os.path.join(raw_cov_dir, "CTD-guided" + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
+
     # group test cases by (instruction+branch) coverage gain and create reverse sorted list of gain values
     grouped_tests_with_cov_gain, ordered_cov_gain_values = __group_tests_by_coverage_gain(tests_with_coverage_gain)
 
@@ -344,24 +392,35 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
     augmented_coverage = base_ctd_coverage
     added_test_classes = 0
     counter = 1
+    first=True
     for cov_val in ordered_cov_gain_values:
         for test_class in grouped_tests_with_cov_gain[cov_val]:
-            coverage_util.add_test_class_to_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+            coverage_util.add_test_class_to_ctd_suite(test_class=test_class,
+                                                      test_directory=ctd_test_dir)
             __print_test_counter(counter)
             counter += 1
 
-            try:
-                augmented_coverage = coverage_util.get_coverage_for_test_suite(
-                    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir, report_dir=report_dir)
-            except subprocess.CalledProcessError as e:
-                logging.error('Error running augmented test suite with class {}: {}'.format(test_class, e))
+            test_raw_cov_file = os.path.join(raw_cov_dir,
+                                        os.path.basename(test_class)[:-5] + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
 
-            if augmented_coverage['instruction_covered'] > curr_coverage['instruction_covered'] or \
-                    augmented_coverage['branch_covered'] > curr_coverage['branch_covered']:
+            try:
+                coverage_delta, augmented_coverage = coverage_util.get_delta_coverage(
+                    test=test_class, test_raw_cov_file=test_raw_cov_file,
+                    ctd_raw_cov_file=current_raw_cov_file,
+                    main_coverage_dir=main_coverage_dir, class_files=class_files,
+                    base_coverage=curr_coverage,
+                    remove_merged_cov_file=first)
+                first = False
+            except subprocess.CalledProcessError as e:
+                logging.error('Error merging augmented test suite with class {}: {}'.format(test_class, e))
+
+            if coverage_delta['instruction_cov_delta'] > 0 or coverage_delta['branch_cov_delta'] > 0:
                 curr_coverage = augmented_coverage
                 added_test_classes += 1
             else:
                 coverage_util.remove_test_class_from_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+
+            current_raw_cov_file = os.path.join(raw_cov_dir, constants.JACOCO_MERGED_DATA_FOR_AUGMENTATION)
 
     return augmented_coverage, added_test_classes
 

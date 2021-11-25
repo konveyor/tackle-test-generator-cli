@@ -127,3 +127,15 @@ TEST_PLAN_SUMMARY_NAME = "test-plan-summary.html"
 # Java version enforced in maven build files
 
 JAVA_VERSION_FOR_MAVEN = 1.8
+
+# Suffix for jacoco.exec files used in test augmentation
+
+JACOCO_SUFFIX_FOR_AUGMENTATION = '_jacoco.exec'
+
+# Output file for merged coverage computed during test augmentation
+
+JACOCO_MERGED_DATA_FOR_AUGMENTATION = 'ctd-guided-augmented.exec'
+
+# Name of Jacoco CLI jar
+
+JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
