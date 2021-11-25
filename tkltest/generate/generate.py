@@ -120,7 +120,18 @@ def generate_ctd_amplified_tests(config):
     ctd_file = app_name+constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX
 
     # generate building-block test sequences
-    if config['generate']['ctd_amplified']['reuse_base_tests']:
+    reuse_sequences = config['generate']['ctd_amplified']['reuse_base_tests']
+
+    if reuse_sequences:
+        if (test_generator_name == constants.COMBINED_TEST_GENERATOR_NAME and \
+            (not os.path.isfile(app_name+"_RandoopTestGenerator"+constants.TKL_BB_SEQ_FILE_SUFFIX) \
+                or not os.path.isfile(app_name+"_EvoSuiteTestGenerator"+constants.TKL_BB_SEQ_FILE_SUFFIX))) \
+                or (test_generator_name != constants.COMBINED_TEST_GENERATOR_NAME and
+                    not os.path.isfile(app_name + "_" + test_generator_name + constants.TKL_BB_SEQ_FILE_SUFFIX)):
+                    tkltest_status("Basic block test sequence files do not exist, generating from scratch")
+                    reuse_sequences = False
+
+    if reuse_sequences:
         tkltest_status("Reusing existing basic block test sequences")
     else:
         run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
