@@ -29,20 +29,20 @@ class UnitTests(unittest.TestCase):
 
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build"""
-        # dict with apps params for test
+        # dict with apps parameters for test
         ant_test_apps = {  # todo move params to be taken from toml?
             'irs': {
                 'standard_classpath': os.path.join('test', 'data', 'irs', 'irs_abspath_classpath.txt'),
                 'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
                 'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
-                'properties_file': '',
+                'property_file': '',
                 'targets_to_test': ["compile-classpath-attribute", "compile-classpathref-attribute", "compile-classpath-element"]
             },
             '84_ifx-framework': {
                 'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-framework_abspath_classpath.txt'),
                 'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
-                'properties_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
+                'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
                 'targets_to_test': ["compile"]
             },
         }
@@ -52,7 +52,7 @@ class UnitTests(unittest.TestCase):
 
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
-            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['properties_file']
+            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']  # todo to toml
             config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
 

@@ -334,34 +334,32 @@ def __fix_relative_paths(tkltest_config):
 
 def __get_ant_target_classpath(target,
                                app_settings_file,
-                               compiled_tasks,
+                               compiled_targets,
                                closed_targets,
                                open_targets,
                                tkltest_app_build_file,
                                copy_build_file_tree,
                                orig_project_root,
                                copy_project_root,
-                               toy_program_dir_path,  # todo refactor to const?
-                               toy_program_destdir_path,  # todo refactor to const?
-                               ant_output_filename,  # todo refactor to const?
                                targets_classpath):
     """
         Extracts the jars that the target and its dependencies need for compiling the target.
         Parameters:
             target - the current main target to run.
             app_settings_file - the property file to use when running ant.
-            compiled_tasks - a list of all the targets containing javac task that were found recursively.
+            compiled_targets - a list of all the targets containing javac task that were found recursively.
             closed_targets - a list of all the targets that were found recursively.
             open_targets - a list of the current recursive path of targets (to avoid circular loop).
             tkltest_app_build_file - edited copy of the build file used to run dummy/tkltest targets.
             copy_build_file_tree - ElementTree of tkltest_app_build_file.
             orig_project_root - the root Element of the original build file.
             copy_project_root - the root Element of tkltest_app_build_file.
-            toy_program_dir_path - dir path for the toy program used for the dummy/tkltest targets.
-            toy_program_destdir_path - destination directory for compiling the toy program.
-            ant_output_filename - output filename for the output of running ant commands.
             targets_classpath - set of all the jars that the target depends on for compiling.
     """
+    # if the classpath of this target was already parsed
+    if target in closed_targets:
+        return
+
     if target in open_targets:
         tkltest_status('Found circular dependency with target {}.\n'.format(target), error=True)
         return
@@ -380,16 +378,13 @@ def __get_ant_target_classpath(target,
         for dependent_on_target in dependencies_list:
             __get_ant_target_classpath(dependent_on_target.strip(),
                                        app_settings_file,
-                                       compiled_tasks,
+                                       compiled_targets,
                                        closed_targets,
                                        open_targets,
                                        tkltest_app_build_file,
                                        copy_build_file_tree,
                                        orig_project_root,
                                        copy_project_root,
-                                       toy_program_dir_path,  # todo refactor to const?
-                                       toy_program_destdir_path,  # todo refactor to const?
-                                       ant_output_filename,  # todo refactor to const?
                                        targets_classpath)
 
     javac_node = target_node.find("./javac")
@@ -397,12 +392,12 @@ def __get_ant_target_classpath(target,
         open_targets.remove(target)
         closed_targets.append(target)
         return
-    compiled_tasks.append(target)
+    compiled_targets.append(target)
 
     tkltest_target_name = target + "-tkltest"
-    tkltest_target_javac_attributes = {'srcdir': toy_program_dir_path,
-                                       'sourcepath': toy_program_dir_path,
-                                       'destdir': toy_program_destdir_path,
+    tkltest_target_javac_attributes = {'srcdir': constants.TOY_PROGRAM_DIR_PATH,
+                                       'sourcepath': constants.TOY_PROGRAM_DIR_PATH,
+                                       'destdir': constants.TOY_PROGRAM_DESTDIR_PATH,
                                        'includeantruntime': "no",
                                        'verbose': "yes"}
 
@@ -425,24 +420,24 @@ def __get_ant_target_classpath(target,
 
     # constructing the tkltest target
     tkltest_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
-    tkltest_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
-    tkltest_target_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
+    tkltest_target_element.append(ElementTree.Element('delete', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
+    tkltest_target_element.append(ElementTree.Element('mkdir', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
     tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
     tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
     tkltest_target_element.append(tkltest_target_javac_element)
-    tkltest_target_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+    tkltest_target_element.append(ElementTree.Element('delete', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
 
     copy_build_file_tree.write(tkltest_app_build_file)
 
     # create output file or override previous output
-    with open(ant_output_filename, "w") as output_file:
+    with open(constants.ANT_OUTPUT_FILENAME, "w") as output_file:
         output_file.write("")
 
     # write command that will run the written target tkltest_target_name, set output to different files
     run_ant_command = "ant -f " + tkltest_app_build_file
     if app_settings_file:
         run_ant_command += " -propertyfile " + os.path.abspath(app_settings_file)
-    run_ant_command += " " + tkltest_target_name + " >> " + ant_output_filename
+    run_ant_command += " " + tkltest_target_name + " >> " + constants.ANT_OUTPUT_FILENAME
 
     # execute ant command
     try:
@@ -461,7 +456,7 @@ def __get_ant_target_classpath(target,
                          'java_class_path': '[echo] Java class path: ',
                          'javac_class_files': '[javac] [search path for class files: '}
 
-    with open(ant_output_filename, "r") as output_file:
+    with open(constants.ANT_OUTPUT_FILENAME, "r") as output_file:
         lines = output_file.read()
     line_list = lines.splitlines()
 
@@ -482,7 +477,7 @@ def __get_ant_target_classpath(target,
         if (item not in java_class_path_list) and (java_home_path not in item) and (item.endswith('.jar')):
             targets_classpath.add(item)
 
-    os.remove(ant_output_filename)
+    os.remove(constants.ANT_OUTPUT_FILENAME)
     open_targets.remove(target)
     closed_targets.append(target)
 
@@ -579,12 +574,6 @@ def __resolve_classpath(tkltest_config, command):
         copy_build_file_tree = ElementTree.parse(app_build_file)
         copy_project_root = copy_build_file_tree.getroot()
 
-        # paths of the toy program to compile in the copy of the build
-        toy_program_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "toy_program"))
-        toy_program_destdir_path = os.path.join(toy_program_dir_path, "toy_destdir")
-
-        ant_output_filename = "tkltest_ant_output.txt"  # todo convert to const?
-
         # a list for the united dependencies of all the input targets
         targets_classpath = set()
 
@@ -592,7 +581,7 @@ def __resolve_classpath(tkltest_config, command):
         closed_targets = []
         open_targets = []
 
-        # create a dummy target for every build target and their dependencies (if running javac)
+        # create a dummy target for the build target and their dependencies (if running javac)
         __get_ant_target_classpath(app_build_target.strip(),
                                    app_settings_file,
                                    compiled_tasks,
@@ -602,9 +591,6 @@ def __resolve_classpath(tkltest_config, command):
                                    copy_build_file_tree,
                                    orig_project_root,
                                    copy_project_root,
-                                   toy_program_dir_path,
-                                   toy_program_destdir_path,
-                                   ant_output_filename,
                                    targets_classpath)
 
         if len(compiled_tasks) == 0:

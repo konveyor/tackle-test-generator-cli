@@ -139,3 +139,10 @@ JACOCO_MERGED_DATA_FOR_AUGMENTATION = 'ctd-guided-augmented.exec'
 # Name of Jacoco CLI jar
 
 JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
+
+# For analyzing classpath from ant build file:
+# toy program directory and destination directory for its compilation, filename for ant's output
+
+TOY_PROGRAM_DIR_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "toy_program"))
+TOY_PROGRAM_DESTDIR_PATH = os.path.join(TOY_PROGRAM_DIR_PATH, "toy_destdir")
+ANT_OUTPUT_FILENAME = "tkltest_ant_output.txt"
