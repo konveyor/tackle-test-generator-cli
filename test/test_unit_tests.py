@@ -30,7 +30,7 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build"""
         # dict with apps parameters for test
-        ant_test_apps = {  # todo move params to be taken from toml?
+        ant_test_apps = {
             'irs': {
                 'standard_classpath': os.path.join('test', 'data', 'irs', 'irs_abspath_classpath.txt'),
                 'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
@@ -52,7 +52,7 @@ class UnitTests(unittest.TestCase):
 
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
-            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']  # todo to toml
+            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']
             config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
 

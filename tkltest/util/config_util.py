@@ -61,8 +61,8 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-                                   options_spec=config_options.get_options_spec(command='general'),
-                                   args=args)
+        options_spec=config_options.get_options_spec(command='general'),
+        args=args)
 
     # if args specified, get command and subcommand
     command = None
@@ -76,15 +76,14 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-                                       options_spec=config_options.get_options_spec(command=command),
-                                       args=args)
+            options_spec=config_options.get_options_spec(command=command),
+            args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-                                       options_spec=config_options.get_options_spec(command=command,
-                                                                                    subcommand=subcommand),
-                                       args=args)
+            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand),
+            args=args)
 
     # validate loaded config information, exit if validation errors occur
     val_failure_msgs = __validate_config(config=tkltest_config, command=command, subcommand=subcommand)
@@ -177,12 +176,12 @@ def __validate_config(config, command=None, subcommand=None):
     for scope, scope_val_errors in val_errors.items():
         if scope_val_errors['missing_required_params']:
             val_failure_msgs.append('\t- Missing required options for "{}": {}\n'.format(
-                scope if scope in ['general', command] else command + ' ' + subcommand.replace('_', '-'),
+                scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
                 scope_val_errors['missing_required_params']
             ))
         for opt, msg in scope_val_errors['missing_conditionally_required_params'].items():
             val_failure_msgs.append('\t- Missing conditionally required option for "{}": {} ({})\n'.format(
-                scope if scope in ['general', command] else command + ' ' + subcommand.replace('_', '-'),
+                scope if scope in ['general', command] else command+' '+subcommand.replace('_', '-'),
                 opt, msg
             ))
         if scope_val_errors['invalid_enum_values']:
@@ -286,6 +285,7 @@ def __fix_relative_path(path):
 
 
 def __fix_relative_paths_recursively(options_spec, config):
+
     for option_name, options in options_spec.items():
         if type(options) is not dict:
             continue
@@ -309,7 +309,7 @@ def __fix_relative_paths_recursively(options_spec, config):
                     lines = file.readlines()
                 lines = [__fix_relative_path(path) for path in lines if path.strip()]
                 new_file = os.path.basename(classpath_file)
-                # todo - we will have a bug if the users uses two different files with the same name
+                #todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
                     f.writelines(lines)
                 config[option_name] = new_file
@@ -461,11 +461,11 @@ def __get_ant_target_classpath(target,
     line_list = lines.splitlines()
 
     # parse java_home path, because some jars are imported from here to javac_class_files.
-    java_home_line = [s for s in line_list if output_lines_dict['java_home'] in s][0].lstrip()
+    java_home_line = [s for s in line_list if output_lines_dict['java_home'] in s][0].lstrip()  # todo make a set from all the runs
     java_home_path = java_home_line[len(output_lines_dict['java_home']):]
 
     # parse java_class_path, because some of those jars are imported from here to javac_class_files.
-    java_class_path_line = [s for s in line_list if output_lines_dict['java_class_path'] in s][0].lstrip()
+    java_class_path_line = [s for s in line_list if output_lines_dict['java_class_path'] in s][0].lstrip()  # todo make a set from all the runs
     java_class_path_list = java_class_path_line[len(output_lines_dict['java_class_path']):].split(';')
 
     # parse javac_class_files, those are the actual locations and jars that ant uses for compiling the target.
@@ -559,7 +559,7 @@ def __resolve_classpath(tkltest_config, command):
 
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']  # todo add to readme
-        if not app_build_target:
+        if not app_build_target:  # todo remove, redundant
             tkltest_status('app_build_target is missing for analyzing ant build file\n', error=True)
 
         # tree and root of original build file
