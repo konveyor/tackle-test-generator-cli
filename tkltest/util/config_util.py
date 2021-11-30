@@ -227,7 +227,7 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
             else:
                 val_errors['missing_required_params'].append(opt_name)
         if 'choices' in opt.keys() and opt_name in config.keys() and config[opt_name] not in opt['choices']:
-            val_errors['invalid_enum_values'][opt_name] = 'must be one of {}: {}'.format(
+            val_errors['invalid_enum_values'][opt_name] = 'must be one of {}: {}\n'.format(
                 opt['choices'], config[opt_name])
 
         # check parameter dependency constraints
