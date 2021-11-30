@@ -15,10 +15,11 @@ import logging
 import os
 import subprocess
 import sys
+import shutil
 
 import toml
 
-from tkltest.util import constants, build_util, command_util, dir_util, config_util
+from tkltest.util import constants, build_util, command_util, dir_util, config_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -33,8 +34,62 @@ def process_execute_command(args, config):
     """
     dir_util.cd_output_dir(config['general']['app_name'])
     config_util.fix_config(config, args.command)
-    __execute_base(args, config)
+#    __execute_base(args, config)
+    if config['execute']['compare_to_dev_tests']:
+        __run_dev_tests(config)
     dir_util.cd_cli_dir()
+
+
+def __run_dev_tests(config):
+
+    app_name = config['general']['app_name']
+    '''
+    __run_test_cases(create_build=False,
+                     app_name=app_name,
+                     collect_codecoverage=True,
+                     verbose=config['general']['verbose'],
+                     build_type=config['dev_tests']['build_type'],
+                     test_root_dir=config['dev_tests']['test_directory'],
+                     build_file=config['dev_tests']['build_file']
+    )
+    '''
+    compare_report_dir = app_name + '-compare-report-dir' #todo - add to constant
+    '''
+    if os.path.isdir(compare_report_dir):
+        shutil.rmtree(compare_report_dir)
+    os.mkdir(compare_report_dir)
+    '''
+
+    test_root_dir = config['general']['test_directory']
+    if test_root_dir == '':
+        test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
+    tkltest_coverage_exec = os.path.join(test_root_dir, 'merged_jacoco.exec') # todo - 1. rename 2. what the name with maven?
+    tkltest_coverage_xml = os.path.join(compare_report_dir, 'tkltest_coverage.xml') # todo - rename
+    tkltest_html_dir = os.path.join(compare_report_dir, 'tkltest_html') # todo - rename
+
+    coverage_util.generate_coverage_xml(monolith_app_path=config['general']['monolith_app_path'],
+                                        exec_file=tkltest_coverage_exec,
+                                        xml_file=tkltest_coverage_xml,
+                                        html_dir=tkltest_html_dir)
+
+    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
+    dev_coverage_xml = os.path.join(compare_report_dir, 'dev_coverage.xml')
+    dev_html_dir = os.path.join(compare_report_dir, 'dev_html') # todo - rename
+
+    coverage_util.generate_coverage_xml(monolith_app_path=config['general']['monolith_app_path'],
+                                        exec_file=dev_coverage_exec,
+                                        xml_file=dev_coverage_xml,
+                                        html_dir=dev_html_dir)
+
+
+    html_dir = os.path.join(compare_report_dir, 'compared_html') # todo - rename
+    if os.path.isdir(html_dir):
+        shutil.rmtree(html_dir)
+    os.mkdir(html_dir)
+    shutil.copytree(dev_html_dir + os.sep + 'jacoco-resources', html_dir + os.sep + 'jacoco-resources')
+    shutil.copyfile('../bluebar.gif',  html_dir + os.sep + 'jacoco-resources/bluebar.gif')
+    shutil.copyfile('../yellowbar.gif',  html_dir + os.sep + 'jacoco-resources/yellowbar.gif')
+    coverage_util.compare_coverage_xml(dev_coverage_xml, tkltest_coverage_xml, dev_html_dir, tkltest_html_dir, html_dir)
 
 
 def __get_test_classes(test_root_dir):
@@ -115,8 +170,9 @@ def __execute_base(args, config):
     )
 
 
-def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs, collect_codecoverage,
-    app_packages, partitions_file, target_class_list, reports_dir, offline_inst, env_vars={}, verbose=False, micro=False):
+def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, test_root_dir, monolith_app_path='', app_classpath='', test_dirs=[],
+    app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='', env_vars={}, verbose=False, micro=False,
+    build_file='', build_target=''):
   
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
@@ -141,9 +197,14 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
             offline_instrumentation=offline_inst
         )
     else:
-        ant_build_file = test_root_dir + os.sep + "build.xml"
-        maven_build_file = test_root_dir + os.sep + "pom.xml"
-        gradle_build_file = test_root_dir + os.sep + "build.gradle"
+        if build_file:
+            ant_build_file = build_file
+            maven_build_file = build_file
+            gradle_build_file = build_file
+        else:
+            ant_build_file = test_root_dir + os.sep + "build.xml"
+            maven_build_file = test_root_dir + os.sep + "pom.xml"
+            gradle_build_file = test_root_dir + os.sep + "build.gradle"
 
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
@@ -153,13 +214,24 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
 
     try:
         if build_type == 'maven':
-            command_util.run_command("mvn -f {} clean test site".format(maven_build_file), verbose=verbose)
+            if not build_target:
+                build_target = 'clean test site'
+            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_target), verbose=verbose)
         elif build_type == 'gradle':
-                command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=verbose)
+            if not build_target:
+                build_target = 'tklest_task'
+            if os.path.basename(gradle_build_file) == "build.gradle":
+                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_target), verbose=verbose)
+            else:
+                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_target), verbose=verbose)
         else:
             if collect_codecoverage:
-                command_util.run_command("ant -f {} merge-coverage-report".format(ant_build_file), verbose=verbose)
+                if not build_target:
+                    build_target = 'merge-coverage-report'
+                command_util.run_command("ant -f {} {}".format(ant_build_file, build_target), verbose=verbose)
             else:
+                if build_target:
+                    tkltest_status('Error executing build {}. Can not build target {} when collect_codecoverage is off'.format(ant_build_file, build_target), error=True)
                 for partition in partitions:
                     command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
                             verbose=verbose)
@@ -180,12 +252,12 @@ def __run_test_cases(create_build, build_type, app_name, monolith_app_path, app_
         tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
         sys.exit(1)
 
-
+    #todo - correct the report dir
     tkltest_status("JUnit reports are saved in " +
-                       os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
+                   os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
     if collect_codecoverage:
         tkltest_status("Jacoco code coverage reports are saved in " +
-                       os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
+                   os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
 
 
 def __get_generate_config(test_directory):

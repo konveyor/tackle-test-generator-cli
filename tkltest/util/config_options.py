@@ -531,7 +531,64 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'help_message': 'path to a test class file (.java) to compile and run'
-        }
+        },
+        'compare_to_dev_tests': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'compare execution coverage to dev test coverage'
+        },
+    },
+
+    # "dev_tests" options
+    'dev_tests': {
+        'help_message': 'user tests information',
+        'test_directory': {
+            'required': True,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relpath_fix_type': 'path',
+            'help_message': 'first test directory to compare'
+        },
+        'build_type': {
+            'required': True,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['ant', 'maven', 'gradle'],
+            'default_value': 'ant',
+            'help_message': 'build file type for compiling and running the tests - either ant, maven or gradle'
+        },
+        'build_file': {
+            'required': True,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relpath_fix_type': 'path',
+            'help_message': 'build file to create the first coverage report'
+        },
+        'build_targets': {
+            'required': True,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'build target, to create the coverage report'
+        },
+        'coverage_exec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'relpath_fix_type': 'path',
+            'help_message': 'the coverage report directory, created by the build file '
+        },
     }
 
 }
