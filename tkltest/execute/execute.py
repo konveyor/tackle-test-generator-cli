@@ -154,7 +154,7 @@ def __execute_base(args, config):
 
     # run test classes
     __run_test_cases(create_build=config['execute']['create_build_file'],
-        build_type=config['execute']['build_type'],
+        build_type=config['general']['build_type'],
         app_name=config['general']['app_name'],
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=classpath,
@@ -165,7 +165,7 @@ def __execute_base(args, config):
         partitions_file=gen_config['generate']['partitions_file'],
         target_class_list=gen_config['generate']['target_class_list'],
         reports_dir=config['general']['reports_path'],
-        offline_inst=not config['execute']['online_instrumentation'],
+        offline_inst=config['general']['offline_instrumentation'],
         verbose=config['general']['verbose']
     )
 
@@ -215,7 +215,7 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
     try:
         if build_type == 'maven':
             if not build_target:
-                build_target = 'clean test site'
+                build_target = 'clean verify site'
             command_util.run_command("mvn -f {} {}".format(maven_build_file, build_target), verbose=verbose)
         elif build_type == 'gradle':
             if not build_target:

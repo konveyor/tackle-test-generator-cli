@@ -365,9 +365,6 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                         line('id', 'default-instrument')
                                         with tag('goals'):
                                             line('goal', 'instrument')
-                                            #line('goal', 'prepare-agent')
-                                        #with tag('configuration'):
-                                        #    line('skip', '${jacoco.skip.instrument}')
                                     with tag('execution'):
                                         line('id', 'default-restore-instrumented-classes')
                                         with tag('goals'):
@@ -381,7 +378,6 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                             line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
                                 with tag('execution'):
                                     line('id', 'generate-code-coverage-report')
-                                    line('phase', 'test')
                                     with tag('goals'):
                                         line('goal', 'report')
                                     with tag('configuration'):
@@ -424,6 +420,10 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                         line('groupId', 'org.apache.maven.plugins')
                         line('artifactId', 'maven-surefire-report-plugin')
                         line('version', constants.MAVEN_SURFIRE_VERSION)
+                        with tag('reportSets'):
+                            with tag('reportSet'):
+                                with tag('reports'):
+                                    line('report', 'report-only')
                         with tag('configuration'):
                             for test_src_dir in test_dirs:
                                 if os.path.basename(test_src_dir) == 'target':
@@ -431,6 +431,14 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                 current_partition = os.path.basename(test_src_dir)
                                 junit_output_dir = os.path.join(main_junit_dir, current_partition)
                                 line('reportsDirectories', junit_output_dir + '/raw')
+                    if collect_codecoverage:
+                        with tag('plugin'):
+                            line('groupId', 'org.jacoco')
+                            line('artifactId', 'jacoco-maven-plugin')
+                            with tag('reportSets'):
+                                with tag('reportSet'):
+                                    with tag('reports'):
+                                        line('report', 'report')
 
     result = indent(
         doc.getvalue(),

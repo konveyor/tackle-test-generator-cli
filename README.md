@@ -221,15 +221,15 @@ and executing them. More detailed description is available in the [CLI user guid
    ```
    tkltest --verbose generate ctd-amplified
    ```
-   The unit test cases will be generated in a folder named `tkltest-outdir-<app-name>/<app-name>-ctd-amplified-tests/monolith`.
-   A CTD coverage report will be created as well  in a folder named `tkltest-outdir-<app-name>/<app-name>-tkltest-reports`, showing
+   The unit test cases will be generated in a folder named `tkltest-output-<app-name>/<app-name>-ctd-amplified-tests/monolith`.
+   A CTD coverage report will be created as well  in a folder named `tkltest-output-<app-name>/<app-name>-tkltest-reports`, showing
    the CTD test plan row coverage achieved by the generated tests.
 
 4. To execute the generated unit tests on the legacy app, run the command
    ```
-   tkltest --verbose --test-directory tkltest-outdir-<app-name>/<app-name>-ctd-amplified-tests execute
+   tkltest --verbose --test-directory tkltest-output-<app-name>/<app-name>-ctd-amplified-tests execute
    ```
-   JUnit reports and Jacoco code coverage reports will be created in  `tkltest-outdir-<app-name>/<app-name>-tkltest-reports`.
+   JUnit reports and Jacoco code coverage reports will be created in  `tkltest-output-<app-name>/<app-name>-tkltest-reports`.
  
 Note that, if the `--config-file` option is not specified on the command line (as in the commands above),
 the CLI uses by default `./tkltest_config.toml` as the configuration file.
@@ -285,10 +285,10 @@ optional arguments:
                         build file (of type set in build_type option) should
                         already exist and will be used
   -cc, --code-coverage  generate code coverage report with JaCoCo agent
-  -onli, --online-instrumentation
-                        perform online instrumentation of app classes for
+  -offli, --offline-instrumentation
+                        perform offline instrumentation of app classes for
                         measuring code coverage (default: app classes are
-                        instrumented offline)
+                        instrumented online)
   -tc TEST_CLASS, --test-class TEST_CLASS
                         path to a test class file (.java) to compile and run
 ```
@@ -336,6 +336,8 @@ required, and the option description).
 | reports_path                        | -rp/--reports-path             | path to the reports directory                                                                                                           |
 | verbose                             | -vb/--verbose                  | run in verbose mode printing detailed status messages                                                                                   |
 | version^                            | -v/--version                   | print CLI version number                                                                                                                |
+| offline_instrumentation             | -offli/--offline-instrumentation | perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented online)             |
+| build_type                          | -bt/--build-type               | build file type for compiling and running the tests - either ant, maven or gradle                                                       |
 |                                     |                                |                                                                                                                                         |
 | config                              |                                | Initialize configuration file or list configuration options                                                                             |
 |                                     |                                |                                                                                                                                         |
@@ -373,8 +375,6 @@ required, and the option description).
 |                                     |                                |                                                                                                                                         |
 | execute                             |                                | Execute generated tests on the application version under test                                                                           |
 | app_packages*                       |                                | list of app packages. Must end with a wildcard                                                                                          |
-| build_type                          | -bt/--build-type               | build file type for compiling and running the tests - either ant, maven or gradle                                                       |
 | create_build_file                   | -nbf/--no-build-file-creation  | Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used |
 | code_coverage                       | -cc/--code-coverage            | generate code coverage report with JaCoCo agent                                                                                         |
-| online_instrumentation              | -onli/--online-instrumentation | perform online instrumentation of app classes for measuring code coverage (default: app classes are instrumented offline)               |
 | test_class                          | -tc/--test-class               | path to a test class file (.java) to compile and run                                                                                    |
