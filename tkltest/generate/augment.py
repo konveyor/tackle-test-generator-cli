@@ -46,6 +46,10 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         build_type (str): Type of build file (either ant or maven)
         ctd_test_dir (str): Root directory for CTD tests
         report_dir (str): Main reports directory, under which coverage report is generated
+
+
+    Returns:
+        bool: whether we were able to collect coverage for augmenting tests (there may be an issue with evosuite class loading)
     """
     tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
 
