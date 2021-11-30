@@ -52,7 +52,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
         jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        command_util.run_command("mvn -f {} clean test site".format(build_file), verbose=False)
+        command_util.run_command("mvn -f {} clean verify site".format(build_file), verbose=False)
         jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
         command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)

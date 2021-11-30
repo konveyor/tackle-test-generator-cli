@@ -103,8 +103,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
             # execute tests
-            #TODO For now restrict maven to online instrumentation, until offline one is added
-            config['general']['offline_instrumentation'] = False
+            config['general']['offline_instrumentation'] = True
             config['general']['build_type'] = 'maven'
             self.__process_execute(config=config)
 
