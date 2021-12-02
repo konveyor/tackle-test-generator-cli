@@ -20,6 +20,7 @@ import subprocess
 import pathlib
 import zipfile
 import re
+import copy
 import xml.etree.ElementTree as ElementTree
 
 from . import constants, config_options
@@ -332,112 +333,99 @@ def __fix_relative_paths(tkltest_config):
     tkltest_config['relative_fixed'] = True
 
 
-def __get_ant_target_classpath(target,
-                               app_settings_file,
-                               compiled_targets,
-                               closed_targets,
-                               open_targets,
-                               tkltest_app_build_file,
-                               copy_build_file_tree,
-                               orig_project_root,
-                               copy_project_root,
-                               targets_classpath):
+def __create_modified_build_file(app_build_file, ant_output_filename):
     """
-        Extracts the jars that the target and its dependencies need for compiling the target.
-        Parameters:
-            target - the current main target to run.
-            app_settings_file - the property file to use when running ant.
-            compiled_targets - a list of all the targets containing javac task that were found recursively.
-            closed_targets - a list of all the targets that were found recursively.
-            open_targets - a list of the current recursive path of targets (to avoid circular loop).
-            tkltest_app_build_file - edited copy of the build file used to run dummy/tkltest targets.
-            copy_build_file_tree - ElementTree of tkltest_app_build_file.
-            orig_project_root - the root Element of the original build file.
-            copy_project_root - the root Element of tkltest_app_build_file.
-            targets_classpath - set of all the jars that the target depends on for compiling.
+    Creates a modified build file based on original one.
+    In the modified version, every target has only necessary modified tasks: {property, javac, antcall}
+    :param app_build_file: original build file for the app
+    :return: the file name for the modified build file
     """
-    # if the classpath of this target was already parsed
-    if target in closed_targets:
-        return
+    '''
+    # tree and root of original build file
+    orig_build_file_tree = ElementTree.parse(app_build_file)
+    orig_project_root = orig_build_file_tree.getroot()
+'''
+    # create a copy of the build file
+    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file),
+                                          "tkltest_" + os.path.basename(app_build_file))
+    shutil.copyfile(app_build_file, tkltest_app_build_file)
 
-    if target in open_targets:
-        tkltest_status('Found circular dependency with target {}.\n'.format(target), error=True)
-        return
+    # tree and root of the copy of build file
+    copy_build_file_tree = ElementTree.parse(app_build_file)
+    copy_project_root = copy_build_file_tree.getroot()
 
-    target_search_tag = "./target[@name='" + target + "']"
-    target_node = orig_project_root.find(target_search_tag)
-    if target_node is None:
-        tkltest_status('Ant build file is missing target {}\n'.format(target), error=True)
-        return
-
-    open_targets.append(target)
-
-    # from every dependent-on target (if it is not in closed list) - get their classpath
-    if 'depends' in target_node.attrib:
-        dependencies_list = target_node.attrib['depends'].split(',')
-        for dependent_on_target in dependencies_list:
-            __get_ant_target_classpath(dependent_on_target.strip(),
-                                       app_settings_file,
-                                       compiled_targets,
-                                       closed_targets,
-                                       open_targets,
-                                       tkltest_app_build_file,
-                                       copy_build_file_tree,
-                                       orig_project_root,
-                                       copy_project_root,
-                                       targets_classpath)
-
-    javac_node = target_node.find("./javac")
-    if javac_node is None:
-        open_targets.remove(target)
-        closed_targets.append(target)
-        return
-    compiled_targets.append(target)
-
-    tkltest_target_name = target + "-tkltest"
-    tkltest_target_javac_attributes = {'srcdir': constants.TOY_PROGRAM_DIR_PATH,
-                                       'sourcepath': constants.TOY_PROGRAM_DIR_PATH,
-                                       'destdir': constants.TOY_PROGRAM_DESTDIR_PATH,
+    # constant attributes for creating the modified javac tasks
+    toy_program_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "toy_program"))
+    toy_program_destdir_path = os.path.join(toy_program_dir_path, "toy_destdir")
+    tkltest_target_javac_attributes = {'srcdir': toy_program_dir_path,
+                                       'sourcepath': toy_program_dir_path,
+                                       'destdir': toy_program_destdir_path,
                                        'includeantruntime': "no",
                                        'verbose': "yes"}
 
-    # case 1: class path passed to javac as classpath attribute
-    classpath_value = javac_node.get('classpath')
-    if classpath_value is not None:
-        tkltest_target_javac_attributes['classpath'] = classpath_value
+    # iterate on the project's targets
+    for element in copy_project_root.findall('target'):
+        # create a new element with identical attributes and no sub-elements
+        modified_element = ElementTree.Element('target', element.attrib)
 
-    # case 2: class path passed to javac as classpathref attribute
-    classpathref_value = javac_node.get('classpathref')
-    if classpathref_value is not None:
-        tkltest_target_javac_attributes['classpathref'] = classpathref_value
+        for task in element:
+            if task.tag == 'property':
+                # add as is to modified_element
+                modified_element.append(task)
 
-    tkltest_target_javac_element = ElementTree.Element('javac', tkltest_target_javac_attributes)
+            elif task.tag == 'javac':
+                # create a modified copy and add to modified_element
+                new_javac_task_attributes = copy.deepcopy(tkltest_target_javac_attributes)
 
-    # case 3: class path passed to javac as classpath nested element
-    classpath_node = javac_node.find("./classpath")
-    if classpath_node is not None:
-        tkltest_target_javac_element.append(classpath_node)
+                # case 1: class path passed to javac as classpath attribute
+                classpath_value = task.get('classpath')
+                if classpath_value is not None:
+                    new_javac_task_attributes['classpath'] = classpath_value
 
-    # constructing the tkltest target
-    tkltest_target_element = ElementTree.SubElement(copy_project_root, 'target', {'name': tkltest_target_name})
-    tkltest_target_element.append(ElementTree.Element('delete', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
-    tkltest_target_element.append(ElementTree.Element('mkdir', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
-    tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
-    tkltest_target_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
-    tkltest_target_element.append(tkltest_target_javac_element)
-    tkltest_target_element.append(ElementTree.Element('delete', {'dir': constants.TOY_PROGRAM_DESTDIR_PATH}))
+                # case 2: class path passed to javac as classpathref attribute
+                classpathref_value = task.get('classpathref')
+                if classpathref_value is not None:
+                    new_javac_task_attributes['classpathref'] = classpathref_value
+
+                new_javac_element = ElementTree.Element('javac', new_javac_task_attributes)
+
+                # case 3: class path passed to javac as classpath nested element
+                classpath_node = task.find("./classpath")
+                if classpath_node is not None:
+                    new_javac_element.append(classpath_node)
+
+                modified_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+                modified_element.append(ElementTree.Element('mkdir', {'dir': toy_program_destdir_path}))
+                modified_element.append(ElementTree.Element('echo', {'message': "Java home: ${java.home}"}))
+                modified_element.append(ElementTree.Element('echo', {'message': "Java class path: ${java.class.path}"}))
+                modified_element.append(new_javac_element)
+                modified_element.append(ElementTree.Element('delete', {'dir': toy_program_destdir_path}))
+
+            elif task.tag == 'antcall':
+                # add as is to modified_element
+                modified_element.append(task)
+
+        copy_project_root.remove(element)
+        copy_project_root.append(modified_element)
 
     copy_build_file_tree.write(tkltest_app_build_file)
+    return tkltest_app_build_file
 
+
+def __run_ant_command_and_parse_output(modified_build_file_name,
+                                       app_settings_file,
+                                       app_build_target,
+                                       ant_output_filename,
+                                       targets_classpath):
     # create output file or override previous output
-    with open(constants.ANT_OUTPUT_FILENAME, "w") as output_file:
+    with open(ant_output_filename, "w") as output_file:
         output_file.write("")
 
     # write command that will run the written target tkltest_target_name, set output to different files
-    run_ant_command = "ant -f " + tkltest_app_build_file
+    run_ant_command = "ant -f " + modified_build_file_name
     if app_settings_file:
         run_ant_command += " -propertyfile " + os.path.abspath(app_settings_file)
-    run_ant_command += " " + tkltest_target_name + " >> " + constants.ANT_OUTPUT_FILENAME
+    run_ant_command += " " + app_build_target + " >> " + ant_output_filename
 
     # execute ant command
     try:
@@ -446,40 +434,45 @@ def __get_ant_target_classpath(target,
         tkltest_status(
             'running ant task {} failed: {}\n{}'.format(run_ant_command, e, e.stderr),
             error=True)
-        os.remove(tkltest_app_build_file)
+        os.remove(modified_build_file_name)
         sys.exit(1)
-    os.remove(tkltest_app_build_file)
+
+    os.remove(modified_build_file_name)
 
     # parse ant output
-    # todo: refactor to const string?
-    output_lines_dict = {'java_home': '[echo] Java home: ',
-                         'java_class_path': '[echo] Java class path: ',
-                         'javac_class_files': '[javac] [search path for class files: '}
+    output_dict = {'java_home': '[echo] Java home: ',
+                   'java_class_path': '[echo] Java class path: ',
+                   'javac_class_files': '[javac] [search path for class files: '}
 
-    with open(constants.ANT_OUTPUT_FILENAME, "r") as output_file:
+    with open(ant_output_filename, "r") as output_file:
         lines = output_file.read()
     line_list = lines.splitlines()
 
     # parse java_home path, because some jars are imported from here to javac_class_files.
-    java_home_line = [s for s in line_list if output_lines_dict['java_home'] in s][0].lstrip()  # todo make a set from all the runs
-    java_home_path = java_home_line[len(output_lines_dict['java_home']):]
+    java_home_lines = set([s.lstrip() for s in line_list if output_dict['java_home'] in s])
+    java_home_paths = set([java_home_line[len(output_dict['java_home']):] for java_home_line in java_home_lines])
 
     # parse java_class_path, because some of those jars are imported from here to javac_class_files.
-    java_class_path_line = [s for s in line_list if output_lines_dict['java_class_path'] in s][0].lstrip()  # todo make a set from all the runs
-    java_class_path_list = java_class_path_line[len(output_lines_dict['java_class_path']):].split(';')
+    java_class_path_lines = [s.lstrip() for s in line_list if output_dict['java_class_path'] in s]
+    java_class_path_set = set()
+    for line in java_class_path_lines:
+        for path in line[len(output_dict['java_class_path']):].split(';'):
+            java_class_path_set.add(path)
 
     # parse javac_class_files, those are the actual locations and jars that ant uses for compiling the target.
-    javac_class_files_line = [s for s in line_list if output_lines_dict['javac_class_files'] in s][0].lstrip()
-    javac_class_files_list = javac_class_files_line[len(output_lines_dict['java_class_path']):-1].split(',')
+    javac_files_lines = [s.lstrip() for s in line_list if output_dict['javac_class_files'] in s]
+    javac_class_files_set = set()
+    for line in javac_files_lines:
+        for path in line[len(output_dict['javac_class_files']):-1].split(','):
+            javac_class_files_set.add(path)
 
     # collect all relevant jars
-    for item in javac_class_files_list:
-        if (item not in java_class_path_list) and (java_home_path not in item) and (item.endswith('.jar')):
-            targets_classpath.add(item)
+    for item in javac_class_files_set:
+        if (item not in java_class_path_set) and (item.endswith('.jar')):
+            if not [path for path in java_home_paths if path in item]:
+                targets_classpath.add(item)
 
-    os.remove(constants.ANT_OUTPUT_FILENAME)
-    open_targets.remove(target)
-    closed_targets.append(target)
+    os.remove(ant_output_filename)
 
 
 def __resolve_classpath(tkltest_config, command):
@@ -559,49 +552,21 @@ def __resolve_classpath(tkltest_config, command):
 
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']  # todo add to readme
-        if not app_build_target:  # todo remove, redundant
-            tkltest_status('app_build_target is missing for analyzing ant build file\n', error=True)
 
-        # tree and root of original build file
-        orig_build_file_tree = ElementTree.parse(app_build_file)
-        orig_project_root = orig_build_file_tree.getroot()
-
-        # create a copy of the build file
-        tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.xml")
-        shutil.copyfile(app_build_file, tkltest_app_build_file)
-
-        # tree and root of the copy of build file
-        copy_build_file_tree = ElementTree.parse(app_build_file)
-        copy_project_root = copy_build_file_tree.getroot()
-
-        # a list for the united dependencies of all the input targets
+        # a set for the united dependencies of the compilation process
         targets_classpath = set()
 
-        compiled_tasks = []
-        closed_targets = []
-        open_targets = []
+        # file name for ant output
+        ant_output_filename = "tkltest_ant_output.txt"
 
-        # create a dummy target for the build target and their dependencies (if running javac)
-        __get_ant_target_classpath(app_build_target.strip(),
-                                   app_settings_file,
-                                   compiled_tasks,
-                                   closed_targets,
-                                   open_targets,
-                                   tkltest_app_build_file,
-                                   copy_build_file_tree,
-                                   orig_project_root,
-                                   copy_project_root,
-                                   targets_classpath)
+        # create a modified build file
+        modified_build_file_name = __create_modified_build_file(app_build_file, ant_output_filename)
 
-        if len(compiled_tasks) == 0:
-            tkltest_status('There were no javac tasks found from the given build file and list of targets to run.\n',
-                           error=True)
-            exit(1)
-
-        compiled_tasks_str = ""
-        for p in compiled_tasks:
-            compiled_tasks_str += p + ", "
-        tkltest_status('Identified targets that contained javac tasks: ' + compiled_tasks_str[:-2])
+        __run_ant_command_and_parse_output(modified_build_file_name,
+                                           app_settings_file,
+                                           app_build_target,
+                                           ant_output_filename,
+                                           targets_classpath)
 
         # copy classpath jars to dependencies directory
         for jar_path in targets_classpath:

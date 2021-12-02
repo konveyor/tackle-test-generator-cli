@@ -44,7 +44,7 @@ class UnitTests(unittest.TestCase):
                 'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
                 'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
-                'targets_to_test': ["compile"],
+                'targets_to_test': ["compile", "compile-antcall"],
                 'output_dir': '84_ifx-framework-app-dependencies'
             },
         }

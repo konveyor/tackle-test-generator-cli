@@ -65,8 +65,11 @@
   </target>
 <!-- Compile the sources -->
   <target name="compile" depends="setup,compile-gen,compile-src">
-    <ant target="compile-gen" />
-    <ant target="compile-src" />
+    <echo message="compilation using depends" />
+  </target>
+  <target name="compile-antcall" depends="setup">
+    <antcall target="compile-gen" />
+    <antcall target="compile-src" />
   </target>
   <target name="compile-gen" depends="setup">
     <javac srcdir="${src.dir}" destdir="${build.dir}" 
