@@ -34,6 +34,8 @@ are those that cause the application to fail with runtime exceptions.
 The CLI command can be installed locally to be run, or it can be run in a Docker container, in which case
 the various dependencies (Java, Ant, and Maven) need not be installed locally.
 
+> **NOTE:** If you are using a released version of Tackle-Test with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`), please skip the [Prerequisite](#prerequisite) step and step 4 of [Running the CLI from local installation](#running-the-cli-from-local-installation). Those steps are required only if the Java dependencies of the Tackle-Test CLI need to be downloaded.
+
 ### Prerequisite
 
 To run the CLI in either way, a few jar files need to be downloaded from Maven repositories hosted on GitHub, which
@@ -94,7 +96,7 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
    
    - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). Currently, this feature is supported for Gradle only; Ant and Maven support will be added. Install Gradle if you plan to use the dependency computation feature.
 
-5. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
+4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
 for the test-generator core is downloaded from the Maven registry on GitHub Packages
 ([tackle-test-generator-core packages](https://github.com/konveyor/tackle-test-generator-core/packages/)) and
 specific builds of EvoSuite jars that are downloaded from another
@@ -124,7 +126,7 @@ both of these require authentication. To do this, before running the download sc
 
    CTD modeling and test-plan generation is done using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
 
-6. Finally, to install the CLI command `tkltest` in a virtual environment, follow these steps:
+5. Finally, to install the CLI command `tkltest` in a virtual environment, follow these steps:
    ```
    python3 -m venv venv
    source venv/bin/activate
