@@ -32,19 +32,19 @@ class UnitTests(unittest.TestCase):
         # dict with apps parameters for test
         ant_test_apps = {
             'irs': {
-                'standard_classpath': os.path.join('test', 'data', 'irs', 'irs_classpath_jars.txt'),
+                'standard_classpath': os.path.join('test', 'data', 'irs', 'irsMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
                 'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
                 'property_file': '',
-                'targets_to_test': ["compile-classpath-attribute", "compile-classpathref-attribute", "compile-classpath-element"],
+                'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute', 'compile-classpath-element'],
                 'output_dir': 'irs-app-dependencies'
             },
             '84_ifx-framework': {
-                'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-framework_classpath_jars.txt'),
+                'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
                 'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
-                'targets_to_test': ["compile", "compile-antcall"],
+                'targets_to_test': ['compile', 'compile-antcall'],
                 'output_dir': '84_ifx-framework-app-dependencies'
             },
         }
@@ -69,21 +69,22 @@ class UnitTests(unittest.TestCase):
                 failed_assertion_message = 'failed for app = ' + app_name + ', target = ' + target_name
                 self.assertTrue(generated_classpath != '', failed_assertion_message)
                 self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
-                self.__assert_classpath(standard_classpath, generated_classpath,
+                self.__assert_classpath(standard_classpath,
+                                        generated_classpath,
                                         os.path.join(os.getcwd(), ant_test_apps[app_name]['output_dir']),
                                         failed_assertion_message)
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message):
         """
-        :param standard_classpath: Path to standard classpath, containing file names of the dependency jars, which are
-               paths relative to tkltest-output-appname/appname-app-dependencies.
+        :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
         :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
         :param message: An informative error message to print in case one of the assertions fails.
         """
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read()
-        line_list_standard = [os.path.join(std_classpath_prefix, jar_name) for jar_name in lines_standard.splitlines()]
+        jar_names = [os.path.basename(line) for line in lines_standard.splitlines()]
+        line_list_standard = [os.path.join(std_classpath_prefix, jar_name) for jar_name in jar_names]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read()

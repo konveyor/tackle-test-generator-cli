@@ -1,45 +1,32 @@
 name = "TKLTEST_CONFIG_FILE"
 
-# general options
 [general]
     app_name = "84_ifx-framework"
     monolith_app_path = ["test/data/84_ifx-framework/src/main"]
     java_jdk_home = ""
 
-# options for "tkltest generate" command
 [generate]
     time_limit = 2
     add_assertions = false
     jee_support = false
     app_build_type = "ant"
     app_build_settings_file = "test/data/84_ifx-framework/build.properties"
+    app_build_target = "compile"
 
-    # partitions file path. If specified, this option overrides target_class_list option.
-    # partitions_file = "test/data/irs/refactored/PartitionsFile.json"
-
-    # list of target classes for test generation. If unspecified, targets all application classes
-    # target_class_list = []
-
-# options for "tkltest generate randoop" command
 [generate.randoop]
     no_error_revealing_tests=true
 
-# options for "tkltest generate evosuite" command
 [generate.evosuite]
     criterion = ["LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH"]
 
-# options for "tkltest generate ctd-amplified" command
 [generate.ctd_amplified]
-    base_test_generator = "combined" # both Randoop and EvoSuite
-    #base_test_generator = "randoop"
-    #base_test_generator = "evosuite"
+    base_test_generator = "combined"
     refactored_app_path_prefix = "test/data/irs/refactored"
     refactored_app_path_suffix = ["target/classes"]
     interaction_level = 1
     no_ctd_coverage = false
     num_seq_executions = 2
 
-# options for "tkltest execute" command
 [execute]
     test_class = ""
     code_coverage = true

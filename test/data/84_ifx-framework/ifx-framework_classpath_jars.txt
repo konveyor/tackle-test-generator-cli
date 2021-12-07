@@ -1,4 +1,0 @@
-jdom.jar
-poolman.jar
-velocity-dep-1.4.jar
-xercesImpl.jar

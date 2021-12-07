@@ -17,9 +17,8 @@ import shutil
 from . import constants, config_util
 from .constants import *
 
+
 cli_dir = os.getcwd()
-
-
 def cd_cli_dir():
     os.chdir(cli_dir)
 
