@@ -34,6 +34,7 @@ are those that cause the application to fail with runtime exceptions.
 The CLI command can be installed locally to be run, or it can be run in a Docker container, in which case
 the various dependencies (Java, Ant, and Maven) need not be installed locally.
 
+You can also download a released version of Tackle-Test from [here](https://github.com/konveyor/tackle-test-generator-cli/releases).
 > **NOTE:** If you are using a released version of Tackle-Test with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`), please skip the [Prerequisite](#prerequisite) step and step 4 of [Running the CLI from local installation](#running-the-cli-from-local-installation). Those steps are required only if the Java dependencies of the Tackle-Test CLI need to be downloaded.
 
 ### Prerequisite
