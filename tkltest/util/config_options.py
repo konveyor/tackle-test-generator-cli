@@ -203,7 +203,7 @@ __options_spec = {
             'default_value': '',
             'relpath_fix_type': 'path',
             'help_message': 'root directory for JDK installation (must be JDK; JRE will not suffice); '
-                            'can be set as environment variable JAVA_HOME'
+                            'alternatively, can be set as environment variable JAVA_HOME'
         },
         'test_directory': {
             'required': False,
