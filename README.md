@@ -326,7 +326,7 @@ all available configuration options with information about each option: the opti
 the option's command-line short/long names (if it supported in the CLI), whether the option is
 required, and the option description).
 
-|| TOML name ("*"=req, "^"=CLI-only)   | CLI name                         | Description                                                                                                                             |
+| TOML name ("*"=req, "^"=CLI-only)   | CLI name                         | Description                                                                                                                             |
 |-------------------------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | general                             |                                  |                                                                                                                                         |
 | app_name*                           |                                  | name of the application being tested                                                                                                    |
