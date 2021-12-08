@@ -103,12 +103,14 @@ def generate_ctd_amplified_tests(config):
     if config['generate']['excluded_class_list']:
         excluded_class_list = config['generate']['excluded_class_list']
 
+    jdk_path = os.path.join(config['general']['java_jdk_home'], 'bin', 'java')
+
     start_time = time.time()
 
     # generate CTD models and test plans
     generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
                                        monolith_app_path, app_classpath_file, app_prefix, app_suffix,
-                                       config['generate']['ctd_amplified']['interaction_level'], verbose)
+                                       config['generate']['ctd_amplified']['interaction_level'], jdk_path, verbose)
 
     tkltest_status("Computing test plans with CTD took "+str(round(time.time()-start_time,2))+" seconds")
 
@@ -116,7 +118,6 @@ def generate_ctd_amplified_tests(config):
 
     test_generator_name = config['generate']['ctd_amplified']['base_test_generator']
     time_limit = config['generate']['time_limit']
-    jdk_path = os.path.join(config['general']['java_jdk_home'], 'bin', 'java')
     ctd_file = app_name+constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX
 
     # generate building-block test sequences
@@ -259,7 +260,7 @@ def generate_ctd_amplified_tests(config):
 
 def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
                                        monolith_app_path, app_classpath_file,
-                                       app_prefix, app_suffix, interaction_level, verbose=False):
+                                       app_prefix, app_suffix, interaction_level, jdk_path, verbose=False):
     """Generates CTD models and test plans.
 
     Performs the first step in the generation of CTD-guided tests (generation of CTD models and test plans)
@@ -272,17 +273,19 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
         partitions_file (str): name of file containing information about app partitions (if the modernization task
             involves partitioning the legacy app)
         target_class_list (list): name of specific classes targeted for test generation
+        excluded_class_list (list): names of classes to omit from the set of test targets
         monolith_app_path (list): paths to directories containing classes of the legacy app
         app_classpath_file (str): name of file containing library dependencies of app
         app_prefix (str): path prefix to root directory of refactored app version
         app_suffix (list): list of paths to refactored app classes
         interaction_level (int): CTD interaction level (strength) for test-plan generation
+        jdk_path (str): path to Java VM
         verbose (bool): run in verbose mode printing detailed status messages
     """
     tkltest_status('Computing coverage goals using CTD')
 
     # build java command to be executed
-    modeling_command = "java -Xmx2048m -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
+    modeling_command = "\""+jdk_path+"\" -Xmx2048m -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "acts_"+constants.ACTS_VERSION+".jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-"+constants.SOOT_VERSION+".jar") + os.pathsep
