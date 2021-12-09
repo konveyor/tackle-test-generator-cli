@@ -634,7 +634,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_ctdamplified_combined_compare_coverage(self) -> None:
-        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list"""
+        """Test "generate ctd-amplified" and "execute": comparing coverage reports"""
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 
