@@ -1,0 +1,29 @@
+# $Id: bean.conf.sample,v 1.1 2003/02/27 01:13:04 spal Exp $
+# $Source: /cvsroot/ifx-framework/code/conf/bean.conf.sample,v $
+# This is a Java property file that you can use as a template to generate
+# an almost complete IFX Framework bean. Some work is needed after that,
+# but should be fairly minimal. The input template is a table of information
+# similar to what is available in the IFX PDF docs.
+# To call the bean generator with this file, run the command:
+# ant grind -Dgrind.file=conf/bean.conf.sample
+
+# Change this to your own name and email address
+AUTH = Sujit Pal (spal@ifx-framework.sourceforge.net)
+
+# The package name where the bean will finally reside
+PKG = org.sourceforge.ifx.framework.messages
+
+# The name of the new bean
+NAME = MyNewBean
+
+# Fields definitions in sequence. Must be contiguous and should start 
+# at zero.
+FIELDS.0.NAME = fooBar
+FIELDS.0.CLASS = org.sourceforge.ifx.framework.aggregates.FooBar
+
+FIELDS.1.NAME = baz
+FIELDS.1.CLASS = org.sourceforge.ifx.framework.elements.Baz
+
+# How to handle repeating groups
+FIELDS.2.NAME = bar
+FIELDS.2.CLASS = org.sourceforge.ifx.framework.aggregates.Bar[]

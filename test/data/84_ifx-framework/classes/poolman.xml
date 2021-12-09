@@ -1,0 +1,24 @@
+<!-- $Id: poolman.xml,v 1.2 2003/02/18 20:31:09 spal Exp $ -->
+<!-- $Source -->
+<poolman>
+  <datasource>
+    <dbname>ifxdb</dbname>
+    <jndiName>default</jndiName>
+    <driver>org.gjt.mm.mysql.Driver</driver>
+    <url>jdbc:mysql://localhost:3306/ifxdb</url>
+    <username>defaultuser</username>
+    <password>defaultus3r</password>
+    <nativeResults>false</nativeResults>
+    <txIsolationLevel>READ_COMMITTED</txIsolationLevel>
+    <initialConnections>2</initialConnections>
+    <minimumSize>0</minimumSize>
+    <maximumSize>10</maximumSize>
+    <maximumSoft>true</maximumSoft>
+    <connectionTimeout>60</connectionTimeout>
+    <userTimeout>10</userTimeout>
+    <skimmerFrequency>60</skimmerFrequency>
+    <shrinkBy>2</shrinkBy>
+    <debugging>false</debugging>
+    <cacheEnabled>false</cacheEnabled>
+  </datasource>
+</poolman>

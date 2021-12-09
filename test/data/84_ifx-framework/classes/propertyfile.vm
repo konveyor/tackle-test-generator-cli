@@ -1,0 +1,9 @@
+## $Id: propertyfile.vm,v 1.1 2004/05/03 21:41:31 spal Exp $
+## $Source: /cvsroot/ifx-framework/code/conf/propertyfile.vm,v $
+## Template for mapping files for IFX Framework
+##
+# Generated code (org.sourceforge.ifx.tools.CodeGenerator)
+#
+#foreach ($property in ${PropertyFile.PropertyList})
+${property.Name} = ${property.Value}
+#end

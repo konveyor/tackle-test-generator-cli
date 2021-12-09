@@ -1,0 +1,186 @@
+<!--
+  $Id: build.xml,v 1.2 2003/07/30 19:39:36 spal Exp $
+  $Source: /cvsroot/ifx-framework/v3/build.xml,v $
+-->
+<project name="ifx-framework" default="help" basedir=".">
+<!-- Class path setting -->
+  <path id="class.path">
+    <fileset dir="lib/">
+      <include name="**.jar" />
+    </fileset>
+    <pathelement location="etc/" />
+    <pathelement location="build/" />
+  </path>
+<!-- Environment variables -->
+  <target name="setup" description="Setting environment variables">
+    <property name="build.dir" value="build" />
+    <property name="src.dir" value="src" />
+    <property name="src-gen.dir" value="src-gen" />
+    <property name="test.dir" value="test" />
+    <property name="lib.dir" value="lib" />
+    <property name="doc.dir" value="doc" />
+    <property name="etc.dir" value="etc" />
+    <property name="dist.dir" value="dist" />
+    <property name="test.class" 
+        value="net.sourceforge.ifxfv3.IfxFrameworkTestSuite" />
+    <property name="rel.ver" value="0.0" />
+  </target>
+<!-- Usage information -->
+  <target name="help" depends="setup">
+    <echo message="IFX-Framework version 3.${rel.ver}" />
+    <echo message="Ant targets:" />
+    <echo message="clean - removes generated class files" />
+    <echo message="clean-gen - removes generated source files" />
+    <echo message="src-gen - generates Java source code" />
+    <echo message="jar-gen - generates jar file of all generated classes" />
+    <echo message="compile - compiles all sources (not test code)" />
+    <echo message="compile-gen - compiles only generated source code" />
+    <echo message="compile-src - compiles only handcoded source code" />
+    <echo message="compile-test - compiles the JUnit tests" />
+    <echo message="test - runs the JUnit tests" />
+    <echo message="javadoc - generates the javadocs for the project" />
+    <echo message="htdocs - generates the web pages for the project" />
+    <echo message="package - generates downloadable tarball for the project" />
+  </target>
+<!-- Clean up before compile -->
+  <target name="clean" depends="setup">
+    <delete dir="${build.dir}" />
+    <mkdir dir="${build.dir}" />
+  </target>
+<!-- Clean up generated sources -->
+  <target name="clean-gen" depends="setup,clean">
+    <delete dir="${src-gen.dir}" />
+    <mkdir dir="${src-gen.dir}" />
+  </target>
+<!-- Generate the JavaBeans from the XSD specification -->
+  <target name="src-gen" depends="clean-gen">
+    <java classname="org.exolab.castor.builder.SourceGenerator"
+         fork="true" failonerror="true" maxmemory="128m">
+      <arg value="-i" /><arg value="${etc.dir}/IFX130.xsd" />
+      <arg value="-dest" /><arg value="${src-gen.dir}" />
+      <arg value="-package" /><arg value="net.sourceforge.ifxfv3.beans" />
+      <arg value="-types" /><arg value="j2" />
+      <arg value="-verbose" />
+      <classpath refid="class.path" />
+    </java>
+  </target>
+<!-- Compile the sources -->
+  <target name="compile" depends="setup">
+    <ant target="compile-gen" />
+    <ant target="compile-src" />
+  </target>
+  <target name="compile-gen" depends="setup">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" 
+         includes="net/sourceforge/ifxfv3/beans/**"
+         debug="on">
+      <classpath refid="class.path" />
+    </javac>
+    <javac srcdir="${src-gen.dir}" destdir="${build.dir}" debug="on">
+      <classpath refid="class.path" />
+    </javac>
+  </target>
+  <target name="compile-src" depends="setup">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" debug="on">
+      <classpath refid="class.path" />
+    </javac>
+  </target>
+<!-- Create JAR file for all generated classes -->
+  <target name="jar-gen" depends="clean-gen,src-gen,compile-gen">
+    <jar jarfile="${lib.dir}/ifxf-v3.${rel.ver}-gen.jar"
+        basedir="${build.dir}" />
+  </target>
+<!-- Compile the test classes -->
+  <target name="compile-test" depends="compile">
+    <javac srcdir="${test.dir}" destdir="${build.dir}" debug="on">
+      <classpath refid="class.path" />
+    </javac>
+  </target>
+<!-- Run the tests -->
+  <target name="test" depends="compile">
+    <junit>
+      <formatter type="plain" usefile="false" />
+      <test name="${test.class}" />
+      <classpath refid="class.path" />
+    </junit>
+  </target>
+<!-- Create JavaDocs -->
+  <target name="javadoc" depends="compile">
+    <javadoc packagenames="net.sourceforge.ifxf-v3.*"
+        sourcepath="${src.dir}" desdir="${doc.dir}/api"
+        author="true" version="true" use="true"
+        windowtitle="ifx-framework V3">
+      <classpath refid="class.path" />
+    </javadoc>
+  </target>
+<!-- Create Website documentation -->
+  <target name="htdocs" 
+      depends="clean,src-gen,compile,compile-test,test,javadoc">
+    <delete dir="${dist.dir}" />
+    <mkdir dir="${dist.dir}/htdocs" />
+    <mkdir dir="${dist.dir}/htdocs/javadoc" />
+    <copy todir="${dist.dir}/htdocs/javadoc">
+      <fileset dir="${doc.dir}/api" />
+    </copy>
+    <mkdir dir="${dist.dir}/htdocs/images" />
+    <mkdir dir="${dist.dir}/htdocs/stylesheet-images" />
+    <exec dir="${doc.dir}" os="Linux" executable="db2html">
+      <arg value="ifxf-v3-book.xml" />
+    </exec>
+    <copy todir="${dist.doc}/htdocs">
+      <fileset dir="${doc.dir}/ifxf-v3-book">
+        <include name="**/*.html" />
+      </fileset>
+    </copy>
+    <copy todir="${dist.dir}/htdocs/images">
+      <fileset dir="${doc.dir}/images">
+        <include name="**/*.png" />
+      </fileset>
+    </copy>
+    <copy todir="${dist.dir}/htdocs/stylesheet-images">
+      <fileset dir="${doc.dir}/ifxf-v3-book/stylesheet-images">
+        <include name="**/*.gif" />
+      </fileset>
+    </copy>
+    <tar tarfile="${dist.dir}/htdocs.tar" basedir="${dist.dir}/htdocs" />
+    <gzip src="${dist.dir}/htdocs.tar" zipfile="${dist.dir}/htdocs.tar.gz" />
+    <delete dir="${doc.dir}/ifxf-v3-book" />
+    <delete dir="${doc.dir}/ifxf-v3-book.junk" />
+    <delete file="${dist.dir}/htdocs.tar" />
+    <echo message="File htdocs.tar.gz available in ${dist.dir}" />
+  </target>
+<!-- Create Distribution -->
+  <target name="package"
+      depends="clean,src-gen,compile,compile-test,test,javadoc">
+    <delete dir="${dist.dir}/code" />
+    <mkdir dir="${dist.dir}/code" />
+    <mkdir dir="${dist.dir}/code/${etc.dir}" />
+    <mkdir dir="${dist.dir}/code/${lib.dir}" />
+    <mkdir dir="${dist.dir}/code/${doc.dir}" />
+    <mkdir dir="${dist.dir}/code/${src.dir}" />
+    <mkdir dir="${dist.dir}/code/${test.dir}" />
+    <copy file="build.xml" todir="${dist.dir}/code" />
+    <copy todir="${dist.dir}/code/${etc.dir}">
+      <fileset dir="${etc.dir}" />
+    </copy>
+    <copy todir="${dist.dir}/code/${lib.dir}">
+      <fileset dir="${lib.dir}" />
+    </copy>
+    <jar jarfile="${dist.dir}/code/${lib.dir}/ifxf-v3.${rel.ver}.jar"
+        basedir="${build.dir}" />
+    <copy todir="${dist.dir}/code/${doc.dir}">
+      <fileset dir="${doc.dir}" />
+    </copy>
+    <copy todir="${dist.dir}/code/${src.dir}">
+      <fileset dir="${src.dir}" />
+    </copy>
+    <copy todir="${dist.dir}/code/${test.dir}">
+      <fileset dir="${test.dir}" />
+    </copy>
+    <tar tarfile="${dist.dir}/ifxf-v3.${rel.ver}.tar"
+        basedir="${dist.dir}" />
+    <gzip src="${dist.dir}/ifxf-v3.${rel.ver}.tar"
+        zipfile="${dist.dir}/ifxf-v3.${rel.ver}.tar.gz" />
+    <delete file="${dist.dir}/ifxf-v3.${rel.ver}.tar" />
+    <echo message="File ifxf-v3.${rel.ver}.tar.gz available in ${dist.dir}" />
+  </target>
+</project>

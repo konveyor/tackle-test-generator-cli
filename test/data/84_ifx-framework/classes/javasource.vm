@@ -1,0 +1,106 @@
+## $Id: javasource.vm,v 1.2 2004/05/14 23:55:58 spal Exp $
+## $Source: /cvsroot/ifx-framework/code/conf/javasource.vm,v $
+## Template for IFX Java bean sources
+##
+/*
+ * IFX-Framework - IFX XML to JavaBean application framework.
+ * Copyright (C) 2003  The IFX-Framework Team
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package $JavaSource.PackageName;
+
+/**
+ * Generated code.
+ * ${JavaSource.ClassJavadocs}
+ * @author org.sourceforge.ifx.tools.CodeGenerator
+ */
+public class ${JavaSource.ClassName}
+#if (${JavaSource.hasSuperClass()})
+        extends ${JavaSource.SuperClass}
+#end
+#if (${JavaSource.hasInterface()})
+        implements ${JavaSource.Interface}
+#end
+{
+
+    /** Default constructor */
+    public ${JavaSource.ClassName}() {
+#if (${JavaSource.hasSuperClass()})
+        super();
+#end
+    }
+
+#foreach ($memberVar in ${JavaSource.MemberVariables})
+    // property declaration 
+    private ${memberVar.ClassName} _${memberVar.Name};
+
+    /** 
+     * Setter for ${memberVar.Name}
+     * @param ${memberVar.Name} the ${memberVar.ClassName} to set
+     */
+    public void ${memberVar.SetterName}(${memberVar.ClassName} _${memberVar.Name}) {
+        this._${memberVar.Name} = _${memberVar.Name};
+    }
+
+    /**
+     * Getter for ${memberVar.Name}
+     * @return a ${memberVar.ClassName}
+     */
+    public ${memberVar.ClassName} ${memberVar.GetterName}() {
+        return _${memberVar.Name};
+    }
+
+#end
+
+    /**
+     * Returns true if objects are equal, false otherwise.
+     * @param obj the object to compare with.
+     * @return true if equal, false if not.
+     */
+    public boolean equals(Object obj) {
+#if (${JavaSource.hasSuperClass()})
+        return super.equals(obj);
+#else
+        if (!(obj instanceof ${JavaSource.ClassName})) return false;
+        ${JavaSource.ClassName} that = (${JavaSource.ClassName}) obj;
+  #foreach ($memberVar in ${JavaSource.MemberVariables})
+    #if ($velocityCount == 1)
+        return (this.${memberVar.GetterName}().equals(that.${memberVar.GetterName}())
+    #else
+            && (this.${memberVar.GetterName}().equals(that.${memberVar.GetterName}())
+    #end
+            );
+  #end
+#end
+    }
+
+#if (${JavaSource.NumberOfMemberVariables} > 0)
+    /** Element ordering - 
+  #foreach ($memberVar in ${JavaSource.MemberVariables})
+     * ${memberVar.ElementName}
+  #end
+     */
+    public final String[] ELEMENTS = {
+  #foreach ($memberVar in ${JavaSource.MemberVariables})
+    #if ($velocityCount == 1)
+        "${memberVar.ElementName}"
+    #else
+       ,"${memberVar.ElementName}"
+    #end
+  #end
+    };
+#end
+}

@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Revision: 1.3.0
+   Date: 07/10/2002
+   
+   Interactive Financial Exchange Schema
+   Copyright 1999, 2000, 2001, 2002 IFX Forum. All rights reserved.
+--><!ELEMENT ATMCityState (#PCDATA)>
+<!ELEMENT ATMLocation (#PCDATA)>
+<!ELEMENT ATMOwner (#PCDATA)>
+<!ELEMENT ATMTrnInfo (ATMOwner?, ATMLocation?, ATMCityState?)>
+<!ELEMENT AcceptReqd (#PCDATA)>
+<!ELEMENT AcctBal (BalType, CurAmt, EffDt?, ExpDt?, Desc?)>
+<!ELEMENT AcctCur (#PCDATA)>
+<!ELEMENT AcctFormat (#PCDATA)>
+<!ELEMENT AcctHelpMsg (#PCDATA)>
+<!ELEMENT AcctId (#PCDATA)>
+<!ELEMENT AcctInqRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId | LoanAcctId), IncExtBal?, IncBal?, DeliveryMethod?)>
+<!ELEMENT AcctInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId | LoanAcctId), IncExtBal?, IncBal?, DeliveryMethod?, UpDt, LastTrnDt?, LastStmtDt?, AcctBal*, ExtAcctBal*, (DepAcctRec | CCAcctRec | LoanAcctRec | LOCAcctRec | MortAcctRec)?)?)>
+<!ELEMENT AcctKey (#PCDATA)>
+<!ELEMENT AcctMask (#PCDATA)>
+<!ELEMENT AcctPayAcct (#PCDATA)>
+<!ELEMENT AcctPayAcctId (#PCDATA)>
+<!ELEMENT AcctRestrictMsg (#PCDATA)>
+<!ELEMENT AcctTaxInfo (Org, TaxType?, CurAmt?, PrevYrCurAmt?, Rate?)>
+<!ELEMENT AcctTaxStatus (#PCDATA)>
+<!ELEMENT AcctTaxType (#PCDATA)>
+<!ELEMENT AcctType (#PCDATA)>
+<!ELEMENT AcctValidateURL (#PCDATA)>
+<!ELEMENT AckType (#PCDATA)>
+<!ELEMENT AdditionalStatus (StatusCode?, ServerStatusCode?, Severity, StatusDesc?)>
+<!ELEMENT Addr1 (#PCDATA)>
+<!ELEMENT Addr2 (#PCDATA)>
+<!ELEMENT Addr3 (#PCDATA)>
+<!ELEMENT Addr4 (#PCDATA)>
+<!ELEMENT AddrType (#PCDATA)>
+<!ELEMENT AdjType (#PCDATA)>
+<!ELEMENT Aging (#PCDATA)>
+<!ELEMENT AllocateAllowed (#PCDATA)>
+<!ELEMENT Amt (#PCDATA)>
+<!ELEMENT ArtWorkId (#PCDATA)>
+<!ELEMENT AsyncRqUID (#PCDATA)>
+<!ELEMENT AsyncRsInfo (AvailDt?, ExpDt?)>
+<!ELEMENT AuthInfo (CustPswd?)>
+<!ELEMENT AuthSupt (#PCDATA)>
+<!ELEMENT AvailDt (#PCDATA)>
+<!ELEMENT BSPReferTo (SPName?, OrgContact?)>
+<!ELEMENT BackupWithholding (#PCDATA)>
+<!ELEMENT BalInqRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId | LoanAcctId), IncExtBal?, DeliveryMethod?)>
+<!ELEMENT BalInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId | LoanAcctId), IncExtBal?, DeliveryMethod?, AcctBal+, ExtAcctBal*, MktgInfo?)?)>
+<!ELEMENT BalType (#PCDATA)>
+<!ELEMENT BankAcctFeatLimit (BankAcctFeatLimitType, TrnSrc?, CurAmt)>
+<!ELEMENT BankAcctFeatLimitType (#PCDATA)>
+<!ELEMENT BankAcctFeatSupt (BankAcctFeatType, TrnSrc*, BankAcctFeatLimit*)>
+<!ELEMENT BankAcctFeatType (#PCDATA)>
+<!ELEMENT BankAcctInfo (CurCode, Desc?, (CustName? | PersonName?), (OrgContact? | ContactInfo?), CustAcctUse?, PrimaryAcct?, Term?, IntRateInfo?, BackupWithholding?, TaxCountry?, TaxProvince?, Ownership?, ProductId?, InitialDeposit?)>
+<!ELEMENT BankAcctRec ((DepAcctId | CardAcctId | LoanAcctId), BankAcctInfo, BankAcctStatus?, AcctTaxType?, XferFromSupt?, XferToSupt?, PaySupt?, BankAcctFeatSupt*, AcctBal*)>
+<!ELEMENT BankAcctStatus (BankAcctStatusCode, StatusDesc?, EffDt?, StatusModBy?)>
+<!ELEMENT BankAcctStatusCode (#PCDATA)>
+<!ELEMENT BankAcctTaxInqRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId | LoanAcctId), TaxYear, DeliveryMethod?)>
+<!ELEMENT BankAcctTaxInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId | LoanAcctId), TaxYear, DeliveryMethod?, TaxId, AcctTaxInfo*)?)>
+<!ELEMENT BankAcctTrnImgInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, DeliveryMethod?, DeliveryMedia?, (DepAcctId | CardAcctId | LoanAcctId), (StopChkInfo | ChkNum)*, SelRangeCurAmt?, SelRangeDt?, TrnType*, IncAllItems?, (CustContact | ContactInfo)?)>
+<!--Section 6.4.7.2-->
+<!ELEMENT BankAcctTrnImgInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, DeliveryMethod?, DeliveryMedia?, (DepAcctId | CardAcctId | LoanAcctId), (StopChkInfo+ | ChkNum)?, SelRangeCurAmt?, SelRangeDt?, TrnType*, IncAllItems?, (CustContact | ContactInfo)?, CSPRefId?, SPRefId?, BankAcctTrnImgRec*)?)>
+<!ELEMENT BankAcctTrnImgRec (TrnType?, CurAmt?, PrcDt?, TrnImage?, ImageURL?)>
+<!ELEMENT BankAcctTrnRec (TrnType?, TrnSrc?, PostedDt, OrigDt?, EffDt?, CurAmt, OrigCurAmt?, CompositeCurAmt*, IndustId?, Memo*, Name?, CounterpartyInfo?, RefInfo*, BillRefInfo?, RemitAdviceRefId?, CustPayeeInfo?, InvoiceInfo?, CSPRefId?, SPRefId?, SPRefIdCorrect?)>
+<!ELEMENT BankId (#PCDATA)>
+<!ELEMENT BankIdType (#PCDATA)>
+<!ELEMENT BankInfo (BankIdType?, BankId?, RefInfo*, Name?, BranchId?, BranchName?, (PostAddr | (City?, StateProv?, PostalCode?, Country?))?)>
+<!ELEMENT BankSvcProfInfo (SvcCore, MsgSupt*, OptSupt*, CustBankPrefSupt*, DeliveryMethod*, StopChkProf?, XferProf?, InterXferProf?)>
+<!ELEMENT BankSvcRq (RqUID, AsyncRqUID?, SPName?, (BalInqRq?, AcctInqRq?, DepAcctStmtInqRq?, CCAcctStmtInqRq?, DepAcctTrnInqRq?, CCAcctTrnInqRq?, BankAcctTrnImgInqRq?, IntRateInqRq?, BankAcctTaxInqRq?, ForExRateInqRq?, StopChkAddRq?, StopChkCanRq?, StopChkInqRq?, StopChkAudRq?, StopChkSyncRq?, XferAddRq?, XferModRq?, XferStatusModRq?, XferCanRq?, XferInqRq?, XferAudRq?, XferSyncRq?, RecXferAddRq?, RecXferModRq?, RecXferCanRq?, RecXferInqRq?, RecXferAudRq?, RecXferSyncRq?, ChkOrdAddRq?, ChkOrdModRq?, ChkOrdCanRq?, ChkOrdInqRq?, ChkOrdSyncRq?, RecChkOrdAddRq?, RecChkOrdModRq?, RecChkOrdCanRq?, RecChkOrdInqRq?, RecChkOrdSyncRq?, RecChkOrdInstAddRq?, DepBkOrdAddRq?, DebitAuthAddRq?, DebitAuthModRq?, DebitAuthCanRq?, DebitAuthInqRq?, DebitAuthAudRq?, DebitAuthSyncRq?, DebitAddRq?, CreditAuthAddRq?, CreditAuthModRq?, CreditAuthCanRq?, CreditAuthInqRq?, CreditAuthAudRq?, CreditAuthSyncRq?, CreditAddRq?, DepAppAddRq?, DepAppModRq?, DepAppCanRq?, DepAppInqRq?, DepAppAudRq?, DepAppSyncRq?)+)>
+<!ELEMENT BankSvcRs (Status?, RqUID, AsyncRqUID?, SPName?, (BalInqRs?, AcctInqRs?, DepAcctStmtInqRs?, CCAcctStmtInqRs?, DepAcctTrnInqRs?, CCAcctTrnInqRs?, BankAcctTrnImgInqRs?, IntRateInqRs?, BankAcctTaxInqRs?, ForExRateInqRs?, StopChkAddRs?, StopChkCanRs?, StopChkInqRs?, StopChkAudRs?, StopChkSyncRs?, XferAddRs?, XferModRs?, XferStatusModRs?, XferCanRs?, XferInqRs?, XferAudRs?, XferSyncRs?, RecXferAddRs?, RecXferModRs?, RecXferCanRs?, RecXferInqRs?, RecXferAudRs?, RecXferSyncRs?, ChkOrdAddRs?, ChkOrdModRs?, ChkOrdCanRs?, ChkOrdInqRs?, ChkOrdSyncRs?, RecChkOrdAddRs?, RecChkOrdModRs?, RecChkOrdCanRs?, RecChkOrdInqRs?, RecChkOrdSyncRs?, RecChkOrdInstAddRs?, DepBkOrdAddRs?, DebitAuthAddRs?, DebitAuthModRs?, DebitAuthCanRs?, DebitAuthInqRs?, DebitAuthAudRs?, DebitAuthSyncRs?, DebitAddRs?, CreditAuthAddRs?, CreditAuthModRs?, CreditAuthCanRs?, CreditAuthInqRs?, CreditAuthAudRs?, CreditAuthSyncRs?, CreditAddRs?, DepAppAddRs?, DepAppModRs?, DepAppCanRs?, DepAppInqRs?, DepAppAudRs?, DepAppSyncRs?)+)>
+<!ELEMENT BaseSvcProfInfo (SvcCore, MsgSupt+, OptSupt*, SignonInfo, EnrollProf?)>
+<!ELEMENT BaseSvcRq (RqUID, AsyncRqUID?, SPName?, (SvcProfInqRq?, HolInqRq?, CustAddRq?, CustModRq?, CustPswdModRq?, CustAuthModRq?, CustStatusModRq?, CustDelRq?, CustInqRq?, CustIdInqRq?, CustAudRq?, CustSyncRq?, CustSvcAddRq?, CustSvcModRq?, CustSvcStatusModRq?, CustSvcDelRq?, CustSvcAudRq?, CustSvcSyncRq?, SvcAcctIdModRq?, SvcAcctAddRq?, SvcAcctModRq?, SvcAcctStatusModRq?, SvcAcctDelRq?, SvcAcctInqRq?, SvcAcctAudRq?, SvcAcctSyncRq?, DiscInqRq?, CustDiscStatusModRq?, CustDiscInqRq?)+)>
+<!ELEMENT BaseSvcRs (Status?, RqUID, AsyncRqUID?, SPName?, (SvcProfInqRs?, HolInqRs?, CustAddRs?, CustModRs?, CustPswdModRs?, CustAuthModRs?, CustStatusModRs?, CustDelRs?, CustInqRs?, CustIdInqRs?, CustAudRs?, CustSyncRs?, CustSvcAddRs?, CustSvcModRs?, CustSvcStatusModRs?, CustSvcDelRs?, CustSvcAudRs?, CustSvcSyncRs?, SvcAcctAddRs?, SvcAcctModRs?, SvcAcctStatusModRs?, SvcAcctIdModRs?, SvcAcctDelRs?, SvcAcctInqRs?, SvcAcctAudRs?, SvcAcctSyncRs?, DiscInqRs?, CustDiscStatusModRs?, CustDiscInqRs?)+)>
+<!ELEMENT BatchInfo (RefInfo?, CurAmt, Count, RemitInfo+)>
+<!ELEMENT BillCounts (BillStatusCounts*, BillPmtStatusCounts*)>
+<!ELEMENT BillDt (#PCDATA)>
+<!ELEMENT BillId (#PCDATA)>
+<!ELEMENT BillInfo (BillType, CustId?, PresAcctId, Memo?, BillSummAmt*, DueDt?, BillDt, OpenDt?, CloseDt?, PmtInst*, NotifyReqd?, ViewDtlPref?, StmtImage?, BillRefInfo?)>
+<!ELEMENT BillInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SPName, SelRangeDt?, BillId*, BillerId*, BillType*, BillStatusCode*, BillPmtStatusCode*, NotifyWilling?, IncCounts?, IncSummary?, DeliveryMethod?)>
+<!ELEMENT BillInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, BillId*, BillerId*, BillType*, BillStatusCode*, BillPmtStatusCode*, NotifyWilling?, IncCounts?, IncSummary?, DeliveryMethod?, BillRec*, BillCounts*))>
+<!ELEMENT BillPmtStatus (PmtId?, BillPmtStatusCode, EffDt?, StatusModBy?, Memo?)>
+<!ELEMENT BillPmtStatusCode (#PCDATA)>
+<!ELEMENT BillPmtStatusCounts (BillPmtStatusCode, Count)>
+<!ELEMENT BillRec (BillId, BillInfo, BillStatus?, BillPmtStatus?)>
+<!ELEMENT BillRefInfo (#PCDATA)>
+<!ELEMENT BillRetAddr ((Addr1, (Addr2, (Addr3, (Addr4)?)?)?), City?, StateProv?, PostalCode?, Country, AddrType?, StartDt?, EndDt?)>
+<!ELEMENT BillStatus (BillStatusCode, StatusDesc?, EffDt?, StatusModBy?, Memo?)>
+<!ELEMENT BillStatusCode (#PCDATA)>
+<!ELEMENT BillStatusCounts (BillStatusCode, Count)>
+<!ELEMENT BillStatusModRq (RqUID, AsyncRqUID?, CustId?, BillId, BillStatus?, BillPmtStatus?)>
+<!ELEMENT BillStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (BillId, BillStatus?, BillPmtStatus?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT BillSummAmt (BillSummAmtId?, BillSummAmtCode?, ShortDesc, Desc?, Memo?, CurAmt, BillSummAmtType, BillSummSubAmt*)>
+<!ELEMENT BillSummAmtCode (#PCDATA)>
+<!ELEMENT BillSummAmtId (#PCDATA)>
+<!ELEMENT BillSummAmtType (#PCDATA)>
+<!ELEMENT BillSummSubAmt (BillSummAmtId, ShortDesc, Desc?, Memo?, CurAmt, AllocateAllowed?)>
+<!ELEMENT BillType (#PCDATA)>
+<!ELEMENT BillerAcctIdInfo (AcctFormat?, AcctMask*, AcctHelpMsg?, AcctRestrictMsg?, AcctValidateURL?)>
+<!ELEMENT BillerContact (LegalName?, Name?, PostAddr?, BillRetAddr?, RemitName?, RemitAddr?, (OrgContact* | ContactInfo*))>
+<!ELEMENT BillerEnrollURL (#PCDATA)>
+<!ELEMENT BillerId (SPName, BillerNum)>
+<!ELEMENT BillerInfo (Name, BillerContact?, IndustId?, (SecretPrompt, CryptType)*, HistRetentionDays?, CSPCustInfoReq?, BillerPayInfo?, LogoURL?, Logo?, BillerEnrollURL?, BillerAcctIdInfo?, DiscReqd?, DiscId?, DiscDt?)>
+<!ELEMENT BillerInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, BillerId*, Name*, PostAddr*, Phone*, PostalCode*, UpDt?, IndustId*, IncBillerContact?, IncImages?, DeliveryMethod?)>
+<!ELEMENT BillerInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, BillerId*, Name*, PostAddr*, Phone*, PostalCode*, UpDt?, IndustId*, IncBillerContact?, IncImages?, DeliveryMethod?, NewUpDt?, BillerRec*)?)>
+<!ELEMENT BillerNum (#PCDATA)>
+<!ELEMENT BillerPayInfo (PmtInst*, DaysToEPost?, PrenoteReqd?)>
+<!ELEMENT BillerPayee (BillerId, BillerContact?, HistRetentionDays?, BillerPayInfo?)>
+<!ELEMENT BillerRec (BillerId+, BillerInfo, BillerStatus?, BSPReferTo?)>
+<!ELEMENT BillerStatus (BillerStatusCode, StatusDesc?, EffDt?, StatusModBy?, Memo?)>
+<!ELEMENT BillerStatusCode (#PCDATA)>
+<!ELEMENT BillingAcct (#PCDATA)>
+<!ELEMENT BillingAddr ((Addr1, (Addr2, (Addr3, (Addr4)?)?)?), City?, StateProv?, PostalCode?, Country, AddrType?, StartDt?, EndDt?)>
+<!ELEMENT BillingMethod (#PCDATA)>
+<!ELEMENT BinData (#PCDATA)>
+<!ELEMENT BinLength (#PCDATA)>
+<!ELEMENT BirthDt (#PCDATA)>
+<!ELEMENT BranchId (#PCDATA)>
+<!ELEMENT BranchName (#PCDATA)>
+<!ELEMENT Brand (#PCDATA)>
+<!ELEMENT CCAcctRec (DueDt?, ExpDt?, LastPmtDt?, LastPmtCurAmt?)>
+<!ELEMENT CCAcctStmtInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, CardAcctId, SelRangeDt?, IncDetail?, DeliveryMethod?)>
+<!ELEMENT CCAcctStmtInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, CardAcctId, SelRangeDt?, IncDetail?, DeliveryMethod?, CCAcctStmtRec*)?)>
+<!ELEMENT CCAcctStmtRec (SPRefId?, NextDt?, AcctBal+, ExtAcctBal*, DueDt?, MinAmtDue?, StmtSummAmt*, DelinqAging*, StartDt, EndDt, MktgInfo?, URL?, CCAcctTrnRec*)>
+<!ELEMENT CCAcctTrnInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, CardAcctId, SelRangeDt?, SelRangeCurAmt?, TrnType*, TrnSrc*, CSPRefId*, SPRefId*, DeliveryMethod?)>
+<!ELEMENT CCAcctTrnInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, CardAcctId, SelRangeDt?, SelRangeCurAmt?, TrnType*, TrnSrc*, CSPRefId*, SPRefId*, DeliveryMethod?, MktgInfo?, CCAcctTrnRec*)?)>
+<!ELEMENT CCAcctTrnRec (BankAcctTrnRec, SalesSlipRefNum, Memo?)>
+<!ELEMENT CCMotoAcct (ExpDt, Name?, (PostAddr | PostalCode)?, Phone?, Brand?)>
+<!ELEMENT CSPCustInfoReq (#PCDATA)>
+<!ELEMENT CSPRefId (#PCDATA)>
+<!ELEMENT CanWind (#PCDATA)>
+<!ELEMENT CardAcctId ((AcctId | CardMagData), AcctType, CCMotoAcct?)>
+<!ELEMENT CardAcctIdFrom ((AcctId | CardMagData), AcctType, CCMotoAcct?)>
+<!ELEMENT CardAcctIdTo ((AcctId | CardMagData), AcctType, CCMotoAcct?)>
+<!ELEMENT CardMagData (MagData1?, MagData2?, MagData3?)>
+<!ELEMENT CardType (#PCDATA)>
+<!ELEMENT CascadeDel (#PCDATA)>
+<!ELEMENT CaseSen (#PCDATA)>
+<!ELEMENT Category (#PCDATA)>
+<!ELEMENT CertCode (#PCDATA)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT Certificate (ContentType?, BinLength, BinData)>
+<!ELEMENT CharType (#PCDATA)>
+<!ELEMENT ChargeRegulation (#PCDATA)>
+<!ELEMENT ChkBkStyleId (#PCDATA)>
+<!ELEMENT ChkClrDt (#PCDATA)>
+<!ELEMENT ChkInfo (ChkNum?, OrigDt?, Name?, PostAddr?, OrgPhone?, Memo?)>
+<!ELEMENT ChkNum (#PCDATA)>
+<!ELEMENT ChkNumEnd (#PCDATA)>
+<!ELEMENT ChkNumPrefix (#PCDATA)>
+<!ELEMENT ChkNumStart (#PCDATA)>
+<!ELEMENT ChkNumSuffix (#PCDATA)>
+<!ELEMENT ChkOrdAddRq (RqUID, AsyncRqUID?, CustId?, ChkOrdInfo)>
+<!ELEMENT ChkOrdAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (ChkOrdInfo, ChkOrdRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT ChkOrdAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, ChkOrdId*, RecChkOrdId*)>
+<!ELEMENT ChkOrdAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (SelRangeDt?, Method*, ChkOrdId*, RecChkOrdId*)?, ChkOrdMsgRec*)?)>
+<!ELEMENT ChkOrdCanRq (RqUID, AsyncRqUID?, CustId?, ChkOrdId)>
+<!ELEMENT ChkOrdCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (ChkOrdId?, ChkOrdRec?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT ChkOrdDetail ((DepAcctId | CardAcctId | LoanAcctId), (ChkPrint? | ChkText*), (CustNameAddr* | PersonInfo*), DeliveryDestination?, Count?, ChkNumPrefix?, ChkNumStart?, ChkNumSuffix?, ChkBkStyleId?, DeliveryMethod?, BillingMethod?, CoverMngrm?, CoverStyleId?, ArtWorkId?, IncEndrsmntStmp?, FontId?, OvrSigText?, IncSecSigLine?, ClubAcctId?, VoucherTypeId?)>
+<!ELEMENT ChkOrdId (#PCDATA)>
+<!ELEMENT ChkOrdInfo ((DepAcctId | CardAcctId | LoanAcctId), (ChkPrint? | ChkText*), (CustNameAddr* | PersonInfo*), DeliveryDestination?, Count?, ChkNumPrefix?, ChkNumStart?, ChkNumSuffix?, ChkBkStyleId?, DeliveryMethod?, BillingMethod?, CoverMngrm?, CoverStyleId?, ArtWorkId?, IncEndrsmntStmp?, FontId?, OvrSigText?, IncSecSigLine?, ClubAcctId?, VoucherTypeId?)>
+<!ELEMENT ChkOrdInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId | LoanAcctId), ChkOrdId*, RecChkOrdId*, SelRangeDt?)>
+<!ELEMENT ChkOrdInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, ((DepAcctId | CardAcctId | LoanAcctId), ChkOrdId*, RecChkOrdId*, SelRangeDt?)?, ChkOrdRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT ChkOrdModRq (RqUID, AsyncRqUID?, CustId?, ChkOrdId, ChkOrdInfo)>
+<!ELEMENT ChkOrdModRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((ChkOrdId, ChkOrdInfo)?, ChkOrdRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT ChkOrdMsgRec (CustId*, MsgRecDt?, (ChkOrdAddRs | ChkOrdModRs | ChkOrdCanRs))>
+<!ELEMENT ChkOrdRec (ChkOrdId, ChkOrdInfo, ChkOrdStatus)>
+<!ELEMENT ChkOrdStatus (ChkOrdStatusCode, StatusDesc?, EffDt, StatusModBy?, ResolvePendingDt?)>
+<!ELEMENT ChkOrdStatusCode (#PCDATA)>
+<!ELEMENT ChkOrdSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, ChkOrdId)>
+<!ELEMENT ChkOrdSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (Token, ChkOrdId)?, NewToken, ChkOrdMsgRec*)?)>
+<!ELEMENT ChkPrint ((CustName+ | PersonName+), PostAddr, Phone?, Desc?)>
+<!ELEMENT ChkRange (ChkNumStart?, ChkNumEnd?)>
+<!ELEMENT ChkText (#PCDATA)>
+<!ELEMENT ChkURL (#PCDATA)>
+<!ELEMENT Chksum (ChksumType, ChksumValue)>
+<!--Section 7.11.1.1-->
+<!ELEMENT ChksumAddRq (RqUID, AsyncRqUID?, CustId?, SvcRqUID?, ChksumInfo)>
+<!--Section 7.11.1.2-->
+<!ELEMENT ChksumAddRs (Status?, RqUID, AsyncRqUID?, CustId?, (SvcRqUID?, ChksumInfo, ChksumRec, SPRefId?)?)>
+<!--Section 7.11.6.1-->
+<!ELEMENT ChksumAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, ChksumId*)>
+<!--Section 7.11.6.2-->
+<!ELEMENT ChksumAudRs (Status?, RqUID, AsyncRqUID?, CustId?, (RecCtrlOut?, SelRangeDt?, Method*, ChksumId?, ChksumMsgRec*))>
+<!--Section 7.11.4.1-->
+<!ELEMENT ChksumDelRq (RqUID, AsyncRqUID?, CustId?, SvcRqUID?, ChksumId)>
+<!--Section 7.11.4.2-->
+<!ELEMENT ChksumDelRs (Status?, RqUID, AsyncRqUID?, CustId?, (SvcRqUID?, ChksumId, ChksumRec?, SPRefId?)?)>
+<!ELEMENT ChksumId (#PCDATA)>
+<!ELEMENT ChksumInfo (RefInfo?, MsgType, Count, Chksum*)>
+<!ELEMENT ChksumInqRq (RqUID, AsyncRqUID?, CustId?, SvcRqUID?, ChksumId, ChksumStatusCode)>
+<!ELEMENT ChksumInqRs (Status?, RqUID, AsyncRqUID?, CustId?, (SvcRqUID?, ChksumId, ChksumStatusCode, ChksumRec?)?)>
+<!ELEMENT ChksumModRq (RqUID, AsyncRqUID?, CustId?, SvcRqUID?, ChksumId, ChksumInfo)>
+<!ELEMENT ChksumModRs (Status?, RqUID, AsyncRqUID?, CustId?, (SvcRqUID?, ChksumId, ChksumInfo, ChksumRec, SPRefId?)?)>
+<!ELEMENT ChksumMsgRec (CustId?, MsgRecDt?, (ChksumAddRs | ChksumModRs | ChksumStatusModRs | ChksumDelRs))>
+<!ELEMENT ChksumRec (ChksumId, ChksumInfo, ChksumStatus)>
+<!ELEMENT ChksumStatus (ChksumStatusCode, StatusDesc?, EffDt, StatusModBy?, Memo?)>
+<!ELEMENT ChksumStatusCode (#PCDATA)>
+<!ELEMENT ChksumStatusModRq (RqUID, AsyncRqUID?, CustId?, SvcRqUID?, ChksumId, ChksumStatus)>
+<!ELEMENT ChksumStatusModRs (Status?, RqUID, AsyncRqUID?, CustId?, (SvcRqUID?, ChksumId, ChksumStatus, CSPRefId?, SPRefId?)?)>
+<!ELEMENT ChksumSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT ChksumSyncRs (Status?, RqUID, AsyncRqUID?, CustId?, (RecCtrlOut?, Token, NewToken, ChksumMsgRec*))>
+<!ELEMENT ChksumType (#PCDATA)>
+<!ELEMENT ChksumValue (#PCDATA)>
+<!ELEMENT City (#PCDATA)>
+<!ELEMENT ClientApp (Org, Name, Version)>
+<!ELEMENT ClientChgCode (#PCDATA)>
+<!ELEMENT ClientDt (#PCDATA)>
+<!ELEMENT CloseDt (#PCDATA)>
+<!ELEMENT ClubAcctId (#PCDATA)>
+<!ELEMENT CollateralDesc (#PCDATA)>
+<!ELEMENT CompRemitStmtAddRq (RqUID, AsyncRqUID?, CustId?, EffDt, CompRemitStmtInfo, DupChkOverride?)>
+<!ELEMENT CompRemitStmtAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((EffDt, CompRemitStmtInfo, DupChkOverride?)?, CompRemitStmtRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CompRemitStmtAudRq ((RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, LockboxDepId*, DepAcctId*))>
+<!ELEMENT CompRemitStmtAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (SelRangeDt?, Method*, LockboxDepId*, DepAcctId*)?, CompRemitStmtMsgRec*)?)>
+<!ELEMENT CompRemitStmtId (#PCDATA)>
+<!ELEMENT CompRemitStmtInfo ((LockboxDepId | DepAcctId)?, CurAmt, Count?, RefInfo?, PrcDt, BatchInfo*, LockboxURL?)>
+<!ELEMENT CompRemitStmtInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, LockboxDepId*, DepAcctId*, SelRangeCurAmt?, SelRangeDt?, IncToken?, DeliveryMethod?)>
+<!ELEMENT CompRemitStmtInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (LockboxDepId*, DepAcctId*, SelRangeCurAmt?, SelRangeDt?, DeliveryMethod?)?, CompRemitStmtRec, Token?)?)>
+<!ELEMENT CompRemitStmtMsgRec (CustId?, MsgRecDt?, CompRemitStmtAddRs)>
+<!ELEMENT CompRemitStmtRec (CompRemitStmtId, CompRemitStmtInfo, CompRemitStmtStatus)>
+<!ELEMENT CompRemitStmtStatus (CompRemitStmtStatusCode, StatusDesc?, EffDt?, StatusModBy?)>
+<!ELEMENT CompRemitStmtStatusCode (#PCDATA)>
+<!ELEMENT CompRemitStmtSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (LockboxDepId | DepAcctId), Token)>
+<!ELEMENT CompRemitStmtSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, ((LockboxDepId | DepAcctId), Token)?, NewToken, CompRemitStmtMsgRec*)?)>
+<!ELEMENT CompletedPmtCount (#PCDATA)>
+<!ELEMENT CompositeContactInfo (ContactInfoType, ContactInfo)>
+<!ELEMENT CompositeCurAmt (CompositeCurAmtId?, CompositeCurAmtType, CurAmt?, Rate?, MinCurAmt?, MaxCurAmt?, SpecialHandling?, Memo?)>
+<!ELEMENT CompositeCurAmtId (#PCDATA)>
+<!ELEMENT CompositeCurAmtType (#PCDATA)>
+<!ELEMENT CompositePmtRemitInfo (PmtRemitChksum?, PmtRemitDetail*)>
+<!ELEMENT ContactInfo (ContactPref?, PrefTimeStart?, PrefTimeEnd?, PhoneNum*, EmailAddr?, URL?, PostAddr*)>
+<!ELEMENT ContactInfoType (#PCDATA)>
+<!ELEMENT ContactPref (#PCDATA)>
+<!ELEMENT ContactType (#PCDATA)>
+<!ELEMENT ContentType (#PCDATA)>
+<!ELEMENT CorrectAction (#PCDATA)>
+<!ELEMENT Count (#PCDATA)>
+<!ELEMENT CounterpartyInfo (LegalName?, RefInfo*, (DepAcctId | CardAcctId | LoanAcctId)?)>
+<!ELEMENT Country (#PCDATA)>
+<!ELEMENT CoverMngrm (#PCDATA)>
+<!ELEMENT CoverStyleId (#PCDATA)>
+<!ELEMENT CreatedDt (#PCDATA)>
+<!ELEMENT CreditAddRq (RqUID, AsyncRqUID?, CustId?, CreditInfo)>
+<!ELEMENT CreditAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CreditInfo, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CreditAuthAddRq (RqUID, AsyncRqUID?, CustId?, CreditAuthInfo)>
+<!ELEMENT CreditAuthAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CreditAuthInfo, CreditAuthRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CreditAuthAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, CreditAuthId*)>
+<!ELEMENT CreditAuthAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, CreditAuthId*, CreditAuthMsgRec*)?)>
+<!ELEMENT CreditAuthCanRq (RqUID, AsyncRqUID?, CustId?, CreditAuthId, ClientChgCode)>
+<!ELEMENT CreditAuthCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CreditAuthId, ClientChgCode, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CreditAuthId (#PCDATA)>
+<!ELEMENT CreditAuthInfo (CreditAuthType, CompositeCurAmt+, (DepAcctId | CardAcctId))>
+<!ELEMENT CreditAuthInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, CreditAuthId*, CSPRefId*, SPRefId*, (DepAcctId | CardAcctId)?, ClientChgCode*, SelRangeDt?, SelRangeCurAmt?, IncToken?)>
+<!ELEMENT CreditAuthInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, CreditAuthId*, CSPRefId*, SPRefId*, (DepAcctId | CardAcctId)?, ClientChgCode*, SelRangeDt?, SelRangeCurAmt?, CreditAuthRec*, Token?)?)>
+<!ELEMENT CreditAuthModRq (RqUID, AsyncRqUID?, CustId?, CreditAuthId, CreditAuthInfo)>
+<!ELEMENT CreditAuthModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CreditAuthId, CreditAuthInfo, CreditAuthRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CreditAuthMsgRec (CustId?, MsgRecDt?, (CreditAuthAddRs | CreditAuthModRs | CreditAuthCanRs))>
+<!ELEMENT CreditAuthRec (CreditAuthId, CreditAuthInfo, CreditAuthStatus)>
+<!ELEMENT CreditAuthStatus (CreditStatusCode, EffDt, StatusModBy?)>
+<!ELEMENT CreditAuthSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, (DepAcctId | CardAcctId))>
+<!ELEMENT CreditAuthSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId), NewToken, CreditAuthMsgRec*)?)>
+<!ELEMENT CreditAuthType (#PCDATA)>
+<!ELEMENT CreditInfo (CreditAuthType, CompositeCurAmt+, (DepAcctId | CardAcctId), CreditAuthId?, ClientChgCode?, NetworkTrnInfo?)>
+<!ELEMENT CreditStatusCode (#PCDATA)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT CryptPswd (ContentType?, BinLength, BinData)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT CryptSecret (ContentType?, BinLength, BinData)>
+<!ELEMENT CryptType (#PCDATA)>
+<!ELEMENT CurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT CurCode (#PCDATA)>
+<!ELEMENT CurConvertRule (#PCDATA)>
+<!ELEMENT CurRate (#PCDATA)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT Cursor (ContentType?, BinLength, BinData)>
+<!ELEMENT CustAcctUse (#PCDATA)>
+<!ELEMENT CustAddRq (RqUID, AsyncRqUID?, CustInfo?, (SecretList+, CryptType)?, CustId?, AuthInfo?)>
+<!ELEMENT CustAddRs ((Status?, RqUID, AsyncRqUID?), (CustInfo?, CustId?, CustRec, PswdDelivery?, SPRefId?)?)>
+<!ELEMENT CustAudRq (SPName?, RqUID, AsyncRqUID?, CustId*, SPName?, RecCtrlIn?, SelRangeDt?, Method*)>
+<!ELEMENT CustAudRs ((Status?, RqUID, AsyncRqUID?, CustId*), (SPName?, RecCtrlOut?, SelRangeDt?, Method*, CustMsgRec*)?)>
+<!--Section 5.4.2.4.1-->
+<!ELEMENT CustAuthModRq (RqUID, AsyncRqUID?, CustId?, (CustPswd | Certificate | PINBlock))>
+<!--Section 5.4.2.4.2-->
+<!ELEMENT CustAuthModRs (Status?, RqUID, AsyncRqUID?, CustId?, ExpDt?, SPRefId?)>
+<!ELEMENT CustBankPrefSupt (#PCDATA)>
+<!ELEMENT CustBankSvcPref (CustWithdrawalPref?)>
+<!ELEMENT CustContact (CustContactPref?, PrefTimeStart?, PrefTimeEnd?, DayPhone?, EvePhone?, DayFax?, EveFax?, EmailAddr?)>
+<!ELEMENT CustContactPref (#PCDATA)>
+<!ELEMENT CustDelRq (RqUID, AsyncRqUID?, CustId?, CascadeDel?)>
+<!ELEMENT CustDelRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CascadeDel?, (CustRec | DependentType+)?, SPRefId?)?)>
+<!ELEMENT CustDiscInqRq (RqUID, AsyncRqUID?, CustId?, SvcName, DiscId?, CustDiscStatusCode?, IncDisc?, DeliveryMethod?)>
+<!ELEMENT CustDiscInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcName, DiscId?, CustDiscStatusCode?, IncDisc?, DeliveryMethod?, CustDiscRec*)?)>
+<!ELEMENT CustDiscRec (CustId, DiscId, DiscInfo?, CustDiscStatus)>
+<!ELEMENT CustDiscStatus (CustDiscStatusCode, StatusDesc?, EffDt?, StatusModBy?)>
+<!ELEMENT CustDiscStatusCode (#PCDATA)>
+<!ELEMENT CustDiscStatusModRq (RqUID, AsyncRqUID?, CustId?, DiscId, CustDiscStatusCode)>
+<!ELEMENT CustDiscStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DiscId, CustDiscStatusCode, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustId (SPName, CustPermId?, CustLoginId?)>
+<!ELEMENT CustIdInqRq (RqUID, AsyncRqUID?, CustPermId?, CustLoginId?)>
+<!ELEMENT CustIdInqRs (Status?, RqUID, AsyncRqUID?, CustId?)>
+<!ELEMENT CustInfo ((CustName, PostAddr?, CustContact?, ContactInfo?, CustPref?, CustType?) | PersonInfo | OrgInfo)>
+<!ELEMENT CustInqRq (RqUID, AsyncRqUID?, CustId*, CardMagData*, DeliveryMethod?, UpDt?, IncToken?)>
+<!ELEMENT CustInqRs ((Status?, RqUID, AsyncRqUID?, CustId*), (CardMagData*, DeliveryMethod?, UpDt?, IncToken?, NewUpDt, CustRec*, Token?)?)>
+<!ELEMENT CustLangPref (#PCDATA)>
+<!ELEMENT CustLoginId (#PCDATA)>
+<!ELEMENT CustModRq (RqUID, AsyncRqUID?, CustId?, CustInfo)>
+<!ELEMENT CustModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustInfo, CustRec, SPRefId?)?)>
+<!ELEMENT CustMsgRec (CustId?, MsgRecDt?, (CustAddRs | CustModRs | CustStatusModRs | CustDelRs))>
+<!ELEMENT CustName (LastName+, FirstName+, MiddleName*, TitlePrefix?, NameSuffix?, Nickname?, LegalName?)>
+<!ELEMENT CustNameAddr (NameAddrType, (FullName+ | CustName | PersonName), PostAddr, (CustContact? | ContactInfo?))>
+<!ELEMENT CustNameReqd (#PCDATA)>
+<!ELEMENT CustPayeeAddRq (RqUID, AsyncRqUID?, CustId?, CustPayeeInfo)>
+<!ELEMENT CustPayeeAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustPayeeInfo, CustPayeeRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustPayeeAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, CustPayeeId*)>
+<!ELEMENT CustPayeeAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, CustPayeeId*, CustPayeeMsgRec*)?)>
+<!ELEMENT CustPayeeDelRq (RqUID, AsyncRqUID?, CustId?, CustPayeeId, CascadeDel?)>
+<!ELEMENT CustPayeeDelRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustPayeeId, CascadeDel?, (CustPayeeRec | DependentType+)?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustPayeeId (#PCDATA)>
+<!ELEMENT CustPayeeInfo (Name?, Nickname?, (StdPayeeId | FSPayee | XferPayee | BillerPayee), BillingAcct?, AcctPayAcctId?, DfltPmtInfo?)>
+<!ELEMENT CustPayeeInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, DeliveryMethod?, CustPayeeId*, PayeeType*, Name*, Nickname*, IncToken?)>
+<!ELEMENT CustPayeeInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, DeliveryMethod?, CustPayeeId*, PayeeType*, Name*, Nickname*, IncToken?, CustPayeeRec*, Token?)?)>
+<!ELEMENT CustPayeeModRq (RqUID, AsyncRqUID?, CustId?, CustPayeeId, CustPayeeInfo, ModPending?)>
+<!ELEMENT CustPayeeModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustPayeeId, CustPayeeInfo, ModPending?, CustPayeeRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustPayeeMsgRec (CustId?, MsgRecDt?, (CustPayeeAddRs | CustPayeeModRs | CustPayeeTypeModRs | CustPayeeDelRs))>
+<!ELEMENT CustPayeeRec (CustPayeeId, CustPayeeInfo, BillerContact?, DaysToPay)>
+<!ELEMENT CustPayeeSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT CustPayeeSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, CustPayeeMsgRec*)?)>
+<!ELEMENT CustPayeeTypeModRq (RqUID, AsyncRqUID?, CustId?, CustPayeeId, PayeeType)>
+<!ELEMENT CustPayeeTypeModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustPayeeId, PayeeType, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustPermId (#PCDATA)>
+<!--Section 3.2.1.5-->
+<!ELEMENT CustPref (Language?, MktgInfo?, CustBankSvcPref?)>
+<!ELEMENT CustPswd (CryptType, (Pswd | CryptPswd))>
+<!ELEMENT CustPswdModRq (RqUID, AsyncRqUID?, CustId?, CustPswd)>
+<!ELEMENT CustPswdModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (ExpDt?, SPRefId?)?)>
+<!ELEMENT CustRec (CustId, CustInfo?, CustStatus, UpDt?)>
+<!ELEMENT CustStatus (CustStatusCode, StatusDesc?, EffDt?, StatusModBy?, ResolvePendingDt?)>
+<!ELEMENT CustStatusCode (#PCDATA)>
+<!ELEMENT CustStatusModRq (RqUID, AsyncRqUID?, CustId?, CustStatus)>
+<!ELEMENT CustStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustStatus, CustRec)?)>
+<!ELEMENT CustSvcAddRq (RqUID, AsyncRqUID?, CustId?, CustSvcId, CustSvcInfo)>
+<!ELEMENT CustSvcAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustSvcId, CustSvcInfo, CustSvcRec, DiscRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustSvcAudRq (RqUID, AsyncRqUID?, CustId*, RecCtrlIn?, SelRangeDt?, Method*, SvcName*, SPName*)>
+<!ELEMENT CustSvcAudRs ((Status?, RqUID, AsyncRqUID?, CustId*), (RecCtrlOut?, SelRangeDt?, Method*, SvcName*, SPName*, CustSvcMsgRec*)?)>
+<!ELEMENT CustSvcDelRq (RqUID, AsyncRqUID?, CustId?, CustSvcId, CascadeDel?)>
+<!ELEMENT CustSvcDelRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustSvcId, CascadeDel?, (CustSvcRec | DependentType+)?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustSvcId (SvcName, SPName)>
+<!ELEMENT CustSvcInfo ((DepAcctId | CardAcctId)?)>
+<!ELEMENT CustSvcModRq (RqUID, AsyncRqUID?, CustId?, CustSvcId, CustSvcInfo)>
+<!ELEMENT CustSvcModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustSvcId, CustSvcInfo, CustSvcRec, DiscRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustSvcMsgRec (CustId?, MsgRecDt?, (CustSvcAddRs | CustSvcModRs | CustSvcStatusModRs | CustSvcDelRs))>
+<!ELEMENT CustSvcRec (CustSvcId, CustSvcInfo, CustSvcStatus)>
+<!ELEMENT CustSvcStatus (CustSvcStatusCode, StatusDesc?, EffDt?, StatusModBy?, ResolvePendingDt?)>
+<!ELEMENT CustSvcStatusCode (#PCDATA)>
+<!ELEMENT CustSvcStatusModRq (RqUID, AsyncRqUID?, CustId?, CustSvcId, CustSvcStatus)>
+<!ELEMENT CustSvcStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CustSvcId, CustSvcStatus, CustSvcRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT CustSvcSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT CustSvcSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, CustSvcMsgRec*)?)>
+<!ELEMENT CustSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT CustSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, CustMsgRec*)?)>
+<!ELEMENT CustType (#PCDATA)>
+<!ELEMENT CustWithdrawalPref (CurAmt, DepAcctId?)>
+<!ELEMENT CutoffTm (#PCDATA)>
+<!ELEMENT DayFax (#PCDATA)>
+<!ELEMENT DayPhone (#PCDATA)>
+<!ELEMENT DaysCall (#PCDATA)>
+<!ELEMENT DaysToEPost (#PCDATA)>
+<!ELEMENT DaysToPay (#PCDATA)>
+<!ELEMENT DaysWith (#PCDATA)>
+<!ELEMENT DebitAddRq (RqUID, AsyncRqUID?, CustId?, DebitInfo)>
+<!ELEMENT DebitAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DebitInfo, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DebitAuthAddRq (RqUID, AsyncRqUID?, CustId?, DebitAuthInfo)>
+<!ELEMENT DebitAuthAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DebitAuthInfo, DebitAuthRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DebitAuthAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, DebitAuthId*)>
+<!ELEMENT DebitAuthAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, DebitAuthId*, DebitAuthMsgRec*)?)>
+<!ELEMENT DebitAuthCanRq (RqUID, AsyncRqUID?, CustId?, DebitAuthId, ClientChgCode)>
+<!ELEMENT DebitAuthCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DebitAuthId, ClientChgCode, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DebitAuthId (#PCDATA)>
+<!ELEMENT DebitAuthInfo (DebitAuthType, CompositeCurAmt+, (DepAcctId | CardAcctId))>
+<!ELEMENT DebitAuthInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, DebitAuthId*, CSPRefId*, SPRefId*, (DepAcctId | CardAcctId)?, ClientChgCode*, SelRangeDt?, SelRangeCurAmt?, IncToken?)>
+<!ELEMENT DebitAuthInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, DebitAuthId*, CSPRefId*, SPRefId*, (DepAcctId | CardAcctId)?, ClientChgCode*, SelRangeDt?, SelRangeCurAmt?, DebitAuthRec*, Token?)?)>
+<!ELEMENT DebitAuthModRq (RqUID, AsyncRqUID?, CustId?, DebitAuthId, DebitAuthInfo)>
+<!ELEMENT DebitAuthModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DebitAuthId, DebitAuthInfo, DebitAuthRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DebitAuthMsgRec (CustId?, MsgRecDt?, (DebitAuthAddRs | DebitAuthModRs | DebitAuthCanRs))>
+<!ELEMENT DebitAuthRec (DebitAuthId, DebitAuthInfo, DebitAuthStatus)>
+<!ELEMENT DebitAuthStatus (DebitStatusCode, EffDt, StatusModBy?)>
+<!ELEMENT DebitAuthSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, (DepAcctId | CardAcctId))>
+<!ELEMENT DebitAuthSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId), NewToken, DebitAuthMsgRec*)?)>
+<!ELEMENT DebitAuthType (#PCDATA)>
+<!ELEMENT DebitInfo (DebitAuthType, CompositeCurAmt+, (DepAcctId | CardAcctId), DebitAuthId?, ClientChgCode?, NetworkTrnInfo?)>
+<!ELEMENT DebitStatusCode (#PCDATA)>
+<!ELEMENT DelinqAging (Aging, CurAmt)>
+<!ELEMENT DeliveryDestination (#PCDATA)>
+<!ELEMENT DeliveryInstruction (#PCDATA)>
+<!ELEMENT DeliveryMedia (#PCDATA)>
+<!ELEMENT DeliveryMethod (#PCDATA)>
+<!ELEMENT DepAcctId (AcctId, AcctType, AcctKey?, AcctCur?, BankInfo)>
+<!ELEMENT DepAcctIdFrom (AcctId, AcctType, AcctKey?, AcctCur?, BankInfo)>
+<!ELEMENT DepAcctIdTo (AcctId, AcctType, AcctKey?, AcctCur?, BankInfo)>
+<!ELEMENT DepAcctRec (StopCount?, HoldCount?, LastDepDt?, LastDepCurAmt?, DepMatureDt?)>
+<!ELEMENT DepAcctStmtId (#PCDATA)>
+<!ELEMENT DepAcctStmtInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId), SelRangeDt?, IncDetail?, DeliveryMethod?)>
+<!ELEMENT DepAcctStmtInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId), SelRangeDt?, IncDetail?, DeliveryMethod?, Fee*, DepAcctStmtRec*)?)>
+<!ELEMENT DepAcctStmtRec (SPRefId?, DepAcctId?, DepAcctStmtId?, EffDt?, NextDt?, AcctBal+, StmtSummAmt*, StartDt, EndDt, MktgInfo?, URL?, DepAcctTrnRec*)>
+<!ELEMENT DepAcctTrnInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId), SelRangeDt?, SelRangeCurAmt?, ChkRange?, TrnType*, TrnSrc*, CSPRefId*, SPRefId*, DeliveryMethod?)>
+<!ELEMENT DepAcctTrnInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId), SelRangeDt?, SelRangeCurAmt?, ChkRange?, TrnType*, TrnSrc*, CSPRefId*, SPRefId*, DeliveryMethod?, MktgInfo?, Fee*, DepAcctTrnRec*)?)>
+<!ELEMENT DepAcctTrnRec (BankAcctTrnRec, AvailDt?, CompositeCurAmt*, ChkNum?, XferId?, PmtId?, (DepAcctIdTo | CardAcctIdTo | LoanAcctIdTo)?, (NetworkTrnInfo | ATMTrnInfo)?, USA.ACHTrnInfo?)>
+<!ELEMENT DepAppAcctId (AcctId?, AcctType, AcctKey, AcctCur, BankInfo)>
+<!ELEMENT DepAppAddRq (RqUID, AsyncRqUID?, CustId?, DepAppInfo)>
+<!ELEMENT DepAppAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAppInfo)?, DepAppRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DepAppAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, DepAppId*)>
+<!ELEMENT DepAppAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (SelRangeDt?, Method*, DepAppId*)?, DepAppMsgRec*)?)>
+<!ELEMENT DepAppCanRq (RqUID, AsyncRqUID?, CustId?, DepAppId)>
+<!ELEMENT DepAppCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAppId)?, DepAppRec?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DepAppId (#PCDATA)>
+<!ELEMENT DepAppInfo (DepApplicant+, DepAppAcctId, BankAcctInfo, CardType?, OverdraftFunding*, CreatedDt?)>
+<!ELEMENT DepAppInqRq (RqUID, AsyncRqUID?, CustId?, DepAppId+, IncToken?)>
+<!ELEMENT DepAppInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAppId+)?, DepAppRec*, CSPRefId?, SPRefId?, Token?)?)>
+<!ELEMENT DepAppModRq (RqUID, AsyncRqUID?, CustId?, DepAppId, DepAppInfo)>
+<!ELEMENT DepAppModRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAppId, DepAppInfo)?, DepAppRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DepAppMsgRec (CustId?, MsgRecDt?, (DepAppAddRs | DepAppModRs | DepAppCanRs))>
+<!ELEMENT DepAppRec (DepAppId, DepAppInfo, DepAppStatus?)>
+<!ELEMENT DepAppStatus (DepAppStatusCode, StatusDesc?, EffDt, StatusModBy?)>
+<!ELEMENT DepAppStatusCode (#PCDATA)>
+<!ELEMENT DepAppSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT DepAppSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, NewToken, DepAppMsgRec*)?)>
+<!ELEMENT DepApplicant (CustId?, CustInfo?, DepApplicantAcctRel*)>
+<!ELEMENT DepApplicantAcctRel (#PCDATA)>
+<!ELEMENT DepBkOrdAddRq (RqUID, AsyncRqUID?, CustId?, DepBkOrdInfo)>
+<!ELEMENT DepBkOrdAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DepBkOrdInfo, DepBkOrdRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT DepBkOrdId (#PCDATA)>
+<!ELEMENT DepBkOrdInfo (DepAcctId, Count?, DepBkStyleId?, DeliveryMethod?)>
+<!ELEMENT DepBkOrdRec (DepBkOrdId, DepBkOrdInfo, DepBkOrdStatus)>
+<!ELEMENT DepBkOrdStatus (DepBkOrdStatusCode, StatusDesc?, EffDt, StatusModBy?)>
+<!ELEMENT DepBkOrdStatusCode (#PCDATA)>
+<!ELEMENT DepBkStyleId (#PCDATA)>
+<!ELEMENT DepMatureDt (#PCDATA)>
+<!ELEMENT DependentType (#PCDATA)>
+<!ELEMENT Dependents (#PCDATA)>
+<!ELEMENT Desc (#PCDATA)>
+<!ELEMENT DfltDaysToPay (#PCDATA)>
+<!ELEMENT DfltPmtInfo ((DepAcctIdFrom? | CardAcctIdFrom?), Category?, Memo?)>
+<!ELEMENT DfltXferDaysToPay (#PCDATA)>
+<!ELEMENT DiscDt (#PCDATA)>
+<!ELEMENT DiscId (#PCDATA)>
+<!ELEMENT DiscInfo ((LongText | DiscURL), AcceptReqd?)>
+<!ELEMENT DiscInqRq (RqUID, AsyncRqUID?, CustId?, SvcName*, DiscId*, DeliveryMethod?, UpDt?)>
+<!ELEMENT DiscInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcName*, DiscId*, DeliveryMethod?, UpDt?, NewUpDt, DiscRec*)?)>
+<!ELEMENT DiscRec (DiscId, DiscInfo)>
+<!ELEMENT DiscReqd (#PCDATA)>
+<!ELEMENT DiscURL (#PCDATA)>
+<!ELEMENT Discount ((Rate | CurAmt), EffDt?, Desc?)>
+<!ELEMENT DomXferFeeCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT DriversLicense (LicenseNum, StateProv?, Country?)>
+<!ELEMENT DueDt (#PCDATA)>
+<!ELEMENT DupChkOverride (#PCDATA)>
+<!ELEMENT EU.Cur (#PCDATA)>
+<!ELEMENT EffDt (#PCDATA)>
+<!ELEMENT EmailAddr (#PCDATA)>
+<!ELEMENT EmploymentHistory (EmploymentStatus?, OrgInfo?, Occupation, Income?, JobTitle?, StartDt?, EndDt?)>
+<!ELEMENT EmploymentStatus (#PCDATA)>
+<!ELEMENT EndDt (#PCDATA)>
+<!ELEMENT EnrollDesc (#PCDATA)>
+<!ELEMENT EnrollProf (WebEnrollURL?, EnrollDesc?, CryptType?, SecretPrompt*, CustNameReqd?, PostAddrReqd?)>
+<!ELEMENT EstablishDt (#PCDATA)>
+<!ELEMENT EveFax (#PCDATA)>
+<!ELEMENT EvePhone (#PCDATA)>
+<!ELEMENT ExpDt (#PCDATA)>
+<!ELEMENT ExtAcctBal (ExtBalType, CurAmt, EffDt, ExpDt?, Desc?)>
+<!ELEMENT ExtBalType (#PCDATA)>
+<!ELEMENT FICreditTrcNum (#PCDATA)>
+<!ELEMENT FIDebitTrcNum (#PCDATA)>
+<!ELEMENT FSPayee (PostAddr, (OrgContact | ContactInfo), LegalName?, OrgId*)>
+<!ELEMENT Fax (#PCDATA)>
+<!ELEMENT Fee (FeeType, CurAmt?, Rate?, MinCurAmt?, MaxCurAmt?)>
+<!ELEMENT FeeChargeAlloc (ChargeRegulation, Fee, DepAcctId?)>
+<!ELEMENT FeeType (#PCDATA)>
+<!ELEMENT FinalCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT FinalDueDt (#PCDATA)>
+<!ELEMENT FinalPrcDt (#PCDATA)>
+<!ELEMENT FirstName (#PCDATA)>
+<!ELEMENT FontId (#PCDATA)>
+<!ELEMENT ForExRateId (#PCDATA)>
+<!ELEMENT ForExRateInfo (CurAmt?, CurRate, CurConvertRule, Fee*, ExpDt?, CSPRefId?, SPRefId?)>
+<!ELEMENT ForExRateInqRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId), CurAmt, CurCode, ForExRateType?, DeliveryMethod?)>
+<!ELEMENT ForExRateInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId), CurAmt, CurCode, ForExRateType?, DeliveryMethod?, ForExRateRec)?)>
+<!ELEMENT ForExRateRec (ForExRateId?, ForExRateInfo)>
+<!ELEMENT ForExRateType (#PCDATA)>
+<!ELEMENT Freq (#PCDATA)>
+<!ELEMENT FullName (#PCDATA)>
+<!ELEMENT FundingPriority (#PCDATA)>
+<!ELEMENT GenSessKey (#PCDATA)>
+<!ELEMENT Gender (#PCDATA)>
+<!ELEMENT HighCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT HistRetentionDays (#PCDATA)>
+<!ELEMENT HolDt (#PCDATA)>
+<!ELEMENT HolInfo (Name, HolDt)>
+<!ELEMENT HolInqRq (RqUID, AsyncRqUID?, SPName?, SvcName?, DeliveryMethod?)>
+<!ELEMENT HolInqRs (Status?, RqUID, AsyncRqUID?, SPName?, SvcName?, DeliveryMethod?, HolInfo*)>
+<!ELEMENT HoldCoId (#PCDATA)>
+<!ELEMENT HoldCount (#PCDATA)>
+<!ELEMENT IFX ((SignonRq, ((BaseSvcRq | BankSvcRq | PaySvcRq | PresSvcRq | MediaSvcRq))*, SignoffRq?) | ((Status?, SignonRs?, ((BaseSvcRs | BankSvcRs | PaySvcRs | PresSvcRs | MediaSvcRs))*, SignoffRs?)))>
+<!ELEMENT ImageURL (#PCDATA)>
+<!ELEMENT ImmediatePmt (#PCDATA)>
+<!ELEMENT ImmediateXfer (#PCDATA)>
+<!ELEMENT ImportDt (#PCDATA)>
+<!ELEMENT IncAllItems (#PCDATA)>
+<!ELEMENT IncBal (#PCDATA)>
+<!ELEMENT IncBillerContact (#PCDATA)>
+<!ELEMENT IncCounts (#PCDATA)>
+<!ELEMENT IncDetail (#PCDATA)>
+<!ELEMENT IncDisc (#PCDATA)>
+<!ELEMENT IncEndrsmntStmp (#PCDATA)>
+<!ELEMENT IncExtBal (#PCDATA)>
+<!ELEMENT IncHistory (#PCDATA)>
+<!ELEMENT IncImages (#PCDATA)>
+<!ELEMENT IncSecSigLine (#PCDATA)>
+<!ELEMENT IncSummary (#PCDATA)>
+<!ELEMENT IncToken (#PCDATA)>
+<!ELEMENT Income (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT IndustId (Org, IndustNum)>
+<!ELEMENT IndustNum (#PCDATA)>
+<!ELEMENT InitialCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT InitialDeposit (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT InsPaidCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT InsPaidDt (#PCDATA)>
+<!ELEMENT IntAPY (#PCDATA)>
+<!ELEMENT IntRateInfo (Rate, Desc?, IntAPY?, Term?, LowCurAmt?, HighCurAmt?)>
+<!ELEMENT IntRateInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, AcctType, AcctTaxStatus?, CurAmt?, Term?, DeliveryMethod?)>
+<!ELEMENT IntRateInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, AcctType, AcctTaxStatus?, CurAmt?, Term?, DeliveryMethod?, IntRateInfo*)?)>
+<!ELEMENT InterXferProf (XferProf?, DomXferFeeCurAmt?, IntlXferFeeCurAmt?, USA.ACHProf?)>
+<!ELEMENT IntermediaryDepAcct (SeqNum, DepAcctId)>
+<!ELEMENT IntlXferFeeCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT InvoiceAdj (InvoiceAdjNum?, AdjType?, CurAmt, EffDt?, Desc?)>
+<!ELEMENT InvoiceAdjNum (#PCDATA)>
+<!ELEMENT InvoiceInfo (InvoiceType?, InvoiceNum, RefInfo*, TotalCurAmt, PaidCurAmt?, EffDt, Desc?, InvoiceVouchNum?, Fee*, InvoicePremium?, Discount?, TaxInfo?, InvoiceAdj?, InvoiceLineItem*)>
+<!ELEMENT InvoiceLineItem (InvoiceLineItemNum, AdjType?, CurAmt, Desc?)>
+<!ELEMENT InvoiceLineItemNum (#PCDATA)>
+<!ELEMENT InvoiceNum (#PCDATA)>
+<!ELEMENT InvoicePremium (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT InvoiceReceiver (OrgId, OrgInfo?, PostAddr?)>
+<!ELEMENT InvoiceSender (OrgId, OrgInfo?, PostAddr?, AcctPayAcct?)>
+<!ELEMENT InvoiceType (#PCDATA)>
+<!ELEMENT InvoiceVouchNum (#PCDATA)>
+<!ELEMENT JobTitle (#PCDATA)>
+<!ELEMENT LOCAcctRec (LOCLimit?, MinPmtCurAmt?, ExpDt?, LoanInfoCommon?)>
+<!ELEMENT LOCLimit (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT Language (#PCDATA)>
+<!ELEMENT LastDepCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT LastDepDt (#PCDATA)>
+<!ELEMENT LastName (#PCDATA)>
+<!ELEMENT LastPmtCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT LastPmtDt (#PCDATA)>
+<!ELEMENT LastStmtDt (#PCDATA)>
+<!ELEMENT LastTrnDt (#PCDATA)>
+<!ELEMENT LastYrInsPaidCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT LastYrInsPaidDt (#PCDATA)>
+<!ELEMENT LastYrTaxPaidCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT LastYrTaxPaidDt (#PCDATA)>
+<!ELEMENT LegalName (#PCDATA)>
+<!ELEMENT LegalRptCode (#PCDATA)>
+<!ELEMENT LicenseNum (#PCDATA)>
+<!ELEMENT LoanAcctId (AcctId, AcctType, BankInfo)>
+<!ELEMENT LoanAcctIdFrom (AcctId, AcctType, BankInfo)>
+<!ELEMENT LoanAcctIdTo (AcctId, AcctType, BankInfo)>
+<!ELEMENT LoanAcctRec (Term?, MatDt?, LoanInfoCommon?)>
+<!ELEMENT LoanInfoCommon (OrigDt?, Freq?, RemainingPmtCount?, PurposeDesc?, CollateralDesc?, CompletedPmtCount?, RegPmtCurAmt?, DueDt?, NextPmtCurAmt?, LastPmtDt?, LastPmtCurAmt?, PastDuePmtCount?, PrepayPenalty?)>
+<!ELEMENT LockboxAcctId (#PCDATA)>
+<!ELEMENT LockboxDepId (LockboxAcctId, DepAcctId?)>
+<!ELEMENT LockboxURL (#PCDATA)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT Logo (ContentType?, BinLength, BinData)>
+<!ELEMENT LogoURL (#PCDATA)>
+<!ELEMENT LongText (#PCDATA)>
+<!ELEMENT LowCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT MagData1 (#PCDATA)>
+<!ELEMENT MagData2 (#PCDATA)>
+<!ELEMENT MagData3 (#PCDATA)>
+<!ELEMENT MaritalStatus (#PCDATA)>
+<!ELEMENT MatDt (#PCDATA)>
+<!ELEMENT MatchedRec (#PCDATA)>
+<!ELEMENT Max (#PCDATA)>
+<!ELEMENT MaxCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT MaxRec (#PCDATA)>
+<!ELEMENT MediaAcctAdjAddRq (RqUID, AsyncRqUID?, CustId?, MediaAcctAdjInfo)>
+<!ELEMENT MediaAcctAdjAddRs (Status?, RqUID, AsyncRqUID?, CustId?, (MediaAcctAdjInfo, MediaAcctAdjRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT MediaAcctAdjAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, MediaAcctAdjId*)>
+<!ELEMENT MediaAcctAdjAudRs (Status?, RqUID, AsyncRqUID?, CustId?, (RecCtrlOut?, SelRangeDt?, Method*, MediaAcctAdjId?, MediaAcctAdjMsgRec*)?)>
+<!ELEMENT MediaAcctAdjId (#PCDATA)>
+<!ELEMENT MediaAcctAdjInfo (MediaAcctId, MediaTrnType?, CurAmt?, TrnAuthId?, MediaItem+)>
+<!ELEMENT MediaAcctAdjInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, MediaAcctAdjId*, CSPRefId*, SPRefId*, MediaAcctId?, SelRangeDt?, SelRangeCurAmt?)>
+<!ELEMENT MediaAcctAdjInqRs (Status?, RqUID, AsyncRqUID?, CustId?, (RecCtrlOut?, MediaAcctAdjId?, CSPRefId*, SPRefId*, MediaAcctId?, SelRangeDt?, SelRangeCurAmt?, MediaAcctAdjRec*)?)>
+<!ELEMENT MediaAcctAdjMsgRec (CustId?, MsgRecDt?, MediaAcctAdjAddRs)>
+<!ELEMENT MediaAcctAdjRec (MediaAcctAdjId, MediaAcctAdjInfo)>
+<!ELEMENT MediaAcctAdjSyncRq (RqUID, AsyncRqUID?, CustId, RecCtrlIn?, Token, MediaAcctId)>
+<!ELEMENT MediaAcctAdjSyncRs (Status?, RqUID, AsyncRqUID?, CustId, (RecCtrlOut?, Token, MediaAcctId, NewToken, MediaAcctAdjMsgRec*)?)>
+<!ELEMENT MediaAcctId (#PCDATA)>
+<!ELEMENT MediaAcctInventoryInqRq (RqUID, AsyncRqUID?, CustId?, MediaAcctId)>
+<!ELEMENT MediaAcctInventoryInqRs (Status?, RqUID, AsyncRqUID?, CustId?, (MediaAcctId, CurAmt?, MediaItem+)?)>
+<!ELEMENT MediaContainerId (#PCDATA)>
+<!ELEMENT MediaItem (MediaContainerId?, MediaType, MediaSubType?, Count?, CurAmt?, TotalCurAmt?)>
+<!ELEMENT MediaSubType (#PCDATA)>
+<!ELEMENT MediaSvcProfInfo (SvcCore, MsgSupt+, OptSupt*)>
+<!ELEMENT MediaSvcRq (RqUID, AsyncRqUID?, SPName?, (MediaAcctAdjAddRq?, MediaAcctAdjInqRq?, MediaAcctAdjAudRq?, MediaAcctAdjSyncRq?, MediaAcctInventoryInqRq?, IncToken?)+)>
+<!ELEMENT MediaSvcRs (Status?, RqUID, AsyncRqUID?, SPName?, (MediaAcctAdjAddRs?, MediaAcctAdjInqRs?, MediaAcctAdjAudRs?, MediaAcctAdjSyncRs?, MediaAcctInventoryInqRs?)+)>
+<!ELEMENT MediaTrnType (#PCDATA)>
+<!ELEMENT MediaType (#PCDATA)>
+<!ELEMENT Memo (#PCDATA)>
+<!ELEMENT Method (#PCDATA)>
+<!ELEMENT MiddleName (#PCDATA)>
+<!ELEMENT Min (#PCDATA)>
+<!ELEMENT MinAmtDue (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT MinCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT MinPmtCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT MktgInfo (#PCDATA)>
+<!ELEMENT ModPending (#PCDATA)>
+<!ELEMENT ModPendingType (#PCDATA)>
+<!ELEMENT ModPswdFirst (#PCDATA)>
+<!ELEMENT MortAcctRec (OrigDt?, LoanInfoCommon?, LastPmtDt?, TaxPaidDt?, TaxPaidCurAmt?, LastYrTaxPaidDt?, LastYrTaxPaidCurAmt?, InsPaidDt?, InsPaidCurAmt?, LastYrInsPaidDt?, LastYrInsPaidCurAmt?)>
+<!ELEMENT MotherMaidenName (#PCDATA)>
+<!ELEMENT MsgRecDt (#PCDATA)>
+<!ELEMENT MsgSupt (#PCDATA)>
+<!ELEMENT MsgType (#PCDATA)>
+<!ELEMENT Name (#PCDATA)>
+<!ELEMENT NameAddrType (#PCDATA)>
+<!ELEMENT NameSuffix (#PCDATA)>
+<!ELEMENT NetworkOwner (#PCDATA)>
+<!ELEMENT NetworkRefId (#PCDATA)>
+<!ELEMENT NetworkTrnInfo (NetworkOwner, OriginatorName?, TerminalId?, (PostAddr | Desc | Name)?, BankIdType?, BankId?, NetworkRefId?)>
+<!ELEMENT NewToken (#PCDATA)>
+<!ELEMENT NewUpDt (#PCDATA)>
+<!ELEMENT NextDt (#PCDATA)>
+<!ELEMENT NextPmtCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT Nickname (#PCDATA)>
+<!ELEMENT NotifyReqd (#PCDATA)>
+<!ELEMENT NotifyWilling (#PCDATA)>
+<!ELEMENT NumEmployees (#PCDATA)>
+<!ELEMENT NumInsts (#PCDATA)>
+<!ELEMENT OEDCode (#PCDATA)>
+<!ELEMENT OEDInstitution (#PCDATA)>
+<!ELEMENT Occupation (#PCDATA)>
+<!ELEMENT OpenDt (#PCDATA)>
+<!ELEMENT OptSupt (#PCDATA)>
+<!ELEMENT Org (#PCDATA)>
+<!ELEMENT OrgContact (ContactType, Desc?, Phone?, Fax?, EmailAddr?, URL?)>
+<!ELEMENT OrgId (OrgIdType, OrgIdNum)>
+<!ELEMENT OrgIdNum (#PCDATA)>
+<!ELEMENT OrgIdType (#PCDATA)>
+<!ELEMENT OrgInfo (IndustId?, Name?, LegalName?, CompositeContactInfo*, TINInfo?, EstablishDt?, NumEmployees?)>
+<!ELEMENT OrgPhone (#PCDATA)>
+<!ELEMENT OrgRec (OrgId*, OrgInfo)>
+<!ELEMENT OrigCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT OrigDt (#PCDATA)>
+<!ELEMENT OrigPmtDueDt (#PCDATA)>
+<!ELEMENT OrigPmtPrcDt (#PCDATA)>
+<!ELEMENT OriginatorName (#PCDATA)>
+<!ELEMENT OverdraftFunding ((DepAcctId | LoanAcctId), FundingPriority)>
+<!ELEMENT OverrideType (#PCDATA)>
+<!ELEMENT OvrSigText (#PCDATA)>
+<!ELEMENT Ownership (#PCDATA)>
+<!ELEMENT PINBlock (#PCDATA)>
+<!ELEMENT PaidCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT PassportCountry (#PCDATA)>
+<!ELEMENT PassportNumber (#PCDATA)>
+<!ELEMENT PastDuePmtCount (#PCDATA)>
+<!ELEMENT PaySupt (MinCurAmt?, MaxCurAmt?)>
+<!ELEMENT PaySvcProfInfo (SvcCore, MsgSupt+, OptSupt*, PrcSched?, PmtModel, DfltDaysToPay, DfltXferDaysToPay, DaysWith, HistRetentionDays, DeliveryMethod*, ModPendingType, RecPmtProf?)>
+<!ELEMENT PaySvcRq (RqUID, AsyncRqUID?, SPName?, (StdPayeeInqRq?, CustPayeeAddRq?, CustPayeeModRq?, CustPayeeTypeModRq?, CustPayeeDelRq?, CustPayeeInqRq?, CustPayeeAudRq?, CustPayeeSyncRq?, PmtAddRq?, PmtModRq?, PmtStatusModRq?, PmtCanRq?, PmtInqRq?, PmtAudRq?, PmtSyncRq?, PmtAuthAddRq?, PmtAuthModRq?, PmtAuthCanRq?, PmtAuthInqRq?, PmtAuthAudRq?, PmtAuthSyncRq?, RemitAddRq?, RemitModRq?, RemitStatusModRq?, RemitDelRq?, RemitInqRq?, RemitAudRq?, RemitSyncRq?, RecPmtAddRq?, RecPmtModRq?, RecPmtCanRq?, RecPmtInqRq?, RecPmtAudRq?, RecPmtSyncRq?, PmtAckInqRq?, ChksumAddRq?, ChksumModRq?, ChksumStatusModRq?, ChksumDelRq?, ChksumInqRq?, ChksumAudRq?, ChksumSyncRq?, CompRemitStmtAddRq?, CompRemitStmtInqRq?, CompRemitStmtAudRq?, CompRemitStmtSyncRq?)+)>
+<!ELEMENT PaySvcRs (Status?, RqUID, AsyncRqUID?, SPName?, (StdPayeeInqRs?, CustPayeeAddRs?, CustPayeeModRs?, CustPayeeTypeModRs?, CustPayeeDelRs?, CustPayeeInqRs?, CustPayeeAudRs?, CustPayeeSyncRs?, PmtAddRs?, PmtModRs?, PmtStatusModRs?, PmtCanRs?, PmtInqRs?, PmtAudRs?, PmtSyncRs?, PmtAuthAddRs?, PmtAuthModRs?, PmtAuthCanRs?, PmtAuthInqRs?, PmtAuthAudRs?, PmtAuthSyncRs?, RemitAddRs?, RemitModRs?, RemitStatusModRs?, RemitDelRs?, RemitInqRs?, RemitAudRs?, RemitSyncRs?, RecPmtAddRs?, RecPmtModRs?, RecPmtCanRs?, RecPmtInqRs?, RecPmtAudRs?, RecPmtSyncRs?, PmtAckInqRs?, ChksumAddRs?, ChksumModRs?, ChksumStatusModRs?, ChksumDelRs?, ChksumInqRs?, ChksumAudRs?, ChksumSyncRs?, CompRemitStmtAddRs?, CompRemitStmtInqRs?, CompRemitStmtAudRs?, CompRemitStmtSyncRs?)+)>
+<!ELEMENT PayeeCountry (#PCDATA)>
+<!ELEMENT PayeeType (#PCDATA)>
+<!ELEMENT PayerInfo ((PersonInfo | (OrgInfo, OrgId)))>
+<!ELEMENT PersonInfo (NameAddrType, (FullName | PersonName), ContactInfo?, TINInfo?, BirthDt?, DriversLicense?, MotherMaidenName?, SpouseName?, EmploymentHistory*, Gender?, MaritalStatus?, USA.MilitaryRank?, Dependents?, PassportNumber?, PassportCountry?, OEDCode?, OEDInstitution?)>
+<!ELEMENT PersonName (LastName+, FirstName, MiddleName*, TitlePrefix?, NameSuffix?, Nickname?, LegalName?)>
+<!ELEMENT Phone (#PCDATA)>
+<!ELEMENT PhoneNum (PhoneType, Phone)>
+<!ELEMENT PhoneType (#PCDATA)>
+<!ELEMENT PmtAckInfo (PmtStatusCode, Count, CurAmt, Memo?, CompositeContactInfo?)>
+<!--Section 7.10.1.1-->
+<!ELEMENT PmtAckInqRq (RqUID, AsyncRqUID?, CustId?, SelRangeDueDt?, SvcRqUID?)>
+<!--Section 7.10.1.2-->
+<!ELEMENT PmtAckInqRs (RqUID, AsyncRqUID?, CustId?, SelRangeDueDt?, SvcRqUID?, PmtAckRec*, CSPRefId?, SPRefId?)>
+<!ELEMENT PmtAckRec (SvcRqUID?, PmtAckInfo+)>
+<!ELEMENT PmtAddRq (RqUID, AsyncRqUID?, CustId?, PmtInfo, DupChkOverride?)>
+<!ELEMENT PmtAddRs ((Status?, RqUID, AsyncRqUID, CustId?), (PmtInfo?, DupChkOverride?, PmtRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT PmtAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, PmtId*)>
+<!ELEMENT PmtAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, PmtId*, PmtMsgRec*)?)>
+<!ELEMENT PmtAuthAddRq (RqUID, AsyncRqUID?, CustId?, PmtAuthInfo)>
+<!ELEMENT PmtAuthAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtAuthInfo, PmtAuthRec)?)>
+<!ELEMENT PmtAuthAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, PmtAuthId*)>
+<!ELEMENT PmtAuthAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, PmtAuthId*, PmtAuthMsgRec*)?)>
+<!ELEMENT PmtAuthCanRq (RqUID, AsyncRqUID?, CustId?, PmtAuthId)>
+<!ELEMENT PmtAuthCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtAuthId, PmtAuthRec?)?)>
+<!ELEMENT PmtAuthCount (#PCDATA)>
+<!ELEMENT PmtAuthId (#PCDATA)>
+<!ELEMENT PmtAuthInfo ((DepAcctIdFrom | CardAcctIdFrom), CurAmt, Name?)>
+<!ELEMENT PmtAuthInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, PmtAuthId*, SelRangeCurAmt?, SelRangeDt?, DeliveryMethod?)>
+<!ELEMENT PmtAuthInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, PmtAuthId*, SelRangeCurAmt?, SelRangeDt?, DeliveryMethod?, PmtAuthRec*)?)>
+<!ELEMENT PmtAuthModRq (RqUID, AsyncRqUID?, CustId?, PmtAuthId, PmtAuthInfo)>
+<!ELEMENT PmtAuthModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtAuthId, PmtAuthInfo, PmtAuthRec)?)>
+<!ELEMENT PmtAuthMsgRec (CustId?, MsgRecDt?, (PmtAuthAddRs | PmtAuthModRs | PmtAuthCanRs))>
+<!ELEMENT PmtAuthRec (PmtAuthId, PmtAuthInfo, PmtAuthStatus)>
+<!ELEMENT PmtAuthStatus (PmtAuthStatusCode, StatusDesc?, EffDt, ExpDt?, StatusModBy?)>
+<!ELEMENT PmtAuthStatusCode (#PCDATA)>
+<!ELEMENT PmtAuthSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT PmtAuthSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, PmtAuthMsgRec*)?)>
+<!ELEMENT PmtCanRq (RqUID, AsyncRqUID?, CustId?, PmtId)>
+<!ELEMENT PmtCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtId, PmtRec?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT PmtFormat (#PCDATA)>
+<!ELEMENT PmtId (#PCDATA)>
+<!ELEMENT PmtInfo (CurAmt?, (LegalName | PayerInfo)?, RemitInfo+, (DepAcctIdFrom | CardAcctIdFrom), Category?, (PrcDt | DueDt), ImmediatePmt?, PmtRefId?)>
+<!ELEMENT PmtInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, PmtType*, PmtId*, RecPmtId*, (DepAcctIdFrom | CardAcctIdFrom)?, Category*, Memo*, ChkNum*, ChkClrDt*, FIDebitTrcNum*, FICreditTrcNum*, PmtMethod*, CustPayeeId*, BillingAcct*, Name*, StdPayeeId*, Nickname*, PmtStatusCode*, SelRangeDueDt?, SelRangePrcDt?, SelRangeCurAmt?, DeliveryMethod?, CSPRefId*, SPRefId*, IncToken?, IncHistory?)>
+<!ELEMENT PmtInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, PmtType*, PmtId*, RecPmtId*, (DepAcctIdFrom | CardAcctIdFrom)?, Category*, Memo*, ChkNum*, ChkClrDt*, FIDebitTrcNum*, FICreditTrcNum*, PmtMethod*, CustPayeeId*, BillingAcct*, Name*, StdPayeeId*, Nickname*, PmtStatusCode*, SelRangeDueDt?, SelRangePrcDt?, SelRangeCurAmt?, DeliveryMethod?, CSPRefId*, SPRefId*, IncToken?, IncHistory?, PmtRec*, Token?)?)>
+<!ELEMENT PmtInst (PmtInstType, Brand?, SettlementInfo*)>
+<!ELEMENT PmtInstType (#PCDATA)>
+<!ELEMENT PmtInstruction (Country?, PmtFormat?, RefInfo?, IntermediaryDepAcct*, FeeChargeAlloc?)>
+<!ELEMENT PmtLegalRpt (OrgInfo, OrgId?, PayeeCountry, CurAmt?, PrcDt?, PmtLegalRptData+)>
+<!ELEMENT PmtLegalRptData (LegalRptCode, SupplRptCode?, Desc?, Memo?, SupplyingCountry?, CurAmt, ImportDt?)>
+<!ELEMENT PmtMethod (#PCDATA)>
+<!ELEMENT PmtModRq (RqUID, AsyncRqUID?, CustId?, PmtId, PmtInfo, UpPayee?, DupChkOverride?)>
+<!ELEMENT PmtModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtId, PmtInfo, UpPayee?, DupChkOverride?, PmtRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT PmtModel (#PCDATA)>
+<!ELEMENT PmtMsgRec (CustId?, MsgRecDt?, (PmtAddRs | PmtModRs | PmtStatusModRs | PmtCanRs))>
+<!ELEMENT PmtRec (PmtId, RecPmtId?, SvcRqUID?, PmtInfo, PmtStatus, PmtRemitAck?, PmtRemitInfo?, CreatedDt?, (OrigPmtPrcDt | OrigPmtDueDt)?, FIDebitTrcNum?, FICreditTrcNum?, CSPRefId?, SPRefId?)>
+<!ELEMENT PmtRefId (#PCDATA)>
+<!ELEMENT PmtRemitAck (TotalFeeCharge?, CompositePmtRemitInfo+)>
+<!ELEMENT PmtRemitChksum (AckType, Count, TotalCurAmt, Memo?, CompositeContactInfo?)>
+<!ELEMENT PmtRemitDetail (PmtRemitRefId, CurAmt, PmtRemitStatus?)>
+<!ELEMENT PmtRemitInfo (Name?, PostAddr?)>
+<!ELEMENT PmtRemitRefId (#PCDATA)>
+<!ELEMENT PmtRemitStatus (PmtRemitStatusCode, StatusDesc?, EffDt, StatusModBy?, Memo?)>
+<!ELEMENT PmtRemitStatusCode (#PCDATA)>
+<!ELEMENT PmtStatus (PmtStatusCode, StatusDesc?, EffDt, StatusModBy?, PmtAuthId?, RemitId?, RecPmtMod?, PmtAuthCount?, PmtMethod?, ChkNum?, Memo?)>
+<!ELEMENT PmtStatusCode (#PCDATA)>
+<!ELEMENT PmtStatusInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SettlementMethod*, PmtId*, PmtRefId*, SvcRqUID?, PmtRemitRefId?, (DepAcctIdFrom | CardAcctIdFrom)?, Category?, ChkNum?, (CustPayeeId+ | FSPayee+)?, Name*, PayerInfo*, PmtStatusCode*, SelRangeDueDt?)>
+<!ELEMENT PmtStatusInqRs (Status?, RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SettlementMethod*, PmtId*, PmtRefId*, SvcRqUID?, PmtRemitRefId?, (DepAcctIdFrom | CardAcctIdFrom)?, Category?, ChkNum?, (CustPayeeId+ | FSPayee+)?, Name*, PayerInfo*, PmtStatusCode*, SelRangeDueDt?, PmtStatusRec*, CSPRefId?, SPRefId?)>
+<!--Section 7.6.3.1-->
+<!ELEMENT PmtStatusModRq (RqUID, AsyncRqUID?, CustId?, PmtId, PmtRefId?, SvcRqUID?, PmtStatus)>
+<!--Section 7.6.3.2-->
+<!ELEMENT PmtStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtId, PmtRefId?, SvcRqUID?, PmtStatus, CSPRefId?, NetworkTrnInfo?, CompositeContactInfo?, SPRefId?)?)>
+<!ELEMENT PmtStatusRec (PmtId, PmtStatus, PmtRefId?, SvcRqUID?, NetworkTrnInfo?, CompositeContactInfo?, PmtRemitAck*)>
+<!ELEMENT PmtSummAmt (BillSummAmtId, CurAmt)>
+<!ELEMENT PmtSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT PmtSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token?, NewToken, PmtMsgRec*)?)>
+<!ELEMENT PmtType (#PCDATA)>
+<!ELEMENT PostAddr ((Addr1, (Addr2, (Addr3, (Addr4)?)?)?), City?, StateProv?, PostalCode?, Country, AddrType?, StartDt?, EndDt?)>
+<!ELEMENT PostAddrReqd (#PCDATA)>
+<!ELEMENT PostalCode (#PCDATA)>
+<!ELEMENT PostedDt (#PCDATA)>
+<!ELEMENT PrcDaysOff (#PCDATA)>
+<!ELEMENT PrcDt (#PCDATA)>
+<!ELEMENT PrcDtAdj (#PCDATA)>
+<!ELEMENT PrcSched (PrcDaysOff*, CutoffTm, PrcDtAdj)>
+<!ELEMENT PrefTimeEnd (#PCDATA)>
+<!ELEMENT PrefTimeStart (#PCDATA)>
+<!ELEMENT PrefetchURL (#PCDATA)>
+<!ELEMENT PrenoteReqd (#PCDATA)>
+<!ELEMENT PrepayPenalty (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT PresAcctId (BillingAcct, BillerId)>
+<!ELEMENT PresAcctInfo (StdPayeeId | (CustPayeeId, SPName))?>
+<!ELEMENT PresAcctRec (PresAcctId, PresAcctInfo, PresAcctStatus?)>
+<!ELEMENT PresAcctStatus (PresAcctStatusCode, StatusDesc?, EffDt?, StatusModBy?)>
+<!ELEMENT PresAcctStatusCode (#PCDATA)>
+<!ELEMENT PresSvcProfInfo (SvcCore, MsgSupt*, OptSupt*, PrcSched?)>
+<!ELEMENT PresSvcRq (RqUID, AsyncRqUID?, SPName?, (BillerInqRq?, BillInqRq?, BillStatusModRq?)+)>
+<!ELEMENT PresSvcRs (Status?, RqUID, AsyncRqUID?, SPName?, (BillerInqRs?, BillInqRs?, BillStatusModRs?)+)>
+<!ELEMENT PrevYrCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT PrimaryAcct (#PCDATA)>
+<!ELEMENT ProductId (#PCDATA)>
+<!ELEMENT Prompt (#PCDATA)>
+<!ELEMENT ProxyClient (Org, Name, Version)>
+<!ELEMENT Pswd (#PCDATA)>
+<!ELEMENT PswdDelivery (CustPswd, ExpDt?)>
+<!ELEMENT PurposeDesc (#PCDATA)>
+<!ELEMENT Rate (#PCDATA)>
+<!ELEMENT RecChkOrdAddRq (RqUID, AsyncRqUID?, CustId?, ChkOrdInfo, RecModelInfo, DupChkOverride)>
+<!ELEMENT RecChkOrdAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((ChkOrdInfo, RecModelInfo, DupChkOverride)?, RecChkOrdRec, CSPRefId, SPRefId)?)>
+<!ELEMENT RecChkOrdAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, RecChkOrdId*)>
+<!ELEMENT RecChkOrdAudRs ((Status?, RqUID, AsyncRqUID?, CustId?, (RecCtrlOut?, (SelRangeDt?, Method*, RecChkOrdId*)?, RecChkOrdMsgRec*)?))>
+<!ELEMENT RecChkOrdCanRq (RqUID, AsyncRqUID?, CustId?, RecChkOrdId, CascadeDel?)>
+<!ELEMENT RecChkOrdCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((RecChkOrdId, CascadeDel?)?, (RecChkOrdRec | DependentType+), CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecChkOrdId (#PCDATA)>
+<!ELEMENT RecChkOrdInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId | LoanAcctId), RecChkOrdId*, CSPRefId*, SPRefId*, SelRangeDt?, IncToken?)>
+<!ELEMENT RecChkOrdInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, ((DepAcctId | CardAcctId | LoanAcctId), RecChkOrdId*, CSPRefId*, SPRefId*, SelRangeDt?)?, RecChkOrdRec*, Token?)?)>
+<!ELEMENT RecChkOrdInstAddRq (RqUID, AsyncRqUID?, CustId?, RecChkOrdId, ChkOrdDetail?)>
+<!ELEMENT RecChkOrdInstAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecChkOrdId, ChkOrdDetail?)?)>
+<!ELEMENT RecChkOrdModRq (RqUID, AsyncRqUID?, CustId?, RecChkOrdId, ChkOrdInfo, RecModelInfo, ModPending?)>
+<!ELEMENT RecChkOrdModRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((RecChkOrdId, ChkOrdInfo, RecModelInfo, ModPending?)?, RecChkOrdRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecChkOrdMsgRec (CustId*, MsgRecDt?, (RecChkOrdAddRs | RecChkOrdModRs | RecChkOrdCanRs))>
+<!ELEMENT RecChkOrdRec (RecChkOrdId, ChkOrdInfo, RecModelInfo, RemainingInsts?)>
+<!ELEMENT RecChkOrdSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, (DepAcctId | CardAcctId | LoanAcctId))>
+<!ELEMENT RecChkOrdSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, ((DepAcctId | CardAcctId | LoanAcctId))?, NewToken, RecChkOrdMsgRec*)?)>
+<!ELEMENT RecCtrlIn (MaxRec, Cursor?)>
+<!ELEMENT RecCtrlOut (MatchedRec, SentRec, Cursor?)>
+<!ELEMENT RecModelInfo (Freq, (NumInsts | FinalPrcDt | FinalDueDt)?, InitialCurAmt?, FinalCurAmt?, Nickname?, SkipNextN?)>
+<!ELEMENT RecPmtAddRq (RqUID, AsyncRqUID?, CustId?, PmtInfo, RecModelInfo, DupChkOverride?)>
+<!ELEMENT RecPmtAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtInfo, RecModelInfo, DupChkOverride?, RecPmtRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecPmtAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, RecPmtId*)>
+<!ELEMENT RecPmtAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, RecPmtId*, RecPmtMsgRec*))>
+<!ELEMENT RecPmtCanRq (RqUID, AsyncRqUID?, CustId?, RecPmtId, CascadeDel?)>
+<!ELEMENT RecPmtCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecPmtId, CascadeDel?, (RecPmtRec | DependentType+)?, CSPRefId?, SPRefId?))>
+<!ELEMENT RecPmtId (#PCDATA)>
+<!ELEMENT RecPmtInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, RecPmtId*, CustPayeeId*, (DepAcctIdFrom | CardAcctIdFrom)?, Category*, Memo*, BillingAcct*, SelRangeCurAmt?, CSPRefId*, SPRefId*, IncToken?, DeliveryMethod?)>
+<!ELEMENT RecPmtInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, RecPmtId*, CustPayeeId*, (DepAcctIdFrom | CardAcctIdFrom)?, Category*, Memo*, BillingAcct*, SelRangeCurAmt?, CSPRefId*, SPRefId*, IncToken?, DeliveryMethod?, RecPmtRec*, Token?))>
+<!ELEMENT RecPmtInstAddRq (RqUID, AsyncRqUID?, CustId?, RecPmtId, DueDt, CurAmt?, RemitInstruction?, RemitDetail*, PmtLegalRpt?)>
+<!ELEMENT RecPmtInstAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecPmtId, DueDt, CurAmt?, RemitDetail*, PmtLegalRpt?, PmtRec)?)>
+<!ELEMENT RecPmtMod (#PCDATA)>
+<!ELEMENT RecPmtModRq (RqUID, AsyncRqUID?, CustId?, RecPmtId, PmtInfo, RecModelInfo, ModPending?)>
+<!ELEMENT RecPmtModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (PmtInfo, RecModelInfo, ModPending?, RecPmtRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecPmtMsgRec (CustId?, MsgRecDt?, (RecPmtAddRs | RecPmtModRs | RecPmtCanRs))>
+<!ELEMENT RecPmtProf (Freq+, ModPendingType)>
+<!ELEMENT RecPmtRec (RecPmtId, PmtInfo, RecModelInfo, RemainingInsts)>
+<!ELEMENT RecPmtSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT RecPmtSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, RecPmtMsgRec*)?)>
+<!ELEMENT RecXferAddRq (RqUID, AsyncRqUID?, CustId?, XferInfo, RecModelInfo, DupChkOverride?)>
+<!ELEMENT RecXferAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (XferInfo, RecModelInfo, DupChkOverride?, RecXferRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecXferAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, RecXferId*)>
+<!ELEMENT RecXferAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, RecXferId*, RecXferMsgRec*)?)>
+<!ELEMENT RecXferCanRq (RqUID, AsyncRqUID?, CustId?, RecXferId, CascadeDel?)>
+<!ELEMENT RecXferCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecXferId, CascadeDel?, (RecXferRec | DependentType)?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecXferId (#PCDATA)>
+<!ELEMENT RecXferInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, RecXferId*, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom)?, SelRangeCurAmt?, CSPRefId*, SPRefId*, IncToken?, DeliveryMethod?)>
+<!ELEMENT RecXferInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, RecXferId*, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom)?, SelRangeCurAmt?, CSPRefId*, SPRefId*, IncToken?, DeliveryMethod?, RecXferRec*, Token?)?)>
+<!ELEMENT RecXferMod (#PCDATA)>
+<!ELEMENT RecXferModRq (RqUID, AsyncRqUID?, CustId?, RecXferId, XferInfo, RecModelInfo, ModPending?)>
+<!ELEMENT RecXferModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecXferId, XferInfo, RecModelInfo, ModPending?, RecXferRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RecXferMsgRec (CustId?, MsgRecDt?, (RecXferAddRs | RecXferModRs | RecXferCanRs))>
+<!ELEMENT RecXferProf (Freq+, ModPendingType)>
+<!ELEMENT RecXferRec (RecXferId, XferInfo, RecModelInfo, RemainingInsts)>
+<!ELEMENT RecXferSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom))>
+<!ELEMENT RecXferSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom), NewToken, RecXferMsgRec*)?)>
+<!ELEMENT RefId (#PCDATA)>
+<!ELEMENT RefInfo (RefType, RefId)>
+<!ELEMENT RefType (#PCDATA)>
+<!ELEMENT RegPmtCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT RemainingInsts (#PCDATA)>
+<!ELEMENT RemainingPmtCount (#PCDATA)>
+<!ELEMENT RemitAddRq (RqUID, AsyncRqUID?, CustId?, EffDt, RemitInfo, DupChkOverride?)>
+<!ELEMENT RemitAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (EffDt, RemitInfo, DupChkOverride?, RemitRec, SPRefId?)?)>
+<!ELEMENT RemitAddr ((Addr1, (Addr2, (Addr3, (Addr4)?)?)?), City?, StateProv?, PostalCode?, Country, AddrType?, StartDt?, EndDt?)>
+<!ELEMENT RemitAdviceRefId (#PCDATA)>
+<!ELEMENT RemitAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, RemitId*)>
+<!ELEMENT RemitAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, RemitId*, RemitMsgRec*)?)>
+<!ELEMENT RemitDelRq (RqUID, AsyncRqUID?, CustId?, RemitId)>
+<!ELEMENT RemitDelRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RemitId, RemitRec?, SPRefId?)?)>
+<!ELEMENT RemitDetail (InvoiceReceiver?, InvoiceSender?, CurAmt?, PmtSummAmt*, RefInfo*, BillRefInfo?, BillId?, Memo?, BillingAcct?, InvoiceInfo*)>
+<!ELEMENT RemitId (#PCDATA)>
+<!ELEMENT RemitInfo (RemitInstruction?, SettlementInfo?, CounterpartyInfo?, ChkInfo?, ChkURL?, (CustPayeeId | CustPayeeInfo), (BillRefInfo?, BillId?, PmtId?, Memo?, BillingAcct?, CurAmt, PmtSummAmt*, InvoiceInfo*, RemitDetail*, RemitInfo?, PmtRemitRefId?), PmtLegalRpt?)>
+<!ELEMENT RemitInqRq (RqUID, AsyncRqUID?, CustId?, RemitId*, SelRangeCurAmt?, SelRangeDt?, DeliveryMethod?)>
+<!ELEMENT RemitInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RemitId*, SelRangeCurAmt?, SelRangeDt?, DeliveryMethod?, RemitRec*)?)>
+<!ELEMENT RemitInstruction (RemitRefId?, PmtRefId?, DeliveryInstruction?, DeliveryMethod?, ContactInfo?)>
+<!ELEMENT RemitModRq (RqUID, AsyncRqUID?, CustId?, RemitId, EffDt, RemitInfo, DupChkOverride?)>
+<!ELEMENT RemitModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (EffDt, RemitId, RemitInfo, DupChkOverride?, RemitRec, SPRefId?)?)>
+<!ELEMENT RemitMsgRec (CustId?, MsgRecDt?, (RemitAddRs | RemitModRs | RemitStatusModRs | RemitDelRs))>
+<!ELEMENT RemitName (#PCDATA)>
+<!ELEMENT RemitRec (RemitId, RemitInfo, RemitStatus)>
+<!ELEMENT RemitRefId (#PCDATA)>
+<!ELEMENT RemitStatus (RemitStatusCode, StatusDesc?, EffDt, StatusModBy?, Memo?)>
+<!ELEMENT RemitStatusCode (#PCDATA)>
+<!ELEMENT RemitStatusModRq (RqUID, AsyncRqUID?, CustId?, RemitId, RemitStatus)>
+<!ELEMENT RemitStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RemitId, RemitStatus, CSPRefId?, SPRefId?)?)>
+<!ELEMENT RemitSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT RemitSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, RemitMsgRec*)?)>
+<!ELEMENT ResolvePendingDt (#PCDATA)>
+<!ELEMENT RqUID (#PCDATA)>
+<!ELEMENT SPName (#PCDATA)>
+<!ELEMENT SPRefId (#PCDATA)>
+<!ELEMENT SPRefIdCorrect (SPRefId, CorrectAction)>
+<!ELEMENT SalesSlipRefNum (#PCDATA)>
+<!ELEMENT Secret (#PCDATA)>
+<!ELEMENT SecretFormat (#PCDATA)>
+<!ELEMENT SecretId (#PCDATA)>
+<!ELEMENT SecretList (SecretId, CryptType, (Secret | CryptSecret))>
+<!ELEMENT SecretMask (#PCDATA)>
+<!ELEMENT SecretOptional (#PCDATA)>
+<!ELEMENT SecretPrompt (SecretId, Prompt, Memo?, SecretOptional?, SecretFormat?, SecretMask?)>
+<!ELEMENT SelRangeCurAmt (LowCurAmt?, HighCurAmt?)>
+<!ELEMENT SelRangeDt (StartDt?, EndDt?)>
+<!ELEMENT SelRangeDueDt (StartDt?, EndDt?)>
+<!ELEMENT SelRangePrcDt (StartDt?, EndDt?)>
+<!ELEMENT SentRec (#PCDATA)>
+<!ELEMENT SeqNum (#PCDATA)>
+<!ELEMENT ServerDt (#PCDATA)>
+<!ELEMENT ServerStatusCode (#PCDATA)>
+<!ELEMENT SessKey (#PCDATA)>
+<!ELEMENT SettlementId (#PCDATA)>
+<!ELEMENT SettlementInfo (SettlementMethod, DepAcctId?, SettlementId?, OrgContact?, ContactInfo?, Memo?, PmtInstruction*)>
+<!ELEMENT SettlementMethod (#PCDATA)>
+<!ELEMENT Severity (#PCDATA)>
+<!ELEMENT ShortDesc (#PCDATA)>
+<!ELEMENT SignoffRq (CustId?)>
+<!ELEMENT SignoffRs (Status?, CustId?)>
+<!ELEMENT SignonCert (SignonRole?, CustId, Certificate, GenSessKey?)>
+<!ELEMENT SignonInfo (AuthSupt*, CryptType*, ModPswdFirst?, Min?, Max?, CharType?, CaseSen?, SpaceAlwd?, Memo?)>
+<!ELEMENT SignonMagPIN (CardMagData, PINBlock, GenSessKey?)>
+<!ELEMENT SignonOverride (OverrideType, (SignonPswd | SignonCert | SignonMagPIN))>
+<!ELEMENT SignonPswd (SignonRole?, CustId, CustPswd, GenSessKey?)>
+<!ELEMENT SignonRole (#PCDATA)>
+<!ELEMENT SignonRq ((SignonPswd | SignonCert | SignonTransport | SignonMagPIN | SessKey)?, SignonOverride?, ClientDt, CustLangPref, ClientApp, ProxyClient?, EU.Cur?, SuppressEcho?)>
+<!ELEMENT SignonRs ((Status?, SignonRole?, CustId?), (GenSessKey?, ClientDt, CustLangPref, ClientApp, ProxyClient?, EU.Cur?, ServerDt, SessKey?, ExpDt?, Language)?)>
+<!ELEMENT SignonTransport (SignonRole?, CustId, GenSessKey?)>
+<!ELEMENT SkipNextN (#PCDATA)>
+<!ELEMENT SpaceAlwd (#PCDATA)>
+<!ELEMENT SpecialHandling (#PCDATA)>
+<!ELEMENT SpouseName (#PCDATA)>
+<!ELEMENT StartDt (#PCDATA)>
+<!ELEMENT StateProv (#PCDATA)>
+<!ELEMENT Status (StatusCode, ServerStatusCode?, Severity, StatusDesc?, AdditionalStatus*, AsyncRsInfo?)>
+<!ELEMENT StatusCode (#PCDATA)>
+<!ELEMENT StatusDesc (#PCDATA)>
+<!ELEMENT StatusModBy (#PCDATA)>
+<!ELEMENT StdPayeeId (SPName, BillerNum)>
+<!ELEMENT StdPayeeInfo (Name?, PostAddr?, AcctMask*, IndustId?, DaysToPay)>
+<!ELEMENT StdPayeeInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, StdPayeeId*, Name*, BillingAcct*, PostalCode*, IndustId*, DeliveryMethod?)>
+<!ELEMENT StdPayeeInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, StdPayeeId*, Name*, BillingAcct*, PostalCode*, IndustId*, DeliveryMethod?, StdPayeeRec*)?)>
+<!ELEMENT StdPayeeRec (StdPayeeId, StdPayeeInfo)>
+<!ELEMENT StmtImage (ImageURL, PrefetchURL*, ExpDt?)>
+<!ELEMENT StmtSummAmt (StmtSummType, CurAmt, Count?)>
+<!ELEMENT StmtSummType (#PCDATA)>
+<!ELEMENT StopChkAddRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo))>
+<!ELEMENT StopChkAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo), StopChkRec+, CSPRefId?, SPRefId?)?)>
+<!ELEMENT StopChkAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId | LoanAcctId), SelRangeDt?, ChkRange?)>
+<!ELEMENT StopChkAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId | LoanAcctId), SelRangeDt?, ChkRange?, StopChkMsgRec*)?)>
+<!ELEMENT StopChkCanRq (RqUID, AsyncRqUID?, CustId?, (DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo))>
+<!ELEMENT StopChkCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), ((DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo), StopChkRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT StopChkInfo (ChkNum, Name?, CurAmt?, OrigDt?, Desc?)>
+<!ELEMENT StopChkInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo+ | SelRangeDt)?, IncToken?, DeliveryMethod?)>
+<!ELEMENT StopChkInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId | LoanAcctId), (ChkRange | StopChkInfo+ | SelRangeDt)?, DeliveryMethod?, StopChkRec*, Token?)?)>
+<!ELEMENT StopChkMsgRec (CustId?, MsgRecDt?, (StopChkAddRs | StopChkCanRs))>
+<!ELEMENT StopChkProf (OptSupt*, PrcSched?, Fee*)>
+<!ELEMENT StopChkRec (StopChkInfo, PostedDt?, StopChkStatusCode, StatusDesc?)>
+<!ELEMENT StopChkStatusCode (#PCDATA)>
+<!ELEMENT StopChkSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, (DepAcctId | CardAcctId | LoanAcctId), Token)>
+<!ELEMENT StopChkSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, (DepAcctId | CardAcctId | LoanAcctId), Token, NewToken, StopChkMsgRec*)?)>
+<!ELEMENT StopCount (#PCDATA)>
+<!ELEMENT SupplRptCode (#PCDATA)>
+<!ELEMENT SupplyingCountry (#PCDATA)>
+<!ELEMENT SuppressEcho (#PCDATA)>
+<!ELEMENT SvcAcctAddRq (RqUID, AsyncRqUID?, CustId?, SvcAcctId, SvcAcctInfo, (SecretList+, CryptType)?, (CustNameAddr* | PersonInfo*))>
+<!ELEMENT SvcAcctAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcAcctId, SvcAcctInfo, SvcAcctRec, DiscRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT SvcAcctAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*)>
+<!ELEMENT SvcAcctAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, SvcAcctMsgRec*)?)>
+<!ELEMENT SvcAcctDelRq (RqUID, AsyncRqUID?, CustId?, SvcAcctId, CascadeDel?)>
+<!ELEMENT SvcAcctDelRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcAcctId?, CascadeDel?, (SvcAcctRec | DependentType+)?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT SvcAcctId (CustSvcId, (DepAcctId | CardAcctId | LoanAcctId | (PresAcctId, PresAcctInfo)))>
+<!ELEMENT SvcAcctIdModRq (RqUID, AsyncRqUID?, CustId?, SvcAcctId, (DepAcctId | CardAcctId | LoanAcctId | (PresAcctId, PresAcctInfo?)))>
+<!ELEMENT SvcAcctIdModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcAcctId, (DepAcctId | CardAcctId | LoanAcctId | (PresAcctId | PresAcctInfo?)), SvcAcctRec)?)>
+<!ELEMENT SvcAcctInfo (Nickname?)>
+<!ELEMENT SvcAcctInqRq (RqUID, AsyncRqUID?, CustId?, CardMagData?, RecCtrlIn?, SvcName*, IncDetail?, IncBal?, IncToken?, DeliveryMethod?, UpDt?)>
+<!ELEMENT SvcAcctInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (CardMagData?, RecCtrlOut?, SvcName*, IncDetail?, IncBal?, IncToken?, DeliveryMethod?, UpDt?, NewUpDt, BankAcctRec*, PresAcctRec*, CustSvcRec*, SvcAcctRec*, Token?)?)>
+<!ELEMENT SvcAcctModRq (RqUID, AsyncRqUID?, CustId?, SvcAcctId, SvcAcctInfo, (SecretList+, CryptType)?, (CustNameAddr* | PersonInfo*))>
+<!ELEMENT SvcAcctModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcAcctId, SvcAcctInfo, SvcAcctRec, CustDiscRec*, CSPRefId?, SPRefId?)?)>
+<!ELEMENT SvcAcctMsgRec (CustId?, MsgRecDt?, (SvcAcctAddRs | SvcAcctModRs | SvcAcctStatusModRs | SvcAcctIdModRs | SvcAcctDelRs))>
+<!ELEMENT SvcAcctRec (SvcAcctId, SvcAcctInfo, SvcAcctStatus, EffDt?)>
+<!ELEMENT SvcAcctStatus (SvcAcctStatusCode, StatusDesc?, EffDt?, StatusModBy?, ResolvePendingDt?)>
+<!ELEMENT SvcAcctStatusCode (#PCDATA)>
+<!ELEMENT SvcAcctStatusModRq (RqUID, AsyncRqUID?, CustId?, SvcAcctId, SvcAcctStatus)>
+<!ELEMENT SvcAcctStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (SvcAcctId, SvcAcctStatus, SvcAcctRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT SvcAcctSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token)>
+<!ELEMENT SvcAcctSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, NewToken, SvcAcctMsgRec*)?)>
+<!ELEMENT SvcCore (Version, SPName, LegalName, Nickname?, HoldCoId?, USA.RTN?, (OrgContact+ | ContactInfo+), Language+, URL?)>
+<!ELEMENT SvcName (#PCDATA)>
+<!ELEMENT SvcProfInqRq (RqUID, AsyncRqUID?, CustId?, DeliveryMethod?, UpDt?)>
+<!ELEMENT SvcProfInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (DeliveryMethod?, UpDt?, NewUpDt, BaseSvcProfInfo*, BankSvcProfInfo*, PaySvcProfInfo*, PresSvcProfInfo*, MediaSvcProfInfo*)?)>
+<!ELEMENT SvcRqUID (#PCDATA)>
+<!ELEMENT TINInfo (TINType?, TaxId, CertCode?)>
+<!ELEMENT TINType (#PCDATA)>
+<!ELEMENT TaxCountry (#PCDATA)>
+<!ELEMENT TaxId (#PCDATA)>
+<!ELEMENT TaxInfo (Org, TaxType, CurAmt?, Rate?)>
+<!ELEMENT TaxPaidCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT TaxPaidDt (#PCDATA)>
+<!ELEMENT TaxProvince (#PCDATA)>
+<!ELEMENT TaxType (#PCDATA)>
+<!ELEMENT TaxYear (#PCDATA)>
+<!ELEMENT Term (Count, TermUnits, Desc?, DaysCall?)>
+<!ELEMENT TermUnits (#PCDATA)>
+<!ELEMENT TerminalId (#PCDATA)>
+<!ELEMENT TitlePrefix (#PCDATA)>
+<!ELEMENT Token (#PCDATA)>
+<!ELEMENT TotalCurAmt (Amt, CurCode?, (CurRate, CurConvertRule)?)>
+<!ELEMENT TotalFeeCharge (Count, CompositeCurAmt)>
+<!ELEMENT TrnAuthId (#PCDATA)>
+<!--The Binary data type is a compound type consisting of threee logical elements.-->
+<!ELEMENT TrnImage (ContentType?, BinLength, BinData)>
+<!ELEMENT TrnSrc (#PCDATA)>
+<!ELEMENT TrnType (#PCDATA)>
+<!ELEMENT URL (#PCDATA)>
+<!ELEMENT USA.ACHProf (DaysWith, DfltDaysToPay, CanWind)>
+<!ELEMENT USA.ACHTrnInfo (OriginatorName, USA.RTN?)>
+<!ELEMENT USA.MilitaryRank (#PCDATA)>
+<!ELEMENT USA.RTN (#PCDATA)>
+<!ELEMENT UpDt (#PCDATA)>
+<!ELEMENT UpPayee (#PCDATA)>
+<!ELEMENT Version (#PCDATA)>
+<!ELEMENT ViewDtlPref (#PCDATA)>
+<!ELEMENT VoucherTypeId (#PCDATA)>
+<!ELEMENT WebEnrollURL (#PCDATA)>
+<!ELEMENT XferAddRq (RqUID, AsyncRqUID?, CustId?, XferInfo, DupChkOverride?)>
+<!ELEMENT XferAddRs ((Status?, RqUID, AsyncRqUID?, CustId?), (XferInfo, DupChkOverride?, XferRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT XferAudRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, SelRangeDt?, Method*, XferId*, RecXferId*)>
+<!ELEMENT XferAudRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, SelRangeDt?, Method*, XferId*, RecXferId*, XferMsgRec*)?)>
+<!ELEMENT XferCanRq (RqUID, AsyncRqUID?, CustId?, XferId)>
+<!ELEMENT XferCanRs ((Status?, RqUID, AsyncRqUID?, CustId?), (XferId, XferRec?, CSPRefId?, SPRefId?)?)>
+<!ELEMENT XferFromSupt (MinCurAmt?, MaxCurAmt?)>
+<!ELEMENT XferId (#PCDATA)>
+<!ELEMENT XferInfo ((DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom), (DepAcctIdTo | CardAcctIdTo | LoanAcctIdTo), CurAmt, DueDt?, Category?, ImmediateXfer?, ForExRateInfo?, RefInfo*)>
+<!ELEMENT XferInqRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, XferId*, RecXferId*, CSPRefId*, SPRefId*, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom)?, (DepAcctIdTo | CardAcctIdTo | LoanAcctIdTo)?, XferStatusCode*, SelRangeDueDt?, SelRangeCurAmt?, IncToken?, DeliveryMethod?)>
+<!ELEMENT XferInqRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, XferId*, RecXferId*, CSPRefId*, SPRefId*, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom)?, (DepAcctIdTo | CardAcctIdTo | LoanAcctIdTo)?, XferStatusCode*, SelRangeDueDt?, SelRangeCurAmt?, DeliveryMethod?, XferRec*, Token?)?)>
+<!ELEMENT XferModRq (RqUID, AsyncRqUID?, CustId?, XferId, XferInfo, DupChkOverride?)>
+<!ELEMENT XferModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (XferId, XferInfo, DupChkOverride?, XferRec, CSPRefId?, SPRefId?)?)>
+<!ELEMENT XferMsgRec (CustId?, MsgRecDt?, (XferAddRs | XferModRs | XferStatusModRs | XferCanRs))>
+<!ELEMENT XferPayee (DepAcctIdTo)>
+<!ELEMENT XferProf (OptSupt*, PrcSched?, RecXferProf?)>
+<!ELEMENT XferRec (XferId, RecXferId?, RecXferMod?, XferInfo, XferStatus)>
+<!ELEMENT XferStatus (XferStatusCode, StatusDesc?, EffDt, StatusModBy?)>
+<!ELEMENT XferStatusCode (#PCDATA)>
+<!ELEMENT XferStatusModRq (RqUID, AsyncRqUID?, CustId?, XferId, XferStatus)>
+<!ELEMENT XferStatusModRs ((Status?, RqUID, AsyncRqUID?, CustId?), (XferId, XferStatus, CSPRefId?, SPRefId?)?)>
+<!ELEMENT XferSyncRq (RqUID, AsyncRqUID?, CustId?, RecCtrlIn?, Token, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom))>
+<!ELEMENT XferSyncRs ((Status?, RqUID, AsyncRqUID?, CustId?), (RecCtrlOut?, Token, (DepAcctIdFrom | CardAcctIdFrom | LoanAcctIdFrom), NewToken, XferMsgRec*)?)>
+<!ELEMENT XferToSupt (MinCurAmt?, MaxCurAmt?)>

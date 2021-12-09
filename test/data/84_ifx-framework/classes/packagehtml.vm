@@ -1,0 +1,7 @@
+## $Id: packagehtml.vm,v 1.1 2004/05/03 21:41:31 spal Exp $
+## $Source: /cvsroot/ifx-framework/code/conf/packagehtml.vm,v $
+## Template for package.html for IFX beans.
+<!-- Generated Code (org.sourceforge.ifx.tools.CodeGenerator) -->
+<body>
+Generated classes for the $PackageHtml.PackageName package.
+</body>
