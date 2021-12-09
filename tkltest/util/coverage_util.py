@@ -254,7 +254,7 @@ def get_test_classes(test_root_dir):
 def compare_to_dev_tests_coverage(config):
 
     app_name = config['general']['app_name']
-    compare_report_dir = os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, constants.TKL_CODE_COVERAGE_REPORT_DIR)
+    compare_report_dir = os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, constants.TKL_CODE_COVERAGE_COMPARE_REPORT_DIR)
 
     if os.path.isdir(compare_report_dir):
         shutil.rmtree(compare_report_dir)
@@ -274,8 +274,8 @@ def compare_to_dev_tests_coverage(config):
     dev_coverage_exec = config['dev_tests']['coverage_exec_file']
     tkltest_coverage_xml = os.path.join(compare_report_dir, tkltest_test_name + '_coverage.xml')
     dev_coverage_xml = os.path.join(compare_report_dir, dev_test_name + '_coverage.xml')
-    tkltest_html_dir = os.path.join(compare_report_dir, tkltest_test_name + '_html')
-    dev_html_dir = os.path.join(compare_report_dir, dev_test_name + '_html')
+    tkltest_html_dir = os.path.join(compare_report_dir, tkltest_test_name + '-html')
+    dev_html_dir = os.path.join(compare_report_dir, dev_test_name + '-html')
 
 
     __generate_coverage_xml(monolith_app_path=config['general']['monolith_app_path'],
@@ -288,7 +288,7 @@ def compare_to_dev_tests_coverage(config):
                           xml_file=dev_coverage_xml,
                           html_dir=dev_html_dir)
 
-    html_compare_dir = os.path.join(compare_report_dir, 'compared_html')
+    html_compare_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
     if os.path.isdir(html_compare_dir):
         shutil.rmtree(html_compare_dir)
     os.mkdir(html_compare_dir)

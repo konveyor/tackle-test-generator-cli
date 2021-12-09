@@ -633,6 +633,30 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    def test_generate_execute_ctdamplified_combined_classlist_diffassert(self) -> None:
+        """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=target_class_list"""
+        for app_name in self.test_list1:
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            config['execute']['code_coverage'] = True
+            config['execute']['compare_to_dev_tests'] = True
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+            # execute tests
+            for build_type in ['ant', 'maven', 'gradle']:
+                config['execute']['build_type'] = build_type
+                shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
+                self.__process_execute(config=config)
+
+                # assert that expected execute resources are created
+                self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
+
+
     def test_generate_execute_gradle(self) -> None:
         """Test getting dependencies using gradle build"""
         for app_name in self.test_list2:
@@ -674,7 +698,7 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path=''):
+    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path='', compare_coverage=False):
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -688,6 +712,15 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(os.path.isdir(cov_report_dir))
         else:
             self.assertFalse(os.path.isdir(cov_report_dir))
+        compare_report_dir = os.path.join(main_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_REPORT_DIR)
+        if compare_coverage:
+            self.assertTrue(os.path.isdir(compare_report_dir))
+            compare_html_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
+            self.assertTrue(os.path.isdir(compare_html_dir))
+            compare_html_file = os.path.join(compare_html_dir, 'index.html')
+            self.assertTrue(os.path.isfile(compare_html_file))
+        else:
+            self.assertFalse(os.path.isdir(compare_report_dir))
         if not reports_path:
             dir_util.cd_cli_dir()
 

@@ -42,16 +42,13 @@ def process_execute_command(args, config):
 
 
 def __run_dev_tests(config):
-
-
     __run_test_cases(create_build=False,
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
                      build_type=config['dev_tests']['build_type'],
                      build_file=config['dev_tests']['build_file'],
-                     build_target=config['dev_tests']['build_targets']
-    )
+                     build_target=config['dev_tests']['build_targets'])
 
 
 

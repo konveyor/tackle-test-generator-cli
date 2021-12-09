@@ -15,7 +15,9 @@ setup(
         'textile==4.0.1',
         'toml==0.10.2',
         'yattag==1.14.0',
-        'jinja2==3.0.2'
+        'jinja2==3.0.2',
+        'bs4==0.0.1',
+        'kaitaistruct==0.9'
     ],
     entry_points={
         "console_scripts": [
