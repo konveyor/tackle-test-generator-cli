@@ -266,7 +266,11 @@ def compare_to_dev_tests_coverage(config):
     tkltest_test_name = os.path.basename(test_root_dir)
     dev_test_name = os.path.basename(config['dev_tests']['test_directory'])
 
-    tkltest_coverage_exec = os.path.join(test_root_dir, 'merged_jacoco.exec') # todo  what the name with maven?
+    if config['general']['build_type'] == 'ant':
+        tkltest_coverage_exec = os.path.join(test_root_dir, 'merged_jacoco.exec')
+    else:
+        tkltest_coverage_exec = os.path.join(test_root_dir, 'jacoco.exec')
+
     dev_coverage_exec = config['dev_tests']['coverage_exec_file']
     tkltest_coverage_xml = os.path.join(compare_report_dir, tkltest_test_name + '_coverage.xml')
     dev_coverage_xml = os.path.join(compare_report_dir, dev_test_name + '_coverage.xml')

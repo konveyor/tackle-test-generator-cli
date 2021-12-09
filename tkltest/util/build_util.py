@@ -460,7 +460,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
     main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))).as_posix()
-    coverage_exec_file = pathlib.PurePath(os.path.join(os.path.abspath(test_root_dir), 'merged_jacoco.exec')).as_posix()
+    coverage_exec_file = pathlib.PurePath(os.path.join(os.path.abspath(test_root_dir), 'jacoco.exec')).as_posix()
 
     #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
     env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
