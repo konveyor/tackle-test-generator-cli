@@ -60,6 +60,7 @@ class UnitTests(unittest.TestCase):
 
             dir_util.cd_output_dir(app_name)
 
+            # every target is a different test case and is being compared to the standard classpath
             for target_name in ant_test_apps[app_name]['targets_to_test']:
                 config['generate']['app_build_target'] = target_name
                 config['general']['app_classpath_file'] = ''

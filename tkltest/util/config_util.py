@@ -26,7 +26,7 @@ import xml.etree.ElementTree as ElementTree
 from . import constants, config_options
 from .logging_util import tkltest_status
 from .constants import *
-from tkltest.util import command_util, dir_util
+from tkltest.util import command_util
 
 
 def load_config(args=None, config_file=None):
