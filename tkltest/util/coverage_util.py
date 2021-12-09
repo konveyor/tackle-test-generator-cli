@@ -293,8 +293,8 @@ def compare_to_dev_tests_coverage(config):
         shutil.rmtree(html_compare_dir)
     os.mkdir(html_compare_dir)
     shutil.copytree(dev_html_dir + os.sep + 'jacoco-resources', html_compare_dir + os.sep + 'jacoco-resources')
-    shutil.copyfile('../bluebar.gif',  html_compare_dir + os.sep + 'jacoco-resources/bluebar.gif')
-    shutil.copyfile('../yellowbar.gif',  html_compare_dir + os.sep + 'jacoco-resources/yellowbar.gif')
+    shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'bluebar.gif',  html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
+    shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'yellowbar.gif',  html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'yellowbar.gif')
     __compare_coverage_xml(xml_file1=dev_coverage_xml, xml_file2=tkltest_coverage_xml,
                          html1_dir=dev_html_dir, html2_dir=tkltest_html_dir, html_compare_dir=html_compare_dir,
                          test_name1=dev_test_name,
