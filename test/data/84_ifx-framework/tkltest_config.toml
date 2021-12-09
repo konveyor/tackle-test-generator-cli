@@ -10,8 +10,10 @@ name = "TKLTEST_CONFIG_FILE"
     add_assertions = false
     jee_support = false
     app_build_type = "ant"
+    app_build_config_file = "test/data/84_ifx-framework/build.xml"
     app_build_settings_file = "test/data/84_ifx-framework/build.properties"
     app_build_target = "compile"
+    target_class_list = ["org.sourceforge.ifx.utils.IFXException"]
 
 [generate.randoop]
     no_error_revealing_tests=true
@@ -28,3 +30,4 @@ name = "TKLTEST_CONFIG_FILE"
 [execute]
     test_class = ""
     code_coverage = true
+    app_packages = ["org.sourceforge.ifx.*"]
