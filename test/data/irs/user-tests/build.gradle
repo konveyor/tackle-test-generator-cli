@@ -120,11 +120,11 @@ test {
 }
 
 task cleanCoverageReportDir(){
-    delete 'C:/Users/HAIMKERMANY/PycharmProjects/tackle-test-generator-cli/tkltest-output-irs/irs-tkltest-reports/jacoco-reports/irs-randoop-standalone-tests'
+    delete '../user-tests/jacoco_report'
 }
 
 jacoco{
-    reportsDirectory = file('C:/Users/HAIMKERMANY/PycharmProjects/tackle-test-generator-cli/tkltest-output-irs/irs-tkltest-reports/jacoco-reports/irs-randoop-standalone-tests')
+    reportsDirectory = file('../user-tests/jacoco_report')
 }
 
 jacocoTestReport {
@@ -132,7 +132,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(
         
-            fileTree(dir:'C:/Users/HAIMKERMANY/PycharmProjects/tackle-test-generator-cli/test/data/irs/monolith/target/classes' , include: '/**/*.class' ),  
+            fileTree(dir:'../monolith/target/classes' , include: '/**/*.class' ),
         )
     }
 }
