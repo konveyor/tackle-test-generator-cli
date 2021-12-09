@@ -2,7 +2,7 @@ name = "TKLTEST_CONFIG_FILE"
 
 [general]
     app_name = "84_ifx-framework"
-    monolith_app_path = ["test/data/84_ifx-framework/src/main"]
+    monolith_app_path = ["test/data/84_ifx-framework/classes"]
     java_jdk_home = ""
 
 [generate]
@@ -21,8 +21,6 @@ name = "TKLTEST_CONFIG_FILE"
 
 [generate.ctd_amplified]
     base_test_generator = "combined"
-    refactored_app_path_prefix = "test/data/irs/refactored"
-    refactored_app_path_suffix = ["target/classes"]
     interaction_level = 1
     no_ctd_coverage = false
     num_seq_executions = 2

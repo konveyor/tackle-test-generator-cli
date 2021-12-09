@@ -333,10 +333,10 @@ def __fix_relative_paths(tkltest_config):
     tkltest_config['relative_fixed'] = True
 
 
-def __create_modified_build_file(app_build_file):
+def __create_modified_build_file(app_build_file, toy_program_dir_path):
     """
     Creates a modified build file based on original one.
-    In the modified version, every target has only necessary modified tasks: {property, javac, antcall}
+    In the modified copy, every target has only necessary modified tasks: {property, javac, antcall}
     :param app_build_file: original build file for the app
     :return: the file name for the modified build file
     """
@@ -349,9 +349,9 @@ def __create_modified_build_file(app_build_file):
     build_file_tree = ElementTree.parse(app_build_file)
     project_root = build_file_tree.getroot()
 
-    # constant attributes for creating the modified javac tasks
-    toy_program_dir_path = os.path.abspath(os.path.join(dir_util.cli_dir, 'tkltest', 'util', 'toy_program'))
+    # destination directory for compiling the toy program
     toy_program_destdir_path = os.path.join(toy_program_dir_path, 'toy_destdir')
+
     tkltest_target_javac_attributes = {'srcdir': toy_program_dir_path,
                                        'sourcepath': toy_program_dir_path,
                                        'destdir': toy_program_destdir_path,
@@ -412,6 +412,8 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
                                        app_build_target,
                                        ant_output_filename,
                                        targets_classpath):
+    """ Runs the ant command with the modified copy of the build file.
+        Also, removes the modified build file copy and the output file after the parsing. """
     # create output file or override previous output
     with open(ant_output_filename, 'w') as output_file:
         output_file.write('')
@@ -546,17 +548,29 @@ def __resolve_classpath(tkltest_config, command):
         # a set for the united dependencies of the compilation process
         targets_classpath = set()
 
-        # file name for ant output
-        ant_output_filename = 'tkltest_ant_output.txt'
+        # file name for ant output, deleted after parsing the output
+        ant_output_filename = os.path.join(os.getcwd(), 'tkltest_ant_output.txt')
+
+        # writing a toy program for compiling when running ant command
+        toy_program_dir_path = os.path.abspath(os.path.join(os.getcwd(), 'tkltest_toy_program'))
+        if os.path.isdir(toy_program_dir_path):
+            shutil.rmtree(toy_program_dir_path)
+        os.mkdir(toy_program_dir_path)
+        with open(os.path.join(toy_program_dir_path, 'ToyProgram.java'), 'w') as java_file:
+            java_file.write("public class ToyProgram {\n")
+            java_file.write("    public static void main(String[] argv) {}\n")
+            java_file.write("}\n")
 
         # create a modified build file
-        modified_build_file_name = __create_modified_build_file(app_build_file)
+        modified_build_file_name = __create_modified_build_file(app_build_file, toy_program_dir_path)
 
         __run_ant_command_and_parse_output(modified_build_file_name,
                                            app_settings_file,
                                            app_build_target,
                                            ant_output_filename,
                                            targets_classpath)
+        # removing the toy program
+        shutil.rmtree(toy_program_dir_path)
 
         # copy classpath jars to dependencies directory
         for jar_path in targets_classpath:

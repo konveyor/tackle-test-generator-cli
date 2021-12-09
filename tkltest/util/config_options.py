@@ -388,7 +388,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'name of the ant target that is used to build the app from the given build file'
+            'help_message': 'Name of the Ant target that is being used to build the app from the given build file. Required only for apps that use an Ant build file.'
         },
 
         # subcommands for the generate command
