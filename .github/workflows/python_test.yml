@@ -55,7 +55,7 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py
+        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py test/test_unit_tests.py
     - name: Install CLI command and run bats tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
