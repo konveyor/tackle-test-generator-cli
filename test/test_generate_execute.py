@@ -81,7 +81,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected generate resources are created
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
             # execute tests
-            for build_type in ['ant', 'maven', 'gradle']:
+            for build_type in ['ant']:
                 config['execute']['build_type'] = build_type
                 shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
                 self.__process_execute(config=config)
@@ -90,6 +90,25 @@ class GenerateExecuteTest(unittest.TestCase):
                 self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
 
 
+    def test_generate_execute_gradle(self) -> None:
+        """Test getting dependencies using gradle build"""
+        for app_name in self.test_list2:
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            config = app_info['config']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+
+            # execute tests
+            config['general']['app_classpath_file'] = ''
+            self.__process_execute(config=config)
+
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name)
 
     def __assert_generate_resources(self, app_name, generate_subcmd):
         dir_util.cd_output_dir(app_name)
