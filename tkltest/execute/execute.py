@@ -15,7 +15,6 @@ import logging
 import os
 import subprocess
 import sys
-import shutil
 
 import toml
 
@@ -49,8 +48,6 @@ def __run_dev_tests(config):
                      build_type=config['dev_tests']['build_type'],
                      build_file=config['dev_tests']['build_file'],
                      build_target=config['dev_tests']['build_targets'])
-
-
 
 
 def __get_test_classes(test_root_dir):
@@ -115,30 +112,30 @@ def __execute_base(args, config):
 
     # run test classes
     __run_test_cases(create_build=config['execute']['create_build_file'],
-        build_type=config['general']['build_type'],
-        app_name=config['general']['app_name'],
-        monolith_app_path=config['general']['monolith_app_path'],
-        app_classpath=classpath,
-        test_root_dir=test_root_dir,
-        test_dirs=test_dirs,
-        collect_codecoverage=config['execute']['code_coverage'],
-        app_packages=config['execute']['app_packages'],
-        partitions_file=gen_config['generate']['partitions_file'],
-        target_class_list=gen_config['generate']['target_class_list'],
-        reports_dir=config['general']['reports_path'],
-        offline_inst=config['general']['offline_instrumentation'],
-        verbose=config['general']['verbose']
-    )
+                     build_type=config['general']['build_type'],
+                     app_name=config['general']['app_name'],
+                     monolith_app_path=config['general']['monolith_app_path'],
+                     app_classpath=classpath,
+                     test_root_dir=test_root_dir,
+                     test_dirs=test_dirs,
+                     collect_codecoverage=config['execute']['code_coverage'],
+                     app_packages=config['execute']['app_packages'],
+                     partitions_file=gen_config['generate']['partitions_file'],
+                     target_class_list=gen_config['generate']['target_class_list'],
+                     reports_dir=config['general']['reports_path'],
+                     offline_inst=config['general']['offline_instrumentation'],
+                     verbose=config['general']['verbose'])
 
 
 def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[],
     app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='', env_vars={}, verbose=False, micro=False,
     build_file='', build_target=''):
-  
-    if test_root_dir:
-        tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
-    else:
+
+    is_user_tests = build_target != ''
+    if is_user_tests:
         tkltest_status('Compiling and running tests with build file {}'.format(os.path.abspath(build_file)))
+    else:
+        tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
     if reports_dir:
         main_reports_dir = reports_dir
@@ -195,10 +192,9 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
                 command_util.run_command("ant -f {} {}".format(ant_build_file, build_target), verbose=verbose)
             else:
                 if build_target:
-                    tkltest_status('Error executing build {}. Can not build target {} when collect_codecoverage is off'.format(ant_build_file, build_target), error=True)
+                    tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(ant_build_file, build_target), error=True)
                 for partition in partitions:
-                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
-                            verbose=verbose)
+                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition), verbose=verbose)
 
         #else:
          #   task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
@@ -213,16 +209,18 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
                   #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
                    #     verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
-        if not build_file: #todo
+        if is_user_tests:
+            tkltest_status('Error executing user junit {}: {}\n{}'.format(build_file, e, e.stderr), error=True)
+        else:
+            tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
             sys.exit(1)
 
-    #todo - correct the report dir
-    tkltest_status("JUnit reports are saved in " +
-                   os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
-    if collect_codecoverage:
-        tkltest_status("Jacoco code coverage reports are saved in " +
-                   os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
+    if not is_user_tests:
+        tkltest_status("JUnit reports are saved in " +
+                       os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
+        if collect_codecoverage:
+            tkltest_status("Jacoco code coverage reports are saved in " +
+                       os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
 
 
 def __get_generate_config(test_directory):

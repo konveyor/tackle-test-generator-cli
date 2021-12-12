@@ -132,7 +132,8 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
         except OSError:
             pass
 
-    jacoco_cli_file = os.path.join('..', 'lib', 'download', constants.JACOCO_CLI_JAR_NAME)
+    # todo - put this code, and other call to the jacoco cli  in __generate_coverage_report
+    jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
     command_util.run_command("java -jar {} merge {} {} --destfile {}".
                              format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
@@ -252,7 +253,14 @@ def get_test_classes(test_root_dir):
 
 
 def compare_to_dev_tests_coverage(config):
+    """
+    a method that compare the coverage of two test suits
+    it first run the jacoco cli twice, for each suit, to create coverage xml files
+    and then, call __compare_coverage_xml() to generate an html compare files
 
+    :param config:
+
+    """
     app_name = config['general']['app_name']
     compare_report_dir = os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX, constants.TKL_CODE_COVERAGE_COMPARE_REPORT_DIR)
 
@@ -277,16 +285,15 @@ def compare_to_dev_tests_coverage(config):
     tkltest_html_dir = os.path.join(compare_report_dir, tkltest_test_name + '-html')
     dev_html_dir = os.path.join(compare_report_dir, dev_test_name + '-html')
 
+    __generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                               exec_file=tkltest_coverage_exec,
+                               xml_file=tkltest_coverage_xml,
+                               html_dir=tkltest_html_dir)
 
-    __generate_coverage_xml(monolith_app_path=config['general']['monolith_app_path'],
-                          exec_file=tkltest_coverage_exec,
-                          xml_file=tkltest_coverage_xml,
-                          html_dir=tkltest_html_dir)
-
-    __generate_coverage_xml(monolith_app_path=config['general']['monolith_app_path'],
-                          exec_file=dev_coverage_exec,
-                          xml_file=dev_coverage_xml,
-                          html_dir=dev_html_dir)
+    __generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                               exec_file=dev_coverage_exec,
+                               xml_file=dev_coverage_xml,
+                               html_dir=dev_html_dir)
 
     html_compare_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
     if os.path.isdir(html_compare_dir):
@@ -296,18 +303,18 @@ def compare_to_dev_tests_coverage(config):
     shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'bluebar.gif',  html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
     shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'yellowbar.gif',  html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'yellowbar.gif')
     __compare_coverage_xml(xml_file1=dev_coverage_xml, xml_file2=tkltest_coverage_xml,
-                         html1_dir=dev_html_dir, html2_dir=tkltest_html_dir, html_compare_dir=html_compare_dir,
-                         test_name1=dev_test_name,
-                         test_name2=tkltest_test_name,
-                         monolith_app_path=config['general']['monolith_app_path'])
+                           html1_dir=dev_html_dir, html2_dir=tkltest_html_dir, html_compare_dir=html_compare_dir,
+                           test_name1=dev_test_name,
+                           test_name2=tkltest_test_name,
+                           monolith_app_path=config['general']['monolith_app_path'])
 
 
-def __generate_coverage_xml(monolith_app_path, exec_file, xml_file,html_dir):
+def __generate_coverage_report(monolith_app_path, exec_file, xml_file, html_dir):
     """Generates jacoco XML file from raw coverage (.exec) files.
 
      runs the jacoco CLI to generate XML report from the raw coverage file.
      The XML reports contains method-level coverage information (line, instruction, branch, etc.).
-     To run the jacoco CLI, directories to the application classes are needed, which is iedentified
+     To run the jacoco CLI, directories to the application classes are needed, which is identified
      using the tkltest config files.
 
     """
@@ -325,7 +332,7 @@ def __generate_coverage_xml(monolith_app_path, exec_file, xml_file,html_dir):
 
 
 def __compare_coverage_xml(xml_file1, xml_file2, html1_dir, html2_dir, html_compare_dir, test_name1, test_name2, monolith_app_path):
-    '''
+    """
     This method is the main flow of creating an html compare files between two test suits.
     for detailed description, please look at the description of coverage_statistic
     the main steps are:
@@ -333,8 +340,8 @@ def __compare_coverage_xml(xml_file1, xml_file2, html1_dir, html2_dir, html_comp
     2. parse the .class files of the app, to get the source line numbers of each method
     3. iterating over the xml line information, and update the diff between the between two test suits.
     4. building the html files. one per class/package/app
+    """
 
-    '''
     xml_tree1, xml_tree2 = ElementTree.parse(xml_file1), ElementTree.parse(xml_file2)
     app_statistic = AppCoverageStatistic(test_name1, test_name2)
     app_statistic.parse_xml(xml_tree1.getroot(), xml_tree2.getroot())
@@ -363,6 +370,3 @@ def __compare_coverage_xml(xml_file1, xml_file2, html1_dir, html2_dir, html_comp
             class_statistic.print_html(html_compare_dir + os.sep + package_statistic.get_html_name(), html1_dir + os.sep + package_statistic.get_html_name(), html2_dir + os.sep + package_statistic.get_html_name())
         package_statistic.print_html(html_compare_dir, html1_dir, html2_dir)
     app_statistic.print_html(html_compare_dir, html1_dir, html2_dir)
-
-
-

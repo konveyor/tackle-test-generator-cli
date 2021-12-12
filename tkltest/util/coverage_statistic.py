@@ -79,7 +79,7 @@ class CoverageStatistic:
             self.total_missed1 = missed1
             self.total_missed2 = missed2
             if self.total_covered1 + self.total_missed1 != self.total_covered2 + self.total_missed2:
-                tkltest_status('fail to parse', error=True)  # todo
+                tkltest_status('xml files can not be compared, counters total does not match', error=True)
                 sys.exit(1)
             self.total = self.total_covered1 + self.total_missed1
             self.missed_both = 0
@@ -143,7 +143,7 @@ class CoverageStatistic:
             if len(coverage_counter1) == 0 and len(coverage_counter2) == 0:
                 continue
             if len(coverage_counter1) != 1 or len(coverage_counter2) != 1:
-                tkltest_status('fail to parse', error=True)  # todo
+                tkltest_status('xml files can not be compared, {} has more then one counter'.format(coverage_type), error=True)
                 sys.exit(1)
             coverage_counter1 = coverage_counter1[0]
             coverage_counter2 = coverage_counter2[0]
@@ -320,9 +320,12 @@ class MethodCoverageStatistic(CoverageStatistic):
         self.signature = ''
     def set_name(self, xml_entry1, xml_entry2):
         self.name = xml_entry1.attrib['name']
-        if self.name != xml_entry2.attrib['name']:
-            tkltest_status('fail to parse', error=True)  # todo
+        desc = xml_entry1.attrib['desc']
+        if self.name != xml_entry2.attrib['name'] or desc != xml_entry2.attrib['desc']:
+            tkltest_status('xml files can not be compared, {}{} != {}{}'
+                           .format(self.name, desc, xml_entry2.attrib['name'], xml_entry2.attrib['desc']), error=True)
             sys.exit(1)
+        self.signature = self.name + desc
         ''' the "desc" is in the form of:
         (full name parameters)full name return value
         for example:
@@ -330,12 +333,7 @@ class MethodCoverageStatistic(CoverageStatistic):
         we will get a list of only the base name of the parameters, and drop the return value:
         parameters = ['Timestamp','String'] 
         '''
-        parameters = xml_entry1.attrib['desc']
-        self.signature = self.name + parameters
-        if parameters != xml_entry2.attrib['desc']:
-            tkltest_status('fail to parse', error=True)  # todo
-            sys.exit(1)
-        parameters = parameters.strip("()").split(';')
+        parameters = desc.strip("()").split(';')
         parameters.pop() # removing the return value
         parameters = [param.split('/').pop() for param in parameters]
         self.name = self.name + '(' + ', '.join(parameters) + ')'
@@ -358,13 +356,14 @@ class ClassCoverageStatistic(CoverageStatistic):
     def set_name(self, xml_entry1, xml_entry2):
         self.name = xml_entry1.attrib['name']
         if self.name != xml_entry2.attrib['name']:
-            tkltest_status('fail to parse', error=True)  # todo
+            tkltest_status('xml files can not be compared, {} != {}'.format(self.name, xml_entry2.attrib['name']), error=True)
             sys.exit(1)
         # removing the package name from the class name
         self.name = self.name.replace(self.parent.name + '/', '', 1)
         self.file_name = xml_entry1.attrib['sourcefilename']
         if self.file_name != xml_entry2.attrib['sourcefilename']:
-            tkltest_status('fail to parse', error=True)  # todo
+            tkltest_status('xml files can not be compared, class {} does not have the same source file {} != {}'
+                           .format(self.name, self.file_name, xml_entry2.attrib['sourcefilename']), error=True)
             sys.exit(1)
 
     def get_html_name(self):
@@ -387,7 +386,7 @@ class PackageCoverageStatistic(CoverageStatistic):
     def set_name(self, xml_entry1, xml_entry2):
         self.name = xml_entry1.attrib['name']
         if self.name != xml_entry2.attrib['name']:
-            tkltest_status('fail to parse', error=True)  # todo
+            tkltest_status('xml files can not be compared, {} != {}'.format(self.name, xml_entry2.attrib['name']), error=True)
             sys.exit(1)
 
     def get_html_name(self):
@@ -402,26 +401,22 @@ class PackageCoverageStatistic(CoverageStatistic):
     def parse_class_file(self, current_class):
         '''
         this method parse of the .class files. it:
-        1. call the parser
-        2. try to eliminate methods that are in the .class files, but does not have CoverageStatistic instance
-        (i.e. these methode was not on the xml file)
+        1. call the parser, to get the class byte_code
+        2. iterating over the byte_code methode, to update the dict byte_code_lines_tables.
         3. update the dict line_to_methods, to be used when reading the lines info from the xml
-
         '''
+
         class_file_names = [path + os.sep + self.name + os.sep + current_class.name + '.class'
                             for path in self.monolith_app_path
                             if os.path.isfile(path + os.sep + self.name + os.sep + current_class.name + '.class')]
         if not len(class_file_names):
-            print('didnt find .class file ')
-            exit(1)  # todo
+            tkltest_status('Could not find .class file for class {} in package {} at '
+                           .format(current_class.name, self.name, self.monolith_app_path), error=True)
+            exit(1) 
         class_file_name = class_file_names[0]
 
-        '''the following code involve the .class parser.
-            matching between the bytecode and the xml by name+desc 
-            '''
         byte_code_data = java_class_parser.JavaClass.from_file(class_file_name)
-
-        lines_tables = {}
+        byte_code_lines_tables = {}
         for byte_code_method in byte_code_data.methods:
             descriptor_index = byte_code_method.descriptor_index - 1
             name_index = byte_code_method.name_index - 1
@@ -429,13 +424,13 @@ class PackageCoverageStatistic(CoverageStatistic):
             desc = byte_code_data.constant_pool[descriptor_index].cp_info.value
             signature = name + desc
             code_attributes = [att for att in byte_code_method.attributes if att.name_as_str == 'Code']
-            if(len(code_attributes)):
-                lines_tables[signature] = code_attributes[0].info.attributes[0].info.line_number_table
+            if len(code_attributes):
+                byte_code_lines_tables[signature] = code_attributes[0].info.attributes[0].info.line_number_table
 
         if not self.line_to_methods.get(current_class.file_name):
             self.line_to_methods[current_class.file_name] = {}
         for method in current_class.children:
-            byte_code_lines_table = lines_tables[method.signature]
+            byte_code_lines_table = byte_code_lines_tables[method.signature]
             for line_entry in byte_code_lines_table:
                 if not self.line_to_methods[current_class.file_name].get(line_entry.line_number):
                     self.line_to_methods[current_class.file_name][line_entry.line_number] = set()
@@ -450,19 +445,19 @@ class PackageCoverageStatistic(CoverageStatistic):
         '''
         file_name, file_name2 = xml_entry1.attrib['name'], xml_entry2.attrib['name']
         if file_name != file_name2:
-            tkltest_status('fail to parse', error=True)  # todo
+            tkltest_status('xml files can not be compared, {} != {}'.format(file_name, file_name2), error=True)
             sys.exit(1)
         lines1, lines2 = xml_entry1.findall('line'), xml_entry2.findall('line')
         for line1, line2 in zip(lines1, lines2):
             line_number = int(line1.attrib['nr'])
             if line_number != int(line2.attrib['nr']):
-                tkltest_status('fail to parse', error=True)  # todo
+                tkltest_status('xml files can not be compared, at {}, {} != {}'.format(file_name, line_number, line2.attrib['nr']), error=True)
                 sys.exit(1)
             mi1, mi2 = int(line1.attrib['mi']), int(line2.attrib['mi'])
             ci1, ci2 = int(line1.attrib['ci']), int(line2.attrib['ci'])
             if line_number not in self.line_to_methods[file_name].keys():
-                tkltest_status('line number wo methods ' + file_name + str(line_number), error=True)  # todo
-                #sys.exit(1)
+                tkltest_status('xml files can not be compared, line number {}{} does not have methods'.format(file_name, line_number), error=True)
+                sys.exit(1)
             else:
                 for method in self.line_to_methods[file_name][line_number]:
                     method.update_line_statistic(mi1, mi2, ci1, ci2)
