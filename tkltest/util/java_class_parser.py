@@ -1,3 +1,10 @@
+'''
+This is a java class parser, download from here:
+https://formats.kaitai.io/java_class/python.html
+It was created by this tool:
+https://kaitai.io/
+
+'''
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
 from pkg_resources import parse_version

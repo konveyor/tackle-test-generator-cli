@@ -546,13 +546,13 @@ __options_spec = {
     'dev_tests': {
         'help_message': 'user tests information',
         'test_directory': {
-            'required': True,
+            'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'first test directory to compare'
+            'help_message': 'user test suite directory'
         },
         'build_type': {
             'required': True,
@@ -570,7 +570,7 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'build file to create the first coverage report'
+            'help_message': 'build file for compiling and running the user tests'
         },
         'build_targets': {
             'required': True,
@@ -578,7 +578,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'build target, to create the coverage report'
+            'help_message': 'build target for compiling and running the user tests'
         },
         'coverage_exec_file': {
             'required': False,
@@ -587,7 +587,7 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'the coverage report directory, created by the build file '
+            'help_message': 'the coverage .exec, created by the user build file'
         },
     }
 
