@@ -1,0 +1,98 @@
+<project name="irs" default="compile-classpath-attribute" basedir=".">
+
+  <!-- The directories for compilation targets -->
+  <property name="build.home"              value="build"/>
+  <property name="build.classes"           value="${build.home}/classes"/>
+	
+  <!-- The base directories for sources -->
+  <property name="source.java"             value="src/main/java"/>
+  <property name="test.java"               value="src/test/java"/>
+
+  <property name="lib.dir"                 value="../lib/"/>
+
+  <!-- The dependency libraries -->
+  <path id="source.lib">
+      <fileset dir="${lib.dir}">
+         <include name="*.jar"/>
+      </fileset>
+  </path>
+  
+  <pathconvert refid="source.lib"
+               property="source.lib.property" />
+  
+
+  <path id="source.lib.only.javax">
+      <fileset dir="${lib.dir}">
+          <include name="javax*.jar"/>
+      </fileset>
+  </path>
+
+  <path id="source.lib.other">
+      <fileset dir="${lib.dir}">
+          <include name="**.jar"/>
+          <exclude name="javax.*.jar"/>
+      </fileset>
+  </path>    
+    
+
+<!-- ====================================================================== -->
+<!-- ========== Executable Targets ======================================== -->
+<!-- ====================================================================== -->
+
+  <target name="clean"
+          description="Clean build and distribution directories">
+    <delete dir="${build.home}"/>
+  </target>
+
+<!-- ====================================================================== -->
+
+  <target name="prepare"
+          description="Prepare build directory">
+      <mkdir dir="${build.home}"/>
+  </target>
+
+<!-- ====================================================================== -->
+
+  <target name="compile-classpath-attribute" depends="prepare"
+          description="Compile main code passing classpath attribute to javac">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  srcdir="${source.java}"
+           destdir="${build.classes}"
+            includeantruntime="no"
+            classpath="${source.lib.property}">
+    </javac>
+  </target>
+
+    
+  <target name="compile-classpathref-attribute" depends="prepare"
+          description="Compile main code passing classpathref attribute to javac">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  srcdir="${source.java}"
+           destdir="${build.classes}"
+            includeantruntime="no"
+          classpathref="source.lib"/>
+  </target>
+    
+    
+  <target name="compile-classpath-element" depends="prepare"
+          description="Compile main code passing classpath nested element to javac">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  srcdir="${source.java}"
+           destdir="${build.classes}"
+            includeantruntime="no">
+          <classpath>
+              <path refid="source.lib.only.javax"/>
+              <fileset dir="${lib.dir}">
+                  <include name="resteasy-*.jar"/>
+                  <include name="commons-logging-1.1.2.jar"/>
+              </fileset>
+          </classpath>
+    </javac>          
+  </target>
+  
+<!-- ====================================================================== -->    
+  
+</project>

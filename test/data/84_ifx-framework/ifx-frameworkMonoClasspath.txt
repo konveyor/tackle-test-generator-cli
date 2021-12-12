@@ -1,0 +1,4 @@
+./test/data/84_ifx-framework/lib/jdom.jar
+./test/data/84_ifx-framework/lib/poolman.jar
+./test/data/84_ifx-framework/lib/velocity-dep-1.4.jar
+./test/data/84_ifx-framework/lib/xercesImpl.jar

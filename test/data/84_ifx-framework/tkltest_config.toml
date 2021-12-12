@@ -1,0 +1,33 @@
+name = "TKLTEST_CONFIG_FILE"
+
+[general]
+    app_name = "84_ifx-framework"
+    monolith_app_path = ["test/data/84_ifx-framework/classes"]
+    java_jdk_home = ""
+
+[generate]
+    time_limit = 2
+    add_assertions = false
+    jee_support = false
+    app_build_type = "ant"
+    app_build_config_file = "test/data/84_ifx-framework/build.xml"
+    app_build_settings_file = "test/data/84_ifx-framework/build.properties"
+    app_build_target = "compile"
+    target_class_list = ["org.sourceforge.ifx.utils.IFXException"]
+
+[generate.randoop]
+    no_error_revealing_tests=true
+
+[generate.evosuite]
+    criterion = ["LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH"]
+
+[generate.ctd_amplified]
+    base_test_generator = "combined"
+    interaction_level = 1
+    no_ctd_coverage = false
+    num_seq_executions = 2
+
+[execute]
+    test_class = ""
+    code_coverage = true
+    app_packages = ["org.sourceforge.ifx.*"]
