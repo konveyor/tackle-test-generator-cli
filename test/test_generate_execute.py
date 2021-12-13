@@ -81,7 +81,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected generate resources are created
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
             # execute tests
-            for build_type in ['maven', 'gradle']:
+            for build_type in ['ant', 'maven', 'gradle']:
                 config['execute']['build_type'] = build_type
                 shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
                 self.__process_execute(config=config)
