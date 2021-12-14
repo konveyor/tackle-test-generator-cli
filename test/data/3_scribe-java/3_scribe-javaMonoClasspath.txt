@@ -1,2 +1,2 @@
-./test/data/3_scribe-java/lib/commons-codec-1.4.jar
-./test/data/3_scribe-java/lib/junit-4.8.1.jar
+commons-codec-1.4.jar
+junit-4.8.1.jar

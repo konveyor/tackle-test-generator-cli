@@ -77,16 +77,15 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
         # dict with apps parameters for test
+        # app_build_type, app_build_config_file are determined by the toml
         maven_test_apps = {
             '14_spark': {
                 'standard_classpath': os.path.join('test', 'data', '14_spark', 'sparkMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
-                'build_file': os.path.join('test', 'data', '14_spark', 'pom.xml'),
             },
             '3_scribe-java': {
                 'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
-                'build_file': os.path.join('test', 'data', '3_scribe-java', 'pom.xml'),
             },
         }
 
@@ -94,8 +93,6 @@ class UnitTests(unittest.TestCase):
             dir_util.cd_cli_dir()
 
             config = config_util.load_config(config_file=maven_test_apps[app_name]['config_file'])
-            config['generate']['app_build_type'] = 'maven'
-            config['generate']['app_build_config_file'] = maven_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(maven_test_apps[app_name]['standard_classpath'])
             dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
             config['general']['app_classpath_file'] = ''
