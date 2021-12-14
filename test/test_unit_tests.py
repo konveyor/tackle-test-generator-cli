@@ -113,6 +113,38 @@ class UnitTests(unittest.TestCase):
                                     os.path.join(os.getcwd(), dependencies_dir),
                                     failed_assertion_message)
 
+    def test_getting_dependencies_gradle(self) -> None:
+        """Test getting dependencies using gradle build file"""
+        # dict with apps parameters for test
+        # app_build_type, app_build_config_file, app_build_settings_file are determined by the toml
+        gradle_test_apps = {
+            'splitNjoin': {
+                'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
+            },
+        }
+
+        for app_name in gradle_test_apps.keys():
+            dir_util.cd_cli_dir()
+
+            config = config_util.load_config(config_file=gradle_test_apps[app_name]['config_file'])
+            standard_classpath = os.path.abspath(gradle_test_apps[app_name]['standard_classpath'])
+            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
+            config['general']['app_classpath_file'] = ''
+
+            dir_util.cd_output_dir(app_name)
+
+            config_util.fix_config(config, 'generate')
+
+            generated_classpath = config['general']['app_classpath_file']
+            failed_assertion_message = 'failed for app = ' + app_name
+            self.assertTrue(generated_classpath != '', failed_assertion_message)
+            self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
+            self.__assert_classpath(standard_classpath,
+                                    generated_classpath,
+                                    os.path.join(os.getcwd(), dependencies_dir),
+                                    failed_assertion_message)
+
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message):
         """
         :param standard_classpath: Path to the standard classpath for comparison.

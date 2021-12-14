@@ -1,0 +1,2 @@
+./test/data/splitNjoin/lib/commons-lang3-3.9.jar
+./test/data/splitNjoin/lib/commons-text-1.7.jar
