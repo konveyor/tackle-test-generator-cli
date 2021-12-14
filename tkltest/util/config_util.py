@@ -498,7 +498,7 @@ def __resolve_classpath(tkltest_config, command):
             sys.exit(1)
 
     # create dependencies directory
-    dependencies_dir = os.path.join(os.getcwd(), app_name + "-app-dependencies")
+    dependencies_dir = os.path.join(os.getcwd(), app_name + constants.DEPENDENCIES_DIR_SUFFIX)
     posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
