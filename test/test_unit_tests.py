@@ -75,6 +75,46 @@ class UnitTests(unittest.TestCase):
                                         os.path.join(os.getcwd(), ant_test_apps[app_name]['output_dir']),
                                         failed_assertion_message)
 
+    def test_getting_dependencies_maven(self) -> None:
+        """Test getting dependencies using maven build file"""
+        # dict with apps parameters for test
+        maven_test_apps = {
+            '14_spark': {
+                'standard_classpath': os.path.join('test', 'data', '14_spark', 'sparkMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
+                'build_file': os.path.join('test', 'data', '14_spark', 'pom.xml'),
+                'output_dir': '14_spark-app-dependencies'
+            },
+            '3_scribe-java': {
+                'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
+                'build_file': os.path.join('test', 'data', '3_scribe-java', 'pom.xml'),
+                'output_dir': '3_scribe-java-app-dependencies'
+            },
+        }
+
+        for app_name in maven_test_apps.keys():
+            dir_util.cd_cli_dir()
+
+            config = config_util.load_config(config_file=maven_test_apps[app_name]['config_file'])
+            config['generate']['app_build_type'] = 'maven'
+            config['generate']['app_build_config_file'] = maven_test_apps[app_name]['build_file']
+            standard_classpath = os.path.abspath(maven_test_apps[app_name]['standard_classpath'])
+            config['general']['app_classpath_file'] = ''
+
+            dir_util.cd_output_dir(app_name)
+
+            config_util.fix_config(config, 'generate')
+
+            generated_classpath = config['general']['app_classpath_file']
+            failed_assertion_message = 'failed for app = ' + app_name
+            self.assertTrue(generated_classpath != '', failed_assertion_message)
+            self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
+            self.__assert_classpath(standard_classpath,
+                                    generated_classpath,
+                                    os.path.join(os.getcwd(), maven_test_apps[app_name]['output_dir']),
+                                    failed_assertion_message)
+
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message):
         """
         :param standard_classpath: Path to the standard classpath for comparison.

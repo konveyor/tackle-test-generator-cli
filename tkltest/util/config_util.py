@@ -486,7 +486,7 @@ def __resolve_classpath(tkltest_config, command):
         return
     if app_classpath_file:
         return
-    if app_build_type not in ['gradle', 'ant']:
+    if app_build_type not in ['gradle', 'ant', 'maven']:
         tkltest_status('Getting app dependencies using {} is not supported yet\n'.format(app_build_type), error=True)
         sys.exit(1)
 
@@ -541,6 +541,18 @@ def __resolve_classpath(tkltest_config, command):
         os.remove(tkltest_app_build_file)
         if app_settings_file:
             os.remove(tkltest_app_settings_file)
+
+    elif app_build_type == 'maven':
+        get_dependencies_task = 'tkltest_get_dependencies'
+        get_dependencies_command = 'mvn dependency:copy-dependencies -f ' + app_build_file + ' -DoutputDirectory=' + dependencies_dir
+        logging.info(get_dependencies_command)
+
+        # run maven
+        try:
+            command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
+            sys.exit(1)
 
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']
