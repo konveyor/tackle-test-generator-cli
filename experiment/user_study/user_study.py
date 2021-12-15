@@ -114,7 +114,7 @@ def main():
 
     if len(sys.argv) == 1:
         parser.print_help()
-        sys.exist()
+        sys.exit(1)
 
     args = parser.parse_args()
 
