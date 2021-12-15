@@ -78,12 +78,13 @@ task cleanCoverageReportDir(){
     delete '{{ main_coverage_report_dir }}'
 }
 
-jacoco{
-    reportsDirectory = file('{{ main_coverage_report_dir }}')
-}
-
 jacocoTestReport {
     dependsOn cleanCoverageReportDir, test
+    reports{
+        xml.required = true
+        html.outputLocation = file('{{ main_coverage_report_dir }}')
+        xml.outputLocation = file('{{ coverage_xml_file }}')
+    }
     afterEvaluate {
         classDirectories.setFrom(
         {% for item in monolith_app_paths %}
