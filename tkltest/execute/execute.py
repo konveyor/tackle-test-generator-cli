@@ -18,7 +18,8 @@ import sys
 
 import toml
 
-from tkltest.util import constants, build_util, command_util, dir_util, config_util, coverage_util
+from tkltest.execute import compare_coverage
+from tkltest.util import constants, build_util, command_util, dir_util, config_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -36,18 +37,32 @@ def process_execute_command(args, config):
     __execute_base(args, config)
     if config['execute']['compare_to_dev_tests']:
         __run_dev_tests(config)
-        coverage_util.compare_to_dev_tests_coverage(config)
+        compare_coverage.compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
 
 
 def __run_dev_tests(config):
+    build_type = config['dev_tests']['build_type'];
+    build_targets = ' '.join(config['dev_tests']['build_targets'])
+    ant_build_file = ''
+    maven_build_file = ''
+    gradle_build_file = ''
+    if build_type == 'ant':
+        ant_build_file = config['dev_tests']['build_file']
+    elif build_type == 'maven':
+        maven_build_file = config['dev_tests']['build_file']
+    else:
+        gradle_build_file = config['dev_tests']['build_file']
     __run_test_cases(create_build=False,
+                     build_type=build_type,
+                     build_targets=build_targets,
+                     ant_build_file=ant_build_file,
+                     maven_build_file=maven_build_file,
+                     gradle_build_file=gradle_build_file,
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
-                     build_type=config['dev_tests']['build_type'],
-                     build_file=config['dev_tests']['build_file'],
-                     build_target=config['dev_tests']['build_targets'])
+    )
 
 
 def __get_test_classes(test_root_dir):
@@ -113,12 +128,15 @@ def __execute_base(args, config):
     # run test classes
     __run_test_cases(create_build=config['execute']['create_build_file'],
                      build_type=config['general']['build_type'],
+                     ant_build_file=test_root_dir + os.sep + "build.xml",
+                     maven_build_file=test_root_dir + os.sep + "pom.xml",
+                     gradle_build_file=test_root_dir + os.sep + "build.gradle",
                      app_name=config['general']['app_name'],
                      monolith_app_path=config['general']['monolith_app_path'],
                      app_classpath=classpath,
                      test_root_dir=test_root_dir,
                      test_dirs=test_dirs,
-                     collect_codecoverage=config['execute']['code_coverage'],
+                     collect_codecoverage=config['execute']['code_coverage'] or config['execute']['compare_to_dev_tests'],
                      app_packages=config['execute']['app_packages'],
                      partitions_file=gen_config['generate']['partitions_file'],
                      target_class_list=gen_config['generate']['target_class_list'],
@@ -127,15 +145,13 @@ def __execute_base(args, config):
                      verbose=config['general']['verbose'])
 
 
-def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[],
-    app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='', env_vars={}, verbose=False, micro=False,
-    build_file='', build_target=''):
+def __run_test_cases(app_name, collect_codecoverage, verbose,
+                     create_build, build_type, ant_build_file, maven_build_file, gradle_build_file, build_targets='',
+                     test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[],
+                     app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='',
+                     env_vars={}, micro=False):
 
-    is_user_tests = build_target != ''
-    if is_user_tests:
-        tkltest_status('Compiling and running tests with build file {}'.format(os.path.abspath(build_file)))
-    else:
-        tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
+    tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
     if reports_dir:
         main_reports_dir = reports_dir
@@ -157,16 +173,6 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
             collect_codecoverage=collect_codecoverage,
             offline_instrumentation=offline_inst
         )
-    else:
-        if build_file:
-            ant_build_file = build_file
-            maven_build_file = build_file
-            gradle_build_file = build_file
-        else:
-            ant_build_file = test_root_dir + os.sep + "build.xml"
-            maven_build_file = test_root_dir + os.sep + "pom.xml"
-            gradle_build_file = test_root_dir + os.sep + "build.gradle"
-
     partitions = [os.path.basename(dir) for dir in test_dirs]
 
     # no env vars indicate monolith application - will merge code coverage reports after running all test partitions
@@ -175,24 +181,24 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
 
     try:
         if build_type == 'maven':
-            if not build_target:
-                build_target = 'clean verify site'
-            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_target), verbose=verbose)
+            if not build_targets:
+                build_targets = 'clean verify site'
+            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_targets), verbose=verbose)
         elif build_type == 'gradle':
-            if not build_target:
-                build_target = 'tklest_task'
+            if not build_targets:
+                build_targets = 'tklest_task'
             if os.path.basename(gradle_build_file) == "build.gradle":
-                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_target), verbose=verbose)
+                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_targets), verbose=verbose)
             else:
-                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_target), verbose=verbose)
+                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_targets), verbose=verbose)
         else:
             if collect_codecoverage:
-                if not build_target:
-                    build_target = 'merge-coverage-report'
-                command_util.run_command("ant -f {} {}".format(ant_build_file, build_target), verbose=verbose)
+                if not build_targets:
+                    build_targets = 'merge-coverage-report'
+                command_util.run_command("ant -f {} {}".format(ant_build_file, build_targets), verbose=verbose)
             else:
-                if build_target:
-                    tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(ant_build_file, build_target), error=True)
+                if build_targets:
+                    tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(ant_build_file, build_targets), error=True)
                 for partition in partitions:
                     command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition), verbose=verbose)
 
@@ -209,13 +215,11 @@ def __run_test_cases(create_build, build_type, app_name, collect_codecoverage, t
                   #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
                    #     verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
-        if is_user_tests:
-            tkltest_status('Error executing user junit {}: {}\n{}'.format(build_file, e, e.stderr), error=True)
-        else:
-            tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
+        tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
+        if not build_targets:
             sys.exit(1)
 
-    if not is_user_tests:
+    if not build_targets:
         tkltest_status("JUnit reports are saved in " +
                        os.path.abspath(main_reports_dir+os.sep+constants.TKL_JUNIT_REPORT_DIR))
         if collect_codecoverage:
