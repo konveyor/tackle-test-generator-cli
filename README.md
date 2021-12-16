@@ -97,7 +97,7 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
 
    - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
    
-   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). Currently, this feature is supported for Gradle and Ant; Maven support will be added. Install Gradle if you plan to use the dependency computation feature.
+   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). This feature is supported for Gradle, Ant and Maven. Install Gradle if you plan to use the dependency computation feature.
 
 4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
 for the test-generator core is downloaded from the Maven registry on GitHub Packages
@@ -358,7 +358,7 @@ required, and the option description).
 | target_class_list                   |                                  | list of target classes to perform test generation on                                                                                    |
 | excluded_class_list                 |                                  | list of classes or packages to exclude from test generation. Packages must end with a wildcard.                                         |
 | time_limit                          |                                  | time limit (in seconds) for evosuite/randoop test generation                                                                            |
-| app_build_type*                     |                                  | build type for collecting app dependencies: gradle or ant (support for maven to be added)                                               |
+| app_build_type*                     |                                  | build type for collecting app dependencies: gradle, ant or maven                                                                        |
 | app_build_config_file*              |                                  | path to app build file for the specified app build type                                                                                 |
 | app_build_settings_file             |                                  | path to app build settings file or property file for the specified app build type                                                       |
 | app_build_target*                   |                                  | Name of the Ant target that is being used to build the app from the build file. Required only for apps that use an Ant build file.      |

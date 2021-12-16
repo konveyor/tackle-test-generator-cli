@@ -362,7 +362,7 @@ __options_spec = {
             'type': str,
             'choices': ['gradle', 'ant', 'maven', None],
             'default_value': None,
-            'help_message': 'build type for collecting app dependencies: gradle, ant or maven.'
+            'help_message': 'build type for collecting app dependencies: gradle, ant or maven'
         },
         'app_build_config_file': {
             'required': __conditionally_required,
