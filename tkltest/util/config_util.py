@@ -609,7 +609,7 @@ def __resolve_classpath(tkltest_config, command):
         app_path_modules = set()
         for root, dirs, files in os.walk(monolith_app_path):
             if len([file for file in files if file.endswith(".class")]):
-                posix_module_path = "-".join(re.split("[\\\\/]+", root.replace(monolith_app_path, "")))
+                posix_module_path = "-".join(re.split("[\\\\/]+", root.replace(monolith_app_path, "").lstrip('\\/')))
                 app_path_modules.add(posix_module_path)
         app_paths_modules[monolith_app_path] = app_path_modules
 
