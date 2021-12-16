@@ -28,7 +28,7 @@ class UnitTests(unittest.TestCase):
         dir_util.cd_cli_dir()
 
     def test_getting_dependencies_ant(self) -> None:
-        """Test getting dependencies using ant build"""
+        """Test getting dependencies using ant build file"""
         # dict with apps parameters for test
         ant_test_apps = {
             'irs': {
@@ -37,7 +37,6 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
                 'property_file': '',
                 'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute', 'compile-classpath-element'],
-                'output_dir': 'irs-app-dependencies'
             },
             '84_ifx-framework': {
                 'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
@@ -45,7 +44,6 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
                 'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
                 'targets_to_test': ['compile', 'compile-antcall'],
-                'output_dir': '84_ifx-framework-app-dependencies'
             },
         }
 
@@ -57,6 +55,7 @@ class UnitTests(unittest.TestCase):
             config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']
             config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
+            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
 
             dir_util.cd_output_dir(app_name)
 
@@ -72,8 +71,76 @@ class UnitTests(unittest.TestCase):
                 self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
                 self.__assert_classpath(standard_classpath,
                                         generated_classpath,
-                                        os.path.join(os.getcwd(), ant_test_apps[app_name]['output_dir']),
+                                        os.path.join(os.getcwd(), dependencies_dir),
                                         failed_assertion_message)
+
+    def test_getting_dependencies_maven(self) -> None:
+        """Test getting dependencies using maven build file"""
+        # dict with apps parameters for test
+        # app_build_type, app_build_config_file are determined by the toml
+        maven_test_apps = {
+            '14_spark': {
+                'standard_classpath': os.path.join('test', 'data', '14_spark', 'sparkMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
+            },
+            '3_scribe-java': {
+                'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
+            },
+        }
+
+        for app_name in maven_test_apps.keys():
+            dir_util.cd_cli_dir()
+
+            config = config_util.load_config(config_file=maven_test_apps[app_name]['config_file'])
+            standard_classpath = os.path.abspath(maven_test_apps[app_name]['standard_classpath'])
+            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
+            config['general']['app_classpath_file'] = ''
+
+            dir_util.cd_output_dir(app_name)
+
+            config_util.fix_config(config, 'generate')
+
+            generated_classpath = config['general']['app_classpath_file']
+            failed_assertion_message = 'failed for app = ' + app_name
+            self.assertTrue(generated_classpath != '', failed_assertion_message)
+            self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
+            self.__assert_classpath(standard_classpath,
+                                    generated_classpath,
+                                    os.path.join(os.getcwd(), dependencies_dir),
+                                    failed_assertion_message)
+
+    def test_getting_dependencies_gradle(self) -> None:
+        """Test getting dependencies using gradle build file"""
+        # dict with apps parameters for test
+        # app_build_type, app_build_config_file, app_build_settings_file are determined by the toml
+        gradle_test_apps = {
+            'splitNjoin': {
+                'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
+            },
+        }
+
+        for app_name in gradle_test_apps.keys():
+            dir_util.cd_cli_dir()
+
+            config = config_util.load_config(config_file=gradle_test_apps[app_name]['config_file'])
+            standard_classpath = os.path.abspath(gradle_test_apps[app_name]['standard_classpath'])
+            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
+            config['general']['app_classpath_file'] = ''
+
+            dir_util.cd_output_dir(app_name)
+
+            config_util.fix_config(config, 'generate')
+
+            generated_classpath = config['general']['app_classpath_file']
+            failed_assertion_message = 'failed for app = ' + app_name
+            self.assertTrue(generated_classpath != '', failed_assertion_message)
+            self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
+            self.__assert_classpath(standard_classpath,
+                                    generated_classpath,
+                                    os.path.join(os.getcwd(), dependencies_dir),
+                                    failed_assertion_message)
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message):
         """
