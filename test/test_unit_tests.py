@@ -28,7 +28,7 @@ class UnitTests(unittest.TestCase):
         dir_util.cd_cli_dir()
 
     def test_getting_dependencies_ant(self) -> None:
-        """Test getting dependencies using ant build"""
+        """Test getting dependencies using ant build file"""
         # dict with apps parameters for test
         ant_test_apps = {
             'irs': {

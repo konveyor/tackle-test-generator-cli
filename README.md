@@ -93,11 +93,11 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
 2. Install JDK 8. The JDK home directory has to be specified as a configuration option;
    see the section [Configuration Options](#configuration-options).
    
-3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems are used in two ways:
+3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems in two ways:
 
    - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
    
-   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). This feature is supported for Gradle, Ant and Maven. Install Gradle if you plan to use the dependency computation feature.
+   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. This feature is supported for Gradle, Ant and Maven. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). If you plan to use the dependency computation feature with a Gradle or Ant build file, install Gradle or Ant respectively.
 
 4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
 for the test-generator core is downloaded from the Maven registry on GitHub Packages

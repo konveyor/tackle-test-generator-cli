@@ -486,9 +486,6 @@ def __resolve_classpath(tkltest_config, command):
         return
     if app_classpath_file:
         return
-    if app_build_type not in ['gradle', 'ant', 'maven']:
-        tkltest_status('Getting app dependencies using {} is not supported yet\n'.format(app_build_type), error=True)
-        sys.exit(1)
 
     if command == 'execute':
         if os.path.isfile(build_classpath_file):
