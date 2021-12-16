@@ -360,9 +360,9 @@ __options_spec = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
-            'choices': ['gradle', 'ant', None],
+            'choices': ['gradle', 'ant', 'maven', None],
             'default_value': None,
-            'help_message': 'build type for collecting app dependencies: gradle or ant (support for maven to be added)'
+            'help_message': 'build type for collecting app dependencies: gradle, ant or maven.'
         },
         'app_build_config_file': {
             'required': __conditionally_required,
