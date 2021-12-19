@@ -141,3 +141,7 @@ JACOCO_MERGED_DATA_FOR_AUGMENTATION = 'ctd-guided-augmented.exec'
 # Name of Jacoco CLI jar
 
 JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
+
+# Suffix for dependencies directory
+
+DEPENDENCIES_DIR_SUFFIX = '-app-dependencies'

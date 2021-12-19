@@ -635,7 +635,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_execute_resources(app_name=app_name)
 
     def test_generate_execute_gradle(self) -> None:
-        """Test getting dependencies using gradle build"""
+        """Test getting dependencies and "execute": using gradle"""
         for app_name in self.test_list2:
             app_info = self.test_apps[app_name]
 
