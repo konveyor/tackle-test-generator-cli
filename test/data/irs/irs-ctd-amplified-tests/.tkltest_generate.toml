@@ -1,41 +1,8 @@
-command = "generate"
 subcommand = "ctd-amplified"
 
 [general]
 app_name = "irs"
-app_classpath_file = "irsMonoClasspath.txt"
-monolith_app_path = [ "..\\test/data/irs/monolith/target/classes",]
-java_jdk_home = "C:\\Program Files\\Java\\jdk1.8.0_291"
-test_directory = "..\\test/data/irs/irs-ctd-amplified-tests"
-reports_path = ""
-verbose = true
-offline_instrumentation = true
-build_type = "ant"
 
 [generate]
-jee_support = false
-no_diff_assertions = false
 partitions_file = ""
 target_class_list = []
-excluded_class_list = []
-time_limit = 2
-app_build_config_file = ""
-app_build_settings_file = ""
-app_build_target = ""
-add_assertions = false
-
-[generate.ctd_amplified]
-base_test_generator = "CombinedTestGenerator"
-augment_coverage = false
-no_ctd_coverage = false
-interaction_level = 1
-num_seq_executions = 2
-refactored_app_path_prefix = "..\\test/data/irs/refactored"
-refactored_app_path_suffix = [ "..\\target/classes",]
-reuse_base_tests = false
-
-[generate.evosuite]
-criterion = [ "LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH",]
-
-[generate.randoop]
-no_error_revealing_tests = true

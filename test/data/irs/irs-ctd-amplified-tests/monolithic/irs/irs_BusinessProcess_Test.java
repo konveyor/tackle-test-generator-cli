@@ -18,8 +18,14 @@ public class irs_BusinessProcess_Test {
 	@Test
 	public void test_main_0() throws Throwable {
 		java.lang.String str0 = null;
-		java.lang.String[] strArray1 = new java.lang.String[] { str0 };
-		irs.BusinessProcess.main(strArray1);
+		java.lang.String str1 = null;
+		java.lang.String str2 = null;
+		java.lang.String str3 = null;
+		java.lang.String str4 = null;
+		java.lang.String str5 = null;
+		java.lang.String str6 = null;
+		java.lang.String[] strArray7 = new java.lang.String[] { str0, str1, str2, str3, str4, str5, str6 };
+		irs.BusinessProcess.main(strArray7);
 	}
 
 	private java.lang.Object getFieldValue(java.lang.Object obj, String fieldName) throws java.lang.reflect.InvocationTargetException, java.lang.SecurityException, java.lang.IllegalArgumentException, java.lang.IllegalAccessException {

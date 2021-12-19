@@ -1,25 +1,24 @@
 package irs;
 
 import org.junit.runners.MethodSorters;
+import java.util.List;
 import static org.junit.Assert.assertNull;
 import irs.Employer;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.EvoRunner;
 import org.junit.runner.RunWith;
 import irs.Employee;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.EvoRunner;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import org.junit.FixMethodOrder;
-import java.util.LinkedList;
 
 public class irs_Employer_Test {
 	@Test
 	public void test_setEmployerName_0() throws Throwable {
 		irs.Employer employer0 = new irs.Employer();
 		assertNull(((irs.Employer) employer0).getEmployerName());
-		employer0.setEmployerName("$");
+		employer0.setEmployerName("n0M6;+L{H");
 	}
 
 	@Test
@@ -65,14 +64,14 @@ public class irs_Employer_Test {
 		assertEquals(10, ((irs.Employee) employee8).getEmployeeId());
 		boolean boolean9 = employeeList3.add(employee8);
 		assertEquals(true, boolean9);
-		employer0.setEmployerAttributes((-1833), "", (java.util.List<irs.Employee>)employeeList3);
+		employer0.setEmployerAttributes((-2062), "n0M6;+L{H", (java.util.List<irs.Employee>)employeeList3);
 	}
 
 	@Test
 	public void test_setEmployerId_0() throws Throwable {
 		irs.Employer employer0 = new irs.Employer();
 		assertNull(((irs.Employer) employer0).getEmployerName());
-		employer0.setEmployerId((-1833));
+		employer0.setEmployerId((-2062));
 	}
 
 	private java.lang.Object getFieldValue(java.lang.Object obj, String fieldName) throws java.lang.reflect.InvocationTargetException, java.lang.SecurityException, java.lang.IllegalArgumentException, java.lang.IllegalAccessException {

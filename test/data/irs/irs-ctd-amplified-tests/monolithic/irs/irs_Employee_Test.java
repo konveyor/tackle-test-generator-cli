@@ -30,7 +30,9 @@ public class irs_Employee_Test {
 		assertEquals(0.0, (double) ((irs.Employee) employee0).getRate(), 0.015);
 		assertNull(((irs.Employee) employee0).getName());
 		assertEquals(0, ((irs.Employee) employee0).getEmployeeId());
-		employee0.setHours((-1));
+		double double1 = employee0.getRate();
+		assertEquals(0.0, (java.lang.Double) double1, 0.015);
+		employee0.setHours(100);
 	}
 
 	@Test
@@ -41,7 +43,8 @@ public class irs_Employee_Test {
 		assertEquals(0.0, (double) ((irs.Employee) employee0).getRate(), 0.015);
 		assertNull(((irs.Employee) employee0).getName());
 		assertEquals(0, ((irs.Employee) employee0).getEmployeeId());
-		employee0.setRate(0.0d);
+		java.lang.String str1 = employee0.getName();
+		employee0.setRate((-1.0d));
 	}
 
 	@Test
@@ -52,7 +55,7 @@ public class irs_Employee_Test {
 		assertEquals(0.0, (double) ((irs.Employee) employee0).getRate(), 0.015);
 		assertNull(((irs.Employee) employee0).getName());
 		assertEquals(0, ((irs.Employee) employee0).getEmployeeId());
-		employee0.setEmployeeId((-1833));
+		employee0.setEmployeeId(1);
 	}
 
 	@Test
@@ -68,13 +71,13 @@ public class irs_Employee_Test {
 
 	@Test
 	public void test_setLevel_0() throws Throwable {
-		irs.Employee employee0 = new irs.Employee();
-		assertEquals("XYZ", ((irs.Employee) employee0).getLevel());
-		assertEquals(0, ((irs.Employee) employee0).getHours());
-		assertEquals(0.0, (double) ((irs.Employee) employee0).getRate(), 0.015);
-		assertNull(((irs.Employee) employee0).getName());
-		assertEquals(0, ((irs.Employee) employee0).getEmployeeId());
-		employee0.setLevel("In Employee static getLevel: level ");
+		irs.Employee employee4 = new irs.Employee(1, "", 1, (double)1);
+		assertEquals("XYZ", ((irs.Employee) employee4).getLevel());
+		assertEquals(1, ((irs.Employee) employee4).getHours());
+		assertEquals(1.0, (double) ((irs.Employee) employee4).getRate(), 0.015);
+		assertEquals("", ((irs.Employee) employee4).getName());
+		assertEquals(1, ((irs.Employee) employee4).getEmployeeId());
+		employee4.setLevel("");
 	}
 
 	private java.lang.Object getFieldValue(java.lang.Object obj, String fieldName) throws java.lang.reflect.InvocationTargetException, java.lang.SecurityException, java.lang.IllegalArgumentException, java.lang.IllegalAccessException {

@@ -18,16 +18,7 @@ public class irs_Salary_Test {
 		assertEquals(0, ((irs.Salary) salary0).getEmployerId());
 		assertEquals(0, ((irs.Salary) salary0).getEmployeeId());
 		assertEquals(0.0, (double) ((irs.Salary) salary0).getSalary(), 0.015);
-		salary0.setSalary((-1384.5672377804945d));
-	}
-
-	@Test
-	public void test_setEmployeeId_0() throws Throwable {
-		irs.Salary salary3 = new irs.Salary(1073, 1073, 0.0d);
-		assertEquals(1073, ((irs.Salary) salary3).getEmployerId());
-		assertEquals(1073, ((irs.Salary) salary3).getEmployeeId());
-		assertEquals(0.0, (double) ((irs.Salary) salary3).getSalary(), 0.015);
-		salary3.setEmployeeId(1073);
+		salary0.setSalary((double)(-479));
 	}
 
 	@Test
@@ -40,10 +31,19 @@ public class irs_Salary_Test {
 	}
 
 	@Test
+	public void test_setEmployeeId_0() throws Throwable {
+		irs.Salary salary0 = new irs.Salary();
+		assertEquals(0, ((irs.Salary) salary0).getEmployerId());
+		assertEquals(0, ((irs.Salary) salary0).getEmployeeId());
+		assertEquals(0.0, (double) ((irs.Salary) salary0).getSalary(), 0.015);
+		salary0.setEmployeeId((-479));
+	}
+
+	@Test
 	public void test_Salary_0() throws Throwable {
-		irs.Salary salary3 = new irs.Salary(0, 0, (double)100);
-		assertEquals(0, ((irs.Salary) salary3).getEmployerId());
-		assertEquals(0, ((irs.Salary) salary3).getEmployeeId());
+		irs.Salary salary3 = new irs.Salary(1, (-1), (double)100.0f);
+		assertEquals(1, ((irs.Salary) salary3).getEmployerId());
+		assertEquals(-1, ((irs.Salary) salary3).getEmployeeId());
 		assertEquals(100.0, (double) ((irs.Salary) salary3).getSalary(), 0.015);
 	}
 
