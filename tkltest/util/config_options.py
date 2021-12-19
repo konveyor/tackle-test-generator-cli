@@ -550,13 +550,13 @@ __options_spec = {
             'is_cli_option': False,
             'type': bool,
             'default_value': False,
-            'help_message': 'compare execution coverage to dev test coverage'
+            'help_message': 'compare execution coverage to dev test suite coverage'
         },
     },
 
     # "dev_tests" options
     'dev_tests': {
-        'help_message': 'user tests information',
+        'help_message': 'user test suite information',
         'build_type': {
             'required': True,
             'is_toml_option': True,
@@ -564,7 +564,7 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven', 'gradle'],
             'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests - either ant, maven or gradle'
+            'help_message': 'build file type for compiling and running the test suite - either ant, maven or gradle'
         },
         'build_file': {
             'required': True,
@@ -573,7 +573,7 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'build file for compiling and running the user tests'
+            'help_message': 'build file for compiling and running the user test suite'
         },
         'build_targets': {
             'required': True,
@@ -581,7 +581,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'build target for compiling and running the user tests'
+            'help_message': 'build target for compiling and running the user test suite'
         },
         'coverage_exec_file': {
             'required': False,
@@ -590,7 +590,7 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'the coverage .exec, created by the user build file'
+            'help_message': 'the path to the coverage .exec file, created by the user build file'
         },
     }
 
