@@ -133,7 +133,6 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
         except OSError:
             pass
 
-    # todo - put this code, and other call to the jacoco cli  in __generate_coverage_report
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
     command_util.run_command("java -jar {} merge {} {} --destfile {}".

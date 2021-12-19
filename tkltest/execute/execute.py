@@ -15,12 +15,14 @@ import logging
 import os
 import subprocess
 import sys
+import shutil
 
 import toml
 
 from tkltest.execute import compare_coverage
-from tkltest.util import constants, build_util, command_util, dir_util, config_util
+from tkltest.util import constants, build_util, command_util, dir_util, config_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
+from tkltest.execute.coverage_html_printer import CoverageStatisticsHtmlPrinter
 
 
 def process_execute_command(args, config):
@@ -37,12 +39,12 @@ def process_execute_command(args, config):
     __execute_base(args, config)
     if config['execute']['compare_to_dev_tests']:
         __run_dev_tests(config)
-        compare_coverage.compare_to_dev_tests_coverage(config)
+        __compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
 
 
 def __run_dev_tests(config):
-    build_type = config['dev_tests']['build_type'];
+    build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     ant_build_file = ''
     maven_build_file = ''
@@ -62,7 +64,7 @@ def __run_dev_tests(config):
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
-    )
+                     )
 
 
 def __get_test_classes(test_root_dir):
@@ -142,7 +144,8 @@ def __execute_base(args, config):
                      target_class_list=gen_config['generate']['target_class_list'],
                      reports_dir=config['general']['reports_path'],
                      offline_inst=config['general']['offline_instrumentation'],
-                     verbose=config['general']['verbose'])
+                     verbose=config['general']['verbose']
+                     )
 
 
 def __run_test_cases(app_name, collect_codecoverage, verbose,
@@ -240,3 +243,55 @@ def __get_generate_config(test_directory):
                        ), error=True)
         sys.exit(1)
     return toml.load(gen_config_file)
+
+
+
+def __compare_to_dev_tests_coverage(config):
+    """
+    a method that compare the coverage of two test suits
+    1. run the jacoco cli , to create coverage xml file of the dev test.
+    2. call compare_coverage() to generate statistics information
+    3. call the html printer
+
+    :param config:
+
+    """
+    app_name = config['general']['app_name']
+    test_root_dir = config['general']['test_directory']
+    if test_root_dir == '':
+        test_root_dir = app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
+    main_reports_dir = config['general']['reports_path']
+    if not main_reports_dir:
+        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+
+    tkltest_test_name = os.path.basename(test_root_dir)
+    tkltest_html_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR, tkltest_test_name)
+    tkltest_coverage_xml = os.path.join(tkltest_html_dir, 'jacoco.xml')
+
+    compare_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_COMPARE_REPORT_DIR)
+    if os.path.isdir(compare_report_dir):
+        shutil.rmtree(compare_report_dir)
+    os.mkdir(compare_report_dir)
+
+    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
+    dev_coverage_xml = os.path.join(compare_report_dir, dev_test_name + '_coverage.xml')
+    dev_html_dir = os.path.join(compare_report_dir, dev_test_name + '-html')
+    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                                           exec_file=dev_coverage_exec,
+                                           xml_file=dev_coverage_xml,
+                                           html_dir=dev_html_dir)
+
+    html_compare_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
+    app_statistics = compare_coverage.compare_coverage(
+        xml_file1=dev_coverage_xml, xml_file2=tkltest_coverage_xml,
+        test_name1=dev_test_name,
+        test_name2=tkltest_test_name,
+        monolith_app_path=config['general']['monolith_app_path'],
+        app_name=app_name)
+    CoverageStatisticsHtmlPrinter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, html_compare_dir)
+
+
+
+
+

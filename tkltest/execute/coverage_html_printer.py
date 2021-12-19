@@ -1,12 +1,30 @@
-
-
+# ***************************************************************************
+# Copyright IBM Corporation 2021
+#
+# Licensed under the Eclipse Public License 2.0, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ***************************************************************************
 
 import os
 from bs4 import BeautifulSoup
-import sys
-from tkltest.execute.coverage_statistics import *
+import shutil
+from tkltest.util import constants
 
 
+'''
+    CoverageStatisticsHtmlPrinter:
+    a class to print a CoverageStatistics tree to html directory.
+    building the html files:
+     each CoverageStatistics has an html file
+     each CoverageStatistics is a also line in the table of it parent.
+    each CoverageStatistics.DiffCounter is an entry in the table
+'''
 
 class CoverageStatisticsHtmlPrinter:
 
@@ -19,25 +37,32 @@ class CoverageStatisticsHtmlPrinter:
                      }
 
     @staticmethod
-    def __get_html_file_name(coverage_statistics):
-        if coverage_statistics.get_type() == 'Class':
-            return coverage_statistics.get_pretty_name() + '.html'
-        elif coverage_statistics.get_type() == 'Package':
-            return coverage_statistics.get_pretty_name() + os.sep + 'index.html'
-        elif coverage_statistics.get_type() == 'App':
-            return 'index.html'
+    def create_coverage_html_dir(app_statistics, html1_dir, html2_dir, html_compare_dir):
+
+        if os.path.isdir(html_compare_dir):
+            shutil.rmtree(html_compare_dir)
+        os.mkdir(html_compare_dir)
+        shutil.copytree(html1_dir + os.sep + 'jacoco-resources', html_compare_dir + os.sep + 'jacoco-resources')
+        shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'bluebar.gif',
+                        html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
+        shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'goldbar.gif',
+                        html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
+
+        for package_statistic in app_statistics.children:
+            os.mkdir(html_compare_dir + os.sep + package_statistic.get_pretty_name())
+            for class_statistic in package_statistic.children:
+                CoverageStatisticsHtmlPrinter.__create_coverage_html_file(
+                    class_statistic,
+                    html_compare_dir + os.sep + package_statistic.get_pretty_name(),
+                    html1_dir + os.sep + package_statistic.get_pretty_name(),
+                    html2_dir + os.sep + package_statistic.get_pretty_name())
+            CoverageStatisticsHtmlPrinter.__create_coverage_html_file(package_statistic, html_compare_dir, html1_dir,
+                                                                      html2_dir)
+        CoverageStatisticsHtmlPrinter.__create_coverage_html_file(app_statistics, html_compare_dir, html1_dir, html2_dir)
+
 
     @staticmethod
-    def __get_html_el(coverage_statistics):
-        if coverage_statistics.get_type() == 'Class':
-            return 'el_class'
-        elif coverage_statistics.get_type() == 'Package':
-           return 'el_package'
-
-
-
-    @staticmethod
-    def create_coverage_html_file(coverage_statistics, html_compare_dir, html1_dir, html2_dir):
+    def __create_coverage_html_file(coverage_statistics, html_compare_dir, html1_dir, html2_dir):
         '''
         Convert the CoverageStatistics to an html file
         Args:
@@ -72,7 +97,7 @@ class CoverageStatisticsHtmlPrinter:
 
         html_title = '<h1>' + coverage_statistics.get_type() + ': ' + coverage_statistics.get_pretty_name() + '</h1>'
         html_title += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + \
-                      '</span><span> Versus: </span>' \
+                      '</span><span> Versus </span>' \
                       '<span style="background-color:cornflowerblue">' + coverage_statistics.test_suite_name2 + '</span></h1>'
 
         html_table_titles = '<td class="sortable" id="a" onclick="toggleSort(this)">Element</td>'
@@ -99,8 +124,8 @@ class CoverageStatisticsHtmlPrinter:
             html_table_line = '<tr>'
             href = ''
             if child_html_file:
-                href = ' href="' + child_html_file + '" class="' + CoverageStatisticsHtmlPrinter.__get_html_el(child_statistics) + '"'
-            html_table_line += '<td><a' + href + '>' + child_name + '</a></td>'
+                href = ' href="' + child_html_file
+            html_table_line += '<td><a' + href + '" class="' + CoverageStatisticsHtmlPrinter.__get_html_el(child_statistics) + '">' + child_name + '</a></td>'
             html_table_line += CoverageStatisticsHtmlPrinter.__get_html_table_line(child_statistics)
             html_table_line += '</tr>'
             html_table_body += html_table_line
@@ -127,10 +152,10 @@ class CoverageStatisticsHtmlPrinter:
             html_table = html_table.replace('jacoco-resources', '../jacoco-resources')
 
         html_test1_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
-        html_test1_text += '<h1><span> Report With </span><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + '</span></h1>'
+        html_test1_text += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + '<span></span> Coverage Report</span></h1>'
         html_test1_text += str(soup1.body.table)
         html_test2_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
-        html_test2_text += '<h1><span> Report With </span><span style="background-color:cornflowerblue">' + coverage_statistics.test_suite_name2 + '</span></h1>'
+        html_test2_text += '<h1><span style="background-color:cornflowerblue">' + coverage_statistics.test_suite_name2 + '</span><span> Coverage Report</span></h1>'
         html_test2_text += str(soup2.body.table)
 
         html_text = '<html>' + html_head
@@ -175,6 +200,24 @@ class CoverageStatisticsHtmlPrinter:
                 line += DiffCounterHtmlPrinter.get_html_na()
         return line
 
+    @staticmethod
+    def __get_html_file_name(coverage_statistics):
+        if coverage_statistics.get_type() == 'Class':
+            return coverage_statistics.get_pretty_name() + '.html'
+        elif coverage_statistics.get_type() == 'Package':
+            return coverage_statistics.get_pretty_name() + os.sep + 'index.html'
+        elif coverage_statistics.get_type() == 'App':
+            return 'index.html'
+
+    @staticmethod
+    def __get_html_el(coverage_statistics):
+        if coverage_statistics.get_type() == 'Method':
+            return 'el_method'
+        elif coverage_statistics.get_type() == 'Class':
+            return 'el_class'
+        elif coverage_statistics.get_type() == 'Package':
+           return 'el_package'
+
 
 class DiffCounterHtmlPrinter:
     '''
@@ -190,25 +233,10 @@ class DiffCounterHtmlPrinter:
 
     @staticmethod
     def __get_html_coverage_compare(counter):
-        counted_total = counter.missed_none + counter.missed_only2 + counter.missed_only1 + counter.missed_both
-        miss_count1 = abs(counter.missed_none + counter.missed_only2- counter.total_covered1)
-        miss_count2 = abs(counter.missed_none + counter.missed_only1- counter.total_covered2)
-        if miss_count1 or miss_count2 or counted_total != counter.total:
-            print('Count has issues: miss_count1 {} miss_count2 {} counted_total {} counter.total {} '
-                  .format(miss_count1, miss_count2, counted_total, counter.total))
-        return '<td class="clr1">{}% vs {}% => {}%</td>'\
+        return '<td class="clr1">{}% vs {}%</td>'\
             .format(int(100 * counter.total_covered1 / counter.total),
-                    int(100 * counter.total_covered2 / counter.total),
-                    int(100 * (counter.missed_none + counter.missed_only2 + counter.missed_only1) /
-                        counted_total))
+                    int(100 * counter.total_covered2 / counter.total))
 
-        '''
-        return '<td class="clr1" >{}/{} vs {}/{} ||| {}/{} vs {}/{}</td>' \
-            .format(counter.total_covered1, counter.total,
-                    counter.total_covered2, counter.total,
-                    counter.missed_none + counter.missed_only2, counted_total,
-                    counter.missed_none + counter.missed_only1, counted_total)
-        '''
 
     @staticmethod
     def get_html_bar(counter, max_val):
@@ -222,8 +250,8 @@ class DiffCounterHtmlPrinter:
 
     @staticmethod
     def get_html_coverage_diff(counter):
-        return '<td class="clr2"> both={} 1st={} 2nd={} none={}</td>' \
-                   .format(counter.missed_both, counter.missed_only1, counter.missed_only2, counter.missed_none) + \
+        return '<td class="clr2"> both={} 1st={} 2nd={} none={} total={}</td>' \
+                   .format(counter.missed_both, counter.missed_only1, counter.missed_only2, counter.missed_none, counter.total) + \
                DiffCounterHtmlPrinter.__get_html_coverage_compare(counter)
 
     @staticmethod
