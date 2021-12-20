@@ -17,6 +17,7 @@ import os
 import shutil
 import sys
 import unittest
+import copy
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.generate import generate
@@ -653,6 +654,43 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+
+
+    def test_execute_ctdamplified_compare_coverage(self) -> None:
+        """execute": comparing coverage reports"""
+        for app_name in self.test_list1:
+            app_info = self.test_apps[app_name]
+
+            main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+            generated_test_directory = 'irs-generated-testing'
+        # set up config and generate tests
+            # execute tests
+            for build_type in ['ant', 'gradle', 'maven']:
+
+                config = copy.deepcopy(app_info['config'])
+                config['execute']['code_coverage'] = True
+                config['execute']['compare_to_dev_tests'] = True
+                shutil.rmtree(main_report_dir, ignore_errors=True)
+                shutil.rmtree(generated_test_directory, ignore_errors=True)
+                shutil.copytree('test/data/irs/irs-ctd-amplified-tests', generated_test_directory)
+                config['general']['build_type'] = build_type
+                config['general']['test_directory'] = generated_test_directory
+                if build_type == 'gradle':
+                    config['dev_tests']['build_type'] = 'ant'
+                    config['dev_tests']['build_file'] = 'test/data/irs/user-tests/build.xml'
+                    config['dev_tests']['build_targets'] = ['merge-coverage-report']
+                    config['dev_tests']['coverage_exec_file'] = "test/data/irs/user-tests/merged_jacoco.exec"
+
+                if os.path.isfile(config['dev_tests']['coverage_exec_file']):
+                    print('deleteing exec file')
+                    os.remove(config['dev_tests']['coverage_exec_file'])
+                self.__process_execute(config=config)
+
+                # assert that expected execute resources are created
+                self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
+                shutil.rmtree(generated_test_directory, ignore_errors=True)
+
+
     def __assert_generate_resources(self, app_name, generate_subcmd):
         dir_util.cd_output_dir(app_name)
         if generate_subcmd == 'ctd-amplified':
@@ -674,7 +712,7 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path=''):
+    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path='', compare_coverage=False):
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -688,6 +726,15 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(os.path.isdir(cov_report_dir))
         else:
             self.assertFalse(os.path.isdir(cov_report_dir))
+        compare_report_dir = os.path.join(main_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_REPORT_DIR)
+        if compare_coverage:
+            self.assertTrue(os.path.isdir(compare_report_dir))
+            compare_html_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
+            self.assertTrue(os.path.isdir(compare_html_dir))
+            compare_html_file = os.path.join(compare_html_dir, 'index.html')
+            self.assertTrue(os.path.isfile(compare_html_file))
+        else:
+            self.assertFalse(os.path.isdir(compare_report_dir))
         if not reports_path:
             dir_util.cd_cli_dir()
 

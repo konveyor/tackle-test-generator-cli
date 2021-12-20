@@ -254,6 +254,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                                     doc.stag('fileset', file=os.path.abspath(path))
                 doc.stag('html', destdir=main_coverage_dir)
                 doc.stag('csv', destfile=os.path.join(main_coverage_dir, os.path.basename(test_root_src_dir) + ".csv"))
+                doc.stag('xml', destfile=os.path.join(main_coverage_dir, "jacoco.xml"))
 
     result = indent(
         doc.getvalue(),
@@ -460,6 +461,8 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
     main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))).as_posix()
+    coverage_exec_file = pathlib.PurePath(os.path.join(os.path.abspath(test_root_dir), 'jacoco.exec')).as_posix()
+    coverage_xml_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.xml')).as_posix()
 
     #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
     env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util'))
@@ -471,9 +474,9 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
         if offline_instrumentation:
             test_dependsOn = ',instrument'
             app_classes_for_tests = [inst_classes]
-        final_task = 'jacocoTestReport'
+        final_task = 'clean, jacocoTestReport'
     else:
-        final_task = 'test'
+        final_task = 'clean, test'
 
     s = template.render(classpath_list=classpath_list,
                         monolith_app_paths=monolith_app_paths,
@@ -483,6 +486,8 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
                         app_classes_for_tests=app_classes_for_tests,
                         main_junit_report_dir=main_junit_report_dir,
                         main_coverage_report_dir=main_coverage_report_dir,
+                        coverage_exec_file=coverage_exec_file,
+                        coverage_xml_file=coverage_xml_file,
                         test_dependsOn=test_dependsOn,
                         final_task=final_task)
 

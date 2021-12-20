@@ -11,13 +11,16 @@
 # limitations under the License.
 # ***************************************************************************
 
+import os
 import csv
 import glob
 import logging
-import os
+import subprocess
 import shutil
+import sys
 
 from tkltest.util import command_util, constants
+from tkltest.util.logging_util import tkltest_status
 
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
@@ -130,7 +133,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
         except OSError:
             pass
 
-    jacoco_cli_file = os.path.join('..', 'lib', 'download', constants.JACOCO_CLI_JAR_NAME)
+    jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
     command_util.run_command("java -jar {} merge {} {} --destfile {}".
                              format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
@@ -247,3 +250,27 @@ def get_test_classes(test_root_dir):
         dir : test_files[dir] for dir in test_files.keys() if test_files[dir]
     }
     return test_files
+
+
+def generate_coverage_report(monolith_app_path, exec_file, xml_file, html_dir):
+    """Generates jacoco XML file from raw coverage (.exec) files.
+
+     runs the jacoco CLI to generate XML report from the raw coverage file.
+     The XML reports contains method-level coverage information (line, instruction, branch, etc.).
+     To run the jacoco CLI, directories to the application classes are needed, which is identified
+     using the tkltest config files.
+
+    """
+
+    jacoco_cli_cmd = 'java -jar {}'.format(os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME))
+    jacoco_classfiles_ops = ''
+    for classpath in monolith_app_path:
+        jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
+    jacoco_cmd = '{} {} {} {} --xml {} --html {}'.format(jacoco_cli_cmd, 'report', exec_file, jacoco_classfiles_ops, xml_file, html_dir)
+    try:
+        command_util.run_command(jacoco_cmd, verbose=True)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Error running jacoco cli command {}: {}\n{}'.format(jacoco_cmd, e, e.stderr), error=True)
+        sys.exit(1)
+
+

@@ -1,0 +1,8 @@
+subcommand = "ctd-amplified"
+
+[general]
+app_name = "irs"
+
+[generate]
+partitions_file = ""
+target_class_list = []

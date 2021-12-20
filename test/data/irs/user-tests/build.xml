@@ -1,0 +1,299 @@
+<project name="tkl_tests">
+
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+
+        <classpath path="../../../../lib/download/org.jacoco.ant-0.8.7-nodeps.jar" />
+
+    </taskdef>
+
+    <path id="classpath">
+
+        <pathelement location="../libcommons-logging-1.1.2.jar" />
+
+        <pathelement location="../libjavax.annotation-api-1.3.2.jar" />
+
+        <pathelement location="../libjavax.json-api-1.0.jar" />
+
+        <pathelement location="../libjavax.servlet-api-3.1.0.jar" />
+
+        <pathelement location="../libjavax.ws.rs-api-2.0.jar" />
+
+        <pathelement location="../libresteasy-client-3.0.8.Final.jar" />
+
+        <pathelement location="../libresteasy-jaxrs-3.0.8.Final.jar" />
+
+        <pathelement location="../../../../lib/acts_3.2.jar" />
+
+        <pathelement location="../../../../lib/download/args4j-2.0.28.jar" />
+
+        <pathelement location="../../../../lib/download/asm-7.1.jar" />
+
+        <pathelement location="../../../../lib/download/asm-analysis-7.1.jar" />
+
+        <pathelement location="../../../../lib/download/asm-commons-7.1.jar" />
+
+        <pathelement location="../../../../lib/download/asm-tree-7.1.jar" />
+
+        <pathelement location="../../../../lib/download/asm-util-7.1.jar" />
+
+        <pathelement location="../../../../lib/download/axml-2.0.0.jar" />
+
+        <pathelement location="../../../../lib/download/checker-qual-2.11.1.jar" />
+
+        <pathelement location="../../../../lib/download/commons-cli-1.4.jar" />
+
+        <pathelement location="../../../../lib/download/commons-codec-1.11.jar" />
+
+        <pathelement location="../../../../lib/download/commons-io-2.6.jar" />
+
+        <pathelement location="../../../../lib/download/commons-logging-1.2.jar" />
+
+        <pathelement location="../../../../lib/download/dexlib2-2.4.0.jar" />
+
+        <pathelement location="../../../../lib/download/error_prone_annotations-2.3.4.jar" />
+
+        <pathelement location="../../../../lib/download/evosuite-master-1.0.7.jar" />
+
+        <pathelement location="../../../../lib/download/evosuite-standalone-runtime-1.0.7.jar" />
+
+        <pathelement location="../../../../lib/download/failureaccess-1.0.1.jar" />
+
+        <pathelement location="../../../../lib/download/FastInfoset-1.2.15.jar" />
+
+        <pathelement location="../../../../lib/download/functionaljava-4.2.jar" />
+
+        <pathelement location="../../../../lib/download/guava-29.0-jre.jar" />
+
+        <pathelement location="../../../../lib/download/hamcrest-all-1.3.jar" />
+
+        <pathelement location="../../../../lib/download/hamcrest-core-1.3.jar" />
+
+        <pathelement location="../../../../lib/download/heros-1.2.0.jar" />
+
+        <pathelement location="../../../../lib/download/httpclient-4.5.13.jar" />
+
+        <pathelement location="../../../../lib/download/httpcore-4.4.6.jar" />
+
+        <pathelement location="../../../../lib/download/istack-commons-runtime-3.0.7.jar" />
+
+        <pathelement location="../../../../lib/download/j2objc-annotations-1.3.jar" />
+
+        <pathelement location="../../../../lib/download/jackson-annotations-2.12.5.jar" />
+
+        <pathelement location="../../../../lib/download/jackson-core-2.12.5.jar" />
+
+        <pathelement location="../../../../lib/download/jackson-databind-2.12.5.jar" />
+
+        <pathelement location="../../../../lib/download/jasmin-3.0.2.jar" />
+
+        <pathelement location="../../../../lib/download/javaparser-core-3.16.1.jar" />
+
+        <pathelement location="../../../../lib/download/javaparser-symbol-solver-core-3.16.1.jar" />
+
+        <pathelement location="../../../../lib/download/javassist-3.27.0-GA.jar" />
+
+        <pathelement location="../../../../lib/download/javax.activation-api-1.2.0.jar" />
+
+        <pathelement location="../../../../lib/download/javax.annotation-api-1.3.2.jar" />
+
+        <pathelement location="../../../../lib/download/java_cup-0.9.2.jar" />
+
+        <pathelement location="../../../../lib/download/jaxb-api-2.4.0-b180725.0427.jar" />
+
+        <pathelement location="../../../../lib/download/jaxb-runtime-2.4.0-b180830.0438.jar" />
+
+        <pathelement location="../../../../lib/download/jsr305-1.3.9.jar" />
+
+        <pathelement location="../../../../lib/download/junit-4.13.1.jar" />
+
+        <pathelement location="../../../../lib/download/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+
+        <pathelement location="../../../../lib/download/org.jacoco.agent-0.8.7.jar" />
+
+        <pathelement location="../../../../lib/download/org.jacoco.ant-0.8.7-nodeps.jar" />
+
+        <pathelement location="../../../../lib/download/org.jacoco.cli-0.8.7-nodeps.jar" />
+
+        <pathelement location="../../../../lib/download/org.jacoco.core-0.8.7.jar" />
+
+        <pathelement location="../../../../lib/download/org.jacoco.report-0.8.7.jar" />
+
+        <pathelement location="../../../../lib/download/polyglot-2006.jar" />
+
+        <pathelement location="../../../../lib/download/randoop-all-4.2.6.jar" />
+
+        <pathelement location="../../../../lib/download/replacecall-4.2.6.jar" />
+
+        <pathelement location="../../../../lib/download/slf4j-api-1.7.5.jar" />
+
+        <pathelement location="../../../../lib/download/soot-4.1.0.jar" />
+
+        <pathelement location="../../../../lib/download/stax-ex-1.8.jar" />
+
+        <pathelement location="../../../../lib/download/tackle-test-generator-core-1.0.0-SNAPSHOT.jar" />
+
+        <pathelement location="../../../../lib/download/txw2-2.4.0-b180830.0438.jar" />
+
+        <pathelement location="../../../../lib/download/xmlpull-1.1.3.4d_b4_min.jar" />
+
+        <pathelement location="instrumented-classes" />
+
+    </path>
+
+    <target name="delete-classes">
+
+        <delete>
+
+            <fileset dir="test_files" includes="**/*.class" />
+
+            <fileset dir="../user-tests" includes="**/*jacoco.exec" />
+
+        </delete>
+
+        <mkdir dir="instrumented-classes" />
+
+        <delete>
+
+            <fileset dir="instrumented-classes" includes="**/*.class" />
+
+        </delete>
+
+        <jacoco:instrument destdir="instrumented-classes" xmlns:jacoco="antlib:org.jacoco.ant">
+
+            <fileset dir="../monolith/target/classes" />
+
+        </jacoco:instrument>
+
+    </target>
+
+    <target name="compile-classes_user-tests" depends="delete-classes">
+
+        <javac srcdir="test_files" includeantruntime="false" debug="True">
+
+            <classpath refid="classpath" />
+
+        </javac>
+
+    </target>
+
+    <target name="execute-tests_user-tests" depends="compile-classes_user-tests">
+
+        <mkdir dir="junit-reports/user-tests" />
+
+        <mkdir dir="junit-reports/user-tests/raw" />
+
+        <mkdir dir="junit-reports/user-tests/html" />
+
+        <jacoco:coverage destfile="jacoco.exec" includes="irs.*" xmlns:jacoco="antlib:org.jacoco.ant">
+
+            <junit printsummary="on" haltonfailure="no" fork="true" forkmode="once" showoutput="yes">
+
+                <classpath>
+
+                    <path refid="classpath" />
+
+                    <pathelement location="../../../../lib/download/hamcrest-all-1.3.jar" />
+
+                    <pathelement location="../../../../lib/download/hamcrest-core-1.3.jar" />
+
+                    <pathelement location="../../../../lib/download/junit-4.13.1.jar" />
+
+                    <pathelement location="test_files" />
+
+                </classpath>
+
+                <batchtest todir="junit-reports/user-tests/raw">
+
+                    <fileset dir="test_files" includes="**/*.class" excludes="**/*ESTest_scaffolding.class" />
+
+                </batchtest>
+
+                <formatter type="xml" />
+
+            </junit>
+
+        </jacoco:coverage>
+
+    </target>
+
+    <target name="test-reports_user-tests" depends="execute-tests_user-tests">
+
+        <junitreport todir="junit-reports/user-tests">
+
+            <fileset dir="junit-reports/user-tests/raw">
+
+                <include name="TEST-*.xml" />
+
+            </fileset>
+
+            <report format="noframes" todir="junit-reports/user-tests/html" />
+
+        </junitreport>
+
+    </target>
+
+    <target name="coverage-reports_user-tests" depends="test-reports_user-tests">
+
+        <jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
+
+            <executiondata>
+
+                <file file="jacoco.exec" />
+
+            </executiondata>
+
+            <structure name="Jacoco">
+
+                <classfiles>
+
+                    <fileset dir="../monolith/target/classes" />
+
+                </classfiles>
+
+            </structure>
+
+            <html destdir="jacoco-reports/user-tests/user-tests" />
+
+        </jacoco:report>
+
+    </target>
+
+    <target name="merge-coverage" depends="test-reports_user-tests">
+
+        <jacoco:merge destfile="merged_jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+
+            <fileset dir="../user-tests" includes="**/*.exec" />
+
+        </jacoco:merge>
+
+    </target>
+
+    <target name="merge-coverage-report" depends="merge-coverage">
+
+        <jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
+
+            <executiondata>
+
+                <file file="merged_jacoco.exec" />
+
+            </executiondata>
+
+            <structure name="Jacoco">
+
+                <classfiles>
+
+                    <fileset dir="../monolith/target/classes" />
+
+                </classfiles>
+
+            </structure>
+
+            <html destdir="jacoco-reports/user-tests" />
+
+            <csv destfile="jacoco-reports/user-tests/user-tests.csv" />
+
+        </jacoco:report>
+
+    </target>
+
+</project>
