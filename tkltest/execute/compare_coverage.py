@@ -201,10 +201,10 @@ class CoverageStatistics:
         '''
         update the counters (only 'LINE' counter with the diff values, using the one line statistics)
         Args:
-            mi1: number of missed instructions by the first test suit
-            mi2: number of missed instructions by the first second suit
-            ci1: number of covered instructions by the first test suit
-            ci2: number of covered instructions by the first second suit
+            mi1: number of missed instructions by the first test suite
+            mi2: number of missed instructions by the first second suite
+            ci1: number of covered instructions by the first test suite
+            ci2: number of covered instructions by the first second suite
 
         Returns:
 

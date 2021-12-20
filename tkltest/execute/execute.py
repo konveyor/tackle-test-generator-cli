@@ -22,7 +22,7 @@ import toml
 from tkltest.execute import compare_coverage
 from tkltest.util import constants, build_util, command_util, dir_util, config_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
-from tkltest.execute.coverage_html_printer import CoverageStatisticsHtmlPrinter
+from tkltest.execute.coverage_html_writer import CoverageStatisticsHtmlWriter
 
 
 def process_execute_command(args, config):
@@ -289,7 +289,7 @@ def __compare_to_dev_tests_coverage(config):
         test_name2=tkltest_test_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_name=app_name)
-    CoverageStatisticsHtmlPrinter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, html_compare_dir)
+    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, html_compare_dir)
 
 
 
