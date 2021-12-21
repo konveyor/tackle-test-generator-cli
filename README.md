@@ -93,11 +93,11 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
 2. Install JDK 8. The JDK home directory has to be specified as a configuration option;
    see the section [Configuration Options](#configuration-options).
    
-3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems are used in two ways:
+3. Install one or more of the required build systems depending on the Tackle-Test features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. Tackle-Test uses these build systems in two ways:
 
    - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [Configuration Options](#configuration-options)). Install the build system that you prefer for running the tests.
    
-   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). Currently, this feature is supported for Gradle and Ant; Maven support will be added. Install Gradle if you plan to use the dependency computation feature.
+   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. This feature is supported for Gradle, Ant and Maven. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). If you plan to use the dependency computation feature with a Gradle or Ant build file, install Gradle or Ant respectively.
 
 4. Download Java libraries using the script [lib/download_lib_jars.sh](lib/download_lib_jars.sh). The jar
 for the test-generator core is downloaded from the Maven registry on GitHub Packages
@@ -358,7 +358,7 @@ required, and the option description).
 | target_class_list                   |                                  | list of target classes to perform test generation on                                                                                    |
 | excluded_class_list                 |                                  | list of classes or packages to exclude from test generation. Packages must end with a wildcard.                                         |
 | time_limit                          |                                  | time limit (in seconds) for evosuite/randoop test generation                                                                            |
-| app_build_type*                     |                                  | build type for collecting app dependencies: gradle or ant (support for maven to be added)                                               |
+| app_build_type*                     |                                  | build type for collecting app dependencies: gradle, ant or maven                                                                        |
 | app_build_config_file*              |                                  | path to app build file for the specified app build type                                                                                 |
 | app_build_settings_file             |                                  | path to app build settings file or property file for the specified app build type                                                       |
 | app_build_target*                   |                                  | Name of the Ant target that is being used to build the app from the build file. Required only for apps that use an Ant build file.      |
@@ -384,3 +384,11 @@ required, and the option description).
 | create_build_file                   | -nbf/--no-build-file-creation    | Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used |
 | code_coverage                       | -cc/--code-coverage              | generate code coverage report with JaCoCo agent                                                                                         |
 | test_class                          | -tc/--test-class                 | path to a test class file (.java) to compile and run                                                                                    |
+| compare_to_dev_tests                |                                  | create a coverage report that compares between the automatically generated test suite and the developer-written test suite              |
+|                                     |                                  |                                                                                                                                         |
+| dev_tests                           |                                  | information of the developer-written test suite                                                                                         |
+| build_type*                         |                                  | build type for compiling and running the developer-written test suite - either ant, maven or gradle                                     |
+| build_file*                         |                                  | path to build file for compiling and running the developer-written test suite                                                           |
+| build_targets*                      |                                  | list of build targets for compiling and running the developer-written test suite                                                        |
+| coverage_exec_file                  |                                  | the path to the Jacoco coverage .exec file, generated by the developer-written build file                                               |
+|                                     |                                  |                                                                                                                                         |

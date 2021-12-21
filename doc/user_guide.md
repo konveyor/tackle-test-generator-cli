@@ -18,11 +18,13 @@ The specification of the app under test is provided using the following configur
    
 3. `app_classpath_file`. The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../test/data/irs/irsMonoClasspath.txt). 
 
-    If your Java project has a Gradle or Ant build file, you can alternatively specify that build file and Tackle-Test will automatically collect the application's library dependencies and create the classpath file. To do this, the `generate` command options in the toml file `app_build_type`, `app_build_config_file`, and `app_build_settings_file` can be used; for example with Gradle build file, see the [splitNjoin app build specification](../test/data/splitNjoin/tkltest_config.toml).
-    
-    For Ant build files, the `app_build_target` option is needed for collecting the dependencies. Also, this feature is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks (no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files).
+    Alternatively, you can specify your Gradle, Ant or Maven build file and Tackle-Test will automatically collect the application's library dependencies and create the classpath file.  To do this, use the `generate` command options in the toml file:
    
-    This feature is currently supported for Gradle and Ant only; Maven support will be added in the future.
+   - For Gradle build file, specify `app_build_type` and `app_build_config_file`. `app_build_settings_file` is optional for specifying a settings file. For example with Gradle build file, see the [splitNjoin app build specification](../test/data/splitNjoin/tkltest_config.toml).
+   
+   - For Ant build file, specify `app_build_type`, `app_build_config_file`, and `app_build_target`. `app_build_settings_file` is optional for specifying a property file. For Ant, this feature is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files.
+   
+   - For Maven build file, specify `app_build_type` and `app_build_config_file`.
 
 ### Selecting the test-generation strategy
 

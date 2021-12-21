@@ -50,4 +50,9 @@ name = "TKLTEST_CONFIG_FILE"
     app_packages = ["irs.*"]
 
 
+[dev_tests]
+    build_type = "gradle"
+    build_file = "test/data/irs/user-tests/build.gradle"
+    build_targets =  ["clean", "test"]
+    coverage_exec_file = "test/data/irs/user-tests/jacoco/jacoco.exec"
 
