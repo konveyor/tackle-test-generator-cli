@@ -669,7 +669,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
                 config = copy.deepcopy(app_info['config'])
                 config['execute']['code_coverage'] = True
-                config['execute']['compare_to_dev_tests'] = True
+                config['dev_tests']['compare_code_coverage'] = True
                 shutil.rmtree(main_report_dir, ignore_errors=True)
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
                 shutil.copytree('test/data/irs/irs-ctd-amplified-tests', generated_test_directory)

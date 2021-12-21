@@ -37,7 +37,7 @@ def process_execute_command(args, config):
     dir_util.cd_output_dir(config['general']['app_name'])
     config_util.fix_config(config, args.command)
     __execute_base(args, config)
-    if config['execute']['compare_to_dev_tests']:
+    if config['dev_tests']['compare_code_coverage']:
         __run_dev_tests(config)
         __compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
@@ -138,7 +138,7 @@ def __execute_base(args, config):
                      app_classpath=classpath,
                      test_root_dir=test_root_dir,
                      test_dirs=test_dirs,
-                     collect_codecoverage=config['execute']['code_coverage'] or config['execute']['compare_to_dev_tests'],
+                     collect_codecoverage=config['execute']['code_coverage'] or config['dev_tests']['compare_code_coverage'],
                      app_packages=config['execute']['app_packages'],
                      partitions_file=gen_config['generate']['partitions_file'],
                      target_class_list=gen_config['generate']['target_class_list'],
