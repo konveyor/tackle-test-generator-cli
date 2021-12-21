@@ -1,6 +1,5 @@
 [general]
 app_name = "14_spark"
-app_classpath_file = "./14_sparkMonoClasspath.txt"
 monolith_app_path = [ "",]
 java_jdk_home = ""
 test_directory = ""
