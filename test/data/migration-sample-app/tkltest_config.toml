@@ -1,6 +1,5 @@
 [general]
 app_name = "migration-sample-app"
-app_classpath_file = "./migration-sample-appMonoClasspath.txt"
 monolith_app_path = [
     "test/data/migration-sample-app/migration-sample-app-master/proprietary-stub/target/classes",
     "test/data/migration-sample-app/migration-sample-app-master/simple-sample-services/target/classes",
@@ -24,7 +23,7 @@ app_build_config_file = "test/data/migration-sample-app/migration-sample-app-mas
 
 [execute]
 app_packages = [ "com.*",]
-build_type = "ant"
+build_type = "maven"
 create_build_file = true
 code_coverage = false
 online_instrumentation = false
