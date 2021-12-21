@@ -44,7 +44,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     main_coverage_dir = os.path.abspath(os.path.join(report_dir,
                                                      constants.TKL_CODE_COVERAGE_REPORT_DIR,
                                                      os.path.basename(test_root_dir)))
-    coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test_root_dir)) + '.csv'
+    if build_type == 'maven':
+        coverage_csv_file = os.path.join(main_coverage_dir, 'jacoco.csv')
+    else:
+        coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test_root_dir) + '.csv')
     try:
         os.remove(coverage_csv_file)
     except OSError:
@@ -56,7 +59,11 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
         command_util.run_command("mvn -f {} clean verify site".format(build_file), verbose=False)
-        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
+        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
+            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
+        else:
+            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
         command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
 
