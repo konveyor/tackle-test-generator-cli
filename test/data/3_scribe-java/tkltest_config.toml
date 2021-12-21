@@ -1,6 +1,5 @@
 [general]
 app_name = "3_scribe-java"
-app_classpath_file = "./3_scribe-javaMonoClasspath.txt"
 monolith_app_path = [ "",]
 java_jdk_home = ""
 test_directory = ""
