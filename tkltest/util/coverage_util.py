@@ -66,6 +66,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
             jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
         command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
