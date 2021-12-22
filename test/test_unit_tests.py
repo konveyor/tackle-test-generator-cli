@@ -80,7 +80,7 @@ class UnitTests(unittest.TestCase):
         # app_build_type, app_build_config_file are determined by the toml
         maven_test_apps = {
             '14_spark': {
-                'standard_classpath': os.path.join('test', 'data', '14_spark', 'sparkMonoClasspath.txt'),
+                'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
             },
             '3_scribe-java': {
