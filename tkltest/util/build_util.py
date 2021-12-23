@@ -77,9 +77,9 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
                            partitions_file, target_class_list, main_reports_dir, app_packages='',
                            collect_codecoverage=False, offline_instrumentation=False):
-    """Generates Ant build.xml file and Maven pom.xml for running tests.
+    """Generates Ant build.xml, Maven pom.xml, and Gradle build.gradle for running tests.
 
-    Generates Ant build.xml file and Maven pom.xml for running generated tests and collecting coverage information.
+    Generates Ant build.xml, aMaven pom.xml and Gradle build.gradle for running generated tests and collecting coverage information.
 
     Args:
         app_name: name of the app under test
@@ -310,7 +310,6 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                 line('scope', 'test')
             for full_path in classpath_list:
                 if full_path.strip() and os.path.isdir(full_path):
-                    print(full_path)
                     try:
                         subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
                     except subprocess.CalledProcessError as e:
@@ -319,14 +318,15 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                     full_path += ".jar"
                 file_name = full_path.rsplit(os.path.sep,1)[1]
                 file_name = file_name.replace('.jar', '')
-                with tag('dependency'):
-                    if 'org.jacoco.agent' in file_name:
+                if 'org.jacoco.agent' in file_name:
+                    with tag('dependency'):
                         line('groupId', 'org.jacoco')
                         line('artifactId', 'org.jacoco.agent')
                         line('version', constants.JACOCO_MAVEN_VERSION)
                         line('scope', 'test')
                         line('classifier', 'runtime')
-                    else:
+                elif os.path.isfile(full_path):
+                    with tag('dependency'):
                         line('groupId', file_name)
                         line('artifactId', file_name)
                         line('version', '1.0')
