@@ -1,9 +1,9 @@
 [general]
-app_name = "migration-sample-app"
+app_name = "windup-sample"
 monolith_app_path = [
-    "test/data/migration-sample-app/migration-sample-app-master/proprietary-stub/target/classes",
-    "test/data/migration-sample-app/migration-sample-app-master/simple-sample-services/target/classes",
-    "test/data/migration-sample-app/migration-sample-app-master/simple-sample-web/target/classes"]
+    "test/data/windup-sample/migration-sample-app-master/proprietary-stub/target/classes",
+    "test/data/windup-sample/migration-sample-app-master/simple-sample-services/target/classes",
+    "test/data/windup-sample/migration-sample-app-master/simple-sample-web/target/classes"]
 java_jdk_home = ""
 test_directory = ""
 reports_path = ""
@@ -19,7 +19,7 @@ excluded_class_list = []
 time_limit = 10
 add_assertions = true
 app_build_type = 'maven'
-app_build_config_file = "test/data/migration-sample-app/migration-sample-app-master/pom.xml"
+app_build_config_file = "test/data/windup-sample/migration-sample-app-master/pom.xml"
 
 [execute]
 app_packages = [ "com.*",]

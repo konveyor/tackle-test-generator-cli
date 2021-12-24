@@ -87,9 +87,9 @@ class UnitTests(unittest.TestCase):
                 'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
             },
-            'migration-sample-app': {
-                'standard_classpath': os.path.join('test', 'data', 'migration-sample-app', 'migration-sample-appMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', 'migration-sample-app', 'tkltest_config.toml'),
+            'windup-sample': {
+                'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sampleMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config.toml'),
             }
         }
 
