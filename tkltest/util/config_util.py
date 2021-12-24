@@ -542,7 +542,8 @@ def __resolve_classpath(tkltest_config, command):
 
     elif app_build_type == 'maven':
         get_dependencies_task = 'tkltest_get_dependencies'
-        get_dependencies_command = 'mvn dependency:copy-dependencies -f ' + app_build_file + ' -DoutputDirectory=' + dependencies_dir + ' -o -e -X'
+        get_dependencies_command = 'mvn dependency:copy-dependencies -f ' + app_build_file + ' -DoutputDirectory=' + dependencies_dir
+        get_dependencies_command += ' -e -X -DoverWriteReleases=false -DoverWriteSnapshots=false -DoverWriteIfNewer=false'
         logging.info(get_dependencies_command)
 
         # run maven
