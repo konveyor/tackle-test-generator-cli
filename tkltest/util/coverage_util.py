@@ -149,7 +149,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     except subprocess.CalledProcessError as e:
         # If merging failed we skip current test file and assume it resulted in zero delta coverage
         # The reason to continue is that we may still gain from previous augmenting test files
-        tkltest_status('Merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr), error=True)
+        tkltest_status('Merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr))
         return {
                    'instruction_cov_delta': 0,
                    'line_cov_delta': 0,
