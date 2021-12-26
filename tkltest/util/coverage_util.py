@@ -142,7 +142,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
 
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
-    command_util.run_command("java -jar {} merge {} {} --destfile {}".
+    command_util.run_command("java -Xmx2048m -jar {} merge {} {} --destfile {}".
                              format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
                                     output_exec_file), verbose=True)
 
@@ -150,7 +150,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
 
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
 
-    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {}".
+    command_util.run_command("java -Xmx2048m -jar {} report {} --classfiles {} --csv {} --html {}".
                              format(jacoco_cli_file, output_exec_file, os.path.pathsep.join(class_files),
                                     coverage_csv_file, main_coverage_dir), verbose=True)
 
