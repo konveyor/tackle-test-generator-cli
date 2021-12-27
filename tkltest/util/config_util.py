@@ -490,6 +490,7 @@ def __resolve_classpath(tkltest_config, command):
     if command == 'execute':
         if os.path.isfile(build_classpath_file):
             tkltest_config['general']['app_classpath_file'] = build_classpath_file
+            return
         else:
             tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
