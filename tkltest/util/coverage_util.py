@@ -24,7 +24,8 @@ from tkltest.util.logging_util import tkltest_status
 
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
-                                raw_cov_data_dir, raw_cov_data_file_pref):
+                                raw_cov_data_dir, raw_cov_data_file_pref,
+                                additional_exec_file = None, class_files = None):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
@@ -44,10 +45,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     main_coverage_dir = os.path.abspath(os.path.join(report_dir,
                                                      constants.TKL_CODE_COVERAGE_REPORT_DIR,
                                                      os.path.basename(test_root_dir)))
-    if build_type == 'maven':
-        coverage_csv_file = os.path.join(main_coverage_dir, 'jacoco.csv')
-    else:
+    if build_type == 'ant':
         coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test_root_dir) + '.csv')
+    else:
+        coverage_csv_file = os.path.join(main_coverage_dir, 'jacoco.csv')
     try:
         os.remove(coverage_csv_file)
     except OSError:
@@ -67,6 +68,20 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     else: #gradle
         command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
         jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+
+    if additional_exec_file:
+        jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+        merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
+        merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
+        command_util.run_command("java -jar {} merge {} {} --destfile {}".
+                                 format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
+                                        merged_exec_file), verbose=True)
+        command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
+                                 format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
+                                        merged_csv_file), verbose=True)
+        jacoco_raw_date_file = merged_exec_file
+        coverage_csv_file = merged_csv_file
+
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)

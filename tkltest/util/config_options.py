@@ -592,6 +592,14 @@ __options_spec = {
             'default_value': False,
             'help_message': 'create a code coverage report that compares between the automatically generated test suite and the developer-written test suite'
         },
+        'add_coverage_for_augmentation': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'add developer-written test suite coverage to CTD-guided tests coverage for augmentation'
+        },
     }
 
 }
