@@ -423,7 +423,7 @@ there are online instructions available on how to enable long paths and avoid th
 
 ## Additional Resources
 
-- [Blog post on TackleTest](https://opensource.com/article/21/8/tackle-test)
+- [Article on TackleTest](https://opensource.com/article/21/8/tackle-test)
 - [Short demo of TackleTest](https://www.youtube.com/watch?v=wpgmB_xvZaQ) (5 min)
 - [Detailed TackleTest presentation and demo from Konveyor meetup](https://www.youtube.com/watch?v=qThqTFh2PM4&t) (48 min)
 - [Slide deck on TackleTest](https://www.slideshare.net/KonveyorIO/tackletest-an-automatic-unitlevel-test-case-generator)
