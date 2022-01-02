@@ -128,6 +128,10 @@ def __execute_base(args, config):
         test_dirs = [test_root_dir]
 
     # run test classes
+    if gen_config['subcommand'] == 'ctd-amplified' and gen_config['generate']['ctd_amplified']['augment_coverage']:
+        offline_inst =gen_config['general']['offline_instrumentation']
+    else:
+        offline_inst = config['general']['offline_instrumentation']
     __run_test_cases(create_build=config['execute']['create_build_file'],
                      build_type=config['general']['build_type'],
                      ant_build_file=test_root_dir + os.sep + "build.xml",
@@ -143,7 +147,7 @@ def __execute_base(args, config):
                      partitions_file=gen_config['generate']['partitions_file'],
                      target_class_list=gen_config['generate']['target_class_list'],
                      reports_dir=config['general']['reports_path'],
-                     offline_inst=config['general']['offline_instrumentation'],
+                     offline_inst=offline_inst,
                      verbose=config['general']['verbose']
                      )
 

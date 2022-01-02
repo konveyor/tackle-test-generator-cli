@@ -218,7 +218,9 @@ def generate_ctd_amplified_tests(config):
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
         collect_codecoverage=True,  # for coverage-based augmentation
         offline_instrumentation=True if config['generate']['ctd_amplified']['augment_coverage'] else False
+        #todo - why not taking orig value in case of not augmentation?
     )
+    config['general']['offline_instrumentation'] = config['generate']['ctd_amplified']['augment_coverage']
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))
@@ -252,6 +254,7 @@ def generate_ctd_amplified_tests(config):
                 collect_codecoverage=True,  # for coverage-based augmentation
                 offline_instrumentation=False
             )
+            config['general']['offline_instrumentation'] = False
             augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                        ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.

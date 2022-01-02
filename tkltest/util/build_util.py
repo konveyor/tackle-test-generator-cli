@@ -67,7 +67,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     ])
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
-        class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
+            class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
     logging.info('classpath: {} '.format(classpath_str))
@@ -339,7 +339,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                     with tag('resource'):
                         line('directory', os.path.abspath(app_path))
             for test_src_dir in test_dirs:
-                if os.path.basename(test_src_dir) == 'target':
+                if os.path.basename(test_src_dir) in ['target', 'build']:
                     continue # skip compilation output directory
                 current_partition = os.path.basename(test_src_dir)
                 junit_output_dir = os.path.join(main_junit_dir, current_partition)
@@ -427,7 +427,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                     line('report', 'report-only')
                         with tag('configuration'):
                             for test_src_dir in test_dirs:
-                                if os.path.basename(test_src_dir) == 'target':
+                                if os.path.basename(test_src_dir) in ['target', 'build']:
                                     continue  # skip compilation output directory
                                 current_partition = os.path.basename(test_src_dir)
                                 junit_output_dir = os.path.join(main_junit_dir, current_partition)
