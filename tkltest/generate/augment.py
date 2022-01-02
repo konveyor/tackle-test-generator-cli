@@ -52,7 +52,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         bool: whether we were able to collect coverage for augmenting tests (there may be an issue with evosuite class loading)
     """
 
-    if config['dev_tests']['add_coverage_for_augmentation']:
+    if config['dev_tests']['use_coverage_for_augmentation']:
         dev_tests = config['dev_tests']
     else:
         dev_tests = None

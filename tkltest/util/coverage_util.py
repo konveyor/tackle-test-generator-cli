@@ -56,18 +56,34 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
     # run tests using build file
     if build_type == 'ant':
-        command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
+        cmd = "ant -f {} merge-coverage-report".format(build_file)
         jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        command_util.run_command("mvn -f {} clean verify site".format(build_file), verbose=False)
+        cmd = "mvn -f {} clean verify site".format(build_file)
         # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
         if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
             jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
         else:
             jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
-        command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
+        cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
         jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    try:
+        command_util.run_command(cmd, verbose=False)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Running test suite for coverage computing: {}\n{}'.format(e, e.stderr))
+    if not os.path.exists(jacoco_raw_date_file):
+        #todo - for Rachel we do not continue, but how?
+        return {
+            'instruction_covered': 0,
+            'line_covered': 0,
+            'branch_covered': 0,
+            'method_covered': 0,
+            'instruction_total': 1,
+            'line_total': 1,
+            'branch_total': 1,
+            'method_total': 1,
+        }
 
     if additional_test_suite:
         additional_build_targets = ' '.join(additional_test_suite['build_targets'])
@@ -82,7 +98,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         try:
             command_util.run_command(cmd, verbose=False)
         except subprocess.CalledProcessError as e:
-            tkltest_status('Running user test suite with command \'{}\' failed: {}\n{}'.format(cmd, e, e.stderr))
+            tkltest_status('Running user test suite: {}\n{}'.format( e, e.stderr))
 
         additional_exec_file = additional_test_suite['coverage_exec_file']
 
