@@ -74,11 +74,16 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         additional_build_file = additional_test_suite['build_file']
         dev_build_type = additional_test_suite['build_type']
         if dev_build_type == 'ant':
-            command_util.run_command("ant -f {} {}".format(additional_build_file, additional_build_targets), verbose=False)
+            cmd = "ant -f {} {}".format(additional_build_file, additional_build_targets)
         elif dev_build_type == 'maven':
-            command_util.run_command("mvn -f {} {}".format(additional_build_file, additional_build_targets), verbose=False)
+            cmd = "mvn -f {} {}".format(additional_build_file, additional_build_targets)
         else:  # gradle
-            command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets), verbose=False)
+            cmd = "gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets)
+        try:
+            command_util.run_command(cmd, verbose=False)
+        except subprocess.CalledProcessError as e:
+            tkltest_status('Running user test suite with command \'{}\' failed: {}\n{}'.format(cmd, e, e.stderr))
+
         additional_exec_file = additional_test_suite['coverage_exec_file']
 
         jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
