@@ -25,7 +25,7 @@ from tkltest.util.logging_util import tkltest_status
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
                                 raw_cov_data_dir, raw_cov_data_file_pref,
-                                class_files = None, additional_test_suite = None):
+                                class_files=None, additional_test_suite=None):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
@@ -36,7 +36,8 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
-
+        class_files (str): the class file of the app
+        additional_test_suite (dict): information of additional test suite, to add its coverage to the tests coverage
     Returns:
         dict: Information about instructions, lines, and branches covered and missed
     """
@@ -71,21 +72,14 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     try:
         command_util.run_command(cmd, verbose=False)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Running test suite for coverage computing: {}\n{}'.format(e, e.stderr))
+        tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
+        sys.exit(1)
     if not os.path.exists(jacoco_raw_date_file):
-        #todo - for Rachel we do not continue, but how?
-        return {
-            'instruction_covered': 0,
-            'line_covered': 0,
-            'branch_covered': 0,
-            'method_covered': 0,
-            'instruction_total': 1,
-            'line_total': 1,
-            'branch_total': 1,
-            'method_total': 1,
-        }
+        tkltest_status('Error: {} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
+        sys.exit(1)
 
     if additional_test_suite:
+        everything_cool = True
         additional_build_targets = ' '.join(additional_test_suite['build_targets'])
         additional_build_file = additional_test_suite['build_file']
         dev_build_type = additional_test_suite['build_type']
@@ -98,22 +92,35 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         try:
             command_util.run_command(cmd, verbose=False)
         except subprocess.CalledProcessError as e:
-            tkltest_status('Running user test suite: {}\n{}'.format( e, e.stderr))
-
+            tkltest_status('Error while running test suite for coverage computing:\n {}\n{}'.format(e, e.stderr))
+            everything_cool = False
         additional_exec_file = additional_test_suite['coverage_exec_file']
+        if everything_cool and not os.path.exists(additional_exec_file):
+            tkltest_status('Error: {} was not created using command: {}'.format(additional_exec_file, cmd), error=True)
+            everything_cool = False
+        if everything_cool:
+            jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+            merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
+            merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
+            try:
+                command_util.run_command("java -jar {} merge {} {} --destfile {}".
+                                         format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
+                                                merged_exec_file), verbose=True)
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Error: fail to merge {} with {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr))
+                everything_cool = False
+        if everything_cool:
+            try:
+                command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
+                                         format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
+                                                merged_csv_file), verbose=True)
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Error: fail to get {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr))
+                everything_cool = False
 
-        jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
-        merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
-        merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
-        command_util.run_command("java -jar {} merge {} {} --destfile {}".
-                                 format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
-                                        merged_exec_file), verbose=True)
-        command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
-                                 format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
-                                        merged_csv_file), verbose=True)
-        jacoco_raw_date_file = merged_exec_file
-        coverage_csv_file = merged_csv_file
-
+        if everything_cool:
+            jacoco_raw_date_file = merged_exec_file
+            coverage_csv_file = merged_csv_file
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)

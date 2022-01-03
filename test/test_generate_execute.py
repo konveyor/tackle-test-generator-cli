@@ -230,7 +230,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['augment_coverage'] = True
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
-            config['dev_tests']['use_coverage_for_augmentation'] = True
+            config['dev_tests']['use_for_augmentation'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created

@@ -6,6 +6,3 @@ app_name = "irs"
 [generate]
 partitions_file = ""
 target_class_list = []
-
-[generate.ctd_amplified]
-augment_coverage = false

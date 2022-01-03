@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import sys
 
-from tkltest.util import constants, coverage_util, command_util
+from tkltest.util import constants, coverage_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -52,7 +52,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         bool: whether we were able to collect coverage for augmenting tests (there may be an issue with evosuite class loading)
     """
 
-    if config['dev_tests']['use_coverage_for_augmentation']:
+    if config['dev_tests']['use_for_augmentation']:
         dev_tests = config['dev_tests']
     else:
         dev_tests = None
@@ -144,6 +144,8 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         build_file (str): Build file to use for running tests
         build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
+        class_files (str): the class file of the app
+        dev_tests (dict): information of user test suite, to add its coverage to the base tests coverage
 
     Returns:
         list: test classes in the augmentation pool
