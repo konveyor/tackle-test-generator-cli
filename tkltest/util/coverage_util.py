@@ -79,7 +79,12 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         sys.exit(1)
 
     if additional_test_suite:
-        everything_cool = True
+        '''
+        when we have additional_test_suite, we allow it to fail.
+        in case of failure, we will use the original .csv & .exec files
+        as long as no_failure flag is true, we continue with the code 
+        '''
+        no_failure = True
         additional_build_targets = ' '.join(additional_test_suite['build_targets'])
         additional_build_file = additional_test_suite['build_file']
         dev_build_type = additional_test_suite['build_type']
@@ -93,12 +98,12 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
             command_util.run_command(cmd, verbose=False)
         except subprocess.CalledProcessError as e:
             tkltest_status('Error while running test suite for coverage computing:\n {}\n{}'.format(e, e.stderr))
-            everything_cool = False
+            no_failure = False
         additional_exec_file = additional_test_suite['coverage_exec_file']
-        if everything_cool and not os.path.exists(additional_exec_file):
-            tkltest_status('Error: {} was not created using command: {}'.format(additional_exec_file, cmd), error=True)
-            everything_cool = False
-        if everything_cool:
+        if no_failure and not os.path.exists(additional_exec_file):
+            tkltest_status('Error: {} was not created using command: {}'.format(additional_exec_file, cmd))
+            no_failure = False
+        if no_failure:
             jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
             merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
             merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
@@ -108,19 +113,21 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                                                 merged_exec_file), verbose=True)
             except subprocess.CalledProcessError as e:
                 tkltest_status('Error: fail to merge {} with {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr))
-                everything_cool = False
-        if everything_cool:
+                no_failure = False
+        if no_failure:
             try:
                 command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
                                          format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
                                                 merged_csv_file), verbose=True)
             except subprocess.CalledProcessError as e:
                 tkltest_status('Error: fail to get {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr))
-                everything_cool = False
+                no_failure = False
 
-        if everything_cool:
+        if no_failure:
             jacoco_raw_date_file = merged_exec_file
             coverage_csv_file = merged_csv_file
+        else:
+            tkltest_status('Fail to get coverage information from additional_test_suite {}, using only coverage from {}'.format(additional_build_file, build_file))
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
