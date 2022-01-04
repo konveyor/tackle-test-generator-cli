@@ -112,7 +112,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                                          format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
                                                 merged_exec_file), verbose=True)
             except subprocess.CalledProcessError as e:
-                tkltest_status('fail to merge {} with {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr), error=True)
+                tkltest_status(' Failed to merge coverage data files {} and {]:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr), error=True)
                 no_failure = False
         if no_failure:
             try:
@@ -120,7 +120,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                                          format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
                                                 merged_csv_file), verbose=True)
             except subprocess.CalledProcessError as e:
-                tkltest_status('fail to obtain {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr), error=True)
+                tkltest_status('Failed to create CSV coverage report {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr), error=True)
                 no_failure = False
 
         if no_failure:
