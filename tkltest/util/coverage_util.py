@@ -24,7 +24,8 @@ from tkltest.util.logging_util import tkltest_status
 
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
-                                raw_cov_data_dir, raw_cov_data_file_pref):
+                                raw_cov_data_dir, raw_cov_data_file_pref,
+                                class_files=None, additional_test_suite=None):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
@@ -35,7 +36,8 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
-
+        class_files (str): the class file of the app
+        additional_test_suite (dict): information of additional test suite, to add its coverage to the tests coverage
     Returns:
         dict: Information about instructions, lines, and branches covered and missed
     """
@@ -44,10 +46,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     main_coverage_dir = os.path.abspath(os.path.join(report_dir,
                                                      constants.TKL_CODE_COVERAGE_REPORT_DIR,
                                                      os.path.basename(test_root_dir)))
-    if build_type == 'maven':
-        coverage_csv_file = os.path.join(main_coverage_dir, 'jacoco.csv')
-    else:
+    if build_type == 'ant':
         coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test_root_dir) + '.csv')
+    else:
+        coverage_csv_file = os.path.join(main_coverage_dir, 'jacoco.csv')
     try:
         os.remove(coverage_csv_file)
     except OSError:
@@ -55,17 +57,77 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
     # run tests using build file
     if build_type == 'ant':
-        command_util.run_command("ant -f {} merge-coverage-report".format(build_file), verbose=False)
+        cmd = "ant -f {} merge-coverage-report".format(build_file)
         jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        command_util.run_command("mvn -f {} clean verify site".format(build_file), verbose=False)
+        cmd = "mvn -f {} clean verify site".format(build_file)
         # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
         if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
             jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
         else:
             jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
-        command_util.run_command("gradle --project-dir {} tklest_task".format(test_root_dir), verbose=False)
+        cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    try:
+        command_util.run_command(cmd, verbose=False)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
+        sys.exit(1)
+    if not os.path.exists(jacoco_raw_date_file):
+        tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
+        sys.exit(1)
+
+    if additional_test_suite:
+        '''
+        when we have additional_test_suite, we allow it to fail.
+        in case of failure, we will use the original .csv & .exec files
+        as long as no_failure flag is true, we continue with the code 
+        '''
+        no_failure = True
+        additional_build_targets = ' '.join(additional_test_suite['build_targets'])
+        additional_build_file = additional_test_suite['build_file']
+        dev_build_type = additional_test_suite['build_type']
+        if dev_build_type == 'ant':
+            cmd = "ant -f {} {}".format(additional_build_file, additional_build_targets)
+        elif dev_build_type == 'maven':
+            cmd = "mvn -f {} {}".format(additional_build_file, additional_build_targets)
+        else:  # gradle
+            cmd = "gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets)
+        try:
+            command_util.run_command(cmd, verbose=False)
+        except subprocess.CalledProcessError as e:
+            tkltest_status('Warning: Error while running dev-written test suite for coverage computing:\n {}\n{}'.format(e, e.stderr))
+            # no_failure is still true, we will look for .exec file
+        additional_exec_file = additional_test_suite['coverage_exec_file']
+        if not os.path.exists(additional_exec_file):
+            tkltest_status('Warning: {} was not created using command: {}'.format(additional_exec_file, cmd))
+            no_failure = False
+        if no_failure:
+            jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+            merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
+            merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
+            try:
+                command_util.run_command("java -jar {} merge {} {} --destfile {}".
+                                         format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
+                                                merged_exec_file), verbose=True)
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Warning: Failed to merge coverage data files {} and {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr))
+                no_failure = False
+        if no_failure:
+            try:
+                command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
+                                         format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
+                                                merged_csv_file), verbose=True)
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Warning: Failed to create CSV coverage report {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr))
+                no_failure = False
+
+        if no_failure:
+            jacoco_raw_date_file = merged_exec_file
+            coverage_csv_file = merged_csv_file
+        else:
+            tkltest_status('Warning: Failed to obtain coverage from dev-written test suite using {}, using only coverage from ctd-amplified test suite {}'.format(additional_build_file, build_file))
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
