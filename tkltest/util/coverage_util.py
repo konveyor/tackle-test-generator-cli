@@ -97,7 +97,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         try:
             command_util.run_command(cmd, verbose=False)
         except subprocess.CalledProcessError as e:
-            tkltest_status('Error while running additional test suite for coverage computing:\n {}\n{}'.format(e, e.stderr), error=True)
+            tkltest_status('Error while running dev-written test suite for coverage computing:\n {}\n{}'.format(e, e.stderr), error=True)
             # no_failure is still true, we will look for eexec file
         additional_exec_file = additional_test_suite['coverage_exec_file']
         if os.path.exists(additional_exec_file):
@@ -120,14 +120,14 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                                          format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
                                                 merged_csv_file), verbose=True)
             except subprocess.CalledProcessError as e:
-                tkltest_status('fail to get {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr), error=True)
+                tkltest_status('fail to obtain {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr), error=True)
                 no_failure = False
 
         if no_failure:
             jacoco_raw_date_file = merged_exec_file
             coverage_csv_file = merged_csv_file
         else:
-            tkltest_status('Fail to get coverage information from additional_test_suite {}, using only coverage from {}'.format(additional_build_file, build_file), error=True)
+            tkltest_status('Failed to obtain coverage from dev-written test suite using {}, using only coverage from ctd-amplified test suite {}'.format(additional_build_file, build_file), error=True)
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
