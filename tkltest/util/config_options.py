@@ -273,7 +273,7 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven',  'gradle'],
             'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests - either ant, maven, or gradle'
+            'help_message': 'build file type for compiling and running the tests: ant, maven, or gradle'
         }
     },
 
@@ -349,7 +349,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of classes or packages to exclude from test generation. Packages must end with a wildcard.'
+            'help_message': 'list of classes or packages to exclude from test generation; packages must end with a wildcard'
         },
         'time_limit': {
             'required': False,
@@ -366,7 +366,7 @@ __options_spec = {
             'type': str,
             'choices': ['gradle', 'ant', 'maven', None],
             'default_value': None,
-            'help_message': 'build type for collecting app dependencies: gradle, ant or maven'
+            'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
         'app_build_config_file': {
             'required': __conditionally_required,
@@ -392,7 +392,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'Name of the Ant target that is being used to build the app from the build file. Required only for apps that use an Ant build file.'
+            'help_message': 'aame of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file'
         },
 
         # subcommands for the generate command
@@ -517,7 +517,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of app packages. Must end with a wildcard'
+            'help_message': 'list of app packages; must end with a wildcard'
         },
         'create_build_file': {
             'required': False,
@@ -527,7 +527,7 @@ __options_spec = {
             'long_name': '--no-build-file-creation',
             'type': bool,
             'default_value': True,
-            'help_message': 'Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used'
+            'help_message': 'whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used'
         },
         'code_coverage': {
             'required': False,
@@ -562,7 +562,7 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven', 'gradle'],
             'default_value': 'ant',
-            'help_message': 'build type for compiling and running the developer-written test suite:  ant, maven, or gradle'
+            'help_message': 'build type for compiling and running the developer-written test suite: ant, maven, or gradle'
         },
         'build_file': {
             'required': True,
