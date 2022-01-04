@@ -257,6 +257,7 @@ def __compare_to_dev_tests_coverage(config):
 
     """
     app_name = config['general']['app_name']
+    build_type = config['general']['build_type']
     test_root_dir = config['general']['test_directory']
     if test_root_dir == '':
         test_root_dir = app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
@@ -289,7 +290,37 @@ def __compare_to_dev_tests_coverage(config):
         test_name2=tkltest_test_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_name=app_name)
-    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, html_compare_dir)
+    merged_exec_file = os.path.join(compare_report_dir, 'dev_tkltest_merged.exec')
+    merged_coverage_xml = os.path.join(compare_report_dir, 'dev_tkltest_merged.xml')
+    merged_html_dir = os.path.join(compare_report_dir, 'dev_tkltest_merged_html')
+
+
+    jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+
+
+    if build_type == 'ant':
+        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+    elif build_type == 'maven':
+        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
+            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
+        else:
+            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    else: #gradle
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+
+    try:
+        command_util.run_command("java -Xmx2048m -jar {} merge {} {} --destfile {}".
+                             format(jacoco_cli_file, jacoco_raw_date_file, dev_coverage_exec,
+                                    merged_exec_file), verbose=True)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Warning: Failed to merge coverage data files {} and {}, not creating a compare report:\n {}\n{}'.format(jacoco_raw_date_file, dev_coverage_exec, e, e.stderr))
+        return
+    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                                           exec_file=merged_exec_file,
+                                           xml_file=merged_coverage_xml,
+                                           html_dir=merged_html_dir)
+
+    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, merged_html_dir, html_compare_dir)
 
 
 

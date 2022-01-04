@@ -37,7 +37,7 @@ class CoverageStatisticsHtmlWriter:
                      }
 
     @staticmethod
-    def create_coverage_html_dir(app_statistics, html1_dir, html2_dir, html_compare_dir):
+    def create_coverage_html_dir(app_statistics, html1_dir, html2_dir, html_summery_dir, html_compare_dir):
 
         if os.path.isdir(html_compare_dir):
             shutil.rmtree(html_compare_dir)
@@ -54,15 +54,15 @@ class CoverageStatisticsHtmlWriter:
                 CoverageStatisticsHtmlWriter.__create_coverage_html_file(
                     class_statistic,
                     html_compare_dir + os.sep + package_statistic.get_pretty_name(),
+                    html_summery_dir + os.sep + package_statistic.get_pretty_name(),
                     html1_dir + os.sep + package_statistic.get_pretty_name(),
                     html2_dir + os.sep + package_statistic.get_pretty_name())
-            CoverageStatisticsHtmlWriter.__create_coverage_html_file(package_statistic, html_compare_dir, html1_dir,
-                                                                      html2_dir)
-        CoverageStatisticsHtmlWriter.__create_coverage_html_file(app_statistics, html_compare_dir, html1_dir, html2_dir)
+            CoverageStatisticsHtmlWriter.__create_coverage_html_file(package_statistic, html_compare_dir, html_summery_dir, html1_dir, html2_dir)
+        CoverageStatisticsHtmlWriter.__create_coverage_html_file(app_statistics, html_compare_dir, html_summery_dir, html1_dir, html2_dir)
 
 
     @staticmethod
-    def __create_coverage_html_file(coverage_statistics, html_compare_dir, html1_dir, html2_dir):
+    def __create_coverage_html_file(coverage_statistics, html_compare_dir, html_summery_dir, html1_dir, html2_dir):
         '''
         Convert the CoverageStatistics to an html file
         Args:
@@ -72,7 +72,6 @@ class CoverageStatisticsHtmlWriter:
             html2_dir: the directory of the second suite
         '''
 
-        html_summery_dir = html1_dir
         if not len(coverage_statistics.counters):
             return
         html_file_name = CoverageStatisticsHtmlWriter.__get_html_file_name(coverage_statistics)
@@ -156,7 +155,7 @@ class CoverageStatisticsHtmlWriter:
 
         html_test_s_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
         html_test_s_text += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + \
-                      '</span><span> And </span>' \
+                      '</span><span> and </span>' \
                       '<span style="background-color:cornflowerblue">' + coverage_statistics.test_suite_name2 +\
                       '</span><span> Combined </span></h1>'
         html_test_s_text += str(soup_s.body.table)
