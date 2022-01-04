@@ -75,7 +75,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
     if not os.path.exists(jacoco_raw_date_file):
-        tkltest_status('Error: {} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
+        tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
         sys.exit(1)
 
     if additional_test_suite:
