@@ -69,7 +69,7 @@ def __add_arguments_to_parser(parser, options_spec):
     # iterate over each option in spec call parser.add_argument for each option with
     # suitable parameters
     for option_name in options_spec:
-        if option_name == 'help_message':
+        if option_name in ['is_cli_command', 'help_message']:
             continue
         option = options_spec[option_name]
         if not option['is_cli_option']:
@@ -158,10 +158,16 @@ def main():
                     'two application versions and performing differential testing (currently '
                     'supporting Java unit testing)')
 
-    # add the arguments for the main parser for non-command top-level options in the option spec
+    # get spec for CLI commands and config options
     options_spec = config_options.get_options_spec()
-    __add_arguments_to_parser(parser, options_spec.pop('general'))
-    __add_arguments_to_parser(parser, options_spec.pop('dev_tests'))
+
+    # add the arguments for the main parser for non-command top-level options in the option spec
+    commands_spec = {}
+    for opt_name in options_spec.keys():
+        if not options_spec[opt_name]['is_cli_command']:
+            __add_arguments_to_parser(parser, options_spec[opt_name])
+        else:
+            commands_spec[opt_name] = options_spec[opt_name]
 
     # set default option values
     default_config_file = [f for f in os.listdir('.') if os.path.isfile(f) and f == TKLTEST_DEFAULT_CONFIG_FILE]
@@ -170,7 +176,7 @@ def main():
 
     # add parsers for all CLI commands
     subparser = parser.add_subparsers(dest='command')
-    __create_command_parsers(subparser, options_spec)
+    __create_command_parsers(subparser, commands_spec)
 
     # parse arguments
     args = parser.parse_args()

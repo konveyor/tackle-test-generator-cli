@@ -114,24 +114,24 @@ def init_config():
     options_spec = config_options.get_options_spec()
     config = {}
 
-    # set general and dev_tests options to default values
-    for non_cmd_opt_group in ['general', 'dev_tests']:
-        opts_spec = options_spec[non_cmd_opt_group]
-        config[non_cmd_opt_group] = __init_options(options_spec[non_cmd_opt_group])
+    for opt_name in options_spec.keys():
 
-    # iterate over commands
-    for cmd in ['generate', 'execute']:
-        cmd_opts_spec = options_spec[cmd]
+        if not options_spec[opt_name]['is_cli_command']:
+            # set general and dev_tests options to default values
+            config[opt_name] = __init_options(options_spec[opt_name])
+        else:
+            # set command and subcommand options to default values
+            cmd_opts_spec = options_spec[opt_name]
 
-        # get subcommands, if any, for command
-        subcmd_opts_spec = cmd_opts_spec.pop('subcommands', {})
+            # get subcommands, if any, for command
+            subcmd_opts_spec = cmd_opts_spec.pop('subcommands', {})
 
-        # set command options to default values
-        config[cmd] = __init_options(cmd_opts_spec)
+            # set command options to default values
+            config[opt_name] = __init_options(cmd_opts_spec)
 
-        # set subcommand options to default values
-        for subcmd in subcmd_opts_spec.keys():
-            config[cmd][subcmd] = __init_options(subcmd_opts_spec[subcmd])
+            # set subcommand options to default values
+            for subcmd in subcmd_opts_spec.keys():
+                config[opt_name][subcmd] = __init_options(subcmd_opts_spec[subcmd])
 
     return config
 
@@ -245,6 +245,7 @@ def __init_options(options_spec):
     """
     ret_config = {}
     options_spec.pop('help_message', None)
+    options_spec.pop('is_cli_command', None)
     for option_name in options_spec.keys():
         if options_spec[option_name]['is_toml_option']:
             ret_config[option_name] = options_spec[option_name]['default_value']

@@ -43,6 +43,7 @@ def get_options_spec(command=None, subcommand=None, load_format=True):
         x = __options_spec
         spec = copy.copy(__options_spec[command]['subcommands'][subcommand])
     if load_format:
+        spec.pop('is_cli_command', None)
         spec.pop('help_message', None)
         spec.pop('subcommands', None)
     return spec
@@ -92,7 +93,7 @@ def __append_output_for_command(cmd, opt_spec, output, subcmd=None):
     cmdstr = cmd if subcmd is None else '{}.{}'.format(cmd, subcmd)
     output.append([cmdstr, '', opt_spec['help_message'] if 'help_message' in opt_spec.keys() else ''])
     for opt_name in opt_spec.keys():
-        if opt_name == 'help_message':
+        if opt_name in ['is_cli_command', 'help_message']:
             continue
         opt_info = opt_spec[opt_name]
         if opt_name == 'subcommands':
@@ -151,6 +152,7 @@ __options_spec = {
 
     # "general" options: applicable to more than one of the subcommands (generate, execute, config)
     'general': {
+        'is_cli_command': False,
         'app_name': {
             'required': True,
             'is_toml_option': True,
@@ -277,6 +279,7 @@ __options_spec = {
 
     # "config" command options
     'config': {
+        'is_cli_command': True,
         'help_message': 'Initialize configuration file or list configuration options',
         # subcommands for the generate command
         'subcommands': {
@@ -301,6 +304,7 @@ __options_spec = {
 
     # "generate" command options
     'generate': {
+        'is_cli_command': True,
         'help_message': 'Generate test cases on the application under test',
         'jee_support': {
             'required': False,
@@ -505,6 +509,7 @@ __options_spec = {
 
     # "execute" command options
     'execute': {
+        'is_cli_command': True,
         'help_message': 'Execute generated tests on the application version under test',
         'app_packages': {
             'required': True,
@@ -548,6 +553,7 @@ __options_spec = {
 
     # "dev_tests" options
     'dev_tests': {
+        'is_cli_command': False,
         'help_message': 'information about developer-written test suite',
         'build_type': {
             'required': True,
