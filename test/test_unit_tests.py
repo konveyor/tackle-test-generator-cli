@@ -19,7 +19,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.util import config_util, constants, dir_util
+from tkltest.util import config_util, constants, dir_util, command_util
 
 
 class UnitTests(unittest.TestCase):
@@ -82,14 +82,17 @@ class UnitTests(unittest.TestCase):
             '14_spark': {
                 'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
+                'requires_build': False,
             },
             '3_scribe-java': {
                 'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
+                'requires_build': False,
             },
             'windup-sample': {
                 'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sampleMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config.toml'),
+                'requires_build': True,
             }
         }
 
@@ -102,6 +105,10 @@ class UnitTests(unittest.TestCase):
             config['general']['app_classpath_file'] = ''
 
             dir_util.cd_output_dir(app_name)
+
+            if maven_test_apps[app_name]['requires_build']:
+                build_command = 'mvn install -f ' + config['generate']['app_build_config_file']
+                command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
             config_util.fix_config(config, 'generate')
 
