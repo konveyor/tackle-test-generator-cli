@@ -69,6 +69,8 @@ def __add_arguments_to_parser(parser, options_spec):
     # iterate over each option in spec call parser.add_argument for each option with
     # suitable parameters
     for option_name in options_spec:
+        if option_name == 'help_message':
+            continue
         option = options_spec[option_name]
         if not option['is_cli_option']:
             continue
@@ -156,9 +158,10 @@ def main():
                     'two application versions and performing differential testing (currently '
                     'supporting Java unit testing)')
 
-    # add the arguments for the main parser for the "general" options in the option spec
+    # add the arguments for the main parser for non-command top-level options in the option spec
     options_spec = config_options.get_options_spec()
     __add_arguments_to_parser(parser, options_spec.pop('general'))
+    __add_arguments_to_parser(parser, options_spec.pop('dev_tests'))
 
     # set default option values
     default_config_file = [f for f in os.listdir('.') if os.path.isfile(f) and f == TKLTEST_DEFAULT_CONFIG_FILE]

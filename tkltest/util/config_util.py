@@ -114,14 +114,13 @@ def init_config():
     options_spec = config_options.get_options_spec()
     config = {}
 
-    # set general options to default values
-    general_opts_spec = options_spec['general']
-    for option in general_opts_spec.keys():
-        config['general'] = __init_options(general_opts_spec)
+    # set general and dev_tests options to default values
+    for non_cmd_opt_group in ['general', 'dev_tests']:
+        opts_spec = options_spec[non_cmd_opt_group]
+        config[non_cmd_opt_group] = __init_options(options_spec[non_cmd_opt_group])
 
     # iterate over commands
-    # for cmd in ['generate', 'execute', 'classify']:
-    for cmd in ['generate', 'execute', 'dev_tests']:
+    for cmd in ['generate', 'execute']:
         cmd_opts_spec = options_spec[cmd]
 
         # get subcommands, if any, for command

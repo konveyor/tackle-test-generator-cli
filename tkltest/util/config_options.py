@@ -149,7 +149,7 @@ def __conditionally_required(opt_name, config):
 
 __options_spec = {
 
-    # "general" options: applicable to more than one of the subcommands (generate, execute, classify, config)
+    # "general" options: applicable to more than one of the subcommands (generate, execute, config)
     'general': {
         'app_name': {
             'required': True,
@@ -548,7 +548,7 @@ __options_spec = {
 
     # "dev_tests" options
     'dev_tests': {
-        'help_message': 'information of the developer-written test suite',
+        'help_message': 'information about developer-written test suite',
         'build_type': {
             'required': True,
             'is_toml_option': True,
@@ -556,7 +556,7 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven', 'gradle'],
             'default_value': 'ant',
-            'help_message': 'build type for compiling and running the developer-written test suite - either ant, maven or gradle'
+            'help_message': 'build type for compiling and running the developer-written test suite:  ant, maven, or gradle'
         },
         'build_file': {
             'required': True,
@@ -598,7 +598,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': bool,
             'default_value': False,
-            'help_message': 'When augmenting with evosuite tests, consider developer-written test suite coverage'
+            'help_message': 'when augmenting with evosuite tests, consider developer-written test suite coverage'
         },
     }
 
