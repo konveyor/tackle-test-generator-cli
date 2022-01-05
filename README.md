@@ -225,21 +225,15 @@ the CLI uses by default `./tkltest_config.toml` as the configuration file.
 `tkltest --help` shows the available commands and options.
 
 ```
-usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]
-               [-td TEST_DIRECTORY] [-rp REPORTS_PATH] [-vb] [-v]
-               {config,generate,execute} ...
+usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}] [-td TEST_DIRECTORY] [-rp REPORTS_PATH] [-vb] [-v] [-offli] [-bt {ant,maven,gradle}] {config,generate,execute} ...
 
-Command-line interface for generating and executing test cases on two
-application versions and performing differential testing (currently supporting
-Java unit testing)
+Command-line interface for generating and executing test cases on two application versions and performing differential testing (currently supporting Java unit testing)
 
 positional arguments:
   {config,generate,execute}
-    config              Initialize configuration file or list configuration
-                        options
+    config              Initialize configuration file or list configuration options
     generate            Generate test cases on the application under test
-    execute             Execute generated tests on the application version
-                        under test
+    execute             Execute generated tests on the application version under test
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -248,12 +242,15 @@ optional arguments:
   -l {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
                         logging level for printing diagnostic messages
   -td TEST_DIRECTORY, --test-directory TEST_DIRECTORY
-                        name of root test directory containing the generated
-                        JUnit test classes
+                        name of root test directory containing the generated JUnit test classes
   -rp REPORTS_PATH, --reports-path REPORTS_PATH
                         path to the reports directory
   -vb, --verbose        run in verbose mode printing detailed status messages
   -v, --version         print CLI version number
+  -offli, --offline-instrumentation
+                        perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented online)
+  -bt {ant,maven,gradle}, --build-type {ant,maven,gradle}
+                        build file type for compiling and running the tests: ant, maven, or gradle
 ```
 
 To see the CLI in action on a sample Java application, set JAVA_HOME to the JDK installation
@@ -278,8 +275,7 @@ By default, this sub-command generates diff assertions and adds them to the gene
 To avoid adding assertions, use the `-nda/--no-diff-assertions` option.
 
 ``` 
-usage: tkltest generate [-h] [-nda] [-pf PARTITIONS_FILE]
-                        {ctd-amplified,evosuite,randoop} ...
+usage: tkltest generate [-h] [-nda] [-pf PARTITIONS_FILE] {ctd-amplified,evosuite,randoop} ...
 
 positional arguments:
   {ctd-amplified,evosuite,randoop}
@@ -290,8 +286,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -nda, --no-diff-assertions
-                        do not add assertions for differential testing to the
-                        generated tests
+                        do not add assertions for differential testing to the generated tests
   -pf PARTITIONS_FILE, --partitions-file PARTITIONS_FILE
                         path to file containing specification of partitions
 ```
@@ -304,25 +299,16 @@ options `monolith_app_path` (list of paths to application classes) and `app_clas
 (file containing paths to jar files that  represent the library dependencies of app).
 
 ```
-usage: tkltest execute [-h] [-bt {ant,maven,gradle}] [-nbf] [-cc] [-onli]
-                       [-tc TEST_CLASS]
+usage: tkltest execute [-h] [-nbf] [-cc] [-tc TEST_CLASS]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -bt {ant,maven,gradle}, --build-type {ant,maven,gradle}
-                        build file type for compiling and running the tests -
-                        either ant, maven or gradle
   -nbf, --no-build-file-creation
-                        Whether to generate build files. If set to false, a
-                        build file (of type set in build_type option) should
-                        already exist and will be used
+                        whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used
   -cc, --code-coverage  generate code coverage report with JaCoCo agent
-  -offli, --offline-instrumentation
-                        perform offline instrumentation of app classes for
-                        measuring code coverage (default: app classes are
-                        instrumented online)
   -tc TEST_CLASS, --test-class TEST_CLASS
                         path to a test class file (.java) to compile and run
+
 ```
 
 For details on the `execute` command options, see the section [Configuration Options](#configuration-options).
@@ -355,7 +341,7 @@ required, and the option description).
 | verbose                             | -vb/--verbose                    | run in verbose mode printing detailed status messages                                                                                   |
 | version^                            | -v/--version                     | print CLI version number                                                                                                                |
 | offline_instrumentation             | -offli/--offline-instrumentation | perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented online)               |
-| build_type                          | -bt/--build-type                 | build file type for compiling and running the tests - either ant, maven, or gradle                                                      |
+| build_type                          | -bt/--build-type                 | build file type for compiling and running the tests: ant, maven, or gradle                                                              |
 |                                     |                                  |                                                                                                                                         |
 | config                              |                                  | Initialize configuration file or list configuration options                                                                             |
 |                                     |                                  |                                                                                                                                         |
@@ -369,12 +355,12 @@ required, and the option description).
 | no_diff_assertions                  | -nda/--no-diff-assertions        | do not add assertions for differential testing to the generated tests                                                                   |
 | partitions_file                     | -pf/--partitions-file            | path to file containing specification of partitions                                                                                     |
 | target_class_list                   |                                  | list of target classes to perform test generation on                                                                                    |
-| excluded_class_list                 |                                  | list of classes or packages to exclude from test generation. Packages must end with a wildcard.                                         |
+| excluded_class_list                 |                                  | list of classes or packages to exclude from test generation; packages must end with a wildcard                                          |
 | time_limit                          |                                  | time limit (in seconds) for evosuite/randoop test generation                                                                            |
-| app_build_type*                     |                                  | build type for collecting app dependencies: gradle, ant or maven                                                                        |
+| app_build_type*                     |                                  | build type for collecting app dependencies: ant, maven, or gradle                                                                       |
 | app_build_config_file*              |                                  | path to app build file for the specified app build type                                                                                 |
 | app_build_settings_file             |                                  | path to app build settings file or property file for the specified app build type                                                       |
-| app_build_target*                   |                                  | Name of the Ant target that is being used to build the app from the build file. Required only for apps that use an Ant build file.      |
+| app_build_target*                   |                                  | aame of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file       |
 |                                     |                                  |                                                                                                                                         |
 | generate.ctd_amplified              |                                  | Use CTD for computing coverage goals                                                                                                    |
 | base_test_generator                 | -btg/--base-test-generator       | base test generator to use for creating building-block test sequences                                                                   |
@@ -393,19 +379,18 @@ required, and the option description).
 | no_error_revealing_tests            |                                  | do not generate error-revealing tests with randoop                                                                                      |
 |                                     |                                  |                                                                                                                                         |
 | execute                             |                                  | Execute generated tests on the application version under test                                                                           |
-| app_packages*                       |                                  | list of app packages. Must end with a wildcard                                                                                          |
-| create_build_file                   | -nbf/--no-build-file-creation    | Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used |
+| app_packages*                       |                                  | list of app packages; must end with a wildcard                                                                                          |
+| create_build_file                   | -nbf/--no-build-file-creation    | whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used |
 | code_coverage                       | -cc/--code-coverage              | generate code coverage report with JaCoCo agent                                                                                         |
 | test_class                          | -tc/--test-class                 | path to a test class file (.java) to compile and run                                                                                    |
 |                                     |                                  |                                                                                                                                         |
-| dev_tests                           |                                  | information of the developer-written test suite                                                                                         |
-| build_type*                         |                                  | build type for compiling and running the developer-written test suite - either ant, maven or gradle                                     |
+| dev_tests                           |                                  | information about developer-written test suite                                                                                          |
+| build_type*                         |                                  | build type for compiling and running the developer-written test suite: ant, maven, or gradle                                            |
 | build_file*                         |                                  | path to build file for compiling and running the developer-written test suite                                                           |
 | build_targets*                      |                                  | list of build targets for compiling and running the developer-written test suite                                                        |
 | coverage_exec_file                  |                                  | the path to the Jacoco coverage .exec file, generated by the developer-written build file                                               |
 | compare_code_coverage               |                                  | create a code coverage report that compares between the automatically generated test suite and the developer-written test suite         |
-| use_for_augmentation                |                                  | When augmenting with evosuite tests, consider developer-written test suite coverage                                                     |
-|                                     |                                  |                                                                                                                                         |
+| use_for_augmentation                |                                  | when augmenting with evosuite tests, consider developer-written test suite coverage                                                     |
 
 ## Known Tool Issues
 
