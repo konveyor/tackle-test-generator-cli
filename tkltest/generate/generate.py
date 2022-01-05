@@ -225,6 +225,7 @@ def generate_ctd_amplified_tests(config):
 
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:
+        config['general']['offline_instrumentation'] = True
         build_type = config['general']['build_type']
         start_time = time.time()
         if build_type == 'ant':
@@ -252,6 +253,7 @@ def generate_ctd_amplified_tests(config):
                 collect_codecoverage=True,  # for coverage-based augmentation
                 offline_instrumentation=False
             )
+            config['general']['offline_instrumentation'] = False
             augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                        ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
