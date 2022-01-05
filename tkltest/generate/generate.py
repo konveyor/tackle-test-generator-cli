@@ -441,8 +441,11 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
 
     with open(app_classpath_file) as file:
         for line in file:
-            # remove new line from line
-            te_command += os.path.abspath(line[:-1]) + os.pathsep
+            if line.endswith('\n'):
+                # remove new line from line
+                te_command += os.path.abspath(line[:-1]) + os.pathsep
+            else:
+                te_command += os.path.abspath(line) + os.pathsep
     te_command += os.pathsep.join(monolith_app_path)
     te_command += " org.konveyor.tackle.testgen.core.extender.TestSequenceExtender"
     te_command += " -app " + app_name
