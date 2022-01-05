@@ -43,6 +43,7 @@ def get_options_spec(command=None, subcommand=None, load_format=True):
         x = __options_spec
         spec = copy.copy(__options_spec[command]['subcommands'][subcommand])
     if load_format:
+        spec.pop('is_cli_command', None)
         spec.pop('help_message', None)
         spec.pop('subcommands', None)
     return spec
@@ -92,7 +93,7 @@ def __append_output_for_command(cmd, opt_spec, output, subcmd=None):
     cmdstr = cmd if subcmd is None else '{}.{}'.format(cmd, subcmd)
     output.append([cmdstr, '', opt_spec['help_message'] if 'help_message' in opt_spec.keys() else ''])
     for opt_name in opt_spec.keys():
-        if opt_name == 'help_message':
+        if opt_name in ['is_cli_command', 'help_message']:
             continue
         opt_info = opt_spec[opt_name]
         if opt_name == 'subcommands':
@@ -149,8 +150,9 @@ def __conditionally_required(opt_name, config):
 
 __options_spec = {
 
-    # "general" options: applicable to more than one of the subcommands (generate, execute, classify, config)
+    # "general" options: applicable to more than one of the subcommands (generate, execute, config)
     'general': {
+        'is_cli_command': False,
         'app_name': {
             'required': True,
             'is_toml_option': True,
@@ -271,12 +273,13 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven',  'gradle'],
             'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests - either ant, maven, or gradle'
+            'help_message': 'build file type for compiling and running the tests: ant, maven, or gradle'
         }
     },
 
     # "config" command options
     'config': {
+        'is_cli_command': True,
         'help_message': 'Initialize configuration file or list configuration options',
         # subcommands for the generate command
         'subcommands': {
@@ -301,6 +304,7 @@ __options_spec = {
 
     # "generate" command options
     'generate': {
+        'is_cli_command': True,
         'help_message': 'Generate test cases on the application under test',
         'jee_support': {
             'required': False,
@@ -345,7 +349,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of classes or packages to exclude from test generation. Packages must end with a wildcard.'
+            'help_message': 'list of classes or packages to exclude from test generation; packages must end with a wildcard'
         },
         'time_limit': {
             'required': False,
@@ -362,7 +366,7 @@ __options_spec = {
             'type': str,
             'choices': ['gradle', 'ant', 'maven', None],
             'default_value': None,
-            'help_message': 'build type for collecting app dependencies: gradle, ant or maven'
+            'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
         'app_build_config_file': {
             'required': __conditionally_required,
@@ -388,7 +392,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'Name of the Ant target that is being used to build the app from the build file. Required only for apps that use an Ant build file.'
+            'help_message': 'aame of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file'
         },
 
         # subcommands for the generate command
@@ -505,6 +509,7 @@ __options_spec = {
 
     # "execute" command options
     'execute': {
+        'is_cli_command': True,
         'help_message': 'Execute generated tests on the application version under test',
         'app_packages': {
             'required': True,
@@ -512,7 +517,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of app packages. Must end with a wildcard'
+            'help_message': 'list of app packages; must end with a wildcard'
         },
         'create_build_file': {
             'required': False,
@@ -522,7 +527,7 @@ __options_spec = {
             'long_name': '--no-build-file-creation',
             'type': bool,
             'default_value': True,
-            'help_message': 'Whether to generate build files. If set to false, a build file (of type set in build_type option) should already exist and will be used'
+            'help_message': 'whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used'
         },
         'code_coverage': {
             'required': False,
@@ -548,7 +553,8 @@ __options_spec = {
 
     # "dev_tests" options
     'dev_tests': {
-        'help_message': 'information of the developer-written test suite',
+        'is_cli_command': False,
+        'help_message': 'information about developer-written test suite',
         'build_type': {
             'required': True,
             'is_toml_option': True,
@@ -556,7 +562,7 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven', 'gradle'],
             'default_value': 'ant',
-            'help_message': 'build type for compiling and running the developer-written test suite - either ant, maven or gradle'
+            'help_message': 'build type for compiling and running the developer-written test suite: ant, maven, or gradle'
         },
         'build_file': {
             'required': True,
@@ -598,7 +604,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': bool,
             'default_value': False,
-            'help_message': 'When augmenting with evosuite tests, consider developer-written test suite coverage'
+            'help_message': 'when augmenting with evosuite tests, consider developer-written test suite coverage'
         },
     }
 
