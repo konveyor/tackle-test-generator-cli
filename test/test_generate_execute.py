@@ -130,7 +130,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_ctdamplified_combined_allclasses_diffassert(self) -> None:
+    def test_generate_execute_ctdamplified_combined_allclasses_diffassert_level_2(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes"""
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
@@ -138,6 +138,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            config['generate']['ctd_amplified']['interaction_level'] = 2
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created

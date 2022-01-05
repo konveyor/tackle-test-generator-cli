@@ -430,6 +430,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         te_command += os.path.join(constants.TKLTEST_LIB_DIR,
                                    "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
         te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "junit-4.13.1.jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DIR, "ccmcl.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.5.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.5.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.5.jar") + os.pathsep
