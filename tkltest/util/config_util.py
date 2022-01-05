@@ -121,7 +121,7 @@ def init_config():
 
     # iterate over commands
     # for cmd in ['generate', 'execute', 'classify']:
-    for cmd in ['generate', 'execute']:
+    for cmd in ['generate', 'execute', 'dev_tests']:
         cmd_opts_spec = options_spec[cmd]
 
         # get subcommands, if any, for command

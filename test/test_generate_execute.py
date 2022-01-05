@@ -221,6 +221,21 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected generate resources are created
             self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
 
+    def test_generate_ctdamplified_evosuite_allclasses_augmentcoverage_with_user_coverage(self) -> None:
+        """Test "generate ctd-amplified": base_test_generator=evosuite scope=all_classes augment_coverage=true"""
+        for app_name in self.test_list1:
+            app_info = self.test_apps[app_name]
+            config = app_info['config']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
+            config['generate']['ctd_amplified']['augment_coverage'] = True
+            config['generate']['partitions_file'] = ''
+            config['generate']['target_class_list'] = []
+            config['dev_tests']['use_for_augmentation'] = True
+            self.__process_generate(subcommand='ctd-amplified', config=config)
+
+            # assert that expected generate resources are created
+            self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified')
+
     @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=partitions_file"""
@@ -669,7 +684,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
                 config = copy.deepcopy(app_info['config'])
                 config['execute']['code_coverage'] = True
-                config['execute']['compare_to_dev_tests'] = True
+                config['dev_tests']['compare_code_coverage'] = True
                 shutil.rmtree(main_report_dir, ignore_errors=True)
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
                 shutil.copytree('test/data/irs/irs-ctd-amplified-tests', generated_test_directory)
