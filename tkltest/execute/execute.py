@@ -257,12 +257,14 @@ def __compare_to_dev_tests_coverage(config):
     a method that compare the coverage of two test suits
     1. run the jacoco cli , to create coverage xml file of the dev test.
     2. call compare_coverage() to generate statistics information
-    3. call the html printer
+    3. run the jacoco cli , to merge the dev .exec with tkltest .exec.
+    4. call the html printer
 
     :param config:
 
     """
     app_name = config['general']['app_name']
+    build_type = config['general']['build_type']
     test_root_dir = config['general']['test_directory']
     if test_root_dir == '':
         test_root_dir = app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
@@ -279,6 +281,7 @@ def __compare_to_dev_tests_coverage(config):
         shutil.rmtree(compare_report_dir)
     os.mkdir(compare_report_dir)
 
+    # calling generate_coverage_report() to create a xml file and html dir:
     dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
     dev_coverage_exec = config['dev_tests']['coverage_exec_file']
     dev_coverage_xml = os.path.join(compare_report_dir, dev_test_name + '_coverage.xml')
@@ -288,6 +291,7 @@ def __compare_to_dev_tests_coverage(config):
                                            xml_file=dev_coverage_xml,
                                            html_dir=dev_html_dir)
 
+    # generating the compare data using the dev xml and the tkltest xml:
     html_compare_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
     app_statistics = compare_coverage.compare_coverage(
         xml_file1=dev_coverage_xml, xml_file2=tkltest_coverage_xml,
@@ -295,7 +299,38 @@ def __compare_to_dev_tests_coverage(config):
         test_name2=tkltest_test_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_name=app_name)
-    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, html_compare_dir)
+
+    # we want to merge the  dev .exec file and the tkltest .exec file, to get the coverage report from the merged .exec file
+    merged_exec_file = os.path.join(compare_report_dir, 'dev_tkltest_merged.exec')
+    merged_coverage_xml = os.path.join(compare_report_dir, 'dev_tkltest_merged.xml')
+    merged_html_dir = os.path.join(compare_report_dir, 'dev_tkltest_merged_html')
+    jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+
+    if build_type == 'ant':
+        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+    elif build_type == 'maven':
+        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
+            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
+        else:
+            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    else: #gradle
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+
+    # merging the .exec files
+    try:
+        command_util.run_command("java -Xmx2048m -jar {} merge {} {} --destfile {}".
+                             format(jacoco_cli_file, jacoco_raw_date_file, dev_coverage_exec,
+                                    merged_exec_file), verbose=True)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Warning: Failed to merge coverage data files {} and {}, not creating a compare report:\n {}\n{}'.format(jacoco_raw_date_file, dev_coverage_exec, e, e.stderr))
+        return
+    # calling generate_coverage_report() to create a xml file and html dir of the merged .exec file:
+    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                                           exec_file=merged_exec_file,
+                                           xml_file=merged_coverage_xml,
+                                           html_dir=merged_html_dir)
+    #printing the html report
+    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, merged_html_dir, html_compare_dir)
 
 
 
