@@ -86,7 +86,7 @@ class CoverageStatisticsHtmlWriter:
         '''
 
         with open(html_summery_dir + os.sep + html_file_name) as htmls_file:
-            soup_s = BeautifulSoup(htmls_file.read(), 'html.parser').html
+            soup_summery = BeautifulSoup(htmls_file.read(), 'html.parser').html
         with open(html1_dir + os.sep + html_file_name) as html1_file:
             soup1 = BeautifulSoup(html1_file.read(), 'html.parser').html
         with open(html2_dir + os.sep + html_file_name) as html2_file:
@@ -153,12 +153,12 @@ class CoverageStatisticsHtmlWriter:
         if '../jacoco-resources' in html_head:
             html_table = html_table.replace('jacoco-resources', '../jacoco-resources')
 
-        html_test_s_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
-        html_test_s_text += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + \
+        html_test_summery_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
+        html_test_summery_text += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + \
                       '</span><span> and </span>' \
                       '<span style="background-color:cornflowerblue">' + coverage_statistics.test_suite_name2 +\
                       '</span><span> Combined </span></h1>'
-        html_test_s_text += str(soup_s.body.table)
+        html_test_summery_text += str(soup_summery.body.table)
         html_test1_text = '<h1>-----------------------------------------------------------------------------------------------------------</h1>'
         html_test1_text += '<h1><span style="background-color:gold"> ' + coverage_statistics.test_suite_name1 + '</span><span> Coverage Report</span></h1>'
         html_test1_text += str(soup1.body.table)
@@ -171,7 +171,7 @@ class CoverageStatisticsHtmlWriter:
         html_text += html_tree_links
         html_text += html_title
         html_text += html_table
-        html_text += html_test_s_text
+        html_text += html_test_summery_text
         html_text += html_test1_text
         html_text += html_test2_text
         html_text += '</body></html>'
