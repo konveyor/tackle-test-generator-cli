@@ -18,7 +18,7 @@ from zipfile import ZipFile
 from .execute import execute
 from .generate import generate
 from .tkltest import *
-from .util import logging_util, config_options
+from .util import logging_util, config_options_unit
 from .util.constants import *
 
 
@@ -50,7 +50,7 @@ def main():
         description='Command-line interface for generating and executing Java unit test cases')
 
     # get spec for CLI commands and config options for unit testing
-    unit_options_spec = config_options.get_options_spec()
+    unit_options_spec = config_options_unit.get_options_spec()
 
     # parse arguments, perform checks, and load configuration
     args = parse_arguments(parser, unit_options_spec)

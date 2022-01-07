@@ -65,7 +65,7 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install .
-        which tkltest
+        which tkltest-unit
         bats test/test_cli.bats
         bats test/test_cli_irs.bats
         deactivate

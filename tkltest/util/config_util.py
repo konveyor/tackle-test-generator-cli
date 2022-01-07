@@ -23,7 +23,7 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 
-from . import constants, config_options
+from . import constants, config_options_unit
 from .logging_util import tkltest_status
 from .constants import *
 from tkltest.util import command_util
@@ -62,7 +62,7 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-        options_spec=config_options.get_options_spec(command='general'),
+        options_spec=config_options_unit.get_options_spec(command='general'),
         args=args)
 
     # if args specified, get command and subcommand
@@ -77,13 +77,13 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-            options_spec=config_options.get_options_spec(command=command),
+            options_spec=config_options_unit.get_options_spec(command=command),
             args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand),
+            options_spec=config_options_unit.get_options_spec(command=command, subcommand=subcommand),
             args=args)
 
     # validate loaded config information, exit if validation errors occur
@@ -111,7 +111,7 @@ def init_config():
         dict containing initialized options
     """
     # get config spec
-    options_spec = config_options.get_options_spec()
+    options_spec = config_options_unit.get_options_spec()
     config = {}
 
     for opt_name in options_spec.keys():
@@ -147,12 +147,12 @@ def __validate_config(config, command=None, subcommand=None):
     """
     # get general options spec and options spec for the given command and subcommand
     options_spec = {
-        'general': config_options.get_options_spec('general')
+        'general': config_options_unit.get_options_spec('general')
     }
     if command is not None:
-        options_spec[command] = config_options.get_options_spec(command)
+        options_spec[command] = config_options_unit.get_options_spec(command)
     if subcommand is not None:
-        options_spec[subcommand] = config_options.get_options_spec(command, subcommand)
+        options_spec[subcommand] = config_options_unit.get_options_spec(command, subcommand)
 
     # initialize validation errors
     val_errors = {
@@ -326,7 +326,7 @@ def __fix_relative_paths(tkltest_config):
 
     """
 
-    options_spec = config_options.get_options_spec()
+    options_spec = config_options_unit.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)

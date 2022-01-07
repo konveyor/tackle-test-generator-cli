@@ -17,7 +17,7 @@ import sys
 import toml
 
 from ._version import __version__
-from .util import logging_util, config_util, config_options
+from .util import logging_util, config_util, config_options_unit
 from .util.constants import *
 
 
@@ -121,7 +121,7 @@ def __process_config_commands(args):
             print('\n{}'.format(toml.dumps(config)))
     else:
         # list subcommand: list all config options with help messages
-        config_options.print_options_with_help()
+        config_options_unit.print_options_with_help()
 
 
 def parse_arguments(parser, options_spec):
@@ -173,83 +173,3 @@ def load_configuration(args):
     tkltest_config = config_util.load_config(args)
     logging.info('config_file: {}'.format(tkltest_config))
     return tkltest_config
-
-
-# def main():
-#     """Main entry point for the CLI.
-#
-#     This is the main entry point for the CLI, which parses command-line arguments, loads configuration
-#     information and executes the specified command (config, generate, or execute).
-#     """
-#     # create the main argument parser
-#     parser = argparse.ArgumentParser(prog='tkltest',
-#         description='Command-line interface for generating and executing test cases on '
-#                     'two application versions and performing differential testing (currently '
-#                     'supporting Java unit testing)')
-#
-#     # get spec for CLI commands and config options
-#     options_spec = config_options.get_options_spec()
-#
-#     # add the arguments for the main parser for non-command top-level options in the option spec
-#     commands_spec = {}
-#     for opt_name in options_spec.keys():
-#         if not options_spec[opt_name]['is_cli_command']:
-#             __add_arguments_to_parser(parser, options_spec[opt_name])
-#         else:
-#             commands_spec[opt_name] = options_spec[opt_name]
-#
-#     # set default option values
-#     default_config_file = [f for f in os.listdir('.') if os.path.isfile(f) and f == TKLTEST_DEFAULT_CONFIG_FILE]
-#     if default_config_file:
-#         parser.set_defaults(config_file=default_config_file[0])
-#
-#     # add parsers for all CLI commands
-#     subparser = parser.add_subparsers(dest='command')
-#     __create_command_parsers(subparser, commands_spec)
-#
-#     # parse arguments
-#     args = parser.parse_args()
-#
-#     # if no args specified, print help message and exit
-#     if len(sys.argv) == 1:
-#         parser.print_help()
-#         sys.exit(0)
-#
-#     # initialize logging
-#     logging_util.init_logging('./tkltest.log', args.log_level)
-#     logging.debug('args: {}'.format(args))
-#
-#     # process config commands
-#     if args.command == 'config':
-#         __process_config_commands(args)
-#         sys.exit(0)
-#
-#     # if config file not specified, print help and exit
-#     if not args.config_file:
-#         logging_util.tkltest_status('No config file specified\n', error=True)
-#         sys.exit(1)
-#
-#     # load config file
-#     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
-#     tkltest_config = config_util.load_config(args)
-#     logging.info('config_file: {}'.format(tkltest_config))
-#
-#     unjar_paths = __unjar_path(tkltest_config)
-#
-#     # process other commands
-#     try:
-#         if args.command == 'execute':
-#             execute.process_execute_command(args, tkltest_config)
-#         elif args.command == 'generate':
-#             generate.process_generate_command(args, tkltest_config)
-#         # elif args.command == 'classify':
-#         #     execute.classify_errors(args.reports_path, tkltest_config['execute']['app_packages'],
-#         #                             tkltest_config['general']['test_directory'])
-#     finally:
-#         for path in unjar_paths:
-#             if os.path.isdir(path):
-#                 shutil.rmtree(path)
-
-
-# if __name__ == '__main__':  # pragma: no cover
-#     main()
