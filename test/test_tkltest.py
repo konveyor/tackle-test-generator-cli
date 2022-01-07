@@ -17,7 +17,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest import tkltest
+from tkltest import tkltest_unit
 from tkltest.util import constants
 
 class TkltestTest(unittest.TestCase):
@@ -43,7 +43,7 @@ class TkltestTest(unittest.TestCase):
         args = ['--config-file', self.config_file, 'config', 'list']
         sys.argv = [self.sys_argv[0]] + args
         with self.assertRaises(SystemExit) as sysexit:
-            tkltest.main()
+            tkltest_unit.main()
         self.assertEqual(sysexit.exception.code, 0)
 
     def test_tkltest_main_config_init(self) -> None:
@@ -51,7 +51,7 @@ class TkltestTest(unittest.TestCase):
         args = ['--config-file', self.config_file, 'config', 'init']
         sys.argv = [self.sys_argv[0]] + args
         with self.assertRaises(SystemExit) as sysexit:
-            tkltest.main()
+            tkltest_unit.main()
         self.assertEqual(sysexit.exception.code, 0)
 
     def test_tkltest_main_config_init_file(self) -> None:
@@ -59,7 +59,7 @@ class TkltestTest(unittest.TestCase):
         args = ['--config-file', self.config_file, 'config', 'init', '--file', self.gen_config_file]
         sys.argv = [self.sys_argv[0]] + args
         with self.assertRaises(SystemExit) as sysexit:
-            tkltest.main()
+            tkltest_unit.main()
         self.assertEqual(sysexit.exception.code, 0)
         self.assertTrue(os.path.isfile(self.gen_config_file))
 
@@ -67,8 +67,8 @@ class TkltestTest(unittest.TestCase):
         """Test main function of tkltest with "generate randoop" and "execute" commands"""
         args = ['--config-file', self.config_file, '--test-directory', self.test_directory, 'generate', 'randoop']
         sys.argv = [self.sys_argv[0]] + args
-        tkltest.main()
+        tkltest_unit.main()
 
         args = ['--config-file', self.config_file, '--test-directory', self.test_directory, 'execute']
         sys.argv = [self.sys_argv[0]] + args
-        tkltest.main()
+        tkltest_unit.main()

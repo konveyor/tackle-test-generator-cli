@@ -20,7 +20,7 @@ setup_file() {
 }
 
 @test "Test 01: CLI generate [all-classes] --no-diff-assertions ctd-amplified irs" {
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate --no-diff-assertions ctd-amplified
@@ -62,7 +62,7 @@ setup_file() {
 
 @test "Test 02: CLI execute irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         --offline-instrumentation \
@@ -98,7 +98,7 @@ setup_file() {
 
 @test "Test 03: CLI execute --online-instrumentation irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         execute
@@ -111,7 +111,7 @@ setup_file() {
 
 @test "Test 04: CLI generate [all-classes] ctd-amplified [diff-assertions] irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate ctd-amplified
@@ -149,7 +149,7 @@ setup_file() {
 
 @test "Test 05: CLI execute irs" {
     rm -rf $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         execute
@@ -187,7 +187,7 @@ setup_file() {
 }
 
 @test "Test 06: CLI generate execute [all-classes] randoop irs" {
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_RANDOOP_TESTDIR \
         generate randoop
@@ -204,7 +204,7 @@ setup_file() {
     [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
 
     # execute generated tests
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_RANDOOP_TESTDIR \
         execute
@@ -212,7 +212,7 @@ setup_file() {
 }
 
 @test "Test 07: CLI generate execute [all-classes] evosuite irs" {
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_EVOSUITE_TESTDIR \
         generate evosuite
@@ -229,7 +229,7 @@ setup_file() {
     [ -f $IRS_EVOSUITE_TESTDIR/pom.xml ]
 
     # execute generated tests
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_EVOSUITE_TESTDIR \
         execute
@@ -238,7 +238,7 @@ setup_file() {
 
 @test "Test 08: CLI generate execute [target-class-list] ctd-amplified irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate --no-diff-assertions ctd-amplified
@@ -263,7 +263,7 @@ setup_file() {
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 
     # execute generated tests
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         execute
@@ -272,7 +272,7 @@ setup_file() {
 
 @test "Test 09: CLI generate [target-class-list] randoop irs" {
     rm -rf $IRS_RANDOOP_TESTDIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_RANDOOP_TESTDIR \
         generate randoop
@@ -285,7 +285,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # execute generated tests
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_RANDOOP_TESTDIR \
         execute
@@ -294,7 +294,7 @@ setup_file() {
 
 @test "Test 10: CLI generate [target-class-list] evosuite irs" {
     rm -rf $IRS_EVOSUITE_TESTDIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_EVOSUITE_TESTDIR \
         generate evosuite
@@ -307,7 +307,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # execute generated tests
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_EVOSUITE_TESTDIR \
         execute
@@ -317,7 +317,7 @@ setup_file() {
 @test "Test 11: CLI generate [all-classes] ctd-amplified --base-test-generator randoop irs" {
     skip
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate --no-diff-assertions ctd-amplified --base-test-generator randoop
@@ -341,7 +341,7 @@ setup_file() {
 @test "Test 12: CLI generate [all-classes] ctd-amplified --base-test-generator evosuite irs" {
     skip
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate --no-diff-assertions ctd-amplified --base-test-generator evosuite
@@ -364,7 +364,7 @@ setup_file() {
 
 @test "Test 13: CLI generate [all-classes] ctd-amplified --base-test-generator evosuite --augment-coverage irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
-    run tkltest --log-level INFO \
+    run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate ctd-amplified --base-test-generator evosuite --augment-coverage

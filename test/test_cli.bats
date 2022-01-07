@@ -24,42 +24,42 @@ teardown_file() {
 }
 
 @test "Test 00: CLI main no args" {
-    run tkltest
+    run tkltest-unit
     assert_success
     assert_output --partial 'usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]'
 }
 
 @test "Test 01: CLI main help" {
-    run tkltest --help
+    run tkltest-unit --help
     assert_success
     assert_output --partial 'usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]'
 }
 
 @test "Test 02: CLI config command help" {
-    run tkltest config --help
+    run tkltest-unit config --help
     assert_success
     assert_output --partial 'usage: tkltest config [-h] {init,list} ...'
 }
 
 @test "Test 03: CLI config subcommands help" {
-    run tkltest config init --help
+    run tkltest-unit config init --help
     assert_success
     assert_output --partial 'usage: tkltest config init [-h] [-f FILE]'
 
-    run tkltest config list --help
+    run tkltest-unit config list --help
     assert_success
     assert_output --partial 'usage: tkltest config list [-h]'
 }
 
 @test "Test 04: CLI config init" {
-    run tkltest config init
+    run tkltest-unit config init
     assert_success
 
     # write captured output to file
     # printf "%s\n" "${lines[@]}" > $TEST_CONFIG_FILE1
 
     # run "config init" with file name specified
-    run tkltest config init --file $TEST_CONFIG_FILE2
+    run tkltest-unit config init --file $TEST_CONFIG_FILE2
     assert_success
 
     # assert that config file is created
@@ -72,48 +72,48 @@ teardown_file() {
 }
 
 @test "Test 05: CLI config list" {
-    run tkltest config list
+    run tkltest-unit config list
     assert_success
 }
 
 @test "Test 06: CLI generate command help" {
-    run tkltest generate --help
+    run tkltest-unit generate --help
     assert_success
     assert_output --partial 'usage: tkltest generate [-h] [-nda] [-pf PARTITIONS_FILE]'
 }
 
 @test "Test 07: CLI execute command help" {
-    run tkltest execute --help
+    run tkltest-unit execute --help
     assert_success
     assert_output --partial 'usage: tkltest execute [-h] [-nbf] [-cc]'
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {
-    run tkltest generate ctd-amplified --help
+    run tkltest-unit generate ctd-amplified --help
     assert_success
     assert_output --partial 'usage: tkltest generate ctd-amplified [-h] [-btg {combined,evosuite,randoop}]'
 }
 
 @test "Test 09: CLI \"generate evosuite\" command help" {
-    run tkltest generate evosuite --help
+    run tkltest-unit generate evosuite --help
     assert_success
     assert_output --partial 'usage: tkltest generate evosuite [-h]'
 }
 
 @test "Test 10: CLI \"generate randoop\" command help" {
-    run tkltest generate randoop --help
+    run tkltest-unit generate randoop --help
     assert_success
     assert_output --partial 'usage: tkltest generate randoop [-h]'
 }
 
 @test "Test 11: CLI --version" {
-    run tkltest --version
+    run tkltest-unit --version
     assert_success
     assert_output "$TKLTEST_CLI_VERSION"
 }
 
 @test "Test 12: CLI generate ctd-amplified invalid spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR generate ctd-amplified
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR generate ctd-amplified
     assert_failure 1
     assert_line --index 1 --partial 'ERROR: configuration options validation failed:'
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name', 'monolith_app_path']"
@@ -122,13 +122,13 @@ teardown_file() {
 }
 
 @test "Test 13: CLI generate ctd-amplified no config" {
-    run tkltest generate ctd-amplified
+    run tkltest-unit generate ctd-amplified
     assert_failure 1
     assert_line --index 0 --partial 'ERROR: No config file specified'
 }
 
 @test "Test 14: CLI generate ctd-amplified invalid spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR \
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR \
         generate --partitions-file $IRS_PARTITIONS_FILE ctd-amplified
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
@@ -140,7 +140,7 @@ teardown_file() {
 }
 
 @test "Test 15: CLI execute invalid spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR execute
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR execute
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name', 'monolith_app_path']"
@@ -158,7 +158,7 @@ teardown_file() {
         echo "# removing $IRS_GENERATE_CONFIG_FILE" >&3
         rm $IRS_GENERATE_CONFIG_FILE
     fi
-    run tkltest --config-file $IRS_CONFIG_FILE \
+    run tkltest-unit --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR execute
     assert_failure 1
     assert_line --index 1 --partial "Generate config file not found:"
@@ -166,7 +166,7 @@ teardown_file() {
 }
 
 @test "Test 17: CLI generate ctd-amplified parameter constraint violation" {
-    run tkltest --config-file $IRS_CONFIG_FILE generate ctd-amplified \
+    run tkltest-unit --config-file $IRS_CONFIG_FILE generate ctd-amplified \
         --base-test-generator randoop --augment-coverage
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
@@ -174,13 +174,13 @@ teardown_file() {
 }
 
 @test "Test 18: CLI generate ctd-amplified invalid build/classpath spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR2 generate ctd-amplified
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR2 generate ctd-amplified
     assert_failure 1
     assert_output --partial 'app_build_config_file (required if "app_build_type" is specified)'
 }
 
 @test "Test 19: CLI generate ctd-amplified invalid build/classpath spec in toml" {
-    run tkltest --config-file $IRS_CONFIG_FILE_ERR3 generate ctd-amplified
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR3 generate ctd-amplified
     assert_failure 1
     assert_output --partial 'app_classpath_file (required if "app_build_type" is not specified)'
     assert_output --partial 'app_build_type (required if "app_classpath_file" is not specified)'
