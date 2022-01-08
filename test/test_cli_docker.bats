@@ -1,11 +1,12 @@
 TEST_CONFIG_FILE1=./__test_config1.toml
 TEST_CONFIG_FILE2=./__test_config2.toml
 
+IRS_OUTPUT_DIR=./tkltest-output-irs
 IRS_CONFIG_FILE=./test/data/irs/tkltest_config.toml
-IRS_CTD_TEST_PLAN_FILE=./irs_ctd_models_and_test_plans.json
-IRS_TESTGEN_SUMMARY_FILE=./irs_test_generation_summary.json
+IRS_CTD_TEST_PLAN_FILE=$IRS_OUTPUT_DIR/irs_ctd_models_and_test_plans.json
+IRS_TESTGEN_SUMMARY_FILE=$IRS_OUTPUT_DIR/irs_test_generation_summary.json
 IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
-IRS_TEST_REPORTS_DIR=./irs-tkltest-reports
+IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR/irs-tkltest-reports
 
 # setup commands run befeore execution of tests in file
 setup_file() {
@@ -103,7 +104,7 @@ teardown_file() {
     [ `jq .extended_sequences_info.executed_sequences $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
     [ `jq .extended_sequences_info.failing_sequences $IRS_TESTGEN_SUMMARY_FILE` -eq 2 ]
     [ `jq .extended_sequences_info.final_sequences $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
-    [ `jq .test_plan_coverage_info.test_plan_rows $IRS_TESTGEN_SUMMARY_FILE` -eq 20 ]
+    [ `jq .test_plan_coverage_info.test_plan_rows $IRS_TESTGEN_SUMMARY_FILE` -eq 22 ]
     [ `jq .test_plan_coverage_info.rows_covered_full $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
     [ `jq .test_plan_coverage_info.rows_covered_bb_sequences $IRS_TESTGEN_SUMMARY_FILE` -gt 0 ]
 

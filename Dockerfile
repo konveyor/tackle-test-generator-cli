@@ -34,4 +34,4 @@ RUN mvn -s ./settings.xml dependency:copy-dependencies -DoutputDirectory=./downl
 
 WORKDIR /app/tackle-test-cli
 
-ENTRYPOINT ["tkltest"]
+ENTRYPOINT ["tkltest-unit"]
