@@ -69,9 +69,9 @@ jobs:
         bats test/unit/test_cli.bats
         bats test/unit/test_cli_irs.bats
         deactivate
-#    - name: Run CLI bats tests using docker-compose
-#      env:
-#        GITHUB_USERNAME: $GITHUB_ACTOR
-#        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
-#      run: |
-#        bats test/test_cli_docker.bats
+    - name: Run tkltest-unit bats tests using docker-compose
+      env:
+        GITHUB_USERNAME: $GITHUB_ACTOR
+        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
+      run: |
+        bats test/test_cli_docker.bats
