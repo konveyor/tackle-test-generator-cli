@@ -26,29 +26,29 @@ teardown_file() {
 @test "Test 00: CLI main no args" {
     run tkltest-unit
     assert_success
-    assert_output --partial 'usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]'
+    assert_output --partial 'usage: tkltest-unit [-h] [-cf CONFIG_FILE]'
 }
 
 @test "Test 01: CLI main help" {
     run tkltest-unit --help
     assert_success
-    assert_output --partial 'usage: tkltest [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]'
+    assert_output --partial 'usage: tkltest-unit [-h] [-cf CONFIG_FILE]'
 }
 
 @test "Test 02: CLI config command help" {
     run tkltest-unit config --help
     assert_success
-    assert_output --partial 'usage: tkltest config [-h] {init,list} ...'
+    assert_output --partial 'usage: tkltest-unit config [-h] {init,list} ...'
 }
 
 @test "Test 03: CLI config subcommands help" {
     run tkltest-unit config init --help
     assert_success
-    assert_output --partial 'usage: tkltest config init [-h] [-f FILE]'
+    assert_output --partial 'usage: tkltest-unit config init [-h] [-f FILE]'
 
     run tkltest-unit config list --help
     assert_success
-    assert_output --partial 'usage: tkltest config list [-h]'
+    assert_output --partial 'usage: tkltest-unit config list [-h]'
 }
 
 @test "Test 04: CLI config init" {
@@ -79,31 +79,31 @@ teardown_file() {
 @test "Test 06: CLI generate command help" {
     run tkltest-unit generate --help
     assert_success
-    assert_output --partial 'usage: tkltest generate [-h] [-nda] [-pf PARTITIONS_FILE]'
+    assert_output --partial 'usage: tkltest-unit generate [-h] [-nda] [-pf PARTITIONS_FILE]'
 }
 
 @test "Test 07: CLI execute command help" {
     run tkltest-unit execute --help
     assert_success
-    assert_output --partial 'usage: tkltest execute [-h] [-nbf] [-cc]'
+    assert_output --partial 'usage: tkltest-unit execute [-h] [-nbf] [-cc]'
 }
 
 @test "Test 08: CLI \"generate ctd-amplified\" command help" {
     run tkltest-unit generate ctd-amplified --help
     assert_success
-    assert_output --partial 'usage: tkltest generate ctd-amplified [-h] [-btg {combined,evosuite,randoop}]'
+    assert_output --partial 'usage: tkltest-unit generate ctd-amplified [-h]'
 }
 
 @test "Test 09: CLI \"generate evosuite\" command help" {
     run tkltest-unit generate evosuite --help
     assert_success
-    assert_output --partial 'usage: tkltest generate evosuite [-h]'
+    assert_output --partial 'usage: tkltest-unit generate evosuite [-h]'
 }
 
 @test "Test 10: CLI \"generate randoop\" command help" {
     run tkltest-unit generate randoop --help
     assert_success
-    assert_output --partial 'usage: tkltest generate randoop [-h]'
+    assert_output --partial 'usage: tkltest-unit generate randoop [-h]'
 }
 
 @test "Test 11: CLI --version" {
