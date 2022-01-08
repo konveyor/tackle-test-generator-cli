@@ -15,8 +15,8 @@ import argparse
 import shutil
 from zipfile import ZipFile
 
-from .execute import execute
-from .generate import generate
+from .execute.unit import execute
+from .generate.unit import generate
 from .tkltest import *
 from .util import logging_util, config_options_unit
 from .util.constants import *

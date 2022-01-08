@@ -20,8 +20,8 @@ import unittest
 import copy
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.generate import generate
-from tkltest.execute import execute
+from tkltest.generate.unit import generate
+from tkltest.execute.unit import execute
 from tkltest.util import config_util, constants, dir_util
 
 
