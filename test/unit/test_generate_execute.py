@@ -20,8 +20,8 @@ import unittest
 import copy
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.generate import generate
-from tkltest.execute import execute
+from tkltest.generate.unit import generate
+from tkltest.execute.unit import execute
 from tkltest.util import config_util, constants, dir_util
 
 
@@ -55,9 +55,9 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_cli_dir()
             # remove directories and files created during test generation
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX), ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX), ignore_errors=True)
 
             # load and set config for app
             app_config = config_util.load_config(config_file=app_info['config_file'])

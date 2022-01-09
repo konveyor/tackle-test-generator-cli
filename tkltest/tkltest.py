@@ -11,18 +11,13 @@
 # limitations under the License.
 # ***************************************************************************
 
-import argparse
 import logging
-import shutil
 import sys
-from zipfile import ZipFile
 
 import toml
 
 from ._version import __version__
-from .execute import execute
-from .generate import generate
-from .util import logging_util, config_util, config_options
+from .util import logging_util, config_util, config_options_unit
 from .util.constants import *
 
 
@@ -105,23 +100,6 @@ def __add_arguments_to_parser(parser, options_spec):
         parser.add_argument(*[option['short_name'], option['long_name']], **add_arg_params)
 
 
-def __unjar_path(tkltest_config):
-    unjar_paths = list()
-    for path in tkltest_config['general']['monolith_app_path']:
-        if path.endswith('.jar'):
-            with ZipFile(path, 'r') as zipObj:
-                unjar_path = path.replace('.jar', '')
-                if not os.path.isdir(unjar_path):
-                    zipObj.extractall(unjar_path)
-                    tkltest_config['general']['monolith_app_path'].remove(path)
-                    tkltest_config['general']['monolith_app_path'].append(unjar_path)
-                    unjar_paths.append(unjar_path)
-                else:
-                    logging_util.tkltest_status('Unzip jar file. Folder {} already exist'.format(unjar_path), error=True)
-                    sys.exit(1)
-    return unjar_paths
-
-
 def __process_config_commands(args):
     """Processes config commands
 
@@ -143,24 +121,10 @@ def __process_config_commands(args):
             print('\n{}'.format(toml.dumps(config)))
     else:
         # list subcommand: list all config options with help messages
-        config_options.print_options_with_help()
+        config_options_unit.print_options_with_help()
 
 
-def main():
-    """Main entry point for the CLI.
-
-    This is the main entry point for the CLI, which parses command-line arguments, loads configuration
-    information and executes the specified command (config, generate, or execute).
-    """
-    # create the main argument parser
-    parser = argparse.ArgumentParser(prog='tkltest',
-        description='Command-line interface for generating and executing test cases on '
-                    'two application versions and performing differential testing (currently '
-                    'supporting Java unit testing)')
-
-    # get spec for CLI commands and config options
-    options_spec = config_options.get_options_spec()
-
+def parse_arguments(parser, options_spec):
     # add the arguments for the main parser for non-command top-level options in the option spec
     commands_spec = {}
     for opt_name in options_spec.keys():
@@ -179,16 +143,14 @@ def main():
     __create_command_parsers(subparser, commands_spec)
 
     # parse arguments
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def perform_checks_init_logger(args, parser, level):
     # if no args specified, print help message and exit
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(0)
-
-    # initialize logging
-    logging_util.init_logging('./tkltest.log', args.log_level)
-    logging.debug('args: {}'.format(args))
 
     # process config commands
     if args.command == 'config':
@@ -200,27 +162,14 @@ def main():
         logging_util.tkltest_status('No config file specified\n', error=True)
         sys.exit(1)
 
+    # initialize logging
+    logging_util.init_logging('./tkltest_{}.log'.format(level), args.log_level)
+    logging.debug('args: {}'.format(args))
+
+
+def load_configuration(args):
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
     tkltest_config = config_util.load_config(args)
     logging.info('config_file: {}'.format(tkltest_config))
-
-    unjar_paths = __unjar_path(tkltest_config)
-
-    # process other commands
-    try:
-        if args.command == 'execute':
-            execute.process_execute_command(args, tkltest_config)
-        elif args.command == 'generate':
-            generate.process_generate_command(args, tkltest_config)
-        # elif args.command == 'classify':
-        #     execute.classify_errors(args.reports_path, tkltest_config['execute']['app_packages'],
-        #                             tkltest_config['general']['test_directory'])
-    finally:
-        for path in unjar_paths:
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-
-
-if __name__ == '__main__':  # pragma: no cover
-    main()
+    return tkltest_config
