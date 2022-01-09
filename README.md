@@ -18,7 +18,7 @@ tooling for performing automated test generation and differential testing on two
 ## Overview
 
 TackleTest provides automated test-generation and differential-testing capability for Java unit
-testing, where unit test cases can be automatically generated on a given application version (the _base_ version)
+testing, where unit test cases can be automatically generated on a given application version
 and executed against a modified version to detect differences.
 
 The core test generator that the CLI invokes resides in the related
@@ -206,15 +206,15 @@ and executing them. More detailed description is available in the [CLI user guid
    ```
    tkltest-unit --verbose generate ctd-amplified
    ```
-   The unit test cases will be generated in a folder named `tkltest-output-<app-name>/<app-name>-ctd-amplified-tests/monolith`.
-   A CTD coverage report will be created as well  in a folder named `tkltest-output-<app-name>/<app-name>-tkltest-reports`, showing
+   The unit test cases will be generated in a folder named `tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests/monolith`.
+   A CTD coverage report will be created as well  in a folder named `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports`, showing
    the CTD test plan row coverage achieved by the generated tests.
 
 4. To execute the generated unit tests on the legacy app, run the command
    ```
-   tkltest-unit --verbose --test-directory tkltest-output-<app-name>/<app-name>-ctd-amplified-tests execute
+   tkltest-unit --verbose --test-directory tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests execute
    ```
-   JUnit reports and Jacoco code coverage reports will be created in  `tkltest-output-<app-name>/<app-name>-tkltest-reports`.
+   JUnit reports and Jacoco code coverage reports will be created in  `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports`.
  
 Note that, if the `--config-file` option is not specified on the command line (as in the commands above),
 the CLI uses by default `./tkltest_config.toml` as the configuration file.
