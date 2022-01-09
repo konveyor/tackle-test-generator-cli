@@ -40,9 +40,9 @@ def __unjar_path(tkltest_config):
 
 
 def main():
-    """Main entry point for the CLI.
+    """Main entry point for the tkltest-unit command.
 
-    This is the main entry point for the CLI, which parses command-line arguments, loads configuration
+    This is the main entry point for the tkltest-unit command, which parses command-line arguments, loads configuration
     information and executes the specified command (config, generate, or execute).
     """
     # create the main argument parser
