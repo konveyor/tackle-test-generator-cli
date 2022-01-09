@@ -13,8 +13,8 @@
         "labels": ["refactoring"]
       },
       {
-        "title": "## ⚡️ Performance Optimizations",
-        "labels": ["perf-optim", "performance"]
+        "title": "## ⚡️ Performance Improvements",
+        "labels": ["performance"]
       },
       {
         "title": "## \uD83D\uDCDA Documentation",
