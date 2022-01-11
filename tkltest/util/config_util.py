@@ -627,7 +627,7 @@ def __resolve_classpath(tkltest_config, command):
     # remove non jar entries
     # collect jars modules
     jars_modules = dict()
-    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):  # TODO fix paths
+    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
         if os.path.isdir(file_path):
             continue
         if not file_path.endswith(".jar"):
