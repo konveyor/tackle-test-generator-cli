@@ -1,4 +1,4 @@
-name: Testgen-CLI CI
+name: TackleTest-Unit CI
 
 on:
   push:
@@ -55,8 +55,8 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        nosetests test/test_config.py test/test_tkltest.py test/test_generate_execute.py test/test_unit_tests.py
-    - name: Install CLI command and run bats tests
+        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_generate_execute.py test/unit/test_unit_tests.py
+    - name: Install tkltest-unit command and run bats tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
@@ -65,13 +65,13 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install .
-        which tkltest
-        bats test/test_cli.bats
-        bats test/test_cli_irs.bats
+        which tkltest-unit
+        bats test/unit/test_cli.bats
+        bats test/unit/test_cli_irs.bats
         deactivate
-#    - name: Run CLI bats tests using docker-compose
-#      env:
-#        GITHUB_USERNAME: $GITHUB_ACTOR
-#        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
-#      run: |
-#        bats test/test_cli_docker.bats
+    - name: Run tkltest-unit bats tests using docker-compose
+      env:
+        GITHUB_USERNAME: $GITHUB_ACTOR
+        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
+      run: |
+        bats test/test_cli_docker.bats

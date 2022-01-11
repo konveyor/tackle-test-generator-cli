@@ -19,7 +19,7 @@ TKLTEST_DEFAULT_CONFIG_FILE='tkltest_config.toml'
 # name of (hidden) config file created by generate command (to be used by the execute command)
 TKLTEST_GENERATE_CONFIG_FILE='.tkltest_generate.toml'
 
-TKLTEST_OUTPUT_DIR_PREFIX = 'tkltest-output-'
+TKLTEST_UNIT_OUTPUT_DIR_PREFIX = 'tkltest-output-unit-'
 
 # lib download dir
 TKLTEST_LIB_DIR = os.path.join('..', 'lib')

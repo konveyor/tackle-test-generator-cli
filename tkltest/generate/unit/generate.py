@@ -225,6 +225,7 @@ def generate_ctd_amplified_tests(config):
 
     # augment CTD-guided tests with coverage-increasing base tests
     if config['generate']['ctd_amplified']['augment_coverage']:
+        config['general']['offline_instrumentation'] = True
         build_type = config['general']['build_type']
         start_time = time.time()
         if build_type == 'ant':
@@ -252,6 +253,7 @@ def generate_ctd_amplified_tests(config):
                 collect_codecoverage=True,  # for coverage-based augmentation
                 offline_instrumentation=False
             )
+            config['general']['offline_instrumentation'] = False
             augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                        ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
@@ -428,6 +430,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         te_command += os.path.join(constants.TKLTEST_LIB_DIR,
                                    "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
         te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "junit-4.13.1.jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DIR, "ccmcl.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.5.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.5.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.5.jar") + os.pathsep
@@ -439,8 +442,11 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
 
     with open(app_classpath_file) as file:
         for line in file:
-            # remove new line from line
-            te_command += os.path.abspath(line[:-1]) + os.pathsep
+            if line.endswith('\n'):
+                # remove new line from line
+                te_command += os.path.abspath(line[:-1]) + os.pathsep
+            else:
+                te_command += os.path.abspath(line) + os.pathsep
     te_command += os.pathsep.join(monolith_app_path)
     te_command += " org.konveyor.tackle.testgen.core.extender.TestSequenceExtender"
     te_command += " -app " + app_name

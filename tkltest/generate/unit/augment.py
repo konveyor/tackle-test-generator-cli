@@ -51,6 +51,11 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     Returns:
         bool: whether we were able to collect coverage for augmenting tests (there may be an issue with evosuite class loading)
     """
+
+    if config['dev_tests']['use_for_augmentation']:
+        dev_tests = config['dev_tests']
+    else:
+        dev_tests = None
     tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
 
     # compute initial coverage of CTD test suite and of each evosuite test file
@@ -61,7 +66,9 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
             evosuite_test_dir=config['general']['app_name'] + constants.TKL_EVOSUITE_OUTDIR_SUFFIX,
             build_file=build_file,
             build_type=build_type,
-            report_dir=report_dir
+            report_dir=report_dir,
+            class_files=config['general']['monolith_app_path'],
+            dev_tests=dev_tests
     )
 
     if not has_coverage:
@@ -123,7 +130,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     return True
 
 
-def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir, build_file, build_type, report_dir):
+def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir, build_file, build_type, report_dir,
+                                                 class_files=None, dev_tests=None):
     """Computes base test suite and augment test suite for coverage-based augmentation.
 
     Given the CTD test suite and the evosuite test suite, computes coverage efficiency of both test suites
@@ -136,6 +144,8 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         build_file (str): Build file to use for running tests
         build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
+        class_files (str): the class file of the app
+        dev_tests (dict): information of user test suite, to add its coverage to the base tests coverage
 
     Returns:
         list: test classes in the augmentation pool
@@ -154,11 +164,13 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     ctd_test_coverage, ctd_test_method_count, ctd_inst_cov_efficiency =\
         __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
                                       report_dir=report_dir, test_suite_name='CTD-guided',
-                                      raw_cov_data_dir=raw_cov_data_dir)
+                                      raw_cov_data_dir=raw_cov_data_dir,
+                                      class_files=class_files,
+                                      additional_test_suite=dev_tests)
     # create backup of CTD-guided tests
     ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
-    shutil.copytree(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
+    shutil.move(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
 
     # initialize CTD test directory with evosuite tests for coverage data collection
     #__initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=evosuite_test_dir)
@@ -206,7 +218,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
 
 
 def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name,
-                                  raw_cov_data_dir):
+                                  raw_cov_data_dir, class_files=None, additional_test_suite=None):
     """Computes and returns coverage efficiency of the given test suite.
 
     Computes coverage efficiency of the given test suite as instruction coverage rate per test method
@@ -219,7 +231,9 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
                                                               test_root_dir=test_dir,
                                                               report_dir=report_dir,
                                                               raw_cov_data_dir=raw_cov_data_dir,
-                                                              raw_cov_data_file_pref=test_suite_name)
+                                                              raw_cov_data_file_pref=test_suite_name,
+                                                              class_files=class_files,
+                                                              additional_test_suite=additional_test_suite)
     inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
     test_method_count = __get_test_method_count(test_dir)
     inst_cov_efficiency = inst_cov_rate / test_method_count

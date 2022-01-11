@@ -72,6 +72,7 @@ test {
   jacoco{
     destinationFile = file('{{coverage_exec_file}}')
   }
+  ignoreFailures = true
 }
 
 task cleanCoverageReportDir(){
@@ -82,8 +83,10 @@ jacocoTestReport {
     dependsOn cleanCoverageReportDir, test
     reports{
         xml.required = true
+        csv.required = true
         html.outputLocation = file('{{ main_coverage_report_dir }}')
         xml.outputLocation = file('{{ coverage_xml_file }}')
+        csv.outputLocation = file('{{ coverage_csv_file }}')
     }
     afterEvaluate {
         classDirectories.setFrom(
