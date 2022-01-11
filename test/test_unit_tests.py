@@ -37,6 +37,7 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
                 'property_file': '',
                 'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute', 'compile-classpath-element'],
+                'is_real_classpath': True,
             },
             '84_ifx-framework': {
                 'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
@@ -44,6 +45,7 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
                 'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
                 'targets_to_test': ['compile', 'compile-antcall'],
+                'is_real_classpath': True,
             },
         }
 
@@ -72,7 +74,8 @@ class UnitTests(unittest.TestCase):
                 self.__assert_classpath(standard_classpath,
                                         generated_classpath,
                                         os.path.join(os.getcwd(), dependencies_dir),
-                                        failed_assertion_message)
+                                        failed_assertion_message,
+                                        ant_test_apps[app_name]['is_real_classpath'])
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -107,7 +110,10 @@ class UnitTests(unittest.TestCase):
             dir_util.cd_output_dir(app_name)
 
             if maven_test_apps[app_name]['requires_build']:
-                build_command = 'mvn install -f ' + config['generate']['app_build_config_file']
+                pom_location = config['generate']['app_build_config_file']
+                if not os.path.isabs(pom_location):
+                    pom_location = '..' + os.sep + pom_location
+                build_command = 'mvn install -f ' + pom_location + ' -e -X'
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
             config_util.fix_config(config, 'generate')
@@ -153,7 +159,7 @@ class UnitTests(unittest.TestCase):
                                     os.path.join(os.getcwd(), dependencies_dir),
                                     failed_assertion_message)
 
-    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message):
+    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, is_real_classpath=False):
         """
         :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
@@ -161,9 +167,10 @@ class UnitTests(unittest.TestCase):
         :param message: An informative error message to print in case one of the assertions fails.
         """
         with open(standard_classpath, 'r') as file:
-            lines_standard = file.read()
-        jar_names = [os.path.basename(line) for line in lines_standard.splitlines()]
-        line_list_standard = [os.path.join(std_classpath_prefix, jar_name) for jar_name in jar_names]
+            lines_standard = file.read().splitlines()
+        if is_real_classpath:
+            lines_standard = [os.path.basename(line) for line in lines_standard]
+        line_list_standard = [os.path.join(std_classpath_prefix, line) for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read()

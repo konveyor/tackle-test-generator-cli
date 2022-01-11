@@ -32,10 +32,10 @@
                 </dependency>
 
 		<dependency>
-			<groupId>javax</groupId>
+			<groupId>javaee</groupId>
 			<artifactId>javaee-api</artifactId>
-			<version>7.0</version>
-			<type>jar</type>
+			<version>5</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
