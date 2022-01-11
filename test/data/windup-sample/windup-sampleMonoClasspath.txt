@@ -7,3 +7,4 @@ javax\javaee-api\7.0\javaee-api-7.0.jar
 log4j\log4j\1.2.17\log4j-1.2.17.jar
 org\jboss\ejb3\jboss-ejb3-ext-api\2.1.0\jboss-ejb3-ext-api-2.1.0.jar
 org\jboss\logging\jboss-logging\3.1.4.GA\jboss-logging-3.1.4.GA.jar
+javax\servlet\javax.servlet-api\3.1.0\javax.servlet-api-3.1.0.jar
