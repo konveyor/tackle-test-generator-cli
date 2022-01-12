@@ -167,6 +167,9 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
                                       raw_cov_data_dir=raw_cov_data_dir,
                                       class_files=class_files,
                                       additional_test_suite=dev_tests)
+    if not ctd_test_coverage:
+        tkltest_status('Error while computing coverage for ctd test suite: {}'.format(ctd_test_dir), error=True)
+        sys.exit(0)
     # create backup of CTD-guided tests
     ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
@@ -203,6 +206,11 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
             __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
                                       report_dir=report_dir, test_suite_name=os.path.basename(test)[:-5],
                                       raw_cov_data_dir=raw_cov_data_dir)
+        if not test_coverage:
+            tkltest_status('Error while computing coverage for test: {}'.format(test), error=True)
+            __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
+            sys.exit(0)
+
         if test_coverage['instruction_covered'] > 0:
             has_coverage = True
         coverage_util.remove_test_class_from_ctd_suite(test_class=test, test_directory=ctd_test_dir)
@@ -234,6 +242,8 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
                                                               raw_cov_data_file_pref=test_suite_name,
                                                               class_files=class_files,
                                                               additional_test_suite=additional_test_suite)
+    if not test_coverage:
+        return None, None, None
     inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
     test_method_count = __get_test_method_count(test_dir)
     inst_cov_efficiency = inst_cov_rate / test_method_count

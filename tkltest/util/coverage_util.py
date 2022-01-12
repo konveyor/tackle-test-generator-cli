@@ -73,10 +73,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         command_util.run_command(cmd, verbose=False)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
-        sys.exit(1)
+        return None
     if not os.path.exists(jacoco_raw_date_file):
         tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
-        sys.exit(1)
+        return None
 
     if additional_test_suite:
         '''
