@@ -229,10 +229,11 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     # run jacoco cli report command
 
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
+    coverage_xml_file = os.path.join(main_coverage_dir, 'jacoco.xml')
 
-    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {}".
+    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {} --xml {}".
                              format(jacoco_cli_file, output_exec_file, os.path.pathsep.join(class_files),
-                                    coverage_csv_file, main_coverage_dir), verbose=True)
+                                    coverage_csv_file, main_coverage_dir, coverage_xml_file), verbose=True)
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0;
