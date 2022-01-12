@@ -173,7 +173,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     # create backup of CTD-guided tests
     ctd_test_dir_bak = ctd_test_dir + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
-    shutil.copytree(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
+    shutil.move(ctd_test_dir + os.sep + 'monolithic', ctd_test_dir_bak)
 
     # initialize CTD test directory with evosuite tests for coverage data collection
     #__initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=evosuite_test_dir)

@@ -17,7 +17,7 @@ import tabulate
 from tkltest.util import constants
 
 """
-This module contains the specification of all tkltest CLI configuration options.
+This module contains the specification of all tkltest-unit configuration options.
 The specification drives the creation of argument parsers and TOML file checking
 for required options.
 """
