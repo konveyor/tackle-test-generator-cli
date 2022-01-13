@@ -168,16 +168,17 @@ class UnitTests(unittest.TestCase):
         """
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if is_real_classpath:
+        if is_real_classpath:  # mainly for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        line_list_standard = [os.path.join(std_classpath_prefix, line) for line in lines_standard]
+        lines_standard = [os.path.join(std_classpath_prefix, line).replace('\\', '/') for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
-            lines_generated = file.read()
-        line_list_generated = lines_generated.splitlines()
+            lines_generated = file.read().splitlines()
+        lines_generated = [line.replace('\\', '/') for line in lines_generated]
 
-        self.assertTrue(len(line_list_generated) == len(line_list_standard), message)
+        self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
-        for path in line_list_standard:
-            self.assertTrue(path in line_list_generated, message)
-            self.assertTrue(os.path.isfile(path), message)
+        for path in lines_standard:
+            extended_message = message + " , path = " + path
+            self.assertTrue(path in lines_generated, extended_message)
+            self.assertTrue(os.path.isfile(path), extended_message)
