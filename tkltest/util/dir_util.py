@@ -29,7 +29,7 @@ def cd_output_dir(app_name):
     # 2. we are at the cli dir
     if os.getcwd() != cli_dir:
         cd_cli_dir()
-    output_dir = TKLTEST_OUTPUT_DIR_PREFIX + app_name
+    output_dir = TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name
     # creating output dir if not exist
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)

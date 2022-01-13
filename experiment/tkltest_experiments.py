@@ -129,7 +129,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     # shutil.rmtree(outdir, ignore_errors=True)
 
     first_time = not os.path.exists(outdir)
-    tkltest_outdir = constants.TKLTEST_OUTPUT_DIR_PREFIX + short_app_name if first_time else outdir
+    tkltest_outdir = constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + short_app_name if first_time else outdir
     os.makedirs(tkltest_outdir, exist_ok=True)
     os.makedirs(outdir, exist_ok=True)
 
@@ -139,7 +139,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
 
     # run ctd-guided test generation
     print('\n*** ctd_amplified combined generate --- {} ***'.format(short_app_name))
-    os.makedirs(constants.TKLTEST_OUTPUT_DIR_PREFIX + short_app_name, exist_ok=True)
+    os.makedirs(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + short_app_name, exist_ok=True)
     ctd_amplified_testdir = f'{tkltest_outdir}/{short_app_name}-ctd-amplified-tests'
     tkltest_config['general']['test_directory'] = ctd_amplified_testdir
     tkltest_config['general']['reports_path'] = os.path.join(tkltest_outdir, short_app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)

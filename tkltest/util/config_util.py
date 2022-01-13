@@ -23,7 +23,7 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 
-from . import constants, config_options
+from . import constants, config_options_unit
 from .logging_util import tkltest_status
 from .constants import *
 from tkltest.util import command_util
@@ -62,7 +62,7 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-        options_spec=config_options.get_options_spec(command='general'),
+        options_spec=config_options_unit.get_options_spec(command='general'),
         args=args)
 
     # if args specified, get command and subcommand
@@ -77,13 +77,13 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-            options_spec=config_options.get_options_spec(command=command),
+            options_spec=config_options_unit.get_options_spec(command=command),
             args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand),
+            options_spec=config_options_unit.get_options_spec(command=command, subcommand=subcommand),
             args=args)
 
     # validate loaded config information, exit if validation errors occur
@@ -111,28 +111,27 @@ def init_config():
         dict containing initialized options
     """
     # get config spec
-    options_spec = config_options.get_options_spec()
+    options_spec = config_options_unit.get_options_spec()
     config = {}
 
-    # set general options to default values
-    general_opts_spec = options_spec['general']
-    for option in general_opts_spec.keys():
-        config['general'] = __init_options(general_opts_spec)
+    for opt_name in options_spec.keys():
 
-    # iterate over commands
-    # for cmd in ['generate', 'execute', 'classify']:
-    for cmd in ['generate', 'execute', 'dev_tests']:
-        cmd_opts_spec = options_spec[cmd]
+        if not options_spec[opt_name]['is_cli_command']:
+            # set general and dev_tests options to default values
+            config[opt_name] = __init_options(options_spec[opt_name])
+        else:
+            # set command and subcommand options to default values
+            cmd_opts_spec = options_spec[opt_name]
 
-        # get subcommands, if any, for command
-        subcmd_opts_spec = cmd_opts_spec.pop('subcommands', {})
+            # get subcommands, if any, for command
+            subcmd_opts_spec = cmd_opts_spec.pop('subcommands', {})
 
-        # set command options to default values
-        config[cmd] = __init_options(cmd_opts_spec)
+            # set command options to default values
+            config[opt_name] = __init_options(cmd_opts_spec)
 
-        # set subcommand options to default values
-        for subcmd in subcmd_opts_spec.keys():
-            config[cmd][subcmd] = __init_options(subcmd_opts_spec[subcmd])
+            # set subcommand options to default values
+            for subcmd in subcmd_opts_spec.keys():
+                config[opt_name][subcmd] = __init_options(subcmd_opts_spec[subcmd])
 
     return config
 
@@ -148,12 +147,12 @@ def __validate_config(config, command=None, subcommand=None):
     """
     # get general options spec and options spec for the given command and subcommand
     options_spec = {
-        'general': config_options.get_options_spec('general')
+        'general': config_options_unit.get_options_spec('general')
     }
     if command is not None:
-        options_spec[command] = config_options.get_options_spec(command)
+        options_spec[command] = config_options_unit.get_options_spec(command)
     if subcommand is not None:
-        options_spec[subcommand] = config_options.get_options_spec(command, subcommand)
+        options_spec[subcommand] = config_options_unit.get_options_spec(command, subcommand)
 
     # initialize validation errors
     val_errors = {
@@ -246,6 +245,7 @@ def __init_options(options_spec):
     """
     ret_config = {}
     options_spec.pop('help_message', None)
+    options_spec.pop('is_cli_command', None)
     for option_name in options_spec.keys():
         if options_spec[option_name]['is_toml_option']:
             ret_config[option_name] = options_spec[option_name]['default_value']
@@ -326,7 +326,7 @@ def __fix_relative_paths(tkltest_config):
 
     """
 
-    options_spec = config_options.get_options_spec()
+    options_spec = config_options_unit.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)

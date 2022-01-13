@@ -20,8 +20,8 @@ import unittest
 import copy
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.generate import generate
-from tkltest.execute import execute
+from tkltest.generate.unit import generate
+from tkltest.execute.unit import execute
 from tkltest.util import config_util, constants, dir_util
 
 
@@ -55,9 +55,9 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_cli_dir()
             # remove directories and files created during test generation
             shutil.rmtree(app_info['test_directory'], ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX), ignore_errors=True)
-            shutil.rmtree(os.path.join(constants.TKLTEST_OUTPUT_DIR_PREFIX+app_name, app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX), ignore_errors=True)
+            shutil.rmtree(os.path.join(constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name, app_name + constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX), ignore_errors=True)
 
             # load and set config for app
             app_config = config_util.load_config(config_file=app_info['config_file'])
@@ -130,7 +130,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
-    def test_generate_execute_ctdamplified_combined_allclasses_diffassert(self) -> None:
+    def test_generate_execute_ctdamplified_combined_allclasses_diffassert_level_2(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes"""
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
@@ -138,6 +138,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            config['generate']['ctd_amplified']['interaction_level'] = 2
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created

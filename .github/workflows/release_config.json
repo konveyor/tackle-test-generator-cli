@@ -9,19 +9,23 @@
         "labels": ["fix"]
       },
       {
-        "title": "## 🧪 Performance Optimizations",
-        "labels": ["perf-optim"]
+        "title": "## ♻️ Refactoring",
+        "labels": ["refactoring"]
       },
       {
-        "title": "## 🧪 Documentation",
-        "labels": ["documentation"]
+        "title": "## ⚡️ Performance Improvements",
+        "labels": ["performance"]
       },
       {
-        "title": "## 🧪 Tests",
+        "title": "## \uD83D\uDCDA Documentation",
+        "labels": ["documentation", "doc"]
+      },
+      {
+        "title": "## \uD83D\uDEA6 Tests",
         "labels": ["test"]
       },
       {
-        "title": "## Other Updates",
+        "title": "## \uD83D\uDEE0 Other Updates",
         "labels": ["other"]
       }
     ],
