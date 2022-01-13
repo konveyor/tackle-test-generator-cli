@@ -500,14 +500,7 @@ def __resolve_classpath(tkltest_config, command):
     dependencies_dir = os.path.join(os.getcwd(), app_name + constants.DEPENDENCIES_DIR_SUFFIX)
     posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
-        try:
-            shutil.rmtree(dependencies_dir)
-        except FileNotFoundError as e:
-            if len(e.filename) > 260:
-                tkltest_status('Tried to access a path that exceeds the 260 characters length limit, enable long paths and retry.\n', error=True)
-                sys.exit(1)
-            else:
-                raise e
+        shutil.rmtree(dependencies_dir)
     os.mkdir(dependencies_dir)
 
     if app_build_type == 'gradle':
@@ -639,11 +632,6 @@ def __resolve_classpath(tkltest_config, command):
             jars_modules[file_path] = set(
                 ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
 
-    # remove empty directories
-    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
-        if os.path.isdir(file_path) and not os.listdir(file_path):
-            shutil.rmtree(file_path)
-
     # compare jars modules to monolith modules, remove matching jars
     for app_path, app_path_modules in app_paths_modules.items():
         for jar_file, jar_modules in jars_modules.items():
@@ -651,6 +639,13 @@ def __resolve_classpath(tkltest_config, command):
                 os.remove(jar_file)
                 del jars_modules[jar_file]
                 break
+
+    # remove empty directories
+    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
+        if os.path.isdir(file_path):
+            contained_jars = list(glob.glob(os.path.join(file_path, '**', '*.jar'), recursive=True))
+            if not contained_jars:
+                shutil.rmtree(file_path)
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")

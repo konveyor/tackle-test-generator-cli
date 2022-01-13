@@ -11,10 +11,8 @@
 # limitations under the License.
 # ***************************************************************************
 
-import argparse
-import json
 import os
-import shutil
+from pathlib import PurePath
 import sys
 import unittest
 
@@ -113,7 +111,7 @@ class UnitTests(unittest.TestCase):
                 pom_location = config['generate']['app_build_config_file']
                 if not os.path.isabs(pom_location):
                     pom_location = '..' + os.sep + pom_location
-                build_command = 'mvn install -f ' + pom_location + ' -e -X'
+                build_command = 'mvn clean install -f ' + pom_location + ' -e -X'
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
             config_util.fix_config(config, 'generate')
@@ -170,11 +168,11 @@ class UnitTests(unittest.TestCase):
             lines_standard = file.read().splitlines()
         if is_real_classpath:  # mainly for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        lines_standard = [os.path.join(std_classpath_prefix, line).replace('\\', '/') for line in lines_standard]
+        lines_standard = [PurePath(os.path.join(std_classpath_prefix, line)).as_posix() for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
-        lines_generated = [line.replace('\\', '/') for line in lines_generated]
+        lines_generated = [PurePath(line).as_posix() for line in lines_generated]
 
         self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
