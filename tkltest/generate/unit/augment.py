@@ -169,7 +169,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
                                       additional_test_suite=dev_tests)
     if not ctd_test_coverage:
         tkltest_status('Error while computing coverage for ctd test suite: {}'.format(ctd_test_dir), error=True)
-        sys.exit(0)
+        sys.exit(1)
     # create backup of CTD-guided tests
     ctd_test_dir_bak = os.path.basename(ctd_test_dir) + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
@@ -201,6 +201,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     for test in augmentation_test_pool:
         with open(test) as f:
             if 'EvoSuite did not generate any tests' in f.read():
+                tkltest_status('EvoSuite did not generate any tests at: {}. Skipping the test '.format(test))
                 continue
         coverage_util.add_test_class_to_ctd_suite(test_class=test, test_directory=ctd_test_dir)
         __print_test_counter(counter)
@@ -212,7 +213,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         if not test_coverage:
             tkltest_status('Error while computing coverage for test: {}'.format(test), error=True)
             __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
-            sys.exit(0)
+            sys.exit(1)
 
         if test_coverage['instruction_covered'] > 0:
             has_coverage = True
