@@ -129,14 +129,16 @@ def __conditionally_required(opt_name, config):
     if opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
         if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
             return 'required if "partitions_file" is specified'
-    elif opt_name == 'app_classpath_file':
+    elif opt_name in ['app_classpath_file', 'monolith_app_path']:
         # required if app_build_type is not specified
         if config['generate']['app_build_type'] == __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is not specified'
     elif opt_name == 'app_build_type':
-        # required if app_classpath_file is not specified
+        # required if app_classpath_file or monolith_app_path are not specified
         if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
             return 'required if "app_classpath_file" is not specified'
+        if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
+            return 'required if "monolith_app_path" is not specified'
     elif opt_name == 'app_build_config_file':
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
@@ -193,7 +195,7 @@ __options_spec = {
             'help_message': 'logging level for printing diagnostic messages'
         },
         'monolith_app_path': {
-            'required': True,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': list,

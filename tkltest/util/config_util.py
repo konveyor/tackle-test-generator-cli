@@ -467,6 +467,85 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
     os.remove(ant_output_filename)
 
 
+#todo - use this method at __resolve_classpath()
+def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task_text, verbose):
+
+    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), task_name + '_build.gradle')
+    shutil.copyfile(app_build_file, tkltest_app_build_file)
+    with open(tkltest_app_build_file, "a") as f:
+        f.write('\n')
+        for line in task_text:
+            f.write(line+ '\n')
+
+    if app_settings_file:
+        tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), task_name + '_settings.gradle')
+        shutil.copyfile(app_settings_file, tkltest_app_settings_file)
+        relative_app_build_file = pathlib.PurePath(
+            os.path.relpath(tkltest_app_build_file, os.path.dirname(app_settings_file))).as_posix()
+        with open(tkltest_app_settings_file, "a") as f:
+            f.write("\nrootProject.buildFileName = '" + relative_app_build_file + "'\n")
+
+    # run gradle
+    get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
+    if app_settings_file:
+        get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
+    get_dependencies_command += " " + task_name
+    logging.info(get_dependencies_command)
+
+    try:
+        command_util.run_command(command=get_dependencies_command, verbose=verbose)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('running gradle task {} failed: {}\n{}'.format( task_name, e, e.stderr),error=True)
+        os.remove(tkltest_app_build_file)
+        if app_settings_file:
+            os.remove(tkltest_app_settings_file)
+        sys.exit(1)
+
+    os.remove(tkltest_app_build_file)
+    if app_settings_file:
+        os.remove(tkltest_app_settings_file)
+
+
+def __resolve_app_path(tkltest_config):
+    app_build_type = tkltest_config['generate']['app_build_type']
+    app_build_file = tkltest_config['generate']['app_build_config_file']
+    app_settings_file = tkltest_config['generate']['app_build_settings_file']
+    if len(tkltest_config['general']['monolith_app_path']):
+        return
+
+    if app_build_type == 'gradle':
+        app_path_file = 'gradle_app_path.txt'
+        task_name = 'tkltest_get_app_path'
+        task_text = [
+                        'public class WriteStringClass extends DefaultTask {',
+                        '  @TaskAction',
+                        '  void writeString(){',
+                        '    FileWriter fw;',
+                        '    fw = new FileWriter( "' + app_path_file + '");',
+                        '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }',
+                        '    fw.close();',
+                        '  }',
+                        '}',
+                        'task ' + task_name + ' (type:WriteStringClass) {}']
+
+        __add_and_run_gradle_task(app_build_file=app_build_file,
+                                  app_settings_file=app_settings_file,
+                                  task_name=task_name,
+                                  task_text=task_text,
+                                  verbose=tkltest_config['general']['verbose'])
+
+        with open(app_path_file) as f:
+            tkltest_config['general']['monolith_app_path'] = [p.strip('[]') for p in f.read().split('\n')]
+
+    elif app_build_type == 'ant':
+        tkltest_status('monolith_app_path is missing\n', error=True)
+        sys.exit(1)
+
+    elif app_build_type == 'maven':
+        tkltest_status('monolith_app_path is missing\n', error=True)
+        sys.exit(1)
+
+
 def __resolve_classpath(tkltest_config, command):
     """
     1. creates a directory of all the app dependencies
@@ -659,6 +738,7 @@ def fix_config(tkltest_config, command):
 
     """
     __fix_relative_paths(tkltest_config)
+    __resolve_app_path(tkltest_config)
     __resolve_classpath(tkltest_config, command)
 
 
