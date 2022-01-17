@@ -418,7 +418,7 @@ __options_spec = {
                     'short_name': '-ac',
                     'long_name': '--augment-coverage',
                     'type': bool,
-                    'default_value': False,
+                    'default_value': True,
                     'help_message': 'augment CTD-guided tests with coverage-increasing base tests'
                 },
                 'no_ctd_coverage': {
