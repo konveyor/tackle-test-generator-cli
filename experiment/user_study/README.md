@@ -16,7 +16,7 @@ The only required input is a directory containing Tackle-Test automatically gene
 python3 user_study.py -td path/to/tests_dir
 ```
 
-The script `user_study.py` performs two main steps. 
+The script `user_study.py` performs the following two main steps. 
 
 First, it samples test files from the given test directory, until reaching a threshold 
 number of test methods. The default number of test methods to sample is 20. It can be changed via the 
