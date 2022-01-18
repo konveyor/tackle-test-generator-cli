@@ -502,7 +502,7 @@ def __resolve_classpath(tkltest_config, command):
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
     os.mkdir(dependencies_dir)
-
+    class_path_order = []
     if app_build_type == 'gradle':
         # create build and settings files
         get_dependencies_task = 'tkltest_get_dependencies'
@@ -542,7 +542,6 @@ def __resolve_classpath(tkltest_config, command):
             os.remove(tkltest_app_settings_file)
 
     elif app_build_type == 'maven':
-        get_dependencies_task = 'tkltest_get_dependencies'
         get_dependencies_command = 'mvn dependency:copy-dependencies -f ' + app_build_file + ' -DoutputDirectory=' + dependencies_dir
         get_dependencies_command += ' -Dmdep.useRepositoryLayout=true'
         get_dependencies_command += ' -e -X -DoverWriteReleases=false -DoverWriteSnapshots=false'
@@ -552,8 +551,22 @@ def __resolve_classpath(tkltest_config, command):
         try:
             command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
         except subprocess.CalledProcessError as e:
-            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
+            tkltest_status('running {} failed: {}\n{}'.format(app_build_type, e, e.stderr), error=True)
             sys.exit(1)
+
+        mvn_classpath_file = os.path.abspath('MavenClassPath.txt')
+        get_cpfile_command = 'mvn dependency:build-classpath -f ' + app_build_file + ' -Dmdep.outputFile=' + mvn_classpath_file
+        logging.info(get_cpfile_command)
+        try:
+            command_util.run_command(command=get_cpfile_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} failed: {}\n{}'.format(app_build_type, e, e.stderr), error=True)
+            sys.exit(1)
+        with open(mvn_classpath_file) as f:
+            class_path_order = f.read().split(';')
+            class_path_order = [os.path.basename(p) for p in class_path_order]
+
+
 
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']
@@ -649,8 +662,14 @@ def __resolve_classpath(tkltest_config, command):
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
-    for jar_file in jars_modules.keys():
-        classpath_fd.write(jar_file + "\n")
+    if not len(class_path_order):
+        for jar_file in jars_modules.keys():
+            classpath_fd.write(jar_file + "\n")
+    else:
+        base_to_jars = {os.path.basename(p): p for p in jars_modules.keys()}
+        for jar_base_file in class_path_order:
+            if jar_base_file in base_to_jars.keys():
+                classpath_fd.write(base_to_jars[jar_base_file] + "\n")
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 

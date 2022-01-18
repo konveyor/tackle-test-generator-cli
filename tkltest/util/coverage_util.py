@@ -73,10 +73,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         command_util.run_command(cmd, verbose=False)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
-        sys.exit(1)
+        return None
     if not os.path.exists(jacoco_raw_date_file):
         tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
-        sys.exit(1)
+        return None
 
     if additional_test_suite:
         '''
@@ -229,10 +229,11 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     # run jacoco cli report command
 
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
+    coverage_xml_file = os.path.join(main_coverage_dir, 'jacoco.xml')
 
-    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {}".
+    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {} --xml {}".
                              format(jacoco_cli_file, output_exec_file, os.path.pathsep.join(class_files),
-                                    coverage_csv_file, main_coverage_dir), verbose=True)
+                                    coverage_csv_file, main_coverage_dir, coverage_xml_file), verbose=True)
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0;
