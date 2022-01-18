@@ -467,9 +467,17 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
     os.remove(ant_output_filename)
 
 
-#todo - use this method at __resolve_classpath()
+#todo - use this method at __resolve_classpath() - will be done after resolving __resolve_classpath issues
 def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task_text, verbose):
-
+    '''
+    insert a task to the gradle build file, and run it
+    :param app_build_file: build.gradle file
+    :param app_settings_file: setting.gradle file
+    :param task_name: the task name to run
+    :param task_text: the text of the task
+    :param verbose: verbose
+    '''
+    # add the task to a copy of the gradle file
     tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), task_name + '_build.gradle')
     shutil.copyfile(app_build_file, tkltest_app_build_file)
     with open(tkltest_app_build_file, "a") as f:
@@ -477,6 +485,7 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
         for line in task_text:
             f.write(line + '\n')
 
+    # also update the setting files with a link to the copy
     if app_settings_file:
         tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), task_name + '_settings.gradle')
         shutil.copyfile(app_settings_file, tkltest_app_settings_file)
@@ -485,7 +494,7 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
         with open(tkltest_app_settings_file, "a") as f:
             f.write("\nrootProject.buildFileName = '" + relative_app_build_file + "'\n")
 
-    # run gradle
+    # run the task with gradle
     get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
     if app_settings_file:
         get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
@@ -507,12 +516,17 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
 
 
 def __resolve_app_path(tkltest_config):
+    '''
+    get the app path from the user build file
+    :param tkltest_config: the config
+    :return:
+    '''
+    if len(tkltest_config['general']['monolith_app_path']):
+        return
     app_name = tkltest_config['general']['app_name']
     app_build_type = tkltest_config['generate']['app_build_type']
     app_build_file = tkltest_config['generate']['app_build_config_file']
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
-    if len(tkltest_config['general']['monolith_app_path']):
-        return
 
     if app_build_type == 'gradle':
         app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_gradle_app_path.txt')).as_posix()
@@ -546,17 +560,17 @@ def __resolve_app_path(tkltest_config):
         sys.exit(1)
 
     elif app_build_type == 'maven':
-        get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
-        logging.info(get_apppath_command)
-
-        # run maven
-        try:
-            command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
-        except subprocess.CalledProcessError as e:
-            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
-            sys.exit(1)
         tkltest_status('monolith_app_path is missing\n', error=True)
         sys.exit(1)
+
+        #get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
+        #logging.info(get_apppath_command)
+        # run maven
+        #try:
+        #    command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
+        #except subprocess.CalledProcessError as e:
+        #    tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
+        #    sys.exit(1)
 
 
 def __resolve_classpath(tkltest_config, command):

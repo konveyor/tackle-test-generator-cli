@@ -3,7 +3,7 @@ name = "TKLTEST_CONFIG_FILE"
 # general options
 [general]
     app_name = "splitNjoin"
-    monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
+    #monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
     # JDK home directory
     java_jdk_home = ""
 
