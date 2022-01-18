@@ -51,11 +51,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Run Python unit tests
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
-      run: |
-        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_generate_execute.py test/unit/test_unit_tests.py
     - name: Install tkltest-unit command and run bats tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
