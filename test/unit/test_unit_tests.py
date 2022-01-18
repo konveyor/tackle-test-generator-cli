@@ -102,7 +102,6 @@ class UnitTests(unittest.TestCase):
 
             config = config_util.load_config(config_file=maven_test_apps[app_name]['config_file'])
             standard_classpath = os.path.abspath(maven_test_apps[app_name]['standard_classpath'])
-            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
             config['general']['app_classpath_file'] = ''
 
             dir_util.cd_output_dir(app_name)
@@ -111,7 +110,7 @@ class UnitTests(unittest.TestCase):
                 pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
                     pom_location = '..' + os.sep + pom_location
-                build_command = 'mvn clean install -f ' + pom_location + ' -e -X'
+                build_command = 'mvn clean install -f ' + pom_location
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
             config_util.fix_config(config, 'generate')
@@ -166,11 +165,12 @@ class UnitTests(unittest.TestCase):
         :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
         :param message: An informative error message to print in case one of the assertions fails.
         """
+        std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
         if is_real_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        lines_standard = [PurePath(os.path.join(std_classpath_prefix, line)).as_posix() for line in lines_standard]
+        lines_standard = [std_classpath_prefix + '/' + PurePath(line).as_posix() for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
