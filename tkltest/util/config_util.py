@@ -522,6 +522,7 @@ def __resolve_app_path(tkltest_config):
                         '  void writeString(){',
                         '    FileWriter fw;',
                         '    fw = new FileWriter( "' + app_path_file + '");',
+                        '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");' #todo - what if there no root project
                         '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }',
                         '    fw.close();',
                         '  }',
@@ -542,6 +543,15 @@ def __resolve_app_path(tkltest_config):
         sys.exit(1)
 
     elif app_build_type == 'maven':
+        get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
+        logging.info(get_apppath_command)
+
+        # run maven
+        try:
+            command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
+            sys.exit(1)
         tkltest_status('monolith_app_path is missing\n', error=True)
         sys.exit(1)
 
