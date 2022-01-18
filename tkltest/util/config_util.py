@@ -545,7 +545,7 @@ def __resolve_classpath(tkltest_config, command):
         shutil.rmtree(dependencies_dir)
         mvn_classpath_file = os.path.abspath('MavenClassPath.txt')
         get_cpfile_command = 'mvn dependency:build-classpath -f ' + app_build_file + ' -Dmdep.outputFile=' + mvn_classpath_file
-        get_cpfile_command += ' -Dmdep.pathSeparator=; -Dmdep.regenerateFile=true'
+        get_cpfile_command += ' -Dmdep.pathSeparator=;'
         logging.info(get_cpfile_command)
         try:
             command_util.run_command(command=get_cpfile_command, verbose=tkltest_config['general']['verbose'])
