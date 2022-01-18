@@ -73,7 +73,7 @@ class UnitTests(unittest.TestCase):
                                         generated_classpath,
                                         os.path.join(os.getcwd(), dependencies_dir),
                                         failed_assertion_message,
-                                        ant_test_apps[app_name]['is_real_classpath'])
+                                        is_real_classpath=ant_test_apps[app_name]['is_real_classpath'])
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -117,13 +117,15 @@ class UnitTests(unittest.TestCase):
             config_util.fix_config(config, 'generate')
 
             generated_classpath = config['general']['app_classpath_file']
+            jars_location = os.path.expanduser('~/.m2/repository')
             failed_assertion_message = 'failed for app = ' + app_name
             self.assertTrue(generated_classpath != '', failed_assertion_message)
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
             self.__assert_classpath(standard_classpath,
                                     generated_classpath,
-                                    os.path.join(os.getcwd(), dependencies_dir),
-                                    failed_assertion_message)
+                                    jars_location,
+                                    failed_assertion_message,
+                                    ordered_classpath=True)
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
@@ -157,7 +159,7 @@ class UnitTests(unittest.TestCase):
                                     os.path.join(os.getcwd(), dependencies_dir),
                                     failed_assertion_message)
 
-    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, is_real_classpath=False):
+    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_real_classpath=False):
         """
         :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
@@ -166,9 +168,9 @@ class UnitTests(unittest.TestCase):
         """
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if is_real_classpath:  # mainly for ant apps
+        if is_real_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        lines_standard = [PurePath(line).as_posix() for line in lines_standard]
+        lines_standard = [PurePath(os.path.join(std_classpath_prefix, line)).as_posix() for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -176,7 +178,10 @@ class UnitTests(unittest.TestCase):
 
         self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
-        for i, path in enumerate(lines_standard):
-            extended_message = message + " , path = " + path
-            self.assertTrue(lines_generated[i].endswith(path), extended_message)
-            self.assertTrue(os.path.isfile(lines_generated[i]), extended_message)
+        for i, jar_path in enumerate(lines_standard):
+            extended_message = message + " , path = " + jar_path
+            if ordered_classpath:
+                self.assertTrue(lines_generated[i] == jar_path, extended_message)
+            else:
+                self.assertTrue(jar_path in lines_generated, extended_message)
+            self.assertTrue(os.path.isfile(jar_path), extended_message)
