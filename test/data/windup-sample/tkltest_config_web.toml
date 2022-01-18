@@ -1,11 +1,11 @@
 [general]
-app_name = "windup-sample"
+app_name = "windup-sample-web"
 monolith_app_path = [
     "test/data/windup-sample/migration-sample-app-master/simple-sample-web/target/classes"]
 java_jdk_home = ""
 test_directory = ""
 reports_path = ""
-verbose = true
+verbose = false
 time_limit = 10
 
 [generate]

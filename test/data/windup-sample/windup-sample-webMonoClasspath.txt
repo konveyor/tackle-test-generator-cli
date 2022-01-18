@@ -1,0 +1,12 @@
+org\jboss\windup\test\apps\weblogic\simple-sample-weblogic-services\1.0.0-SNAPSHOT\simple-sample-weblogic-services-1.0.0-SNAPSHOT.jar
+org\jboss\ejb3\jboss-ejb3-ext-api\2.1.0\jboss-ejb3-ext-api-2.1.0.jar
+javax\javaee-api\7.0\javaee-api-7.0.jar
+com\sun\mail\javax.mail\1.5.0\javax.mail-1.5.0.jar
+javax\activation\activation\1.1\activation-1.1.jar
+javax\servlet\javax.servlet-api\3.1.0\javax.servlet-api-3.1.0.jar
+org\jboss\windup\test\apps\weblogic\proprietary-stub\1.0.0-SNAPSHOT\proprietary-stub-1.0.0-SNAPSHOT.jar
+javaee\javaee-api\5\javaee-api-5.jar
+commons-lang\commons-lang\2.6\commons-lang-2.6.jar
+org\jboss\logging\jboss-logging\3.1.4.GA\jboss-logging-3.1.4.GA.jar
+log4j\log4j\1.2.17\log4j-1.2.17.jar
+javax\ejb\ejb-api\3.0\ejb-api-3.0.jar

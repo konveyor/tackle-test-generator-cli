@@ -83,17 +83,17 @@ class UnitTests(unittest.TestCase):
             '14_spark': {
                 'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
-                'requires_build': False,
+                'build_file_if_requires_build': '',
             },
             '3_scribe-java': {
                 'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
                 'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
-                'requires_build': False,
+                'build_file_if_requires_build': '',
             },
-            'windup-sample': {
-                'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sampleMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config.toml'),
-                'requires_build': True,
+            'windup-sample-web': {
+                'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sample-webMonoClasspath.txt'),
+                'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config_web.toml'),
+                'build_file_if_requires_build': os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml'),
             }
         }
 
@@ -107,8 +107,8 @@ class UnitTests(unittest.TestCase):
 
             dir_util.cd_output_dir(app_name)
 
-            if maven_test_apps[app_name]['requires_build']:
-                pom_location = config['generate']['app_build_config_file']
+            if maven_test_apps[app_name]['build_file_if_requires_build']:
+                pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
                     pom_location = '..' + os.sep + pom_location
                 build_command = 'mvn clean install -f ' + pom_location + ' -e -X'
@@ -168,7 +168,7 @@ class UnitTests(unittest.TestCase):
             lines_standard = file.read().splitlines()
         if is_real_classpath:  # mainly for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        lines_standard = [PurePath(os.path.join(std_classpath_prefix, line)).as_posix() for line in lines_standard]
+        lines_standard = [PurePath(line).as_posix() for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -176,7 +176,7 @@ class UnitTests(unittest.TestCase):
 
         self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
-        for path in lines_standard:
+        for i, path in enumerate(lines_standard):
             extended_message = message + " , path = " + path
-            self.assertTrue(path in lines_generated, extended_message)
-            self.assertTrue(os.path.isfile(path), extended_message)
+            self.assertTrue(lines_generated[i].endswith(path), extended_message)
+            self.assertTrue(os.path.isfile(lines_generated[i]), extended_message)

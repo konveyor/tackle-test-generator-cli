@@ -496,14 +496,15 @@ def __resolve_classpath(tkltest_config, command):
             tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
 
-    # create dependencies directory
+    # initialize dependencies directory variables
     dependencies_dir = os.path.join(os.getcwd(), app_name + constants.DEPENDENCIES_DIR_SUFFIX)
     posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
-    os.mkdir(dependencies_dir)
     class_path_order = []
+
     if app_build_type == 'gradle':
+        os.mkdir(dependencies_dir)
         # create build and settings files
         get_dependencies_task = 'tkltest_get_dependencies'
         tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.gradle")
@@ -542,20 +543,9 @@ def __resolve_classpath(tkltest_config, command):
             os.remove(tkltest_app_settings_file)
 
     elif app_build_type == 'maven':
-        get_dependencies_command = 'mvn dependency:copy-dependencies -f ' + app_build_file + ' -DoutputDirectory=' + dependencies_dir
-        get_dependencies_command += ' -Dmdep.useRepositoryLayout=true'
-        get_dependencies_command += ' -e -X -DoverWriteReleases=false -DoverWriteSnapshots=false'
-        logging.info(get_dependencies_command)
-
-        # run maven
-        try:
-            command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
-        except subprocess.CalledProcessError as e:
-            tkltest_status('running {} failed: {}\n{}'.format(app_build_type, e, e.stderr), error=True)
-            sys.exit(1)
-
         mvn_classpath_file = os.path.abspath('MavenClassPath.txt')
         get_cpfile_command = 'mvn dependency:build-classpath -f ' + app_build_file + ' -Dmdep.outputFile=' + mvn_classpath_file
+        get_cpfile_command += ' -Dmdep.pathSeparator=; -Dmdep.regenerateFile=true'
         logging.info(get_cpfile_command)
         try:
             command_util.run_command(command=get_cpfile_command, verbose=tkltest_config['general']['verbose'])
@@ -564,11 +554,10 @@ def __resolve_classpath(tkltest_config, command):
             sys.exit(1)
         with open(mvn_classpath_file) as f:
             class_path_order = f.read().split(';')
-            class_path_order = [os.path.basename(p) for p in class_path_order]
-
-
+        os.remove(mvn_classpath_file)
 
     elif app_build_type == 'ant':
+        os.mkdir(dependencies_dir)
         app_build_target = tkltest_config['generate']['app_build_target']
 
         # a set for the united dependencies of the compilation process
@@ -633,43 +622,53 @@ def __resolve_classpath(tkltest_config, command):
     # remove non jar entries
     # collect jars modules
     jars_modules = dict()
-    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
-        if os.path.isdir(file_path):
-            continue
-        if not file_path.endswith(".jar"):
-            os.remove(file_path)
-        else:
-            archive = zipfile.ZipFile(file_path, 'r')
-            class_files = set([file for file in archive.namelist() if file.endswith(".class")])
-            archive.close()
-            jars_modules[file_path] = set(
-                ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+    if app_build_type in ['ant', 'gradle']:
+        for jar_file in os.listdir(dependencies_dir):
+            jar_file_path = os.path.join(dependencies_dir, jar_file)
+            if os.path.isdir(jar_file_path):
+                shutil.rmtree(jar_file_path)
+            elif not jar_file_path.endswith(".jar"):
+                os.remove(jar_file_path)
+            else:
+                archive = zipfile.ZipFile(jar_file_path, 'r')
+                class_files = set([file for file in archive.namelist() if file.endswith(".class")])
+                archive.close()
+                jars_modules[jar_file_path] = set(
+                    ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+    elif app_build_type == 'maven':
+        for jar_file_path in class_path_order:
+            if jar_file_path.endswith('.jar'):
+                archive = zipfile.ZipFile(jar_file_path, 'r')
+                class_files = set([file for file in archive.namelist() if file.endswith(".class")])
+                archive.close()
+                jars_modules[jar_file_path] = set(
+                    ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
 
     # compare jars modules to monolith modules, remove matching jars
     for app_path, app_path_modules in app_paths_modules.items():
         for jar_file, jar_modules in jars_modules.items():
             if len(jar_modules) and jar_modules == app_path_modules:
-                os.remove(jar_file)
+                if jar_file.startswith(dependencies_dir):
+                    os.remove(jar_file)
                 del jars_modules[jar_file]
                 break
 
-    # remove empty directories
-    for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
-        if os.path.isdir(file_path):
-            contained_jars = list(glob.glob(os.path.join(file_path, '**', '*.jar'), recursive=True))
-            if not contained_jars:
-                shutil.rmtree(file_path)
+    # # remove empty directories
+    # for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
+    #     if os.path.isdir(file_path):
+    #         contained_jars = list(glob.glob(os.path.join(file_path, '**', '*.jar'), recursive=True))
+    #         if not contained_jars:
+    #             shutil.rmtree(file_path)
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
-    if not len(class_path_order):
+    if not len(class_path_order):  # there is no specific order for classpath jars
         for jar_file in jars_modules.keys():
             classpath_fd.write(jar_file + "\n")
     else:
-        base_to_jars = {os.path.basename(p): p for p in jars_modules.keys()}
-        for jar_base_file in class_path_order:
-            if jar_base_file in base_to_jars.keys():
-                classpath_fd.write(base_to_jars[jar_base_file] + "\n")
+        for jar_file in class_path_order:
+            if jar_file in jars_modules.keys():
+                classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
