@@ -475,7 +475,7 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
     with open(tkltest_app_build_file, "a") as f:
         f.write('\n')
         for line in task_text:
-            f.write(line+ '\n')
+            f.write(line + '\n')
 
     if app_settings_file:
         tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), task_name + '_settings.gradle')
@@ -507,6 +507,7 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
 
 
 def __resolve_app_path(tkltest_config):
+    app_name = tkltest_config['general']['app_name']
     app_build_type = tkltest_config['generate']['app_build_type']
     app_build_file = tkltest_config['generate']['app_build_config_file']
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
@@ -514,16 +515,18 @@ def __resolve_app_path(tkltest_config):
         return
 
     if app_build_type == 'gradle':
-        app_path_file = 'gradle_app_path.txt'
+        app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_gradle_app_path.txt')).as_posix()
         task_name = 'tkltest_get_app_path'
+        write_classes_dirs_line = '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");'
+        if app_settings_file:
+            write_classes_dirs_line = '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }'
         task_text = [
                         'public class WriteStringClass extends DefaultTask {',
                         '  @TaskAction',
                         '  void writeString(){',
                         '    FileWriter fw;',
                         '    fw = new FileWriter( "' + app_path_file + '");',
-                        '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");' #todo - what if there no root project
-                        '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }',
+                        write_classes_dirs_line,
                         '    fw.close();',
                         '  }',
                         '}',
