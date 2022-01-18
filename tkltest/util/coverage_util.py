@@ -116,8 +116,11 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                 no_failure = False
         if no_failure:
             try:
-                command_util.run_command("java -jar {} report {} --classfiles {} --csv {}".
-                                         format(jacoco_cli_file, merged_exec_file, os.path.pathsep.join(class_files),
+                jacoco_classfiles_ops = ''
+                for classpath in class_files:
+                    jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
+                command_util.run_command("java -jar {} report {} {} --csv {}".
+                                         format(jacoco_cli_file, merged_exec_file, jacoco_classfiles_ops,
                                                 merged_csv_file), verbose=True)
             except subprocess.CalledProcessError as e:
                 tkltest_status('Warning: Failed to create CSV coverage report {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr))
@@ -231,8 +234,11 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
     coverage_xml_file = os.path.join(main_coverage_dir, 'jacoco.xml')
 
-    command_util.run_command("java -jar {} report {} --classfiles {} --csv {} --html {} --xml {}".
-                             format(jacoco_cli_file, output_exec_file, os.path.pathsep.join(class_files),
+    jacoco_classfiles_ops = ''
+    for classpath in class_files:
+        jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
+    command_util.run_command("java -jar {} report {} {} --csv {} --html {} --xml {}".
+                             format(jacoco_cli_file, output_exec_file, jacoco_classfiles_ops,
                                     coverage_csv_file, main_coverage_dir, coverage_xml_file), verbose=True)
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
