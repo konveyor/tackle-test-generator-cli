@@ -116,7 +116,7 @@ class UnitTests(unittest.TestCase):
             config_util.fix_config(config, 'generate')
 
             generated_classpath = config['general']['app_classpath_file']
-            jars_location = os.path.expanduser('~/.m2/repository')
+            jars_location = os.path.expanduser(os.path.join('~', '.m2', 'repository'))
             failed_assertion_message = 'failed for app = ' + app_name
             self.assertTrue(generated_classpath != '', failed_assertion_message)
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
@@ -170,7 +170,8 @@ class UnitTests(unittest.TestCase):
             lines_standard = file.read().splitlines()
         if is_real_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        lines_standard = [std_classpath_prefix + '/' + PurePath(line).as_posix() for line in lines_standard]
+        # Paths inside standard_classpath must be in unix format for the test.
+        lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
