@@ -16,7 +16,7 @@ The only required input is a directory containing Tackle-Test automatically gene
 python3 user_study.py -td path/to/tests_dir
 ```
 
-The script `user_study.py` performs two main steps. 
+The script `user_study.py` performs the following two main steps. 
 
 First, it samples test files from the given test directory, until reaching a threshold 
 number of test methods. The default number of test methods to sample is 20. It can be changed via the 
@@ -24,11 +24,11 @@ argument `-n`. **Note:** this step may end up sampling more than the threshold n
 because it samples entire test files. 
 
 The sampled test files are copied to a new folder next to
-the given tests directory and with the same directory name with the addition of `_samples` suffix.
+the given tests directory and with the same directory name with the addition of `_sampled` suffix.
 The location of the sampled test files is also printed to the standard output.   
 
-Second, it creates an Excel (csv) questionnaire that the user should answer with respect to the
-sampled test methods.
+Second, it creates inside the sampled directory an Excel (csv) questionnaire called `user_study_questionnaire.csv` 
+that the user should answer with respect to the sampled test methods.
 
 The questionnaire has two parts: (1) a table, where each row relates to a specific test method 
 (desginated by the test file and test method names), and (2) an optional open questions section, 
