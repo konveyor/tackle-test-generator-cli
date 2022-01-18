@@ -117,9 +117,9 @@ teardown_file() {
     assert_failure 1
     assert_line --index 1 --partial 'ERROR: configuration options validation failed:'
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 3 --partial "Missing conditionally required option for "general": monolith_app_path (required if "app_build_type" is not specified)"
+    assert_line --index 3 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
     assert_line --index 4 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
-    assert_line --index 5 --partial "Missing conditionally required option for "generate": app_build_type (required if "monolith_app_path" is not specified)"
+    assert_line --index 5 --partial "Missing conditionally required option for \"generate\": app_build_type (required if \"monolith_app_path\" is not specified)"
     assert_line --index 6 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
@@ -135,9 +135,9 @@ teardown_file() {
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 3 --partial "Missing conditionally required option for "general": monolith_app_path (required if "app_build_type" is not specified)"
+    assert_line --index 3 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
     assert_line --index 4 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
-    assert_line --index 5 --partial "Missing conditionally required option for "generate": app_build_type (required if "monolith_app_path" is not specified)"
+    assert_line --index 5 --partial "Missing conditionally required option for \"generate\": app_build_type (required if \"monolith_app_path\" is not specified)"
     assert_line --index 6 --partial "refactored_app_path_prefix (required if \"partitions_file\" is specified)"
     assert_line --index 7 --partial "refactored_app_path_suffix (required if \"partitions_file\" is specified)"
     assert_line --index 8 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
@@ -148,7 +148,7 @@ teardown_file() {
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
     assert_line --index 2 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 3 --partial "Missing conditionally required option for "general": monolith_app_path (required if "app_build_type" is not specified)"
+    assert_line --index 3 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
     assert_line --index 4 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
     assert_line --index 5 --partial "Missing required options for \"execute\": ['app_packages']"
 
