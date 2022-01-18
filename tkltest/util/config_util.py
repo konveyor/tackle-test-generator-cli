@@ -21,7 +21,6 @@ import pathlib
 import zipfile
 import re
 import copy
-import glob
 import xml.etree.ElementTree as ElementTree
 
 from . import constants, config_options_unit
@@ -496,15 +495,15 @@ def __resolve_classpath(tkltest_config, command):
             tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
 
-    # initialize dependencies directory variables
+    # create dependencies directory
     dependencies_dir = os.path.join(os.getcwd(), app_name + constants.DEPENDENCIES_DIR_SUFFIX)
     posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
+    os.mkdir(dependencies_dir)
     class_path_order = []
 
     if app_build_type == 'gradle':
-        os.mkdir(dependencies_dir)
         # create build and settings files
         get_dependencies_task = 'tkltest_get_dependencies'
         tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.gradle")
@@ -543,6 +542,7 @@ def __resolve_classpath(tkltest_config, command):
             os.remove(tkltest_app_settings_file)
 
     elif app_build_type == 'maven':
+        shutil.rmtree(dependencies_dir)
         mvn_classpath_file = os.path.abspath('MavenClassPath.txt')
         get_cpfile_command = 'mvn dependency:build-classpath -f ' + app_build_file + ' -Dmdep.outputFile=' + mvn_classpath_file
         get_cpfile_command += ' -Dmdep.pathSeparator=; -Dmdep.regenerateFile=true'
@@ -557,7 +557,6 @@ def __resolve_classpath(tkltest_config, command):
         os.remove(mvn_classpath_file)
 
     elif app_build_type == 'ant':
-        os.mkdir(dependencies_dir)
         app_build_target = tkltest_config['generate']['app_build_target']
 
         # a set for the united dependencies of the compilation process
@@ -652,13 +651,6 @@ def __resolve_classpath(tkltest_config, command):
                     os.remove(jar_file)
                 del jars_modules[jar_file]
                 break
-
-    # # remove empty directories
-    # for file_path in list(glob.glob(os.path.join(dependencies_dir, '**', '*'), recursive=True)):
-    #     if os.path.isdir(file_path):
-    #         contained_jars = list(glob.glob(os.path.join(file_path, '**', '*.jar'), recursive=True))
-    #         if not contained_jars:
-    #             shutil.rmtree(file_path)
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
