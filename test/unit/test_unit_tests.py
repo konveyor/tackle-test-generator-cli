@@ -35,7 +35,7 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
                 'property_file': '',
                 'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute', 'compile-classpath-element'],
-                'is_real_classpath': True,
+                'is_user_defined_classpath': True,
             },
             '84_ifx-framework': {
                 'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
@@ -43,7 +43,7 @@ class UnitTests(unittest.TestCase):
                 'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
                 'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
                 'targets_to_test': ['compile', 'compile-antcall'],
-                'is_real_classpath': True,
+                'is_user_defined_classpath': True,
             },
         }
 
@@ -73,7 +73,7 @@ class UnitTests(unittest.TestCase):
                                         generated_classpath,
                                         os.path.join(os.getcwd(), dependencies_dir),
                                         failed_assertion_message,
-                                        is_real_classpath=ant_test_apps[app_name]['is_real_classpath'])
+                                        is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -158,7 +158,7 @@ class UnitTests(unittest.TestCase):
                                     os.path.join(os.getcwd(), dependencies_dir),
                                     failed_assertion_message)
 
-    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_real_classpath=False):
+    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
         :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
@@ -168,7 +168,7 @@ class UnitTests(unittest.TestCase):
         std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if is_real_classpath:  # for ant apps
+        if is_user_defined_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
         # Paths inside standard_classpath must be in unix format for the test.
         lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]

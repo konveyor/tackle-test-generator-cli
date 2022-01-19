@@ -467,6 +467,15 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
     os.remove(ant_output_filename)
 
 
+def __collect_jar_modules(jar_file_path, jars_modules):
+    """ Collects the modules of the jar and adds them to the dictionary jars_modules. """
+    archive = zipfile.ZipFile(jar_file_path, 'r')
+    class_files = set([file for file in archive.namelist() if file.endswith(".class")])
+    archive.close()
+    jars_modules[jar_file_path] = set(
+        ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+
+
 def __resolve_classpath(tkltest_config, command):
     """
     1. creates a directory of all the app dependencies
@@ -629,19 +638,11 @@ def __resolve_classpath(tkltest_config, command):
             elif not jar_file_path.endswith(".jar"):
                 os.remove(jar_file_path)
             else:
-                archive = zipfile.ZipFile(jar_file_path, 'r')
-                class_files = set([file for file in archive.namelist() if file.endswith(".class")])
-                archive.close()
-                jars_modules[jar_file_path] = set(
-                    ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+                __collect_jar_modules(jar_file_path, jars_modules)
     elif app_build_type == 'maven':
         for jar_file_path in class_path_order:
             if jar_file_path.endswith('.jar'):
-                archive = zipfile.ZipFile(jar_file_path, 'r')
-                class_files = set([file for file in archive.namelist() if file.endswith(".class")])
-                archive.close()
-                jars_modules[jar_file_path] = set(
-                    ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
+                __collect_jar_modules(jar_file_path, jars_modules)
 
     # compare jars modules to monolith modules, remove matching jars
     for app_path, app_path_modules in app_paths_modules.items():
