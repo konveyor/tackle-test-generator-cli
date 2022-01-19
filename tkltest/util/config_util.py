@@ -521,7 +521,7 @@ def __resolve_app_path(tkltest_config):
     :param tkltest_config: the config
     :return:
     '''
-    if len(tkltest_config['general']['monolith_app_path']):
+    if tkltest_config['general']['monolith_app_path']:
         return
     app_name = tkltest_config['general']['app_name']
     app_build_type = tkltest_config['generate']['app_build_type']
@@ -561,7 +561,7 @@ def __resolve_app_path(tkltest_config):
 
     elif app_build_type == 'maven':
         tkltest_status('monolith_app_path is missing\n', error=True)
-        sys.exit(1)
+            sys.exit(1)
 
         #get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
         #logging.info(get_apppath_command)
