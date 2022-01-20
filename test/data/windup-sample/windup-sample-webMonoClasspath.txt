@@ -8,5 +8,7 @@ org/jboss/windup/test/apps/weblogic/proprietary-stub/1.0.0-SNAPSHOT/proprietary-
 javaee/javaee-api/5/javaee-api-5.jar
 commons-lang/commons-lang/2.6/commons-lang-2.6.jar
 org/jboss/logging/jboss-logging/3.1.4.GA/jboss-logging-3.1.4.GA.jar
-log4j/log4j/1.2.17/log4j-1.2.17.jar
+org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar
+org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar
+org/apache/logging/log4j/log4j-1.2-api/2.17.1/log4j-1.2-api-2.17.1.jar
 javax/ejb/ejb-api/3.0/ejb-api-3.0.jar
