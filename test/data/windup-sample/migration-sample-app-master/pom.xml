@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+
+	<groupId>org.jboss.windup.test.apps.weblogic</groupId>
+	<artifactId>simple-sample-weblogic-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Simple WebLogic Java EE 6 Example</name>
+	<description>Example EAR, WAR, EJB JAR that use Weblogic vendor specific APIs.  </description>
+
+	<modules>
+		<module>simple-sample-services</module>
+		<module>simple-sample-web</module>
+		<module>simple-sample-app</module>
+              
+                <!-- Stub to allow compilation against proprietary APIs -->
+                <module>proprietary-stub</module>
+	</modules>
+
+	<properties>
+		<weblogic.version>10.3</weblogic.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ejb</groupId>
+			<artifactId>ejb-api</artifactId>
+			<version>3.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+</project>

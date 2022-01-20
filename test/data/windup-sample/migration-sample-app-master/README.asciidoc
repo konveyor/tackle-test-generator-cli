@@ -1,0 +1,5 @@
+== Migration Sample Application
+
+This repository contains a single small sample application, suitable for demonstrating
+a simple migration to JBoss EAP 7+.
+
