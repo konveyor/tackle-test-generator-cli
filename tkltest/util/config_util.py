@@ -527,9 +527,9 @@ def __resolve_app_path(tkltest_config):
     app_build_type = tkltest_config['generate']['app_build_type']
     app_build_file = tkltest_config['generate']['app_build_config_file']
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
+    app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')).as_posix()
 
     if app_build_type == 'gradle':
-        app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_gradle_app_path.txt')).as_posix()
         task_name = 'tkltest_get_app_path'
         write_classes_dirs_line = '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");'
         if app_settings_file:
@@ -560,17 +560,19 @@ def __resolve_app_path(tkltest_config):
         sys.exit(1)
 
     elif app_build_type == 'maven':
+        #get_apppath_command = 'mvn properties:write-project-properties -f ' + app_build_file# + ' -Dproperties.outputFile=' + app_path_file
+        get_apppath_command = 'mvn org.codehaus.mojo:properties-maven-plugin:1.0-alpha-2:write-project-propertiesss -f ' + app_build_file# + ' -DoutputFile=' + 'aaa.txt'
+        #get_apppath_command = 'mvn clean generate-resources -f ' + app_build_file
+        logging.info(get_apppath_command)
+        # run maven
+        try:
+            command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_apppath_command, e, e.stderr), error=True)
+            sys.exit(1)
         tkltest_status('monolith_app_path is missing\n', error=True)
         sys.exit(1)
 
-        #get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
-        #logging.info(get_apppath_command)
-        # run maven
-        #try:
-        #    command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
-        #except subprocess.CalledProcessError as e:
-        #    tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
-        #    sys.exit(1)
 
 
 def __collect_jar_modules(jar_file_path, jars_modules):
