@@ -785,7 +785,6 @@ def fix_config(tkltest_config, command):
 
     """
     __fix_relative_paths(tkltest_config)
-    __resolve_app_path(tkltest_config)
     __resolve_classpath(tkltest_config, command)
 
 
