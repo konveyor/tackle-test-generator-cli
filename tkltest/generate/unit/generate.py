@@ -217,14 +217,14 @@ def generate_ctd_amplified_tests(config):
         main_reports_dir=reports_dir,
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
         collect_codecoverage=True,  # for coverage-based augmentation
-        offline_instrumentation=True if config['generate']['ctd_amplified']['augment_coverage'] else False
+        offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))
 
     # augment CTD-guided tests with coverage-increasing base tests
-    if config['generate']['ctd_amplified']['augment_coverage']:
+    if not config['generate']['ctd_amplified']['no_augment_coverage']:
         config['general']['offline_instrumentation'] = True
         build_type = config['general']['build_type']
         start_time = time.time()
@@ -552,5 +552,5 @@ if __name__ == '__main__':  # pragma: no cover
     args.base_test_generator = 'evosuite'
     args.verbose = True
     config = config_util.load_config(args=args, config_file=config_file)
-    config['generate']['ctd_amplified']['augment_coverage'] = True
+    config['generate']['ctd_amplified']['no_augment_coverage'] = False
     process_generate_command(args=args, config=config)
