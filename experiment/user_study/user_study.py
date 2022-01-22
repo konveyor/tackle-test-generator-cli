@@ -39,9 +39,10 @@ def __select_samples(tests_dir, num_samples):
         os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
         shutil.copy(current_file, dest_fpath)
         methods = __get_method_names(current_file)
+        num_sampled += len(methods)
         files_to_methods[current_file] = methods
 
-    print("sampled "+str(len(methods)) + " test methods, located in "+os.path.abspath(sampled_tests_dir))
+    print("sampled "+str(num_sampled) + " test methods, located in "+os.path.abspath(sampled_tests_dir))
 
     return files_to_methods, sampled_tests_dir
 
@@ -57,7 +58,7 @@ def __get_method_names(filename):
             if '@Test' in line:
                 next_is_test = True
             elif next_is_test:
-                next_is_test = False
+                next_is_test = False				
                 method_names.add(line[line.find(method_prefix)+len(method_prefix):line.index('(')])
 
     return method_names
