@@ -129,9 +129,9 @@ def __execute_base(args, config):
 
     # run test classes
     if gen_config['subcommand'] == 'ctd-amplified' and\
-            'augment_coverage' in gen_config['generate']['ctd_amplified'].keys() and\
-            gen_config['generate']['ctd_amplified']['augment_coverage']:
-        offline_inst =gen_config['general']['offline_instrumentation']
+            'no_augment_coverage' in gen_config['generate']['ctd_amplified'].keys() and\
+            not gen_config['generate']['ctd_amplified']['no_augment_coverage']:
+        offline_inst = gen_config['general']['offline_instrumentation']
     else:
         offline_inst = config['general']['offline_instrumentation']
     __run_test_cases(create_build=config['execute']['create_build_file'],
