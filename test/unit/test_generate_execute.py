@@ -101,7 +101,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # set up config and generate tests
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config)
-            config['generate']['ctd_amplified']['augment_coverage'] = False
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
@@ -128,7 +128,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            config['generate']['ctd_amplified']['augment_coverage'] = False
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
@@ -247,12 +247,12 @@ class GenerateExecuteTest(unittest.TestCase):
                 orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
 
     def test_generate_ctdamplified_evosuite_allclasses_augmentcoverage(self) -> None:
-        """Test "generate ctd-amplified": base_test_generator=evosuite scope=all_classes augment_coverage=true"""
+        """Test "generate ctd-amplified": base_test_generator=evosuite scope=all_classes no_augment_coverage=false"""
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['ctd_amplified']['augment_coverage'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = False
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='ctd-amplified', config=config)
