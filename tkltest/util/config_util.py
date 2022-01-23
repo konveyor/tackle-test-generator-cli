@@ -555,7 +555,7 @@ def __resolve_app_path(tkltest_config):
 
         with open(app_path_file) as f:
             tkltest_config['general']['monolith_app_path'] = [p.strip('[]') for p in f.read().split('\n')]
-
+            tkltest_config['general']['monolith_app_path'].remove('')
     elif app_build_type == 'ant':
         tkltest_status('monolith_app_path is missing\n', error=True)
         sys.exit(1)
