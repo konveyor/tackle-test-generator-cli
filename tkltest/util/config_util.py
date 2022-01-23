@@ -230,10 +230,11 @@ def __validate_config_scope(config, options_spec, val_errors, loaded_config=None
                 opt['choices'], config[opt_name])
 
         # check parameter dependency constraints
-        if opt_name == 'augment_coverage':
-            if config[opt_name] is True and config['base_test_generator'] == 'randoop':
+        if opt_name == 'no_augment_coverage':
+            if config[opt_name] is False and config['base_test_generator'] == 'randoop':
                 val_errors['param_constraint_violation'].append(
-                    'To use option "{}/{}", base test generator must be "combined" or "evosuite"'.format(
+                    'For coverage augmentation, base test generator must be "combined" or "evosuite"; ' +
+                    'to "randoop" as the only base generator, specify also the option {}/{}'.format(
                         opt['short_name'], opt['long_name']
                     ))
 

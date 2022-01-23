@@ -23,7 +23,7 @@ setup_file() {
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate --no-diff-assertions ctd-amplified
+        generate --no-diff-assertions ctd-amplified --no-augment-coverage
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -114,7 +114,7 @@ setup_file() {
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified
+        generate ctd-amplified --no-augment-coverage
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -241,7 +241,7 @@ setup_file() {
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE2 \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate --no-diff-assertions ctd-amplified
+        generate --no-diff-assertions ctd-amplified --no-augment-coverage
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -320,7 +320,7 @@ setup_file() {
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate --no-diff-assertions ctd-amplified --base-test-generator randoop
+        generate --no-diff-assertions ctd-amplified --base-test-generator randoop --no-augment-coverage
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -344,7 +344,7 @@ setup_file() {
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate --no-diff-assertions ctd-amplified --base-test-generator evosuite
+        generate --no-diff-assertions ctd-amplified --base-test-generator evosuite --no-augment-coverage
     [ $status -eq 0 ]
 
     # assert over test reports dir
@@ -362,12 +362,12 @@ setup_file() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 13: CLI generate [all-classes] ctd-amplified --base-test-generator evosuite --augment-coverage irs" {
+@test "Test 13: CLI generate [all-classes] ctd-amplified --base-test-generator evosuite [augment-coverage] irs" {
     rm -rf $IRS_CTD_TEST_PLAN_FILE $IRS_CTD_AMPLIFIED_TESTDIR $IRS_TEST_REPORTS_DIR
     run tkltest-unit --log-level INFO \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
-        generate ctd-amplified --base-test-generator evosuite --augment-coverage
+        generate ctd-amplified --base-test-generator evosuite
     [ $status -eq 0 ]
 
     # assert over test reports dir

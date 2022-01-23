@@ -29,7 +29,7 @@ test_class = ""
 
 [generate.ctd_amplified]
 base_test_generator = "combined"
-augment_coverage = false
+no_augment_coverage = true
 no_ctd_coverage = false
 interaction_level = 1
 num_seq_executions = 10
