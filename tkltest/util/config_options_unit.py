@@ -394,7 +394,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'aame of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file'
+            'help_message': 'Name of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file'
         },
 
         # subcommands for the generate command
@@ -413,15 +413,15 @@ __options_spec = {
                     'default_value': 'combined',
                     'help_message': 'base test generator to use for creating building-block test sequences'
                 },
-                'augment_coverage': {
+                'no_augment_coverage': {
                     'required': False,
                     'is_toml_option': True,
                     'is_cli_option': True,
-                    'short_name': '-ac',
-                    'long_name': '--augment-coverage',
+                    'short_name': '-nac',
+                    'long_name': '--no-augment-coverage',
                     'type': bool,
-                    'default_value': True,
-                    'help_message': 'augment CTD-guided tests with coverage-increasing base tests'
+                    'default_value': False,
+                    'help_message': 'do not augment CTD-guided tests with coverage-increasing base tests'
                 },
                 'no_ctd_coverage': {
                     'required': False,
@@ -431,7 +431,7 @@ __options_spec = {
                     'long_name': '--no-ctd-coverage',
                     'type': bool,
                     'default_value': False,
-                    'help_message': 'generate CTD coverage report'
+                    'help_message': 'do not generate CTD coverage report'
                 },
                 'interaction_level': {
                     'required': False,

@@ -172,10 +172,10 @@ teardown_file() {
 
 @test "Test 17: CLI generate ctd-amplified parameter constraint violation" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE generate ctd-amplified \
-        --base-test-generator randoop --augment-coverage
+        --base-test-generator randoop
     assert_failure 1
     assert_line --index 1 --partial "ERROR: configuration options validation failed:"
-    assert_line --index 2 --partial "Violated parameter constraint: To use option \"-ac/--augment-coverage\", base test generator must be \"combined\" or \"evosuite\""
+    assert_line --index 2 --partial "Violated parameter constraint: For coverage augmentation, base test generator must be \"combined\" or \"evosuite\""
 }
 
 @test "Test 18: CLI generate ctd-amplified invalid build/classpath spec in toml" {
