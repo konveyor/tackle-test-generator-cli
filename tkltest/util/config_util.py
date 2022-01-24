@@ -23,13 +23,13 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 
-from . import constants, config_options_unit
+from . import constants, config_options_unit, config_options
 from .logging_util import tkltest_status
 from .constants import *
 from tkltest.util import command_util
 
 
-def load_config(args=None, config_file=None):
+def load_config(test_level='unit', args=None, config_file=None):
     """Loads config options.
 
     Creates default config options object, updates it with options specified in the toml file and the
@@ -37,6 +37,7 @@ def load_config(args=None, config_file=None):
     are specified in both places), and returns the final options object.
 
     Args:
+        test_level: level of testing (unit, ui)
         args: parsed command-line arguments
         config_file: name of config file to be loaded
 
@@ -44,7 +45,7 @@ def load_config(args=None, config_file=None):
         dict: dictionary containing configuration options for run
     """
     # initialize config
-    tkltest_config = init_config()
+    tkltest_config = init_config(test_level)
 
     # if neither command-line args nor config file specified, return initialized config
     if args is None and config_file is None:
@@ -62,7 +63,7 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-        options_spec=config_options_unit.get_options_spec(command='general'),
+        options_spec=config_options.get_options_spec(command='general', test_level=test_level),
         args=args)
 
     # if args specified, get command and subcommand
@@ -77,17 +78,18 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-            options_spec=config_options_unit.get_options_spec(command=command),
+            options_spec=config_options.get_options_spec(command=command, test_level=test_level),
             args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-            options_spec=config_options_unit.get_options_spec(command=command, subcommand=subcommand),
+            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand, test_level=test_level),
             args=args)
 
     # validate loaded config information, exit if validation errors occur
-    val_failure_msgs = __validate_config(config=tkltest_config, command=command, subcommand=subcommand)
+    val_failure_msgs = __validate_config(config=tkltest_config, test_level=test_level, command=command,
+                                         subcommand=subcommand)
     if val_failure_msgs:  # pragma: no cover
         tkltest_status('configuration options validation failed:\n{}'.format(''.join(val_failure_msgs)), error=True)
         sys.exit(1)
@@ -101,17 +103,20 @@ def load_config(args=None, config_file=None):
     return tkltest_config
 
 
-def init_config():
+def init_config(test_level='unit'):
     """Initializes config.
 
     Initializes and returns config data structure containing default values for all
     configuration options (excluding non-toml options, which should not be loaded).
 
+    Args:
+        test_level: level of testing (unit, ui)
+
     Returns:
         dict containing initialized options
     """
     # get config spec
-    options_spec = config_options_unit.get_options_spec()
+    options_spec = config_options.get_options_spec(test_level=test_level)
     config = {}
 
     for opt_name in options_spec.keys():
@@ -136,7 +141,7 @@ def init_config():
     return config
 
 
-def __validate_config(config, command=None, subcommand=None):
+def __validate_config(config, test_level, command=None, subcommand=None):
     """Validate loaded config information.
 
     Validates the given loaded config information in the context of the given command and (optionally)
@@ -150,9 +155,9 @@ def __validate_config(config, command=None, subcommand=None):
         'general': config_options_unit.get_options_spec('general')
     }
     if command is not None:
-        options_spec[command] = config_options_unit.get_options_spec(command)
+        options_spec[command] = config_options.get_options_spec(command, test_level=test_level)
     if subcommand is not None:
-        options_spec[subcommand] = config_options_unit.get_options_spec(command, subcommand)
+        options_spec[subcommand] = config_options.get_options_spec(command, subcommand, test_level=test_level)
 
     # initialize validation errors
     val_errors = {
@@ -327,7 +332,7 @@ def __fix_relative_paths(tkltest_config):
 
     """
 
-    options_spec = config_options_unit.get_options_spec()
+    options_spec = config_options.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)
@@ -798,5 +803,5 @@ if __name__ == '__main__':
     print('base_config={}'.format(base_config))
     __merge_config(base_config, file_config)
     print('updated_config={}'.format(base_config))
-    failure_msgs = __validate_config(base_config, command='generate', subcommand='ctd_amplified')
+    failure_msgs = __validate_config(base_config, test_level='unit', command='generate', subcommand='ctd_amplified')
     print('failure_msgs={}'.format(failure_msgs))

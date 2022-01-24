@@ -17,7 +17,7 @@ import sys
 import toml
 
 from ._version import __version__
-from .util import logging_util, config_util, config_options_unit
+from .util import logging_util, config_util, config_options
 from .util.constants import *
 
 
@@ -100,17 +100,18 @@ def __add_arguments_to_parser(parser, options_spec):
         parser.add_argument(*[option['short_name'], option['long_name']], **add_arg_params)
 
 
-def __process_config_commands(args):
+def __process_config_commands(args, test_level):
     """Processes config commands
 
     Processes config commands (init, list)
 
     Args:
         args: parsed command-line arguments
+        test_level: level of testing (unit, ui)
     """
     if args.sub_command == 'init':
         # initialize config
-        config = config_util.init_config()
+        config = config_util.init_config(test_level=test_level)
 
         # if file name specified, write config to file; otherwise print to stdout
         if hasattr(args, 'file') and args.file:
@@ -121,7 +122,7 @@ def __process_config_commands(args):
             print('\n{}'.format(toml.dumps(config)))
     else:
         # list subcommand: list all config options with help messages
-        config_options_unit.print_options_with_help()
+        config_options.print_options_with_help(test_level=test_level)
 
 
 def parse_arguments(parser, options_spec):
@@ -146,7 +147,7 @@ def parse_arguments(parser, options_spec):
     return parser.parse_args()
 
 
-def perform_checks_init_logger(args, parser, level):
+def perform_checks_init_logger(args, parser, test_level):
     # if no args specified, print help message and exit
     if len(sys.argv) == 1:
         parser.print_help()
@@ -154,7 +155,7 @@ def perform_checks_init_logger(args, parser, level):
 
     # process config commands
     if args.command == 'config':
-        __process_config_commands(args)
+        __process_config_commands(args, test_level)
         sys.exit(0)
 
     # if config file not specified, print help and exit
@@ -163,13 +164,13 @@ def perform_checks_init_logger(args, parser, level):
         sys.exit(1)
 
     # initialize logging
-    logging_util.init_logging('./tkltest_{}.log'.format(level), args.log_level)
+    logging_util.init_logging('./tkltest_{}.log'.format(test_level), args.log_level)
     logging.debug('args: {}'.format(args))
 
 
-def load_configuration(args):
+def load_configuration(args, test_level):
     # load config file
     logging_util.tkltest_status('Loading config file {}'.format(args.config_file.name))
-    tkltest_config = config_util.load_config(args)
+    tkltest_config = config_util.load_config(args=args, test_level=test_level)
     logging.info('config_file: {}'.format(tkltest_config))
     return tkltest_config
