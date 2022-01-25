@@ -22,6 +22,27 @@ from tkltest.util import config_util, constants, dir_util, command_util
 
 class UnitTests(unittest.TestCase):
 
+    # dict with apps parameters for test
+    # app_build_type, app_build_config_file are determined by the toml
+    maven_test_apps = {
+        '14_spark': {
+            'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
+            'build_file_if_requires_build': '',
+        },
+        '3_scribe-java': {
+            'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
+            'build_file_if_requires_build': '',
+        },
+        'windup-sample-web': {
+            'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sample-webMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config_web.toml'),
+            'build_file_if_requires_build': os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master',
+                                                         'pom.xml'),
+        }
+    }
+
     def setUp(self) -> None:
         dir_util.cd_cli_dir()
 
@@ -77,26 +98,7 @@ class UnitTests(unittest.TestCase):
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
-        # dict with apps parameters for test
-        # app_build_type, app_build_config_file are determined by the toml
-        maven_test_apps = {
-            '14_spark': {
-                'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', '14_spark', 'tkltest_config.toml'),
-                'build_file_if_requires_build': '',
-            },
-            '3_scribe-java': {
-                'standard_classpath': os.path.join('test', 'data', '3_scribe-java', '3_scribe-javaMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', '3_scribe-java', 'tkltest_config.toml'),
-                'build_file_if_requires_build': '',
-            },
-            'windup-sample-web': {
-                'standard_classpath': os.path.join('test', 'data', 'windup-sample', 'windup-sample-webMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config_web.toml'),
-                'build_file_if_requires_build': os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml'),
-            }
-        }
-
+        maven_test_apps = self.maven_test_apps
         for app_name in maven_test_apps.keys():
             dir_util.cd_cli_dir()
 
@@ -125,6 +127,38 @@ class UnitTests(unittest.TestCase):
                                     jars_location,
                                     failed_assertion_message,
                                     ordered_classpath=True)
+
+
+    def test_getting_app_path_maven(self) -> None:
+        """Test getting dependencies using maven build file"""
+        maven_test_apps = self.maven_test_apps
+        for app_name in maven_test_apps.keys():
+            dir_util.cd_cli_dir()
+            failed_assertion_message = 'failed for app = ' + app_name
+
+            config = config_util.load_config(config_file=maven_test_apps[app_name]['config_file'])
+            monolith_app_path = config['general']['monolith_app_path']
+            self.assertTrue(len(monolith_app_path) == 1, failed_assertion_message)
+            if monolith_app_path[0] == '':
+                continue
+            config['general']['monolith_app_path'] = []
+            dir_util.cd_output_dir(app_name)
+            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
+
+            if maven_test_apps[app_name]['build_file_if_requires_build']:
+                pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
+                if not os.path.isabs(pom_location):
+                    pom_location = '..' + os.sep + pom_location
+                build_command = 'mvn clean install -f ' + pom_location
+                command_util.run_command(command=build_command, verbose=config['general']['verbose'])
+
+            config_util.fix_config(config, 'generate')
+
+            generated_monolith_app_path = config['general']['monolith_app_path']
+            self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
+            self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
+            self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
+
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
