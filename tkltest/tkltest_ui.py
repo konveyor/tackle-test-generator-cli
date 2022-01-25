@@ -24,7 +24,7 @@ def main():
     information and executes the specified command (config, generate, or execute).
     """
     # create the main argument parser
-    parser = argparse.ArgumentParser(prog='tkltest',
+    parser = argparse.ArgumentParser(prog='tkltest-ui',
         description='Command-line interface for generating and executing UI test cases for web applications')
 
     # get spec for CLI commands and config options for UI testing
