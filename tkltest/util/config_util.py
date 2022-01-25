@@ -561,50 +561,31 @@ def __resolve_app_path(tkltest_config):
         sys.exit(1)
 
     elif app_build_type == 'maven':
+        app_path_file = os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')
+        build_directory_name = 'project.build.directory'
 
-
-        all_modules_file = os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_midules_derwctories.txt')
-        get_modules_command = 'mvn --quiet'
-        get_modules_command += ' -f ' + app_build_file
-        get_modules_command += ' exec:exec -Dexec.executable="pwd" -Dproperties.outputFile=' + all_modules_file
-        print(get_modules_command)
+        get_apppath_command = 'mvn org.kuali.maven.plugins:properties-maven-plugin:2.0.1:write-project-properties'
+        get_apppath_command += ' -f ' + app_build_file
+        get_apppath_command += ' -Dproperties.includeStandardMavenProperties=true'
+        get_apppath_command += ' -Dproperties.encoding=' + sys.getfilesystemencoding()
+        get_apppath_command += ' -Dproperties.include=' + build_directory_name
+        get_apppath_command += ' -Dproperties.outputFile=' + app_path_file
+        logging.info(get_apppath_command)
+        # run maven
         try:
-            command_util.run_command(command=get_modules_command, verbose=tkltest_config['general']['verbose'])
+            command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
         except subprocess.CalledProcessError as e:
-            tkltest_status('running {} command "{}" failed: {}\n{}'.format(app_build_type, get_modules_command, e, e.stderr), error=True)
+            tkltest_status('running {} command "{}" failed: {}\n{}'.format(app_build_type, get_apppath_command, e, e.stderr), error=True)
             sys.exit(1)
 
-        with open(all_modules_file) as f:
-            modules_build_files = [os.path.join(p, 'pom.xml') for p in f.read().split('\n')]
-        app_path_file = os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')
-        app_path_lines = []
-        for module_build_files in modules_build_files:
-            build_derectory_name = 'project.build.directory'
+        with open(app_path_file) as f:
+            app_path_lines = [l for l in f.read().split('\n') if build_directory_name in l]
 
-            get_apppath_command = 'mvn org.kuali.maven.plugins:properties-maven-plugin:2.0.1:write-project-properties'
-            get_apppath_command += ' -f ' + module_build_files
-            get_apppath_command += ' -Dproperties.includeStandardMavenProperties=true'
-            get_apppath_command += ' -Dproperties.encoding=' + sys.getfilesystemencoding()
-            get_apppath_command += ' -Dproperties.include=' + build_derectory_name
-            get_apppath_command += ' -Dproperties.outputFile=' + app_path_file
-            logging.info(get_apppath_command)
-            # run maven
-            try:
-                command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
-            except subprocess.CalledProcessError as e:
-                tkltest_status('running {} command "{}" failed: {}\n{}'.format(app_build_type, get_apppath_command, e, e.stderr), error=True)
-                sys.exit(1)
-
-            with open(app_path_file) as f:
-                app_path_lines = app_path_lines + [l for l in f.read().split('\n') if build_derectory_name in l ]
-                print(app_path_lines)
-
-        app_path_lines = [l.replace(build_derectory_name + '=', '', 1) for l in app_path_lines ]
-        app_path_lines = [l.replace('\\:\\\\', ':\\\\') for l in app_path_lines ]
-        app_path_lines = [os.path.join(l, 'classes') for l in app_path_lines ]
-        print(app_path_lines)
+        app_path_lines = [l.replace(build_directory_name + '=', '', 1) for l in app_path_lines]
+        app_path_lines = [l.replace('\\:\\\\', ':\\\\') for l in app_path_lines]
+        app_path_lines = [os.path.join(l, 'classes') for l in app_path_lines]
+        app_path_lines = [l for l in app_path_lines if os.path.isdir(l)]
         tkltest_config['general']['monolith_app_path'] = app_path_lines
-
 
 
 def __collect_jar_modules(jar_file_path, jars_modules):
