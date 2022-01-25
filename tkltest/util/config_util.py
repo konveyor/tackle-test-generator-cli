@@ -535,7 +535,7 @@ def __resolve_app_path(tkltest_config):
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
 
     if app_build_type == 'gradle':
-        app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_gradle_app_path.txt')).as_posix()
+        app_path_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')).as_posix()
         task_name = 'tkltest_get_app_path'
         write_classes_dirs_line = '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");'
         if app_settings_file:
@@ -566,17 +566,31 @@ def __resolve_app_path(tkltest_config):
         sys.exit(1)
 
     elif app_build_type == 'maven':
-        tkltest_status('monolith_app_path is missing\n', error=True)
-        sys.exit(1)
+        app_path_file = os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')
+        build_directory_name = 'project.build.directory'
 
-        #get_apppath_command = 'mvn project-info-reports:summary -f ' + app_build_file
-        #logging.info(get_apppath_command)
+        get_apppath_command = 'mvn org.kuali.maven.plugins:properties-maven-plugin:2.0.1:write-project-properties'
+        get_apppath_command += ' -f ' + app_build_file
+        get_apppath_command += ' -Dproperties.includeStandardMavenProperties=true'
+        get_apppath_command += ' -Dproperties.encoding=' + sys.getfilesystemencoding()
+        get_apppath_command += ' -Dproperties.include=' + build_directory_name
+        get_apppath_command += ' -Dproperties.outputFile=' + app_path_file
+        logging.info(get_apppath_command)
         # run maven
-        #try:
-        #    command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
-        #except subprocess.CalledProcessError as e:
-        #    tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
-        #    sys.exit(1)
+        try:
+            command_util.run_command(command=get_apppath_command, verbose=tkltest_config['general']['verbose'])
+        except subprocess.CalledProcessError as e:
+            tkltest_status('running {} command "{}" failed: {}\n{}'.format(app_build_type, get_apppath_command, e, e.stderr), error=True)
+            sys.exit(1)
+
+        with open(app_path_file) as f:
+            app_path_lines = [l for l in f.read().split('\n') if build_directory_name in l]
+
+        app_path_lines = [l.replace(build_directory_name + '=', '', 1) for l in app_path_lines]
+        app_path_lines = [l.replace('\\:\\\\', ':\\\\') for l in app_path_lines]
+        app_path_lines = [os.path.join(l, 'classes') for l in app_path_lines]
+        app_path_lines = [l for l in app_path_lines if os.path.isdir(l)]
+        tkltest_config['general']['monolith_app_path'] = app_path_lines
 
 
 def __collect_jar_modules(jar_file_path, jars_modules):
