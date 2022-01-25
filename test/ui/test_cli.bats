@@ -11,9 +11,9 @@ setup() {
     load "../test_helper/bats-support/load"
 }
 
-# teardown_file() {
-#     rm -f $TEST_CONFIG_FILE
-# }
+teardown_file() {
+    rm -f $TEST_CONFIG_FILE
+}
 
 @test "Test 00: CLI main no args" {
     run tkltest-ui
