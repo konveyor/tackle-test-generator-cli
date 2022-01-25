@@ -1,5 +1,5 @@
 # ***************************************************************************
-# Copyright IBM Corporation 2021
+# Copyright IBM Corporation 2022
 #
 # Licensed under the Eclipse Public License 2.0, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -189,13 +189,53 @@ __options_spec = {
             'default_value': 2,
             'help_message': 'maximum depth for crawling; default is 2'
         },
+        'add_state_diff_assertions': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'add assertions for comparing UI states; default is false'
+        },
         'crawl_hidden_anchors': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': bool,
             'default_value': False,
-            'help_message': 'Crawl anchors even if they are not visible in the browser'
+            'help_message': 'crawl anchors even if they are not visible in the browser'
+        },
+        'crawl_frames': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'crawl frames'
+        },
+        'click_once': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': True,
+            'help_message': 'perform action on a web element only once; default is true'
+        },
+        'click_randomly': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': True,
+            'help_message': 'click elements randomly instead of the order in which they are discovered'
+        },
+        'click_default_elements': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': True,
+            'help_message': 'click default elements'
         },
         'wait_after_event': {
             'required': False,
@@ -213,23 +253,71 @@ __options_spec = {
             'default_value': 500,
             'help_message': 'the time to wait (in milliseconds) after URL load; default is 500'
         },
-        'no_state_diff_assertions': {
+        'clickables': {
             'required': False,
             'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-nsa',
-            'long_name': '--no-state-assertions',
-            'type': bool,
-            'default_value': False,
-            'help_message': 'do not add assertions for comparing UI states'
+            'is_cli_option': False,
+            'type': list,
+            'default_value': [],
+            'help_message': 'list of HTML tags that should be clicked'
         },
+        'form_fill_mode': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['normal', 'random', 'training', 'xpath_training'],
+            'default_value': 'random',
+            'help_message': 'TBD'
+        },
+        'form_fill_order': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['normal', 'dom', 'visual'],
+            'default_value': 'normal',
+            'help_message': 'TBD'
+        },
+        'dont_click_spec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'TOML file containing specification of elements to not be clicked'
+        },
+        'form_data_spec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'TOML file containing specification of form data'
+        },
+        'browser_opts_spec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'TOML file containing specification of browser options'
+        },
+        'fragment_rules_spec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'TOML file containing specification of fragment rules (advanced)'
+        }
 
     },
 
     # "execute" command options
     'execute': {
         'is_cli_command': True,
-        'help_message': 'Execute generated tests on the application version under test',
+        'help_message': 'Execute generated UI tests on the application under test',
     }
 
 }

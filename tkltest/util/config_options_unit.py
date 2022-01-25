@@ -13,7 +13,7 @@
 
 import argparse
 import copy
-import tabulate
+
 from tkltest.util import constants
 
 """
