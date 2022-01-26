@@ -160,6 +160,43 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
 
 
+    def test_getting_modules_maven(self) -> None:
+        """Test getting list of mudules using maven build file"""
+        dir_util.cd_cli_dir()
+        config = {}
+        config['general'] = {}
+        config['generate'] = {}
+        app_name = 'migration-sample-app-master'
+        config['general']['app_name'] = app_name
+        config['general']['verbose'] = True
+
+        pom_file1 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml')
+        pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web', 'pom.xml')
+        config['generate']['app_build_config_files'] = [pom_file1, pom_file2]
+        config['generate']['app_build_settings_files'] = ['', '']
+        config['generate']['app_build_type'] = 'maven'
+
+        dir_util.cd_cli_dir()
+        modules_final_names = ['simple-sample-weblogic-parent-1.0.0-SNAPSHOT',
+                               'proprietary-stub-1.0.0-SNAPSHOT',
+                               'simple-sample-weblogic-services-1.0.0-SNAPSHOT',
+                               'simple-sample-weblogic-web-1.0.0-SNAPSHOT',
+                               'simple-sample-app']
+        module_keys = ['name', 'final_name', 'directory', 'build_file', 'app_path']
+        modules = config_util.get_app_modules(config)
+        self.assertTrue(len(modules) == 5)
+        for final_name, module in modules.items():
+            self.assertTrue(final_name in modules_final_names)
+            self.assertTrue(len(module.keys()) == 5)
+            for key in module.keys():
+                self.assertTrue(key in module_keys)
+            self.assertTrue(os.path.isdir(module['directory']))
+            self.assertTrue(os.path.isfile(module['build_file']))
+            if os.path.isdir(module['app_path']):
+                self.assertTrue(os.path.samefile(os.path.join(module['directory'], 'target', 'classes'), module['app_path']))
+            self.assertTrue(module['final_name'] in modules_final_names)
+
+
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test

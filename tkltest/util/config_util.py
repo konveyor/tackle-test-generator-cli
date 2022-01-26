@@ -26,7 +26,7 @@ import xml.etree.ElementTree as ElementTree
 from . import constants, config_options_unit
 from .logging_util import tkltest_status
 from .constants import *
-from tkltest.util import command_util
+from tkltest.util import command_util, dir_util
 
 
 def load_config(args=None, config_file=None):
@@ -786,6 +786,95 @@ def __resolve_classpath(tkltest_config, command):
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
+
+def resolve_modules_configs(tkltest_user_config):
+    #pom_file1 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml')
+    #pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web','pom.xml')
+    #tkltest_user_config['generate']['app_build_config_files'] = [pom_file1, pom_file2]
+    #tkltest_user_config['generate']['app_build_settings_files'] = ['', '']
+    get_app_modules(tkltest_user_config)
+
+def get_app_modules(tkltest_user_config):
+    '''
+    get a list of pom files of an app, and find all the modules and their properties (name, build file, )
+    :param tkltest_user_config: the config we got from the user
+    :return: dict of module names and properties
+    '''
+
+    app_build_type = tkltest_user_config['generate']['app_build_type']
+    app_build_files = tkltest_user_config['generate']['app_build_config_files']
+    app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
+    app_name = tkltest_user_config['general']['app_name']
+
+    modules_properties_file = os.path.join(dir_util.get_app_dir(app_name), app_name + '_modules_properties.xml')
+    if app_build_type == 'maven':
+        if os.path.isfile(modules_properties_file):
+            os.remove(modules_properties_file)
+        for app_build_file, app_settings_file in zip(app_build_files, app_settings_files):
+            with open(modules_properties_file, 'a') as f:
+                f.write('<user_build_file>\n<path>' + app_build_file + '</path>\n<modules>\n')
+
+            get_modules_args = '<module>'
+            get_modules_args += '<final_name>${project.build.finalName}</final_name>'
+            get_modules_args += '<directory>${basedir}</directory>'
+            get_modules_args += '<app_path>${project.build.outputDirectory}</app_path>'
+            get_modules_args += '<name>${project.name}</name>'
+            get_modules_args += '</module>'
+            get_modules_args = get_modules_args.replace('<', '_tkltest_lt_')
+            get_modules_args = get_modules_args.replace('>', '_tkltest_gt_')
+
+            get_modules_command = 'mvn --quiet'
+            get_modules_command += ' -f ' + app_build_file
+            if os.name == 'nt':
+                get_modules_command += ' exec:exec -Dexec.executable=cmd.exe -Dexec.args='
+                get_modules_command += '"/c echo ' + get_modules_args + '"'
+            else:
+                get_modules_command += ' exec:exec -Dexec.executable="echo" -Dexec.args='
+                get_modules_command += '\'' + get_modules_args + '\''
+
+            get_modules_command += ' >> ' + modules_properties_file
+            try:
+                command_util.run_command(command=get_modules_command, verbose=tkltest_user_config['general']['verbose'])
+            except subprocess.CalledProcessError as e:
+                tkltest_status('running {} command "{}" failed: {}\n{}'.
+                        format(app_build_type, get_modules_command, e, e.stderr),error=True)
+                sys.exit(1)
+            with open(modules_properties_file, 'a') as f:
+                f.write('</modules>\n</user_build_file>\n')
+
+        with open(modules_properties_file) as f:
+            modules_properties = f.read()
+        modules_properties = modules_properties.replace('_tkltest_lt_', '<')
+        modules_properties = modules_properties.replace('_tkltest_gt_', '>')
+        modules_properties = '<user_build_files>\n' + modules_properties + '</user_build_files>'
+        with open(modules_properties_file, 'w') as f:
+            f.write(modules_properties)
+
+    user_build_files = ElementTree.parse(modules_properties_file).getroot()
+    modules = {}
+    for user_build_file in user_build_files:
+        modules_element = user_build_file.find('modules')
+        for module_element in modules_element:
+            module = {}
+            for module_property in module_element:
+                module[module_property.tag] = module_property.text
+            final_name = module['final_name']
+            if final_name in modules.keys():
+                if str(modules[final_name]) != str(module):
+                    tkltest_status('got two different modules with the same name:\n{}\n{}\n'.
+                                   format(str(modules[final_name]), str(module)), error=True)
+                    sys.exit(1)
+                else:
+                    tkltest_status('got two modules with the same name:\n{}\n{}\n'.
+                                   format(str(modules[final_name]), str(module)))
+            else:
+                modules[final_name] = module
+
+    if app_build_type == 'maven':
+        for module in modules.values():
+            module['build_file'] = os.path.join(module['directory'], 'pom.xml')
+
+    return modules
 
 def fix_config(tkltest_config, command):
     """
