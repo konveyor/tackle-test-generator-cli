@@ -3,17 +3,19 @@ name: TackleTest-UI CI
 on:
   push:
     paths:
-      - 'tkltest/util'
+      - 'tkltest/util/**'
       - 'tkltest/tkltest.py'
       - 'tkltest/tkltest_ui.py'
-      - 'test/ui'
+      - 'test/ui/**'
+      - '.github/workflows/tkltest_ui_ci.yml'
       - 'setup.*'
   pull_request:
     paths:
-      - 'tkltest/util'
+      - 'tkltest/util/**'
       - 'tkltest/tkltest.py'
       - 'tkltest/tkltest_ui.py'
-      - 'test/ui'
+      - 'test/ui/**'
+      - '.github/workflows/tkltest_ui_ci.yml'
       - 'setup.*'
 
 jobs:
