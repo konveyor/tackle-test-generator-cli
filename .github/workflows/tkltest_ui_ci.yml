@@ -29,6 +29,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Install prerequisites
+      run: |
+        sudo apt-get install -y bats libxml2-utils
+        bats --version
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -40,7 +44,6 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install .
-        which tkltest-unit
         which tkltest-ui
     - name: Run bats tests
       run: |
