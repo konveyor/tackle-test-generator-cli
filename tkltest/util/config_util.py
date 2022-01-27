@@ -819,7 +819,7 @@ def get_app_modules(tkltest_user_config):
             get_modules_args += '<directory>${basedir}</directory>'
             get_modules_args += '<build_file>${basedir}/pom.xml</build_file>'
             get_modules_args += '<app_path>${project.build.outputDirectory}</app_path>'
-            get_modules_args += '<name>${project.name}</name>'
+            get_modules_args += '<name>${project.artifactId}</name>'
             get_modules_args += '</module>'
             get_modules_args = get_modules_args.replace('<', '_tkltest_lt_')
             get_modules_args = get_modules_args.replace('>', '_tkltest_gt_')
