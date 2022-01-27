@@ -548,6 +548,3 @@ __options_spec = {
     }
 
 }
-
-if __name__ == '__main__':
-    print_options_with_help(tablefmt='github')

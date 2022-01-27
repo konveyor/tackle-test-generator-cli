@@ -102,3 +102,6 @@ def __append_output_for_command(cmd, opt_spec, output, subcmd=None):
                 '{}/{}'.format(opt_info['short_name'], opt_info['long_name']) if opt_info['is_cli_option'] else '',
                 opt_info['help_message']
             ])
+
+if __name__ == '__main__':
+    print_options_with_help(tablefmt='github', test_level='unit')
