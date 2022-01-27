@@ -185,8 +185,8 @@ class UnitTests(unittest.TestCase):
         module_keys = ['name', 'final_name', 'directory', 'build_file', 'app_path']
         modules = config_util.get_app_modules(config)
         self.assertTrue(len(modules) == 5)
-        for final_name, module in modules.items():
-            self.assertTrue(final_name in modules_final_names)
+        for module in modules:
+            self.assertTrue(module['final_name'] in modules_final_names)
             self.assertTrue(len(module.keys()) == 5)
             for key in module.keys():
                 self.assertTrue(key in module_keys)
@@ -194,7 +194,6 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(module['build_file']))
             if os.path.isdir(module['app_path']):
                 self.assertTrue(os.path.samefile(os.path.join(module['directory'], 'target', 'classes'), module['app_path']))
-            self.assertTrue(module['final_name'] in modules_final_names)
 
 
     def test_getting_dependencies_gradle(self) -> None:

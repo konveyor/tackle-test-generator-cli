@@ -817,6 +817,7 @@ def get_app_modules(tkltest_user_config):
             get_modules_args = '<module>'
             get_modules_args += '<final_name>${project.build.finalName}</final_name>'
             get_modules_args += '<directory>${basedir}</directory>'
+            get_modules_args += '<build_file>${basedir}/pom.xml</build_file>'
             get_modules_args += '<app_path>${project.build.outputDirectory}</app_path>'
             get_modules_args += '<name>${project.name}</name>'
             get_modules_args += '</module>'
@@ -851,29 +852,21 @@ def get_app_modules(tkltest_user_config):
             f.write(modules_properties)
 
     user_build_files = ElementTree.parse(modules_properties_file).getroot()
-    modules = {}
+    modules = []
     for user_build_file in user_build_files:
         modules_element = user_build_file.find('modules')
         for module_element in modules_element:
             module = {}
             for module_property in module_element:
                 module[module_property.tag] = module_property.text
-            final_name = module['final_name']
-            if final_name in modules.keys():
-                if str(modules[final_name]) != str(module):
+            same_module = [m for m in modules if m['final_name'] == module['final_name']]
+            if same_module:
+                if str(same_module[0]) != str(module):
                     tkltest_status('got two different modules with the same name:\n{}\n{}\n'.
-                                   format(str(modules[final_name]), str(module)), error=True)
+                                   format(str(same_module[0]), str(module)), error=True)
                     sys.exit(1)
-                else:
-                    tkltest_status('got two modules with the same name:\n{}\n{}\n'.
-                                   format(str(modules[final_name]), str(module)))
             else:
-                modules[final_name] = module
-
-    if app_build_type == 'maven':
-        for module in modules.values():
-            module['build_file'] = os.path.join(module['directory'], 'pom.xml')
-
+                modules.append(module)
     return modules
 
 def fix_config(tkltest_config, command):
