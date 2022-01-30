@@ -43,30 +43,32 @@ class UnitTests(unittest.TestCase):
         }
     }
 
+    ant_test_apps = {
+        'irs': {
+            'standard_classpath': os.path.join('test', 'data', 'irs', 'irsMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
+            'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
+            'property_file': '',
+            'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute',
+                                'compile-classpath-element'],
+            'is_user_defined_classpath': True,
+        },
+        '84_ifx-framework': {
+            'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
+            'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
+            'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
+            'targets_to_test': ['compile', 'compile-antcall'],
+            'is_user_defined_classpath': True,
+        },
+    }
+
     def setUp(self) -> None:
         dir_util.cd_cli_dir()
 
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build file"""
-        # dict with apps parameters for test
-        ant_test_apps = {
-            'irs': {
-                'standard_classpath': os.path.join('test', 'data', 'irs', 'irsMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', 'irs', 'tkltest_config.toml'),
-                'build_file': os.path.join('test', 'data', 'irs', 'monolith', 'build.xml'),
-                'property_file': '',
-                'targets_to_test': ['compile-classpath-attribute', 'compile-classpathref-attribute', 'compile-classpath-element'],
-                'is_user_defined_classpath': True,
-            },
-            '84_ifx-framework': {
-                'standard_classpath': os.path.join('test', 'data', '84_ifx-framework', 'ifx-frameworkMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', '84_ifx-framework', 'tkltest_config.toml'),
-                'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
-                'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
-                'targets_to_test': ['compile', 'compile-antcall'],
-                'is_user_defined_classpath': True,
-            },
-        }
+        ant_test_apps = self.ant_test_apps
 
         for app_name in ant_test_apps.keys():
             dir_util.cd_cli_dir()
@@ -95,6 +97,32 @@ class UnitTests(unittest.TestCase):
                                         os.path.join(os.getcwd(), dependencies_dir),
                                         failed_assertion_message,
                                         is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
+
+    def test_getting_app_path_ant(self) -> None:  # TODO@vicky add for target loop and test cases
+        """Test getting monolith app path using ant build file"""
+        ant_test_apps = self.ant_test_apps
+        for app_name in ant_test_apps.keys():
+            dir_util.cd_cli_dir()
+            failed_assertion_message = 'failed for app = ' + app_name
+
+            config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
+            config['generate']['app_build_type'] = 'ant'
+            config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']
+            config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
+            monolith_app_path = config['general']['monolith_app_path']
+            self.assertTrue(len(monolith_app_path) == 1, failed_assertion_message)
+            if monolith_app_path[0] == '':
+                continue
+            config['general']['monolith_app_path'] = []
+            dir_util.cd_output_dir(app_name)
+            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
+
+            config_util.fix_config(config, 'generate')
+
+            generated_monolith_app_path = config['general']['monolith_app_path']
+            self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
+            self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
+            self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -128,9 +156,8 @@ class UnitTests(unittest.TestCase):
                                     failed_assertion_message,
                                     ordered_classpath=True)
 
-
     def test_getting_app_path_maven(self) -> None:
-        """Test getting dependencies using maven build file"""
+        """Test getting monolith app path using maven build file"""
         maven_test_apps = self.maven_test_apps
         for app_name in maven_test_apps.keys():
             dir_util.cd_cli_dir()
@@ -158,7 +185,6 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
             self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
             self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
-
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""

@@ -1,7 +1,7 @@
 <project name="irs" default="compile-classpath-attribute" basedir=".">
 
   <!-- The directories for compilation targets -->
-  <property name="build.home"              value="build"/>
+  <property name="build.home"              value="target"/>
   <property name="build.classes"           value="${build.home}/classes"/>
 	
   <!-- The base directories for sources -->
