@@ -21,7 +21,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "tkltest-unit = tkltest.tkltest_unit:main"
+            "tkltest-unit = tkltest.tkltest_unit:main",
+            "tkltest-ui = tkltest.tkltest_ui:main"
         ]
     },
     classifiers=[
