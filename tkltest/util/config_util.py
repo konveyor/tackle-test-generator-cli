@@ -152,7 +152,7 @@ def __validate_config(config, test_level, command=None, subcommand=None):
     """
     # get general options spec and options spec for the given command and subcommand
     options_spec = {
-        'general': config_options_unit.get_options_spec('general')
+        'general': config_options.get_options_spec('general', test_level=test_level)
     }
     if command is not None:
         options_spec[command] = config_options.get_options_spec(command, test_level=test_level)

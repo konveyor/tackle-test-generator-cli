@@ -179,39 +179,16 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 0,
-            'help_message': 'maximum states to discover during crawl; default is 0 (unlimited)'
+            'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
         },
-        'max_depth': {
+        'add_state_diff_assertions': { # convert to enum
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
-            'type': int,
-            'default_value': 2,
-            'help_message': 'maximum depth for crawling; default is 2'
-        },
-        'add_state_diff_assertions': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'add assertions for comparing UI states; default is false'
-        },
-        'crawl_hidden_anchors': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'crawl anchors even if they are not visible in the browser'
-        },
-        'crawl_frames': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'crawl frames'
+            'type': str,
+            'choices': ['dom', 'visual', 'both', 'hybrid', 'none'],
+            'default_value': 'none',
+            'help_message': 'types of assertions to add to generated test cases (see doc for explanation); default is none'
         },
         'click_once': {
             'required': False,
@@ -228,14 +205,6 @@ __options_spec = {
             'type': bool,
             'default_value': True,
             'help_message': 'click elements randomly instead of the order in which they are discovered'
-        },
-        'click_default_elements': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': True,
-            'help_message': 'click default elements'
         },
         'wait_after_event': {
             'required': False,
@@ -258,26 +227,8 @@ __options_spec = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': list,
-            'default_value': [],
+            'default_value': ["a", "button"],  # TODO: check
             'help_message': 'list of HTML tags that should be clicked'
-        },
-        'form_fill_mode': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['normal', 'random', 'training', 'xpath_training'],
-            'default_value': 'random',
-            'help_message': 'TBD'
-        },
-        'form_fill_order': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['normal', 'dom', 'visual'],
-            'default_value': 'normal',
-            'help_message': 'TBD'
         },
         'dont_click_spec_file': {
             'required': False,
@@ -294,6 +245,102 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'help_message': 'TOML file containing specification of form data'
+        }
+    },
+
+    # "execute" command options
+    'execute': {
+        'is_cli_command': True,
+        'help_message': 'Execute generated UI tests on the application under test',
+    }
+
+}
+
+def get_options_spec_internal(command=None, load_format=True):
+    """Returns internal-options specification.
+
+    Returns the internal options specification for the given command if specified; otherwise, returns
+    the entire options specification
+
+    Args:
+        command: command to load option spec for
+        load_format: whether to use loaded format (which omits some fields); used only if command
+            or subcommand is specified
+    """
+    if command is None:
+        return copy.deepcopy(__options_spec_internal)
+    spec = copy.copy(__options_spec_internal[command])
+    if load_format:
+        spec.pop('is_cli_command', None)
+        spec.pop('help_message', None)
+        spec.pop('subcommands', None)
+    return spec
+
+"""
+Advanced configuration options that are meant for internal use or to be uses for experimentation.
+These options are not available for normal tool usage and are not documented.
+"""
+__options_spec_internal = {
+
+    # internal "general" options
+    'general': {},
+
+    # internal "config" command options
+    'config': {},
+
+    # internal "generate" command options
+    'generate': {
+        'is_cli_command': True,
+        'help_message': 'Generate UI test cases on the application under test',
+        'max_depth': { # internal
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': int,
+            'default_value': 2,
+            'help_message': 'maximum depth for crawling; default is 2'
+        },
+        'crawl_hidden_anchors': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'crawl anchors even if they are not visible in the browser'
+        },
+        'crawl_frames': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': False,
+            'help_message': 'crawl frames'
+        },
+        'click_default_elements': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': True,
+            'help_message': 'click default elements'
+        },
+        'form_fill_mode': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['normal', 'random', 'training', 'xpath_training'],
+            'default_value': 'normal',
+            'help_message': 'mode in which to perform actions on form fields'
+        },
+        'form_fill_order': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'choices': ['normal', 'dom', 'visual'],
+            'default_value': 'normal',
+            'help_message': 'order in which fill in values in form fields'
         },
         'browser_opts_spec_file': {
             'required': False,
@@ -302,14 +349,6 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'help_message': 'TOML file containing specification of browser options'
-        },
-        'fragment_rules_spec_file': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'help_message': 'TOML file containing specification of fragment rules (advanced)'
         }
 
     },

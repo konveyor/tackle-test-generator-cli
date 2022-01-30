@@ -67,3 +67,8 @@ teardown_file() {
     run tkltest-ui config list
     assert_success
 }
+
+@test "Test 06: CLI config file load" {
+    run tkltest-ui -cf ./test/ui/tkltest_ui_config.toml -l DEBUG
+    assert_success
+}

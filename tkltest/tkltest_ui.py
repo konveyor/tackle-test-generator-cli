@@ -12,9 +12,20 @@
 # ***************************************************************************
 
 import argparse
+import logging
 
 from .tkltest import *
 from .util import config_options_ui
+
+
+def __add_internal_config_options(loaded_config, internal_options):
+    for command in internal_options.keys():
+        command_spec = internal_options[command]
+        command_spec.pop('help_message', None)
+        command_spec.pop('is_cli_command', None)
+        for option_name in command_spec.keys():
+            if command_spec[option_name]['is_toml_option']:
+                loaded_config[command][option_name] = command_spec[option_name]['default_value']
 
 
 def main():
@@ -34,6 +45,12 @@ def main():
     args = parse_arguments(parser, ui_options_spec)
     perform_checks_init_logger(args, parser, 'ui')
     tkltest_config = load_configuration(args, 'ui')
+    logging.debug('Loaded config (excluding internal options): {}'.format(tkltest_config))
+
+    # add internal configuration options
+    __add_internal_config_options(loaded_config=tkltest_config,
+                                  internal_options=config_options_ui.get_options_spec_internal())
+    logging.debug('Loaded config (including internal options): {}'.format(tkltest_config))
 
     # TODO: process generate/execute commands
 
