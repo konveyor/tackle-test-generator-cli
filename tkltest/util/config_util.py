@@ -23,7 +23,7 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 import json
-from . import constants, config_options_unit
+from . import constants, config_options_unit, config_options
 from .logging_util import tkltest_status
 from .constants import *
 from tkltest.util import command_util, dir_util
