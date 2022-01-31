@@ -1,7 +1,8 @@
 <project name="irs" default="compile-classpath-attribute" basedir=".">
-
+    <!-- This build.xml was written for test purposes, should not be used to compile the app! -->
+    
   <!-- The directories for compilation targets -->
-  <property name="build.home"              value="build"/>
+  <property name="build.home"              value="target"/>
   <property name="build.classes"           value="${build.home}/classes"/>
 	
   <!-- The base directories for sources -->
@@ -19,6 +20,11 @@
   
   <pathconvert refid="source.lib"
                property="source.lib.property" />
+    
+    <path id="build.classes.pathid" path="target/classes" />
+    
+    <pathconvert refid="build.classes.pathid"
+               property="build.classes.refid" />
   
 
   <path id="source.lib.only.javax">
@@ -54,7 +60,7 @@
 <!-- ====================================================================== -->
 
   <target name="compile-classpath-attribute" depends="prepare"
-          description="Compile main code passing classpath attribute to javac">
+          description="Compile main code passing classpath attribute to javac, destdir is a property">
     <delete dir="${build.classes}"/>
     <mkdir dir="${build.classes}"/>
     <javac  srcdir="${source.java}"
@@ -66,22 +72,21 @@
 
     
   <target name="compile-classpathref-attribute" depends="prepare"
-          description="Compile main code passing classpathref attribute to javac">
+          description="Compile main code passing classpathref attribute to javac, destdir is a relative path">
     <delete dir="${build.classes}"/>
     <mkdir dir="${build.classes}"/>
     <javac  srcdir="${source.java}"
-           destdir="${build.classes}"
+           destdir="target/classes"
             includeantruntime="no"
           classpathref="source.lib"/>
   </target>
     
     
   <target name="compile-classpath-element" depends="prepare"
-          description="Compile main code passing classpath nested element to javac">
+          description="For test, will not compile! destdir not specified - equals to srcdir">
     <delete dir="${build.classes}"/>
     <mkdir dir="${build.classes}"/>
-    <javac  srcdir="${source.java}"
-           destdir="${build.classes}"
+    <javac  srcdir="${build.classes}"
             includeantruntime="no">
           <classpath>
               <path refid="source.lib.only.javax"/>
@@ -92,7 +97,38 @@
           </classpath>
     </javac>          
   </target>
+    
+    
+    <target name="compile-destdir-through-modulesourcepath" depends="prepare"
+          description="For test, will not compile! destdir not specified - equals to modulesourcepath">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  modulesourcepath="${build.classes}"
+            includeantruntime="no"
+            classpathref="source.lib"/>
+  </target>
   
+
+<target name="compile-destdir-through-modulesourcepathref" depends="prepare"
+          description="For test, will not compile! destdir not specified - equals to modulesourcepathref">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  modulesourcepathref="build.classes.pathid"
+            includeantruntime="no"
+            classpathref="source.lib"/>     
+  </target>
+
+<target name="compile-destdir-through-src-elements" depends="prepare"
+          description="For test, will not compile! destdir not specified - equals to modulesourcepathref">
+    <delete dir="${build.classes}"/>
+    <mkdir dir="${build.classes}"/>
+    <javac  includeantruntime="no"
+            classpathref="source.lib">
+            <src path="${build.classes}/nonexistent_dir" />
+            <src path="${build.classes}/irs" />
+    </javac>          
+  </target>
+
 <!-- ====================================================================== -->    
   
 </project>
