@@ -553,6 +553,44 @@ def __resolve_app_path(tkltest_config):
                                   task_text=task_text,
                                   verbose=tkltest_config['general']['verbose'])
 
+
+        module_properties_file = pathlib.PurePath(os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_module_properties.json')).as_posix()
+        task_name = 'tkltest_get_module_properties'
+        properties_dict = '{ '
+        properties_dict += ' "name" : "${the_module.name}",'
+        properties_dict += ' "directory" : "${the_module.projectDir}",'
+        properties_dict += ' "build_file" : "${the_module.projectDir}/build.gradle",'
+        properties_dict += ' "app_path" : "${the_module.sourceSets.main.output.classesDirs.getFiles()}",'
+        properties_dict += ' "user_build_file" : "'+ app_build_file +'",'
+        properties_dict = properties_dict.replace('"', '_tkltest_quot_')
+        if app_settings_file:
+            properties_dict = properties_dict.replace('the_module', 'it')
+            print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
+        else:
+            properties_dict = properties_dict.replace('the_module', 'project')
+            print_properties_line = '    fw.write("' + properties_dict + '\\n");'
+
+        task_text = [
+                        'public class WriteStringClass extends DefaultTask {',
+                        '  @TaskAction',
+                        '  void writeString(){',
+                        '    FileWriter fw;',
+                        '    fw = new FileWriter( "' + module_properties_file + '");',
+                        print_properties_line,
+                        '    fw.close();',
+                        '  }',
+                        '}',
+                        'task ' + task_name + ' (type:WriteStringClass) {}']
+
+        __add_and_run_gradle_task(app_build_file=app_build_file,
+                                  app_settings_file=app_settings_file,
+                                  task_name=task_name,
+                                  task_text=task_text,
+                                  verbose=tkltest_config['general']['verbose'])
+
+
+
+
         with open(app_path_file) as f:
             tkltest_config['general']['monolith_app_path'] = [p.strip('[]') for p in f.read().split('\n')]
             tkltest_config['general']['monolith_app_path'].remove('')
