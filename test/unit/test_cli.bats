@@ -5,8 +5,8 @@ IRS_CONFIG_FILE=./test/data/irs/tkltest_config.toml
 IRS_PARTITIONS_FILE=./test/data/irs/refactored/PartitionsFile.json
 IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
 IRS_GENERATE_CONFIG_FILE=$IRS_CTD_AMPLIFIED_TESTDIR/.tkltest_generate.toml
-TEST_CONFIG_FILE1=./__test_config1.toml
-TEST_CONFIG_FILE2=./__test_config2.toml
+TEST_CONFIG_FILE1=./__test_unit_config1.toml
+TEST_CONFIG_FILE2=./__test_unit_config2.toml
 TKLTEST_CLI_VERSION=`cat ./tkltest/_version.py | cut -d '=' -f 2 | xargs`
 
 # setup commands run befeore execution of tests in file
@@ -15,8 +15,8 @@ setup_file() {
 }
 
 setup() {
-    load "test_helper/bats-assert/load"
-    load "test_helper/bats-support/load"
+    load "../test_helper/bats-assert/load"
+    load "../test_helper/bats-support/load"
 }
 
 teardown_file() {

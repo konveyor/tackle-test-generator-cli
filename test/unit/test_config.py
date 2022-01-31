@@ -17,7 +17,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.util import config_util, config_options_unit, constants
+from tkltest.util import config_util, config_options, constants
 
 class ConfigTest(unittest.TestCase):
 
@@ -55,6 +55,6 @@ class ConfigTest(unittest.TestCase):
 
     def test_config_print(self) -> None:
         """Test print options"""
-        config_options_unit.print_options_with_help()
-        config_options_unit.print_options_with_help(tablefmt='github')
-        config_options_unit.print_options_with_help(command='generate')
+        config_options.print_options_with_help()
+        config_options.print_options_with_help(tablefmt='github')
+        config_options.print_options_with_help(command='generate')

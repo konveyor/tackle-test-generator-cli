@@ -13,7 +13,7 @@
 
 import argparse
 import copy
-import tabulate
+
 from tkltest.util import constants
 
 """
@@ -47,69 +47,6 @@ def get_options_spec(command=None, subcommand=None, load_format=True):
         spec.pop('help_message', None)
         spec.pop('subcommands', None)
     return spec
-
-
-def print_options_with_help(command=None, tablefmt='simple'):
-    """Prints configuration options.
-
-    Prints configuration options along with help messages for all options of the given command, if provided,
-    or all CLI configuration options otherwise.
-
-    Args:
-        command: command to print configuration options for
-        tablefmt: table format for the tabulate module
-    """
-    opt_spec = get_options_spec(command, load_format=False)
-    output = []
-    if command:
-        commands = [command]
-        opt_spec = {command: opt_spec}
-    else:
-        commands = list(opt_spec.keys())
-
-    for cmd in commands:
-        __append_output_for_command(cmd, opt_spec[cmd], output)
-        output.append(['', '', ''])
-
-    tabulate.PRESERVE_WHITESPACE = True
-    print(tabulate.tabulate(output, tablefmt=tablefmt,
-                            headers=['TOML name ("*"=req, "^"=CLI-only)', 'CLI name', 'Description']))
-
-
-def __append_output_for_command(cmd, opt_spec, output, subcmd=None):
-    """Appends options list for command to output.
-
-    Appends options list, with help messages, for the given command and subcommand (optional) to
-    the output array.
-
-    Args:
-        cmd: command for which to add option information
-        opt_spec: option specification for command or subcommand
-        output: output array to add information to
-        subcmd: subcommand (of command) for which to add option information
-    """
-    if subcmd is not None:
-        output.append(['', '', ''])
-    cmdstr = cmd if subcmd is None else '{}.{}'.format(cmd, subcmd)
-    output.append([cmdstr, '', opt_spec['help_message'] if 'help_message' in opt_spec.keys() else ''])
-    for opt_name in opt_spec.keys():
-        if opt_name in ['is_cli_command', 'help_message']:
-            continue
-        opt_info = opt_spec[opt_name]
-        if opt_name == 'subcommands':
-            for subcmd in opt_info.keys():
-                __append_output_for_command(cmd, opt_info[subcmd], output, subcmd)
-        else:
-            fmtname = opt_name
-            if opt_info['required']:
-                fmtname += '*'
-            if not opt_info['is_toml_option']:
-                fmtname += '^'
-            output.append([
-                fmtname,
-                '{}/{}'.format(opt_info['short_name'], opt_info['long_name']) if opt_info['is_cli_option'] else '',
-                opt_info['help_message']
-            ])
 
 
 def __conditionally_required(opt_name, config):
@@ -611,6 +548,3 @@ __options_spec = {
     }
 
 }
-
-if __name__ == '__main__':
-    print_options_with_help(tablefmt='github')
