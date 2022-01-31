@@ -1,0 +1,49 @@
+name: TackleTest-UI CI
+
+on:
+  push:
+    paths:
+      - 'tkltest/util/**'
+      - 'tkltest/tkltest.py'
+      - 'tkltest/tkltest_ui.py'
+      - 'test/ui/**'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'setup.*'
+  pull_request:
+    paths:
+      - 'tkltest/util/**'
+      - 'tkltest/tkltest.py'
+      - 'tkltest/tkltest_ui.py'
+      - 'test/ui/**'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'setup.*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install prerequisites
+      run: |
+        sudo apt-get install -y bats libxml2-utils
+        bats --version
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Install tkltest-ui command and run bats tests
+      run: |
+        git submodule init
+        git submodule update
+        python -m venv venv
+        source venv/bin/activate
+        pip install .
+        which tkltest-ui
+        bats test/ui/test_cli.bats
+        deactivate
