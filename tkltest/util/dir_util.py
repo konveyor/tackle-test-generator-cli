@@ -22,6 +22,11 @@ cli_dir = os.getcwd()
 def cd_cli_dir():
     os.chdir(cli_dir)
 
+def get_app_dir(app_name):
+    app_dir = os.path.join(cli_dir, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
+    if not os.path.isdir(app_dir):
+        os.mkdir(app_dir)
+    return app_dir
 
 def cd_output_dir(app_name):
     # first we make sure that:

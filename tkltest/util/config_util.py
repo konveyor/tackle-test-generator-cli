@@ -22,11 +22,11 @@ import zipfile
 import re
 import copy
 import xml.etree.ElementTree as ElementTree
-
+import json
 from . import constants, config_options_unit, config_options
 from .logging_util import tkltest_status
 from .constants import *
-from tkltest.util import command_util
+from tkltest.util import command_util, dir_util
 
 
 def load_config(test_level='unit', args=None, config_file=None):
@@ -790,6 +790,96 @@ def __resolve_classpath(tkltest_config, command):
                 classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
+
+
+def get_modules_properties(tkltest_user_config):
+    '''
+    get from the config a list of pom files of an app, and find all the modules and their properties (name, build file,...)
+    eliminate modules that we do not need (no app_path, ...)
+    :param tkltest_user_config: the config we got from the user
+           modules_properties_file: the xml file to save the the properties
+    :return: list of dict of module names and properties
+    '''
+
+    app_name = tkltest_user_config['general']['app_name']
+    app_build_type = tkltest_user_config['generate']['app_build_type']
+    app_build_files = tkltest_user_config['generate']['app_build_config_files']
+    app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
+
+    modules_properties_file = os.path.join(dir_util.get_app_dir(app_name), app_name + '_modules_properties.json')
+    if os.path.isfile(modules_properties_file):
+        os.remove(modules_properties_file)
+
+    if app_build_type == 'maven':
+        '''
+        for each user pom file, we call exec:exec with executable "echo".
+        exec:exec runs the executable on every module of the project
+        we redirect the echo output to the modules_properties_file 
+        '''
+        for app_build_file in app_build_files:
+
+            # set the parameter to the echo executable
+            get_modules_args = '{ '
+            get_modules_args += '"name" : "${project.artifactId}", '
+            get_modules_args += '"directory" : "${basedir}", '
+            get_modules_args += '"build_file" : "${basedir}/pom.xml", '
+            get_modules_args += '"app_path" : "${project.build.outputDirectory}", '
+            get_modules_args += '"user_build_file" : "' + app_build_file + '"'
+            get_modules_args += ' },'
+
+            # exec:exec can not have " in the arguments, so we replace it with _tkltest_quot_
+            get_modules_args = get_modules_args.replace('"', '_tkltest_quot_')
+            #call exec:exec with echo:
+            get_modules_command = 'mvn --quiet'
+            get_modules_command += ' -f ' + app_build_file
+            if os.name == 'nt':
+                get_modules_command += ' exec:exec -Dexec.executable=cmd.exe -Dexec.args='
+                get_modules_command += '"/c echo ' + get_modules_args + '"'
+            else:
+                get_modules_command += ' exec:exec -Dexec.executable="echo" -Dexec.args='
+                get_modules_command += '\'' + get_modules_args + '\''
+
+            get_modules_command += ' >> ' + modules_properties_file
+            try:
+                command_util.run_command(command=get_modules_command, verbose=tkltest_user_config['general']['verbose'])
+            except subprocess.CalledProcessError as e:
+                tkltest_status('running {} command "{}" failed: {}\n{}'.
+                        format(app_build_type, get_modules_command, e, e.stderr), error=True)
+                sys.exit(1)
+
+        # read the file to fix the quotes, and save it as a valid json file
+        with open(modules_properties_file) as f:
+            modules_properties = f.read()
+        modules_properties = modules_properties[:-2] + '\n' # removing the final "," from the list
+        modules_properties = modules_properties.replace('_tkltest_quot_', '"')
+        modules_properties = modules_properties.replace('\\', '\\\\')
+        modules_properties = '[\n' + modules_properties + ']'
+        with open(modules_properties_file, 'w') as f:
+            f.write(modules_properties)
+
+    elif app_build_type == 'gradle':
+        pass
+
+    modules = []
+    with open(modules_properties_file) as f:
+        all_modules = json.load(f)
+    modules_names = set([m['name'] for m in all_modules])
+    for module_name in modules_names:
+        module_entries = [m for m in all_modules if m['name'] == module_name]
+        '''
+        we check that all entries are of the same module. 
+        i.e has the same build filw
+        '''
+        if len(module_entries) > 1:
+            module_build_files = set([m['build_file'] for m in module_entries])
+            if len(module_build_files) > 1:
+                tkltest_status('got a module with the same name "{}", in {} different build files:\n{}\n'.
+                                   format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
+                sys.exit(1)
+        module = module_entries[0]
+        if os.path.isdir(module['app_path']):
+            modules.append(module)
+    return modules
 
 
 def fix_config(tkltest_config, command):
