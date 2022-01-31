@@ -181,7 +181,7 @@ __options_spec = {
             'default_value': 0,
             'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
         },
-        'add_state_diff_assertions': { # convert to enum
+        'add_state_diff_assertions': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
@@ -190,21 +190,13 @@ __options_spec = {
             'default_value': 'none',
             'help_message': 'types of assertions to add to generated test cases (see doc for explanation); default is none'
         },
-        'click_once': {
+        'include_iframes': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': bool,
-            'default_value': True,
-            'help_message': 'perform action on a web element only once; default is true'
-        },
-        'click_randomly': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': True,
-            'help_message': 'click elements randomly instead of the order in which they are discovered'
+            'default_value': False,
+            'help_message': 'if the AUT has iframes that need to be covered, set this option to true; default is false'
         },
         'wait_after_event': {
             'required': False,
@@ -222,21 +214,13 @@ __options_spec = {
             'default_value': 500,
             'help_message': 'the time to wait (in milliseconds) after URL load; default is 500'
         },
-        'clickables': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': list,
-            'default_value': ["a", "button"],  # TODO: check
-            'help_message': 'list of HTML tags that should be clicked'
-        },
-        'dont_click_spec_file': {
+        'click_dont_click_spec_file': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
-            'help_message': 'TOML file containing specification of elements to not be clicked'
+            'help_message': 'TOML file containing specification of elements to click or not to click'
         },
         'form_data_spec_file': {
             'required': False,
@@ -292,7 +276,7 @@ __options_spec_internal = {
     'generate': {
         'is_cli_command': True,
         'help_message': 'Generate UI test cases on the application under test',
-        'max_depth': { # internal
+        'max_depth': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
@@ -308,14 +292,6 @@ __options_spec_internal = {
             'default_value': False,
             'help_message': 'crawl anchors even if they are not visible in the browser'
         },
-        'crawl_frames': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'crawl frames'
-        },
         'click_default_elements': {
             'required': False,
             'is_toml_option': True,
@@ -330,7 +306,7 @@ __options_spec_internal = {
             'is_cli_option': False,
             'type': str,
             'choices': ['normal', 'random', 'training', 'xpath_training'],
-            'default_value': 'normal',
+            'default_value': 'random',
             'help_message': 'mode in which to perform actions on form fields'
         },
         'form_fill_order': {
@@ -342,13 +318,16 @@ __options_spec_internal = {
             'default_value': 'normal',
             'help_message': 'order in which fill in values in form fields'
         },
-        'browser_opts_spec_file': {
+        'browser_pixel_density': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'help_message': 'TOML file containing specification of browser options'
+            'type': int,
+            'default_value': 1,
+            'help_message': 'Pixel density depending on the display resolution'
+        },
+        'threshold': {
+
         }
 
     },
