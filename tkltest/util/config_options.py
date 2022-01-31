@@ -18,7 +18,7 @@ for required options.
 """
 import tabulate
 
-from . import config_options_unit
+from .unit import config_options_unit
 from .ui import config_options_ui
 
 

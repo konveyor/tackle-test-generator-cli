@@ -14,8 +14,8 @@
 import os
 import shutil
 
-from . import constants, config_util
-from .constants import *
+# from . import constants
+from ..constants import *
 
 
 cli_dir = os.getcwd()

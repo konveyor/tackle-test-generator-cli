@@ -17,7 +17,8 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest.util import config_util, constants, dir_util, command_util
+from tkltest.util import config_util, constants, command_util
+from tkltest.util.unit import  dir_util
 
 
 class UnitTests(unittest.TestCase):
