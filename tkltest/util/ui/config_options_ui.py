@@ -204,7 +204,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 500,
-            'help_message': 'the time to wait (in milliseconds) after an event has been fired; default is 500'
+            'help_message': 'the time to wait (in milliseconds) after an event has been fired; default is 500ms'
         },
         'wait_after_reload': {
             'required': False,
@@ -212,7 +212,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 500,
-            'help_message': 'the time to wait (in milliseconds) after URL load; default is 500'
+            'help_message': 'the time to wait (in milliseconds) after URL load; default is 500; default is 500ms'
         },
         'click_dont_click_spec_file': {
             'required': False,
@@ -326,8 +326,13 @@ __options_spec_internal = {
             'default_value': 1,
             'help_message': 'Pixel density depending on the display resolution'
         },
-        'threshold': {
-
+        'rted_similarity_threshold': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': float,
+            'default_value': 0,
+            'help_message': 'Threshold value for determining similar/duplicate states for the RTED algorithm'
         }
 
     },

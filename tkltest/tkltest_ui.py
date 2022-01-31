@@ -15,7 +15,7 @@ import argparse
 import logging
 
 from .tkltest import *
-from .util import config_options_ui
+from .util.ui import config_options_ui
 
 
 def __add_internal_config_options(loaded_config, internal_options):
