@@ -13,7 +13,7 @@
   </path>
 <!-- Environment variables -->
   <target name="setup" description="Setting environment variables">
-    <property name="build.dir" value="classes" />
+    <property name="build.dir" value="." />
     <property name="src.dir" value="src" />
     <property name="src-gen.dir" value="src-gen" />
     <property name="test.dir" value="test" />

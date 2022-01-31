@@ -2,7 +2,7 @@ name = "TKLTEST_CONFIG_FILE"
 
 [general]
     app_name = "84_ifx-framework"
-    monolith_app_path = ["test/data/84_ifx-framework/classes"]
+    monolith_app_path = ["test/data/84_ifx-framework"]
     java_jdk_home = ""
 
 [generate]
