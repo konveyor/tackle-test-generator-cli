@@ -787,15 +787,6 @@ def __resolve_classpath(tkltest_config, command):
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
-def resolve_modules_configs(tkltest_user_config):
-    pom_file1 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml')
-    pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web','pom.xml')
-    tkltest_user_config['generate']['app_build_config_files'] = [pom_file1, pom_file2]
-    tkltest_user_config['generate']['app_build_settings_files'] = ['', '']
-    get_modules_properties(tkltest_user_config)
-
-
-
 def get_modules_properties(tkltest_user_config):
     '''
     get from the config a list of pom files of an app, and find all the modules and their properties (name, build file,...)
