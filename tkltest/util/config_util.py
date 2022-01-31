@@ -493,7 +493,7 @@ def __get_source_of_ant_javac(javac_task):
     for source in source_options:
         srcdir = javac_task.get(source)
         if srcdir is not None:
-            return srcdir
+            return '${toString:' + srcdir + '}' if source == 'modulesourcepathref' else srcdir
     # source not given as attribute, search for nested <src> elements
     srcdir = []
     for element in javac_task.findall('src'):
@@ -509,7 +509,7 @@ def __create_modified_build_file_for_monolith_app_path(app_build_file):
     The modified copy has the original property and antcall tasks, and every javac task was replaced
     by echo of the destination directory.
     :param app_build_file: path to Ant build file (build.xml)
-    :return: path to the created modified copy of the build file
+    :return: tuple of (path to the created modified copy of the build file, basedir of build file)
     """
 
     # create a copy of the build file
@@ -545,13 +545,13 @@ def __create_modified_build_file_for_monolith_app_path(app_build_file):
                 if isinstance(destdir, list):
                     # when destdir is not given and there are multiple source files
                     for src_path in destdir:
-                        modified_element.append(ElementTree.Element('echo', {'message': src_path}))
+                        modified_element.append(ElementTree.Element('echo', {'message': 'destdir: ' + src_path}))
                 else:
-                    modified_element.append(ElementTree.Element('echo', {'message': destdir}))
+                    modified_element.append(ElementTree.Element('echo', {'message': 'destdir: ' + destdir}))
         project_root.remove(element)
         project_root.append(modified_element)
     build_file_tree.write(tkltest_app_build_file)
-    return tkltest_app_build_file
+    return tkltest_app_build_file, basedir
 
 
 #todo - use this method at __resolve_classpath() - will be done after resolving __resolve_classpath issues
@@ -646,17 +646,16 @@ def __resolve_app_path(tkltest_config):
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']
         # create a modified build file
-        modified_build_file_name = __create_modified_build_file_for_monolith_app_path(app_build_file)
+        modified_build_file_name, build_base_dir = __create_modified_build_file_for_monolith_app_path(app_build_file)
         ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target)
 
         with open(ant_output_filename, 'r') as output_file:
             lines = output_file.read().splitlines()
-        # os.remove(ant_output_filename) TODO@vicky
-        echo_prefix = '[echo] '
+        os.remove(ant_output_filename)
+        echo_prefix = '[echo] destdir: '
         app_path = list(set([s.replace(echo_prefix, '').lstrip() for s in lines if s.lstrip().startswith(echo_prefix)]))
         app_path = os.path.commonpath(app_path)
-        app_path = os.path.abspath(os.path.join(os.path.dirname(app_build_file), app_path))
-        print(app_path)
+        app_path = app_path if os.path.isabs(app_path) else os.path.abspath(os.path.join(build_base_dir, app_path))
         tkltest_config['general']['monolith_app_path'] = [app_path]
 
     elif app_build_type == 'maven':
