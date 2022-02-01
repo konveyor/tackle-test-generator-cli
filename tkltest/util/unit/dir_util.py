@@ -43,10 +43,9 @@ def cd_output_dir(app_name):
     # (currently, at the core, the locations of these jars are hard coded)
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
+    os.makedirs(os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join("lib", "download", "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join("lib", "download", "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
     # cd output dir
     os.chdir(output_dir)
