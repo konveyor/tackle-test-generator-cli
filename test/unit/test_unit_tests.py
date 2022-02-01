@@ -161,7 +161,7 @@ class UnitTests(unittest.TestCase):
 
 
     def test_getting_modules_maven(self) -> None:
-        """Test getting list of mudules using maven build file"""
+        """Test getting list of modules using maven build file"""
         dir_util.cd_cli_dir()
         config = {}
         config['general'] = {}
@@ -176,23 +176,35 @@ class UnitTests(unittest.TestCase):
         config['generate']['app_build_settings_files'] = ['', '']
         config['generate']['app_build_type'] = 'maven'
 
-        dir_util.cd_cli_dir()
         modules_names = ['proprietary-stub',
                          'simple-sample-weblogic-services',
                          'simple-sample-weblogic-web']
-        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file']
         modules = config_util.get_modules_properties(config)
-        self.assertTrue(len(modules) == len(modules_names))
-        for module in modules:
-            self.assertTrue(module['name'] in modules_names)
-            self.assertTrue(len(module.keys()) == len(module_keys))
-            for key in module.keys():
-                self.assertTrue(key in module_keys)
-            self.assertTrue(os.path.isdir(module['directory']))
-            self.assertTrue(os.path.isfile(module['build_file']))
-            self.assertTrue(os.path.isdir(module['app_path']))
-            self.assertTrue(os.path.samefile(os.path.join(module['directory'], 'target', 'classes'), module['app_path']))
+        self.__assert_modules_properties(modules_names, modules)
 
+
+    def test_getting_modules_gradle(self) -> None:
+        """Test getting list of modules using gradle build file"""
+        dir_util.cd_cli_dir()
+        config = {}
+        config['general'] = {}
+        config['generate'] = {}
+        app_name = 'splitNjoin'
+        config['general']['app_name'] = app_name
+        config['general']['verbose'] = True
+
+        build_file1 = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
+        build_file2 = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
+        settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
+        config['generate']['app_build_config_files'] = [build_file1, build_file2]
+        config['generate']['app_build_settings_files'] = [settings_file, settings_file]
+        config['generate']['app_build_type'] = 'gradle'
+
+        modules_names = ['app',
+                         'list',
+                         'utilities']
+        modules = config_util.get_modules_properties(config)
+        self.__assert_modules_properties(modules_names, modules)
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
@@ -254,3 +266,19 @@ class UnitTests(unittest.TestCase):
             else:
                 self.assertTrue(jar_path in lines_generated, extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
+
+    def __assert_modules_properties(self, modules_names, modules):
+        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file', 'classpath']
+        self.assertTrue(len(modules) == len(modules_names))
+        for module in modules:
+            self.assertTrue(module['name'] in modules_names)
+            self.assertTrue(len(module.keys()) == len(module_keys))
+            for key in module.keys():
+                self.assertTrue(key in module_keys)
+            self.assertTrue(os.path.isdir(module['directory']))
+            self.assertTrue(os.path.isfile(module['build_file']))
+            for path in module['app_path']:
+                self.assertTrue(os.path.isdir(path))
+            for path in module['classpath']:
+                self.assertTrue(os.path.isfile(path))
+
