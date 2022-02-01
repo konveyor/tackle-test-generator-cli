@@ -18,7 +18,8 @@ import subprocess
 import sys
 import json
 
-from tkltest.util import constants, build_util, command_util
+from tkltest.util import constants, command_util
+from tkltest.util.unit import build_util
 from tkltest.util.logging_util import tkltest_status
 
 

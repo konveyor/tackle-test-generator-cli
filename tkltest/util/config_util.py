@@ -23,10 +23,11 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 import json
-from . import constants, config_options_unit, config_options
+from . import constants, config_options
 from .logging_util import tkltest_status
 from .constants import *
-from tkltest.util import command_util, dir_util
+from tkltest.util import command_util
+from tkltest.util.unit import dir_util
 
 
 def load_config(test_level='unit', args=None, config_file=None):

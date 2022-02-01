@@ -20,7 +20,8 @@ import shutil
 import toml
 
 from tkltest.execute.unit import compare_coverage
-from tkltest.util import constants, build_util, command_util, dir_util, config_util, coverage_util
+from tkltest.util import constants, command_util, config_util
+from tkltest.util.unit import build_util, dir_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
 from tkltest.execute.unit.coverage_html_writer import CoverageStatisticsHtmlWriter
 

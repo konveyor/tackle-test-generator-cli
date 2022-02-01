@@ -26,7 +26,8 @@ from threading import Thread
 from .augment import augment_with_code_coverage
 from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
-from tkltest.util import build_util, command_util, constants, config_util, dir_util
+from tkltest.util import command_util, constants, config_util
+from tkltest.util.unit import  build_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
