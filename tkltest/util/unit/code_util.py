@@ -12,7 +12,7 @@
 # ***************************************************************************
 
 
-from tkltest.util import java_class_parser
+from tkltest.util.unit import java_class_parser
 
 
 def get_methods_lines(class_file_name):

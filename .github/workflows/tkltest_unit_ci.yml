@@ -3,10 +3,18 @@ name: TackleTest-Unit CI
 on:
   push:
     paths-ignore:
+      - 'tkltest/generate/ui/**'
+      - 'tkltest/execute/ui/**'
+      - 'tkltest/util/ui/**'
+      - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
   pull_request:
     paths-ignore:
+      - 'tkltest/generate/ui/**'
+      - 'tkltest/execute/ui/**'
+      - 'tkltest/util/ui/**'
+      - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
 
