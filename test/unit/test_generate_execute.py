@@ -22,7 +22,8 @@ import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.generate.unit import generate
 from tkltest.execute.unit import execute
-from tkltest.util import config_util, constants, dir_util
+from tkltest.util import config_util, constants
+from tkltest.util.unit import dir_util
 
 from pathlib import Path
 import xml.etree.ElementTree as ElementTree

@@ -18,7 +18,8 @@ for required options.
 """
 import tabulate
 
-from . import config_options_unit, config_options_ui
+from .unit import config_options_unit
+from .ui import config_options_ui
 
 
 def get_options_spec(command=None, subcommand=None, load_format=True, test_level='unit'):

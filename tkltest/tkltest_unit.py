@@ -18,7 +18,8 @@ from zipfile import ZipFile
 from .execute.unit import execute
 from .generate.unit import generate
 from .tkltest import *
-from .util import logging_util, config_options_unit
+from .util import logging_util
+from .util.unit import config_options_unit
 from .util.constants import *
 
 
