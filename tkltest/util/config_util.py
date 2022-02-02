@@ -912,7 +912,6 @@ def get_modules_properties(tkltest_user_config):
         we redirect the echo output to the modules_properties_file 
         '''
         for app_build_file in app_build_files:
-
             # set the parameter to the echo executable
             get_modules_args = '{ '
             get_modules_args += '"name" : "${project.artifactId}", '
@@ -942,28 +941,77 @@ def get_modules_properties(tkltest_user_config):
                         format(app_build_type, get_modules_command, e, e.stderr), error=True)
                 sys.exit(1)
 
-        # read the file to fix the quotes, and save it as a valid json file
-        with open(modules_properties_file) as f:
-            modules_properties = f.read()
-        modules_properties = modules_properties[:-2] + '\n' # removing the final "," from the list
-        modules_properties = modules_properties.replace('_tkltest_quot_', '"')
-        modules_properties = modules_properties.replace('\\', '\\\\')
-        modules_properties = '[\n' + modules_properties + ']'
-        with open(modules_properties_file, 'w') as f:
-            f.write(modules_properties)
-
     elif app_build_type == 'gradle':
-        pass
+        if not app_settings_files:
+            app_settings_files = '' * len(app_build_files)
+        elif len(app_build_files) != len(app_settings_files):
+            tkltest_status('app_build_files and app_settings_files must have the same size', error=True)
+            sys.exit(1)
 
-    modules = []
+        for app_build_file, app_settings_file in zip(app_build_files, app_settings_files):
+            # set the parameter to the echo executable
+            task_name = 'tkltest_get_module_properties'
+            properties_dict = '{ '
+            properties_dict += ' "name" : "${it.name}",'
+            properties_dict += ' "directory" : "${it.projectDir}",'
+            properties_dict += ' "build_file" : "${it.projectDir}/build.gradle",'
+            properties_dict += ' "app_path" : "${it.sourceSets.main.output.classesDirs.getFiles()}",'
+            properties_dict += ' "classpath" : "${it.sourceSets.main.runtimeClasspath.getFiles()}",'
+            properties_dict += ' "user_build_file" : "' + pathlib.PurePath(app_build_file).as_posix() + '"'
+            properties_dict += ' },'
+
+            # gradle can not have " in the write(), so we replace it with _tkltest_quot_
+            properties_dict = properties_dict.replace('"', '_tkltest_quot_')
+            print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
+
+            task_text = [
+                            'public class WriteStringClass extends DefaultTask {',
+                            '  @TaskAction',
+                            '  void writeString(){',
+                            '    FileWriter fw;',
+                            '    fw = new FileWriter( "' + pathlib.PurePath(modules_properties_file).as_posix() + '", true);',
+                            print_properties_line,
+                            '    fw.close();',
+                            '  }',
+                            '}',
+                            'task ' + task_name + ' (type:WriteStringClass) {}']
+
+            __add_and_run_gradle_task(app_build_file=app_build_file,
+                                      app_settings_file=app_settings_file,
+                                      task_name=task_name,
+                                      task_text=task_text,
+                                      verbose=tkltest_user_config['general']['verbose'])
+    elif app_build_type == 'ant':
+        tkltest_status('Automatically obtaining modules from Ant build files is not supported', error=True)
+        sys.exit(1)
+
+    with open(modules_properties_file) as f:
+        modules_properties = f.read()
+    modules_properties = modules_properties.replace('[', '').replace(']', '')
+    modules_properties = modules_properties[:-2] + '\n' # removing the final "," from the list
+    modules_properties = modules_properties.replace('_tkltest_quot_', '"')
+    modules_properties = modules_properties.replace('\\', '\\\\')
+    modules_properties = '[\n' + modules_properties + ']'
+    with open(modules_properties_file, 'w') as f:
+        f.write(modules_properties)
+
     with open(modules_properties_file) as f:
         all_modules = json.load(f)
+    for module in all_modules:
+        if 'classpath' not in module.keys():
+            module['classpath'] = ''
+        module['app_path'] = module['app_path'].replace(' ', '').split(',')
+        module['app_path'] = [path for path in module['app_path'] if os.path.isdir(path)]
+        module['classpath'] = module['classpath'].replace(' ', '').split(',')
+        module['classpath'] = [path for path in module['classpath'] if os.path.isfile(path)]
     modules_names = set([m['name'] for m in all_modules])
+
+    modules = []
     for module_name in modules_names:
         module_entries = [m for m in all_modules if m['name'] == module_name]
         '''
         we check that all entries are of the same module. 
-        i.e has the same build filw
+        i.e has the same build file
         '''
         if len(module_entries) > 1:
             module_build_files = set([m['build_file'] for m in module_entries])
@@ -972,7 +1020,7 @@ def get_modules_properties(tkltest_user_config):
                                    format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
                 sys.exit(1)
         module = module_entries[0]
-        if os.path.isdir(module['app_path']):
+        if module['app_path']:
             modules.append(module)
     return modules
 
