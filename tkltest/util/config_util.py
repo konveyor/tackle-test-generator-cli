@@ -951,20 +951,17 @@ def get_modules_properties(tkltest_user_config):
             # set the parameter to the echo executable
             task_name = 'tkltest_get_module_properties'
             properties_dict = '{ '
-            properties_dict += ' "name" : "${the_module.name}",'
-            properties_dict += ' "directory" : "${the_module.projectDir}",'
-            properties_dict += ' "build_file" : "${the_module.projectDir}/build.gradle",'
-            properties_dict += ' "app_path" : "${the_module.sourceSets.main.output.classesDirs.getFiles()}",'
-            properties_dict += ' "classpath" : "${the_module.sourceSets.main.runtimeClasspath.getFiles()}",'
+            properties_dict += ' "name" : "${it.name}",'
+            properties_dict += ' "directory" : "${it.projectDir}",'
+            properties_dict += ' "build_file" : "${it.projectDir}/build.gradle",'
+            properties_dict += ' "app_path" : "${it.sourceSets.main.output.classesDirs.getFiles()}",'
+            properties_dict += ' "classpath" : "${it.sourceSets.main.runtimeClasspath.getFiles()}",'
             properties_dict += ' "user_build_file" : "' + pathlib.PurePath(app_build_file).as_posix() + '"'
             properties_dict += ' },'
+
+            # gradle can not have " in the write(), so we replace it with _tkltest_quot_
             properties_dict = properties_dict.replace('"', '_tkltest_quot_')
-            if app_settings_file:
-                properties_dict = properties_dict.replace('the_module', 'it')
-                print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
-            else:
-                properties_dict = properties_dict.replace('the_module', 'project')
-                print_properties_line = '    fw.write("' + properties_dict + '\\n");'
+            print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
 
             task_text = [
                             'public class WriteStringClass extends DefaultTask {',
@@ -1000,7 +997,6 @@ def get_modules_properties(tkltest_user_config):
     with open(modules_properties_file) as f:
         all_modules = json.load(f)
     for module in all_modules:
-        #todo - resolve classpath for maven, and remove the following if:
         if 'classpath' not in module.keys():
             module['classpath'] = ''
         module['app_path'] = module['app_path'].replace(' ', '').split(',')
