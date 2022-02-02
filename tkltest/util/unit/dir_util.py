@@ -36,6 +36,7 @@ def cd_output_dir(app_name, module_name = ''):
     # first we make sure that:
     # 1. the cli dir is set (by referring to it)
     # 2. we are at the cli dir
+    module_name = app_name
     if os.getcwd() != TKLTEST_CLI_DIR:
         cd_cli_dir()
     output_dir = get_app_dir(app_name)
