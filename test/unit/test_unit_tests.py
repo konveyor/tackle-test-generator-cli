@@ -125,8 +125,7 @@ class UnitTests(unittest.TestCase):
             if monolith_app_path[0] == '':
                 continue
             dir_util.cd_output_dir(app_name)
-            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
-
+            monolith_app_path[0] = os.path.join(dir_util.get_output_to_cli_path_fix(), monolith_app_path[0])
             # every target is a different test case
             for target_name in ant_test_apps[app_name]['targets_to_test_app_path']:
                 config['generate']['app_build_target'] = target_name
@@ -154,7 +153,7 @@ class UnitTests(unittest.TestCase):
             if maven_test_apps[app_name]['build_file_if_requires_build']:
                 pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
-                    pom_location = '..' + os.sep + pom_location
+                    pom_location = dir_util.get_output_to_cli_path_fix() + os.sep + pom_location
                 build_command = 'mvn clean install -f ' + pom_location
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
@@ -185,12 +184,12 @@ class UnitTests(unittest.TestCase):
                 continue
             config['general']['monolith_app_path'] = []
             dir_util.cd_output_dir(app_name)
-            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
+            monolith_app_path[0] = os.path.join(dir_util.get_output_to_cli_path_fix(), monolith_app_path[0])
 
             if maven_test_apps[app_name]['build_file_if_requires_build']:
                 pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
-                    pom_location = '..' + os.sep + pom_location
+                    pom_location = dir_util.get_output_to_cli_path_fix() + os.sep + pom_location
                 build_command = 'mvn clean install -f ' + pom_location
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 

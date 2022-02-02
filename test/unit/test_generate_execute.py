@@ -879,9 +879,9 @@ class GenerateExecuteTest(unittest.TestCase):
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, augment=True, reports_path=''):
         dir_util.cd_output_dir(app_name)
-        orig_test_directory = os.path.join('..', orig_test_directory)
+        orig_test_directory = os.path.join(dir_util.get_output_to_cli_path_fix(), orig_test_directory)
         if reports_path:
-            main_report_dir = os.path.join('..', reports_path)
+            main_report_dir = os.path.join(dir_util.get_output_to_cli_path_fix(), reports_path)
         else:
             main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
         cov_report_dir = os.path.join(main_report_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR, os.path.basename(test_directory))
