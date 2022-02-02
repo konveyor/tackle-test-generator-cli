@@ -944,8 +944,8 @@ def get_modules_properties(tkltest_user_config):
     elif app_build_type == 'gradle':
         if not app_settings_files:
             app_settings_files = '' * len(app_build_files)
-        elif len(app_build_files) != len(app_build_files):
-            tkltest_status('app_build_files and app_build_files must have the same size', error=True)
+        elif len(app_build_files) != len(app_settings_files):
+            tkltest_status('app_build_files and app_settings_files must have the same size', error=True)
             sys.exit(1)
 
         for app_build_file, app_settings_file in zip(app_build_files, app_settings_files):
@@ -982,7 +982,7 @@ def get_modules_properties(tkltest_user_config):
                                       task_text=task_text,
                                       verbose=tkltest_user_config['general']['verbose'])
     elif app_build_type == 'ant':
-        tkltest_status('getting module properties with ant is not supported', error=True)
+        tkltest_status('using ant for obtaining modules properties is not supported', error=True)
         sys.exit(1)
 
     with open(modules_properties_file) as f:
@@ -1020,7 +1020,7 @@ def get_modules_properties(tkltest_user_config):
                                    format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
                 sys.exit(1)
         module = module_entries[0]
-        if len(module['app_path']):
+        if module['app_path']:
             modules.append(module)
     return modules
 
