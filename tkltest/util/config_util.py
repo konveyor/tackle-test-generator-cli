@@ -982,7 +982,7 @@ def get_modules_properties(tkltest_user_config):
                                       task_text=task_text,
                                       verbose=tkltest_user_config['general']['verbose'])
     elif app_build_type == 'ant':
-        tkltest_status('using ant for obtaining modules properties is not supported', error=True)
+        tkltest_status('Automatically obtaining modules from Ant build files is not supported', error=True)
         sys.exit(1)
 
     with open(modules_properties_file) as f:
