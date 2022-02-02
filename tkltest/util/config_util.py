@@ -288,7 +288,7 @@ def __merge_config(base_config, update_config):
 
 def __fix_relative_path(path):
     if path != "" and not os.path.isabs(path):
-        return os.path.join('..', path)
+        return os.path.join(dir_util.get_output_to_cli_path_fix(), path)
     return path
 
 

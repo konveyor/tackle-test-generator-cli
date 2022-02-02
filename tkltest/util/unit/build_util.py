@@ -466,7 +466,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     coverage_csv_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.csv')).as_posix()
 
     #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
-    env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util' + os.sep + 'unit'))
+    env = Environment(loader=FileSystemLoader(os.path.join(constants.TKLTEST_CLI_DIR, 'tkltest', 'util', 'unit')))
     template = env.get_template('build_template.gradle')
 
     test_dependsOn = ''

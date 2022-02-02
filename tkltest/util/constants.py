@@ -21,8 +21,9 @@ TKLTEST_GENERATE_CONFIG_FILE='.tkltest_generate.toml'
 
 TKLTEST_UNIT_OUTPUT_DIR_PREFIX = 'tkltest-output-unit-'
 
-# lib download dir
-TKLTEST_LIB_DIR = os.path.join('..', 'lib')
+# cli lib download dir
+TKLTEST_CLI_DIR = os.getcwd()
+TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'lib')
 TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 
 # version of testgen core

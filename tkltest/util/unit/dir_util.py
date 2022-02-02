@@ -18,23 +18,30 @@ import shutil
 from ..constants import *
 
 
-cli_dir = os.getcwd()
+output_to_cli_path_fix = '..'
+
+def get_output_to_cli_path_fix():
+    return output_to_cli_path_fix
+
 def cd_cli_dir():
-    os.chdir(cli_dir)
+    os.chdir(TKLTEST_CLI_DIR)
 
 def get_app_dir(app_name):
-    app_dir = os.path.join(cli_dir, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
+    app_dir = os.path.join(TKLTEST_CLI_DIR, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
     if not os.path.isdir(app_dir):
         os.mkdir(app_dir)
     return app_dir
 
-def cd_output_dir(app_name):
+def cd_output_dir(app_name, module_name = ''):
     # first we make sure that:
     # 1. the cli dir is set (by referring to it)
     # 2. we are at the cli dir
-    if os.getcwd() != cli_dir:
+    if os.getcwd() != TKLTEST_CLI_DIR:
         cd_cli_dir()
-    output_dir = TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name
+    output_dir = get_app_dir(app_name)
+    if module_name:
+        output_dir = os.path.join(output_dir, module_name)
+        output_to_cli_path_fix = os.path.join('..', '..')
     # creating output dir if not exist
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
@@ -44,8 +51,8 @@ def cd_output_dir(app_name):
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
     os.makedirs(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
     # cd output dir
     os.chdir(output_dir)
