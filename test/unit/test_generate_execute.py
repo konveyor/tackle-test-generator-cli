@@ -851,12 +851,12 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path='', compare_coverage=False):
+    def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False):
         if reports_path:
             main_report_dir = reports_path
         else:
             main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-            dir_util.cd_output_dir(app_name)
+            dir_util.cd_output_dir(app_name, module_name)
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
         self.assertTrue(os.path.isdir(junit_report_dir))

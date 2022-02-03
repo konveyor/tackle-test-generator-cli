@@ -325,6 +325,24 @@ __options_spec = {
             'relpath_fix_type': 'path',
             'help_message': 'path to app build settings file or property file for the specified app build type'
         },
+        'app_build_config_files': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': list,
+            'default_value': [],
+            'relpath_fix_type': 'path',
+            'help_message': 'path to app build file for the specified app build type'
+        },
+        'app_build_settings_files': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': list,
+            'default_value': [],
+            'relpath_fix_type': 'path',
+            'help_message': 'path to app build settings file or property file for the specified app build type'
+        },
         'app_build_target': {
             'required': __conditionally_required,
             'is_toml_option': True,

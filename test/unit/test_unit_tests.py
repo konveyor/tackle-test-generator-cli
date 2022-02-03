@@ -86,6 +86,7 @@ class UnitTests(unittest.TestCase):
 
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
+            config['generate']['module_name'] = ''
             config['generate']['app_build_settings_file'] = ant_test_apps[app_name]['property_file']
             config['generate']['app_build_config_file'] = ant_test_apps[app_name]['build_file']
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])

@@ -887,6 +887,46 @@ def __resolve_classpath(tkltest_config, command):
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
+def create_modules_tkltest_configs(tkltest_user_config):
+    tkltest_user_config['general']['module_name'] = ''
+    if tkltest_user_config['generate']['app_build_type'] == 'ant':
+        return [tkltest_user_config]
+    app_name = tkltest_user_config['general']['app_name']
+    modules_properties = get_modules_properties(tkltest_user_config)
+    if len(modules_properties) == 1:
+        module_properties = modules_properties[0]
+        if not tkltest_user_config['general']['monolith_app_path']:
+            tkltest_user_config['general']['monolith_app_path'] = module_properties['app_path']
+        if not tkltest_user_config['general']['app_classpath_file'] and module_properties['classpath']:
+            build_classpath_file = os.path.join(dir_util.get_output_dir(app_name), app_name + "_build_classpath.txt")
+            with open(build_classpath_file, 'w') as f:
+                f.write('\n'.join(module_properties['classpath']))
+            tkltest_user_config['general']['app_classpath_file'] = build_classpath_file
+        return [tkltest_user_config]
+
+    tkltest_configs = []
+    for module_properties in modules_properties:
+        module_name = module_properties['name']
+        tkltest_config = copy.deepcopy(tkltest_user_config)
+        tkltest_config['general']['module_name'] = module_name
+        tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
+        tkltest_config['generate']['app_build_config_file'] = module_properties['build_file']
+        tkltest_config['generate']['app_build_settings_file'] = '' #todo
+        if module_properties['classpath']:
+            build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name), module_name + "_build_classpath.txt")
+            with open(build_classpath_file, 'w') as f:
+                f.write('\n'.join(module_properties['classpath']))
+            tkltest_config['general']['app_classpath_file'] = build_classpath_file
+
+        #todo - need to save the toml file?
+        tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
+                                            module_name + "_tkltest_config.toml")
+        with open(tkltest_config_file, 'w') as f:
+            toml.dump(tkltest_config, f)
+
+        tkltest_configs.append(tkltest_config)
+    return tkltest_configs
+
 def get_modules_properties(tkltest_user_config):
     '''
     get from the config a list of pom files of an app, and find all the modules and their properties (name, build file,...)
@@ -943,7 +983,7 @@ def get_modules_properties(tkltest_user_config):
 
     elif app_build_type == 'gradle':
         if not app_settings_files:
-            app_settings_files = '' * len(app_build_files)
+            app_settings_files = [''] * len(app_build_files)
         elif len(app_build_files) != len(app_settings_files):
             tkltest_status('app_build_files and app_settings_files must have the same size', error=True)
             sys.exit(1)
