@@ -888,6 +888,12 @@ def __resolve_classpath(tkltest_config, command):
 
 
 def create_modules_tkltest_configs(tkltest_user_config):
+    '''
+    creates a config for modules
+    :param tkltest_user_config: the user config that he wrote at the toml file
+    :return: a list of configs, per generate/execute
+    '''
+
     tkltest_user_config['general']['module_name'] = ''
     # todo: support ant at get_modules_properties, and remove this if
     if tkltest_user_config['generate']['app_build_type'] == 'ant':
@@ -895,11 +901,13 @@ def create_modules_tkltest_configs(tkltest_user_config):
     if not tkltest_user_config['generate']['app_build_config_files']:
         return [tkltest_user_config]
     app_name = tkltest_user_config['general']['app_name']
+    #first read the properties from the build file
     modules_properties = get_modules_properties(tkltest_user_config)
     if len(modules_properties) == 0:
         tkltest_status('Failed to automatically obtain modules from user build files', error=True)
         sys.exit(1)
     if len(modules_properties) == 1:
+        # we have only one module, will run it under the app directory, and it has no module name
         module_properties = modules_properties[0]
         if not tkltest_user_config['general']['monolith_app_path']:
             tkltest_user_config['general']['monolith_app_path'] = module_properties['app_path']

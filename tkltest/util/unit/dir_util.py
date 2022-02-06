@@ -14,7 +14,6 @@
 import os
 import shutil
 import sys
-# from . import constants
 from ..constants import *
 
 
@@ -22,20 +21,14 @@ output_to_cli_path_fix = ''
 
 def get_output_to_cli_path_fix():
     global output_to_cli_path_fix
-    if output_to_cli_path_fix == '':
-        sys.exit(1)
     return output_to_cli_path_fix
 
 def __set_output_to_cli_path_fix_for_module(module_name):
     global output_to_cli_path_fix
-    old_output_to_cli_path_fix = output_to_cli_path_fix
     if module_name:
         output_to_cli_path_fix = os.path.join('..', '..')
     else:
         output_to_cli_path_fix = '..'
-    if old_output_to_cli_path_fix:
-        if old_output_to_cli_path_fix != output_to_cli_path_fix:
-            sys.exit(1)
 
 
 def cd_cli_dir():
@@ -49,9 +42,6 @@ def get_app_dir(app_name):
 
 
 def get_output_dir(app_name, module_name=''):
-    # first we make sure that:
-    # 1. the cli dir is set (by referring to it)
-    # 2. we are at the cli dir
     output_dir = get_app_dir(app_name)
     if module_name:
         output_dir = os.path.join(output_dir, module_name)
