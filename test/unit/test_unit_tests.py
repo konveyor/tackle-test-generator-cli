@@ -309,11 +309,11 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(jar_path), extended_message)
 
     def __assert_modules_properties(self, modules_names, modules):
-        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file', 'classpath']
+        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file', 'user_settings_file', 'classpath']
         self.assertTrue(len(modules) == len(modules_names))
         for module in modules:
             self.assertTrue(module['name'] in modules_names)
-            self.assertTrue(len(module.keys()) == len(module_keys))
+            self.assertTrue(len(module.keys()) == len(module_keys) or len(module.keys()) == len(module_keys) - 1 )
             for key in module.keys():
                 self.assertTrue(key in module_keys)
             self.assertTrue(os.path.isdir(module['directory']))

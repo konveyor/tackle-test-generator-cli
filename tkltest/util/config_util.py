@@ -889,10 +889,16 @@ def __resolve_classpath(tkltest_config, command):
 
 def create_modules_tkltest_configs(tkltest_user_config):
     tkltest_user_config['general']['module_name'] = ''
+    # todo: support ant at get_modules_properties, and remove this if
     if tkltest_user_config['generate']['app_build_type'] == 'ant':
+        return [tkltest_user_config]
+    if not tkltest_user_config['generate']['app_build_config_files']:
         return [tkltest_user_config]
     app_name = tkltest_user_config['general']['app_name']
     modules_properties = get_modules_properties(tkltest_user_config)
+    if len(modules_properties) == 0:
+        tkltest_status('Failed to automatically obtain modules from user build files', error=True)
+        sys.exit(1)
     if len(modules_properties) == 1:
         module_properties = modules_properties[0]
         if not tkltest_user_config['general']['monolith_app_path']:
@@ -904,6 +910,7 @@ def create_modules_tkltest_configs(tkltest_user_config):
             tkltest_user_config['general']['app_classpath_file'] = build_classpath_file
         return [tkltest_user_config]
 
+    # we have more than one module
     tkltest_configs = []
     for module_properties in modules_properties:
         module_name = module_properties['name']
@@ -911,14 +918,19 @@ def create_modules_tkltest_configs(tkltest_user_config):
         tkltest_config['general']['module_name'] = module_name
         tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
         tkltest_config['generate']['app_build_config_file'] = module_properties['build_file']
-        tkltest_config['generate']['app_build_settings_file'] = '' #todo
+        if 'user_settings_file' in module_properties.keys():
+            tkltest_config['generate']['app_build_settings_file'] = module_properties['user_settings_file']
+        if tkltest_config['general']['test_directory']:
+            tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
+        if tkltest_config['general']['reports_path']:
+            tkltest_config['general']['reports_path'] = os.path.join(tkltest_config['general']['reports_path'], module_name)
+
         if module_properties['classpath']:
             build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name), module_name + "_build_classpath.txt")
             with open(build_classpath_file, 'w') as f:
                 f.write('\n'.join(module_properties['classpath']))
             tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
-        #todo - need to save the toml file?
         tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
                                             module_name + "_tkltest_config.toml")
         with open(tkltest_config_file, 'w') as f:
@@ -992,17 +1004,22 @@ def get_modules_properties(tkltest_user_config):
             # set the parameter to the echo executable
             task_name = 'tkltest_get_module_properties'
             properties_dict = '{ '
-            properties_dict += ' "name" : "${it.name}",'
-            properties_dict += ' "directory" : "${it.projectDir}",'
-            properties_dict += ' "build_file" : "${it.projectDir}/build.gradle",'
-            properties_dict += ' "app_path" : "${it.sourceSets.main.output.classesDirs.getFiles()}",'
-            properties_dict += ' "classpath" : "${it.sourceSets.main.runtimeClasspath.getFiles()}",'
+            properties_dict += ' "name" : "${project.name}",'
+            properties_dict += ' "directory" : "${project.projectDir}",'
+            properties_dict += ' "build_file" : "${project.projectDir}/build.gradle",'
+            properties_dict += ' "app_path" : "${project.sourceSets.main.output.classesDirs.getFiles()}",'
+            properties_dict += ' "classpath" : "${project.sourceSets.main.runtimeClasspath.getFiles()}",'
             properties_dict += ' "user_build_file" : "' + pathlib.PurePath(app_build_file).as_posix() + '"'
+            if app_settings_files:
+                properties_dict += ', "user_settings_file" : "' + pathlib.PurePath(app_settings_file).as_posix() + '"'
             properties_dict += ' },'
 
             # gradle can not have " in the write(), so we replace it with _tkltest_quot_
             properties_dict = properties_dict.replace('"', '_tkltest_quot_')
-            print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
+            if app_settings_file:
+                print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict.replace('${project.', '${it.') + '\\n" ); }'
+            else:
+                print_properties_line = '     fw.write( "' + properties_dict + '\\n" ); '
 
             task_text = [
                             'public class WriteStringClass extends DefaultTask {',

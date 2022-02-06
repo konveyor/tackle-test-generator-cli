@@ -541,7 +541,7 @@ def __reset_test_directory(args, config):
         directory_to_reset = directory_to_reset + constants.TKLTEST_TEMP_DIR_SUFFIX
 
     shutil.rmtree(directory_to_reset, ignore_errors=True)
-    os.mkdir(directory_to_reset)
+    os.makedirs(directory_to_reset)
     return test_directory
 
 
