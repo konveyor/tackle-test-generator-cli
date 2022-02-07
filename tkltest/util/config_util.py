@@ -925,9 +925,9 @@ def create_modules_tkltest_configs(tkltest_user_config):
         tkltest_config = copy.deepcopy(tkltest_user_config)
         tkltest_config['general']['module_name'] = module_name
         tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
-        tkltest_config['generate']['app_build_config_file'] = module_properties['build_file']
+        tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
         if 'user_settings_file' in module_properties.keys():
-            tkltest_config['generate']['app_build_settings_file'] = module_properties['user_settings_file']
+            tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
         if tkltest_config['general']['test_directory']:
             tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
         if tkltest_config['general']['reports_path']:

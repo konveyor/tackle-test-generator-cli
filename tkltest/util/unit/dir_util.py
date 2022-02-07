@@ -13,7 +13,6 @@
 
 import os
 import shutil
-import sys
 from ..constants import *
 
 
@@ -33,6 +32,7 @@ def __set_output_to_cli_path_fix_for_module(module_name):
 
 def cd_cli_dir():
     os.chdir(TKLTEST_CLI_DIR)
+
 
 def get_app_dir(app_name):
     app_dir = os.path.join(TKLTEST_CLI_DIR, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
