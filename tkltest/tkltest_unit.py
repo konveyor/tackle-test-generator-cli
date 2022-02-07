@@ -18,7 +18,8 @@ from zipfile import ZipFile
 from .execute.unit import execute
 from .generate.unit import generate
 from .tkltest import *
-from .util import logging_util, config_options_unit
+from .util import logging_util
+from .util.unit import config_options_unit
 from .util.constants import *
 
 
@@ -55,7 +56,7 @@ def main():
     # parse arguments, perform checks, and load configuration
     args = parse_arguments(parser, unit_options_spec)
     perform_checks_init_logger(args, parser, 'unit')
-    tkltest_config = load_configuration(args)
+    tkltest_config = load_configuration(args, 'unit')
 
     unjar_paths = __unjar_path(tkltest_config)
 

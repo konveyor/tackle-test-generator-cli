@@ -26,7 +26,8 @@ from threading import Thread
 from .augment import augment_with_code_coverage
 from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
-from tkltest.util import build_util, command_util, constants, config_util, dir_util
+from tkltest.util import command_util, constants, config_util
+from tkltest.util.unit import  build_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -287,7 +288,7 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     tkltest_status('Computing coverage goals using CTD')
 
     # build java command to be executed
-    modeling_command = "\""+jdk_path+"\" -Xmx2048m -cp "+os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
+    modeling_command = "\""+jdk_path+"\" -Xmx2048m -cp "+os.path.join(constants.TKLTEST_UNIT_CORE_JAR)+os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DIR, "acts_"+constants.ACTS_VERSION+".jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-"+constants.SOOT_VERSION+".jar") + os.pathsep
@@ -352,7 +353,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tkltest_status('Generating basic block test sequences using '+test_generator_name)
 
     # build the java command to be executed
-    tg_command = "\""+jdk_path+"\" -Xmx2048m -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR)+os.pathsep
+    tg_command = "\""+jdk_path+"\" -Xmx2048m -cp " + os.path.join(constants.TKLTEST_UNIT_CORE_JAR)+os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-standalone-runtime-"
                                +constants.EVOSUITE_VERSION+".jar") + os.pathsep
@@ -423,7 +424,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command = "\"" + jdk_path + "\""
     te_command += " -Xmx2048m -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+\
                   ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+".jar"
-    te_command += " -cp " + os.path.join(constants.TKLTEST_TESTGEN_CORE_JAR) + os.pathsep
+    te_command += " -cp " + os.path.join(constants.TKLTEST_UNIT_CORE_JAR) + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     te_command += os.path.abspath(app_name+constants.TKL_EVOSUITE_OUTDIR_SUFFIX) + os.pathsep
     if jee_support:

@@ -22,14 +22,15 @@ import zipfile
 import re
 import copy
 import xml.etree.ElementTree as ElementTree
-
-from . import constants, config_options_unit
+import json
+from . import constants, config_options
 from .logging_util import tkltest_status
 from .constants import *
 from tkltest.util import command_util
+from tkltest.util.unit import dir_util
 
 
-def load_config(args=None, config_file=None):
+def load_config(test_level='unit', args=None, config_file=None):
     """Loads config options.
 
     Creates default config options object, updates it with options specified in the toml file and the
@@ -37,6 +38,7 @@ def load_config(args=None, config_file=None):
     are specified in both places), and returns the final options object.
 
     Args:
+        test_level: level of testing (unit, ui)
         args: parsed command-line arguments
         config_file: name of config file to be loaded
 
@@ -44,7 +46,7 @@ def load_config(args=None, config_file=None):
         dict: dictionary containing configuration options for run
     """
     # initialize config
-    tkltest_config = init_config()
+    tkltest_config = init_config(test_level)
 
     # if neither command-line args nor config file specified, return initialized config
     if args is None and config_file is None:
@@ -62,7 +64,7 @@ def load_config(args=None, config_file=None):
 
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
-        options_spec=config_options_unit.get_options_spec(command='general'),
+        options_spec=config_options.get_options_spec(command='general', test_level=test_level),
         args=args)
 
     # if args specified, get command and subcommand
@@ -77,17 +79,18 @@ def load_config(args=None, config_file=None):
     if command:
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
-            options_spec=config_options_unit.get_options_spec(command=command),
+            options_spec=config_options.get_options_spec(command=command, test_level=test_level),
             args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
-            options_spec=config_options_unit.get_options_spec(command=command, subcommand=subcommand),
+            options_spec=config_options.get_options_spec(command=command, subcommand=subcommand, test_level=test_level),
             args=args)
 
     # validate loaded config information, exit if validation errors occur
-    val_failure_msgs = __validate_config(config=tkltest_config, command=command, subcommand=subcommand)
+    val_failure_msgs = __validate_config(config=tkltest_config, test_level=test_level, command=command,
+                                         subcommand=subcommand)
     if val_failure_msgs:  # pragma: no cover
         tkltest_status('configuration options validation failed:\n{}'.format(''.join(val_failure_msgs)), error=True)
         sys.exit(1)
@@ -101,17 +104,20 @@ def load_config(args=None, config_file=None):
     return tkltest_config
 
 
-def init_config():
+def init_config(test_level='unit'):
     """Initializes config.
 
     Initializes and returns config data structure containing default values for all
     configuration options (excluding non-toml options, which should not be loaded).
 
+    Args:
+        test_level: level of testing (unit, ui)
+
     Returns:
         dict containing initialized options
     """
     # get config spec
-    options_spec = config_options_unit.get_options_spec()
+    options_spec = config_options.get_options_spec(test_level=test_level)
     config = {}
 
     for opt_name in options_spec.keys():
@@ -136,7 +142,7 @@ def init_config():
     return config
 
 
-def __validate_config(config, command=None, subcommand=None):
+def __validate_config(config, test_level, command=None, subcommand=None):
     """Validate loaded config information.
 
     Validates the given loaded config information in the context of the given command and (optionally)
@@ -147,12 +153,12 @@ def __validate_config(config, command=None, subcommand=None):
     """
     # get general options spec and options spec for the given command and subcommand
     options_spec = {
-        'general': config_options_unit.get_options_spec('general')
+        'general': config_options.get_options_spec('general', test_level=test_level)
     }
     if command is not None:
-        options_spec[command] = config_options_unit.get_options_spec(command)
+        options_spec[command] = config_options.get_options_spec(command, test_level=test_level)
     if subcommand is not None:
-        options_spec[subcommand] = config_options_unit.get_options_spec(command, subcommand)
+        options_spec[subcommand] = config_options.get_options_spec(command, subcommand, test_level=test_level)
 
     # initialize validation errors
     val_errors = {
@@ -327,14 +333,14 @@ def __fix_relative_paths(tkltest_config):
 
     """
 
-    options_spec = config_options_unit.get_options_spec()
+    options_spec = config_options.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
     __fix_relative_paths_recursively(options_spec, tkltest_config)
     tkltest_config['relative_fixed'] = True
 
 
-def __create_modified_build_file(app_build_file, toy_program_dir_path):
+def __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path):
     """
     Creates a modified build file based on original one.
     In the modified copy, every target has only necessary modified tasks: {property, javac, antcall}
@@ -408,13 +414,18 @@ def __create_modified_build_file(app_build_file, toy_program_dir_path):
     return tkltest_app_build_file
 
 
-def __run_ant_command_and_parse_output(modified_build_file_name,
-                                       app_settings_file,
-                                       app_build_target,
-                                       ant_output_filename,
-                                       targets_classpath):
-    """ Runs the ant command with the modified copy of the build file.
-        Also, removes the modified build file copy and the output file after the parsing. """
+def __run_ant_command(modified_build_file_name,
+                      app_settings_file,
+                      app_build_target):
+    """
+    Runs the ant command with the modified copy of the build file.
+    Also, removes the modified build file copy after running command.
+    :param modified_build_file_name: the modified build file to run Ant with
+    :param app_settings_file: settings file for user properties
+    :param app_build_target: Ant target to run
+    :return: path to the file containing the output
+    """
+    ant_output_filename = os.path.join(os.getcwd(), 'tkltest_ant_output.txt')
     # create output file or override previous output
     with open(ant_output_filename, 'w') as output_file:
         output_file.write('')
@@ -424,19 +435,29 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
     if app_settings_file:
         run_ant_command += ' -propertyfile ' + os.path.abspath(app_settings_file)
     run_ant_command += ' ' + app_build_target + ' >> ' + ant_output_filename
+    logging.info(run_ant_command)
 
     # execute ant command
     try:
         command_util.run_command(command=run_ant_command, verbose=True)
     except subprocess.CalledProcessError as e:
         tkltest_status(
-            'running ant task {} failed: {}\n{}'.format(run_ant_command, e, e.stderr),
+            'running ant task "{}" failed: {}\n{}'.format(run_ant_command, e, e.stderr),
             error=True)
         os.remove(modified_build_file_name)
         sys.exit(1)
 
     os.remove(modified_build_file_name)
+    return ant_output_filename
 
+
+def __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath):
+    """
+    Parses Ant output for extracting dependencies, deletes output file when finished.
+    :param ant_output_filename: filename of the Ant command output
+    :param targets_classpath: set for the united dependencies of the compilation process
+    :return: None
+    """
     # parse ant output
     java_home_prefix = '[echo] Java home: '
     java_class_path_prefix = '[echo] Java class path: '
@@ -466,6 +487,77 @@ def __run_ant_command_and_parse_output(modified_build_file_name,
                 targets_classpath.add(item)
 
     os.remove(ant_output_filename)
+
+
+def __get_source_of_ant_javac(javac_task):
+    """
+    Returns the source parameter passed to given javac task, in an Ant build file.
+    :param javac_task: Given task, ElementTree variable.
+    :return: a string for single source, or a list of sources.
+    """
+    source_options = ['srcdir', 'modulesourcepath', 'modulesourcepathref']
+    for source in source_options:
+        srcdir = javac_task.get(source)
+        if srcdir is not None:
+            return '${toString:' + srcdir + '}' if source == 'modulesourcepathref' else srcdir
+    # source not given as attribute, search for nested <src> elements
+    srcdir = []
+    for element in javac_task.findall('src'):
+        src_path = element.get('path')
+        if src_path is not None:
+            srcdir.append(src_path)
+    return srcdir
+
+
+def __create_modified_build_file_for_monolith_app_path(app_build_file):
+    """
+    Creates a modified copy of the build file that will be used to extracting the monolith_app_path.
+    The modified copy has the original property and antcall tasks, and every javac task was replaced
+    by echo of the destination directory.
+    :param app_build_file: path to Ant build file (build.xml)
+    :return: tuple of (path to the created modified copy of the build file, basedir of build file)
+    """
+
+    # create a copy of the build file
+    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file),
+                                          'tkltest_' + os.path.basename(app_build_file))
+    # tree and root of original build file
+    build_file_tree = ElementTree.parse(app_build_file)
+    project_root = build_file_tree.getroot()
+    basedir = project_root.get('basedir')
+    basedir = basedir if os.path.isabs(basedir) else os.path.join(os.path.dirname(app_build_file), basedir)
+
+    # iterate on the project's targets
+    for element in project_root.findall('target'):
+        # create a new element with identical attributes and no sub-elements (no tasks)
+        modified_element = ElementTree.Element('target', element.attrib)
+        for task in element:
+            if task.tag == 'property':
+                # add as is to modified_element
+                modified_element.append(task)
+            elif task.tag == 'antcall':
+                # add as is to modified_element
+                modified_element.append(task)
+            elif task.tag == 'javac':
+                # create instead an echo task to print the "destdir" of javac
+                destdir = task.get('destdir')
+                if destdir is None:
+                    # "class" files are created near original "java" files
+                    destdir = __get_source_of_ant_javac(task)
+                elif destdir == "":
+                    # "class" files are created in basedir
+                    destdir = basedir
+
+                if isinstance(destdir, list):
+                    # when destdir is not given and there are multiple source files
+                    for src_path in destdir:
+                        modified_element.append(ElementTree.Element('echo', {'message': 'destdir: ' + src_path}))
+                else:
+                    modified_element.append(ElementTree.Element('echo', {'message': 'destdir: ' + destdir}))
+        project_root.remove(element)
+        project_root.append(modified_element)
+    build_file_tree.write(tkltest_app_build_file)
+    return tkltest_app_build_file, basedir
 
 
 #todo - use this method at __resolve_classpath() - will be done after resolving __resolve_classpath issues
@@ -556,9 +648,21 @@ def __resolve_app_path(tkltest_config):
         with open(app_path_file) as f:
             tkltest_config['general']['monolith_app_path'] = [p.strip('[]') for p in f.read().split('\n')]
             tkltest_config['general']['monolith_app_path'].remove('')
+
     elif app_build_type == 'ant':
-        tkltest_status('monolith_app_path is missing\n', error=True)
-        sys.exit(1)
+        app_build_target = tkltest_config['generate']['app_build_target']
+        # create a modified build file
+        modified_build_file_name, build_base_dir = __create_modified_build_file_for_monolith_app_path(app_build_file)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target)
+
+        with open(ant_output_filename, 'r') as output_file:
+            lines = output_file.read().splitlines()
+        os.remove(ant_output_filename)
+        echo_prefix = '[echo] destdir: '
+        app_path = list(set([s.replace(echo_prefix, '').lstrip() for s in lines if s.lstrip().startswith(echo_prefix)]))
+        app_path = os.path.commonpath(app_path)
+        app_path = app_path if os.path.isabs(app_path) else os.path.abspath(os.path.join(build_base_dir, app_path))
+        tkltest_config['general']['monolith_app_path'] = [app_path]
 
     elif app_build_type == 'maven':
         app_path_file = os.path.join(os.getcwd(), app_name + '_' + app_build_type + '_app_path.txt')
@@ -706,13 +810,9 @@ def __resolve_classpath(tkltest_config, command):
             java_file.write("}\n")
 
         # create a modified build file
-        modified_build_file_name = __create_modified_build_file(app_build_file, toy_program_dir_path)
-
-        __run_ant_command_and_parse_output(modified_build_file_name,
-                                           app_settings_file,
-                                           app_build_target,
-                                           ant_output_filename,
-                                           targets_classpath)
+        modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target)
+        __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)
 
@@ -787,6 +887,144 @@ def __resolve_classpath(tkltest_config, command):
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
+def get_modules_properties(tkltest_user_config):
+    '''
+    get from the config a list of pom files of an app, and find all the modules and their properties (name, build file,...)
+    eliminate modules that we do not need (no app_path, ...)
+    :param tkltest_user_config: the config we got from the user
+           modules_properties_file: the xml file to save the the properties
+    :return: list of dict of module names and properties
+    '''
+
+    app_name = tkltest_user_config['general']['app_name']
+    app_build_type = tkltest_user_config['generate']['app_build_type']
+    app_build_files = tkltest_user_config['generate']['app_build_config_files']
+    app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
+
+    modules_properties_file = os.path.join(dir_util.get_app_dir(app_name), app_name + '_modules_properties.json')
+    if os.path.isfile(modules_properties_file):
+        os.remove(modules_properties_file)
+
+    if app_build_type == 'maven':
+        '''
+        for each user pom file, we call exec:exec with executable "echo".
+        exec:exec runs the executable on every module of the project
+        we redirect the echo output to the modules_properties_file 
+        '''
+        for app_build_file in app_build_files:
+            # set the parameter to the echo executable
+            get_modules_args = '{ '
+            get_modules_args += '"name" : "${project.artifactId}", '
+            get_modules_args += '"directory" : "${basedir}", '
+            get_modules_args += '"build_file" : "${basedir}/pom.xml", '
+            get_modules_args += '"app_path" : "${project.build.outputDirectory}", '
+            get_modules_args += '"user_build_file" : "' + app_build_file + '"'
+            get_modules_args += ' },'
+
+            # exec:exec can not have " in the arguments, so we replace it with _tkltest_quot_
+            get_modules_args = get_modules_args.replace('"', '_tkltest_quot_')
+            #call exec:exec with echo:
+            get_modules_command = 'mvn --quiet'
+            get_modules_command += ' -f ' + app_build_file
+            if os.name == 'nt':
+                get_modules_command += ' exec:exec -Dexec.executable=cmd.exe -Dexec.args='
+                get_modules_command += '"/c echo ' + get_modules_args + '"'
+            else:
+                get_modules_command += ' exec:exec -Dexec.executable="echo" -Dexec.args='
+                get_modules_command += '\'' + get_modules_args + '\''
+
+            get_modules_command += ' >> ' + modules_properties_file
+            try:
+                command_util.run_command(command=get_modules_command, verbose=tkltest_user_config['general']['verbose'])
+            except subprocess.CalledProcessError as e:
+                tkltest_status('running {} command "{}" failed: {}\n{}'.
+                        format(app_build_type, get_modules_command, e, e.stderr), error=True)
+                sys.exit(1)
+
+    elif app_build_type == 'gradle':
+        if not app_settings_files:
+            app_settings_files = '' * len(app_build_files)
+        elif len(app_build_files) != len(app_settings_files):
+            tkltest_status('app_build_files and app_settings_files must have the same size', error=True)
+            sys.exit(1)
+
+        for app_build_file, app_settings_file in zip(app_build_files, app_settings_files):
+            # set the parameter to the echo executable
+            task_name = 'tkltest_get_module_properties'
+            properties_dict = '{ '
+            properties_dict += ' "name" : "${it.name}",'
+            properties_dict += ' "directory" : "${it.projectDir}",'
+            properties_dict += ' "build_file" : "${it.projectDir}/build.gradle",'
+            properties_dict += ' "app_path" : "${it.sourceSets.main.output.classesDirs.getFiles()}",'
+            properties_dict += ' "classpath" : "${it.sourceSets.main.runtimeClasspath.getFiles()}",'
+            properties_dict += ' "user_build_file" : "' + pathlib.PurePath(app_build_file).as_posix() + '"'
+            properties_dict += ' },'
+
+            # gradle can not have " in the write(), so we replace it with _tkltest_quot_
+            properties_dict = properties_dict.replace('"', '_tkltest_quot_')
+            print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict + '\\n" ); }'
+
+            task_text = [
+                            'public class WriteStringClass extends DefaultTask {',
+                            '  @TaskAction',
+                            '  void writeString(){',
+                            '    FileWriter fw;',
+                            '    fw = new FileWriter( "' + pathlib.PurePath(modules_properties_file).as_posix() + '", true);',
+                            print_properties_line,
+                            '    fw.close();',
+                            '  }',
+                            '}',
+                            'task ' + task_name + ' (type:WriteStringClass) {}']
+
+            __add_and_run_gradle_task(app_build_file=app_build_file,
+                                      app_settings_file=app_settings_file,
+                                      task_name=task_name,
+                                      task_text=task_text,
+                                      verbose=tkltest_user_config['general']['verbose'])
+    elif app_build_type == 'ant':
+        tkltest_status('Automatically obtaining modules from Ant build files is not supported', error=True)
+        sys.exit(1)
+
+    with open(modules_properties_file) as f:
+        modules_properties = f.read()
+    modules_properties = modules_properties.replace('[', '').replace(']', '')
+    modules_properties = modules_properties[:-2] + '\n' # removing the final "," from the list
+    modules_properties = modules_properties.replace('_tkltest_quot_', '"')
+    modules_properties = modules_properties.replace('\\', '\\\\')
+    modules_properties = '[\n' + modules_properties + ']'
+    with open(modules_properties_file, 'w') as f:
+        f.write(modules_properties)
+
+    with open(modules_properties_file) as f:
+        all_modules = json.load(f)
+    for module in all_modules:
+        if 'classpath' not in module.keys():
+            module['classpath'] = ''
+        module['app_path'] = module['app_path'].replace(' ', '').split(',')
+        module['app_path'] = [path for path in module['app_path'] if os.path.isdir(path)]
+        module['classpath'] = module['classpath'].replace(' ', '').split(',')
+        module['classpath'] = [path for path in module['classpath'] if os.path.isfile(path)]
+    modules_names = set([m['name'] for m in all_modules])
+
+    modules = []
+    for module_name in modules_names:
+        module_entries = [m for m in all_modules if m['name'] == module_name]
+        '''
+        we check that all entries are of the same module. 
+        i.e has the same build file
+        '''
+        if len(module_entries) > 1:
+            module_build_files = set([m['build_file'] for m in module_entries])
+            if len(module_build_files) > 1:
+                tkltest_status('got a module with the same name "{}", in {} different build files:\n{}\n'.
+                                   format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
+                sys.exit(1)
+        module = module_entries[0]
+        if module['app_path']:
+            modules.append(module)
+    return modules
+
+
 def fix_config(tkltest_config, command):
     """
     fix the config before running generate
@@ -812,5 +1050,5 @@ if __name__ == '__main__':
     print('base_config={}'.format(base_config))
     __merge_config(base_config, file_config)
     print('updated_config={}'.format(base_config))
-    failure_msgs = __validate_config(base_config, command='generate', subcommand='ctd_amplified')
+    failure_msgs = __validate_config(base_config, test_level='unit', command='generate', subcommand='ctd_amplified')
     print('failure_msgs={}'.format(failure_msgs))

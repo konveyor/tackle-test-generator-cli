@@ -14,14 +14,19 @@
 import os
 import shutil
 
-from . import constants, config_util
-from .constants import *
+# from . import constants
+from ..constants import *
 
 
 cli_dir = os.getcwd()
 def cd_cli_dir():
     os.chdir(cli_dir)
 
+def get_app_dir(app_name):
+    app_dir = os.path.join(cli_dir, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
+    if not os.path.isdir(app_dir):
+        os.mkdir(app_dir)
+    return app_dir
 
 def cd_output_dir(app_name):
     # first we make sure that:
@@ -38,10 +43,9 @@ def cd_output_dir(app_name):
     # (currently, at the core, the locations of these jars are hard coded)
     if os.path.isdir(os.path.join(output_dir, "lib")):
         shutil.rmtree(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib"))
-    os.mkdir(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-4.2.6.jar"), os.path.join(output_dir, "lib", "download"))
+    os.makedirs(os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join("lib", "download", "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join("lib", "download", "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
     # cd output dir
     os.chdir(output_dir)
