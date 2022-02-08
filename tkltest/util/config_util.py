@@ -65,7 +65,7 @@ def load_config(test_level='unit', args=None, config_file=None):
     # update general options with values specified in command line
     __update_config_with_cli_value(config=tkltest_config['general'],
         options_spec=config_options.get_options_spec(command='general', test_level=test_level),
-        args=args)
+                                   args=args)
 
     # if args specified, get command and subcommand
     command = None
@@ -80,13 +80,13 @@ def load_config(test_level='unit', args=None, config_file=None):
         # update command options with values specified in command line
         __update_config_with_cli_value(config=tkltest_config[command],
             options_spec=config_options.get_options_spec(command=command, test_level=test_level),
-            args=args)
+                                       args=args)
 
     # update subcommand options with values specified in command line
     if subcommand:
         __update_config_with_cli_value(config=tkltest_config[command][subcommand],
             options_spec=config_options.get_options_spec(command=command, subcommand=subcommand, test_level=test_level),
-            args=args)
+                                       args=args)
 
     # validate loaded config information, exit if validation errors occur
     val_failure_msgs = __validate_config(config=tkltest_config, test_level=test_level, command=command,
@@ -628,16 +628,16 @@ def __resolve_app_path(tkltest_config):
         if app_settings_file:
             write_classes_dirs_line = '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }'
         task_text = [
-                        'public class WriteStringClass extends DefaultTask {',
-                        '  @TaskAction',
-                        '  void writeString(){',
-                        '    FileWriter fw;',
-                        '    fw = new FileWriter( "' + app_path_file + '");',
-                        write_classes_dirs_line,
-                        '    fw.close();',
-                        '  }',
-                        '}',
-                        'task ' + task_name + ' (type:WriteStringClass) {}']
+            'public class WriteStringClass extends DefaultTask {',
+            '  @TaskAction',
+            '  void writeString(){',
+            '    FileWriter fw;',
+            '    fw = new FileWriter( "' + app_path_file + '");',
+            write_classes_dirs_line,
+            '    fw.close();',
+            '  }',
+            '}',
+            'task ' + task_name + ' (type:WriteStringClass) {}']
 
         __add_and_run_gradle_task(app_build_file=app_build_file,
                                   app_settings_file=app_settings_file,
@@ -887,8 +887,6 @@ def __resolve_classpath(tkltest_config, command):
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
-
-
 def resolve_tkltest_configs(tkltest_user_config, command):
     '''
     creates the configs that we are going to run on
@@ -897,74 +895,77 @@ def resolve_tkltest_configs(tkltest_user_config, command):
     '''
 
     app_name = tkltest_user_config['general']['app_name']
-    tkltest_config_file_sofix ='_generated_tkltest_config.toml'
-    tkltest_user_config['general']['module_name'] = ''
-    if command != 'generate':
-        app_dir = dir_util.get_app_dir(app_name)
-        toml_files = list( pathlib.Path(app_dir).glob('**/*' + tkltest_config_file_sofix))
+    tkltest_config_file_suffix = '_generated_tkltest_config.toml'
+    if tkltest_user_config['generate']['app_build_type'] == 'ant' or \
+            not tkltest_user_config['generate']['app_build_config_files'] or \
+            tkltest_user_config['general']['monolith_app_path']:
+        if 'module_name' not in tkltest_user_config['general']:
+            tkltest_user_config['general']['module_name'] = ''
+        __resolve_app_path(tkltest_user_config)
+        __resolve_classpath(tkltest_user_config, command)
+        return [tkltest_user_config]
+    elif command != 'generate':
+        toml_files = list(pathlib.Path(dir_util.get_app_output_dir(app_name)).glob('**/*' + tkltest_config_file_suffix))
         if toml_files:
-             tkltest_configs = [toml.load(toml_file) for toml_file in toml_files]
-             return tkltest_configs
+            tkltest_status('Running on {} config files that were created by the generate command  '.format(len(toml_files)))
+            return [toml.load(toml_file) for toml_file in toml_files]
         else:
-            #todo - this is just a comment, sould be an error if we drop backword competability:
-            tkltest_status('Could not find any generated toml files created by generate')
-            tkltest_configs = [tkltest_user_config]
-    elif tkltest_user_config['generate']['app_build_type'] == 'ant':
-        tkltest_configs = [tkltest_user_config]
-    elif not tkltest_user_config['generate']['app_build_config_files']:
-        tkltest_configs = [tkltest_user_config]
-    elif tkltest_user_config['general']['monolith_app_path']:
-        tkltest_configs = [tkltest_user_config]
+            tkltest_user_config['general']['module_name'] = ''
+            __resolve_app_path(tkltest_user_config)
+            __resolve_classpath(tkltest_user_config, command)
+            return [tkltest_user_config]
     else:
-        tkltest_configs = __resolve_modules_properties_into_tkltest_configs(tkltest_user_config)
+        # we first read the properties from the build file
+        modules_properties = get_modules_properties(tkltest_user_config)
+        if not modules_properties:
+            tkltest_status('Failed to automatically obtain modules from user build files', error=True)
+            sys.exit(1)
+        if len(modules_properties) == 1:
+            tkltest_user_config['general']['module_name'] = ''
+            __resolve_app_path(tkltest_user_config)
+            __resolve_classpath(tkltest_user_config, command)
+            return [tkltest_user_config]
 
-    for tkltest_config in tkltest_configs:
-        module_name = tkltest_config['general']['module_name']
-
-        __resolve_app_path(tkltest_config)
-        __resolve_classpath(tkltest_config, command)
-        if command == 'generate':
+        tkltest_configs = __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties)
+        tkltest_status('Obtained {} modules from the build files. creating a config file per module.'.format(len(tkltest_configs)))
+        # todo - print to the user
+        for tkltest_config in tkltest_configs:
+            module_name = tkltest_config['general']['module_name']
+            __resolve_classpath(tkltest_config, command)
             tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
-                                            app_name + '_' + module_name + tkltest_config_file_sofix)
+                                           app_name + '_' + module_name + tkltest_config_file_suffix)
             with open(tkltest_config_file, 'w') as f:
                 toml.dump(tkltest_config, f)
-    return tkltest_configs
 
-def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config):
+        return tkltest_configs
+
+
+def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties):
     app_name = tkltest_user_config['general']['app_name']
-    # we first read the properties from the build file
-    modules_properties = get_modules_properties(tkltest_user_config)
-    if not modules_properties:
-        tkltest_status('Failed to automatically obtain modules from user build files', error=True)
-        sys.exit(1)
-
-    multi_modules = len(modules_properties) > 1
     tkltest_configs = []
     for module_properties in modules_properties:
-        module_name = module_properties['name'] if multi_modules else ''
+        module_name = module_properties['name']
         tkltest_config = copy.deepcopy(tkltest_user_config)
         tkltest_config['general']['module_name'] = module_name
         tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
-        if multi_modules:
-            tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
-            if 'user_settings_file' in module_properties.keys():
-                tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
-            if tkltest_config['general']['test_directory']:
-                tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
-            if tkltest_config['general']['reports_path']:
-                tkltest_config['general']['reports_path'] = os.path.join(tkltest_config['general']['reports_path'], module_name)
+        tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
+        if 'user_settings_file' in module_properties.keys():
+            tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
+        if tkltest_config['general']['test_directory']:
+            tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
+        if tkltest_config['general']['reports_path']:
+            tkltest_config['general']['reports_path'] = os.path.join(tkltest_config['general']['reports_path'], module_name)
 
         if module_properties['classpath']:
-            if multi_modules or not tkltest_user_config['general']['app_classpath_file']:
-                build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name), app_name + '_' + module_name + "_build_classpath.txt")
-                with open(build_classpath_file, 'w') as f:
-                    f.write('\n'.join(module_properties['classpath']))
-                tkltest_config['general']['app_classpath_file'] = build_classpath_file
+            build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
+                                                app_name + '_' + module_name + "_build_classpath.txt")
+            with open(build_classpath_file, 'w') as f:
+                f.write('\n'.join(module_properties['classpath']))
+            tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
         tkltest_configs.append(tkltest_config)
 
     return tkltest_configs
-
 
 
 def get_modules_properties(tkltest_user_config):
@@ -981,7 +982,7 @@ def get_modules_properties(tkltest_user_config):
     app_build_files = tkltest_user_config['generate']['app_build_config_files']
     app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
 
-    modules_properties_file = os.path.join(dir_util.get_app_dir(app_name), app_name + '_modules_properties.json')
+    modules_properties_file = os.path.join(dir_util.get_app_output_dir(app_name), app_name + '_modules_properties.json')
     if os.path.isfile(modules_properties_file):
         os.remove(modules_properties_file)
 
@@ -1018,7 +1019,7 @@ def get_modules_properties(tkltest_user_config):
                 command_util.run_command(command=get_modules_command, verbose=tkltest_user_config['general']['verbose'])
             except subprocess.CalledProcessError as e:
                 tkltest_status('running {} command "{}" failed: {}\n{}'.
-                        format(app_build_type, get_modules_command, e, e.stderr), error=True)
+                               format(app_build_type, get_modules_command, e, e.stderr), error=True)
                 sys.exit(1)
 
     elif app_build_type == 'gradle':
@@ -1050,16 +1051,16 @@ def get_modules_properties(tkltest_user_config):
                 print_properties_line = '     fw.write( "' + properties_dict + '\\n" ); '
 
             task_text = [
-                            'public class WriteStringClass extends DefaultTask {',
-                            '  @TaskAction',
-                            '  void writeString(){',
-                            '    FileWriter fw;',
-                            '    fw = new FileWriter( "' + pathlib.PurePath(modules_properties_file).as_posix() + '", true);',
-                            print_properties_line,
-                            '    fw.close();',
-                            '  }',
-                            '}',
-                            'task ' + task_name + ' (type:WriteStringClass) {}']
+                'public class WriteStringClass extends DefaultTask {',
+                '  @TaskAction',
+                '  void writeString(){',
+                '    FileWriter fw;',
+                '    fw = new FileWriter( "' + pathlib.PurePath(modules_properties_file).as_posix() + '", true);',
+                print_properties_line,
+                '    fw.close();',
+                '  }',
+                '}',
+                'task ' + task_name + ' (type:WriteStringClass) {}']
 
             __add_and_run_gradle_task(app_build_file=app_build_file,
                                       app_settings_file=app_settings_file,
@@ -1102,7 +1103,7 @@ def get_modules_properties(tkltest_user_config):
             module_build_files = set([m['build_file'] for m in module_entries])
             if len(module_build_files) > 1:
                 tkltest_status('got a module with the same name "{}", in {} different build files:\n{}\n'.
-                                   format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
+                               format(module_name, len(module_build_files), '\n'.join(module_build_files)), error=True)
                 sys.exit(1)
         module = module_entries[0]
         if module['app_path']:
@@ -1121,9 +1122,9 @@ def fix_config(tkltest_config, command):
     Returns:
 
     """
-    #todo - can we move the following the the line to resolve_tkltest_configs()
+    # todo - can we move the following the the line to resolve_tkltest_configs()
     __fix_relative_paths(tkltest_config)
-    #todo - to remove the following two
+    # todo - to remove the following two
     __resolve_app_path(tkltest_config)
     __resolve_classpath(tkltest_config, command)
 

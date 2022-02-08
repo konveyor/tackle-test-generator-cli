@@ -34,7 +34,7 @@ def cd_cli_dir():
     os.chdir(TKLTEST_CLI_DIR)
 
 
-def get_app_dir(app_name):
+def get_app_output_dir(app_name):
     app_dir = os.path.join(TKLTEST_CLI_DIR, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
     if not os.path.isdir(app_dir):
         os.mkdir(app_dir)
@@ -42,7 +42,7 @@ def get_app_dir(app_name):
 
 
 def get_output_dir(app_name, module_name=''):
-    output_dir = get_app_dir(app_name)
+    output_dir = get_app_output_dir(app_name)
     if module_name:
         output_dir = os.path.join(output_dir, module_name)
 

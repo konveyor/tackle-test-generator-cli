@@ -17,6 +17,7 @@ import sys
 import unittest
 import toml
 import shutil
+import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.util import config_util, constants, command_util
 from tkltest.util.unit import  dir_util
@@ -250,52 +251,93 @@ class UnitTests(unittest.TestCase):
     def test_getting_modules_configs(self) -> None:
         """Test getting list of modules using gradle build file"""
         dir_util.cd_cli_dir()
-        config = {}
-        config['general'] = {}
-        config['generate'] = {}
+        base_config = {}
+        base_config['general'] = {}
+        base_config['generate'] = {}
         app_name = 'splitNjoin'
-        shutil.rmtree(dir_util.get_app_dir(app_name))
-        config['general']['app_name'] = app_name
-        config['general']['verbose'] = True
+        base_config['general']['app_name'] = app_name
+        base_config['general']['verbose'] = True
 
-        build_file1 = os.path.join('test', 'data', 'splitNjoin', 'utilities', 'build.gradle')
-        build_file2 = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
+        build_file_list = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
+        build_file_app = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
         settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
-        config['generate']['app_build_type'] = 'gradle'
-        config['general']['test_directory'] = 'SNJ_test_dir'
-        config['general']['reports_path'] = 'SNJ_report_dir'
+        base_config['generate']['app_build_type'] = 'gradle'
+        base_config['general']['test_directory'] = 'SNJ_test_dir'
+        base_config['general']['reports_path'] = 'SNJ_report_dir'
+
+        base_config['general']['app_classpath_file'] = ''
+        base_config['general']['monolith_app_path'] = ''
+
+        base_config['generate']['app_build_config_files'] = [build_file_app]
+        base_config['generate']['app_build_settings_files'] = [settings_file]
+        #todo - remove the following two lines:
+        base_config['generate']['app_build_config_file'] = build_file_app
+        base_config['generate']['app_build_settings_file'] = settings_file
+
+        for case in ['we have app_path', 'execute without generated toml', 'only one module']:
+            shutil.rmtree(dir_util.get_app_output_dir(app_name))
+            config = copy.deepcopy(base_config)
+            if case == 'we have app_path':
+                config['general']['monolith_app_path'] = 'dummy_path'
+            if case == 'only one module':
+                config['generate']['app_build_config_files'] = [build_file_list]
+                config['generate']['app_build_settings_files'] = []
+                # todo - remove the following two lines:
+                config['generate']['app_build_config_file'] = build_file_list
+                config['generate']['app_build_settings_file'] = ''
+                os.rename(settings_file, settings_file + '.bkp')
+            saved_config = copy.deepcopy(config)
+            if case == 'execute without generated toml':
+                resolved_configs = config_util.resolve_tkltest_configs(config, 'execute')
+            else:
+                resolved_configs = config_util.resolve_tkltest_configs(config, 'generate')
+            if case == 'only one module':
+                os.rename(settings_file + '.bkp', settings_file)
+
+            self.assertTrue(len(resolved_configs) == 1)
+            self.assertTrue(os.path.isfile(resolved_configs[0]['general']['app_classpath_file']))
+
+            if case == 'we have app_path':
+                self.assertTrue(resolved_configs[0]['general']['monolith_app_path'] == 'dummy_path')
+            else:
+                if case == 'only one module':
+                    self.assertTrue(len(resolved_configs[0]['general']['monolith_app_path']) == 1)
+                else:
+                    self.assertTrue(len(resolved_configs[0]['general']['monolith_app_path']) == 3)
+                for path in resolved_configs[0]['general']['monolith_app_path']:
+                    self.assertTrue(os.path.isdir(path))
+                saved_config['general']['monolith_app_path'] = resolved_configs[0]['general']['monolith_app_path']
+
+            saved_config['general']['app_classpath_file'] = resolved_configs[0]['general']['app_classpath_file']
+            saved_config['general']['module_name'] = ''
+            self.assertTrue(resolved_configs == [saved_config])
+
+
+
+
+
+        shutil.rmtree(dir_util.get_app_output_dir(app_name))
         modules_names = ['app', 'list', 'utilities']
-
-
-
-
-        config['general']['app_classpath_file'] = 'dummy_path'
-        config['general']['monolith_app_path'] = 'dummy_path'
-        config['generate']['app_build_config_files'] = ['build_file2']
-        config['generate']['app_build_settings_files'] = ['settings_file']
-        #todo - remove the following two lines
-        config['generate']['app_build_config_file'] = build_file2
-        config['generate']['app_build_settings_file'] = settings_file
-        configs_execute_without_app_path = config_util.resolve_tkltest_configs(config, 'execute')
-        self.assertTrue(len(configs_execute_without_app_path) == 1)
-        self.assertTrue(configs_execute_without_app_path == [config])
-
-        config['generate']['app_build_config_files'] = [build_file1, build_file2]
+        #case 3  - generate multi modules
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
-        configs_with_app_path = config_util.resolve_tkltest_configs(config, 'generate')
-        self.assertTrue(len(configs_with_app_path) == 1)
-        self.assertTrue(configs_with_app_path == [config])
-
-
-
-        shutil.rmtree(dir_util.get_app_dir(app_name))
         config['general']['app_classpath_file'] = ''
         config['general']['monolith_app_path'] = ''
+
         configs_generate = config_util.resolve_tkltest_configs(config, 'generate')
+
+        #case 4  - execute with multi modules
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_settings_files'] = [settings_file, settings_file]
+        config['general']['app_classpath_file'] = ''
+        config['general']['monolith_app_path'] = ''
         configs_execute = config_util.resolve_tkltest_configs(config, 'execute')
+
         self.assertTrue(len(configs_generate) == len(modules_names))
         self.assertTrue(len(configs_execute) == len(modules_names))
-        self.assertTrue(os.path.isdir(dir_util.get_app_dir(app_name)))
+        self.assertTrue(os.path.isdir(dir_util.get_app_output_dir(app_name)))
 
         for modules_name in modules_names:
             outdir = dir_util.get_output_dir(app_name, modules_name)
