@@ -27,9 +27,9 @@ TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'lib')
 TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 
 # version of testgen core
-TKLTEST_TESTGEN_CORE_VERSION = '1.0.0'
-TKLTEST_TESTGEN_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
-                                        'tackle-test-generator-core-{}-SNAPSHOT.jar'.format(TKLTEST_TESTGEN_CORE_VERSION))
+TKLTEST_UNIT_CORE_VERSION = '1.1.0'
+TKLTEST_UNIT_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
+                                     'tackle-test-generator-unit-{}.jar'.format(TKLTEST_UNIT_CORE_VERSION))
 
 # suffix for the default test directory name (used if test directory is unspecified)
 # CTD amplified tests
