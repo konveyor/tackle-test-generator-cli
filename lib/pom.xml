@@ -12,7 +12,9 @@
     <junit.version>4.13.1</junit.version>
     <evosuite.version>1.0.7</evosuite.version>
     <randoop.version>4.2.6</randoop.version>
+    <crawljax.version>5.0-frag</crawljax.version>
     <testgencore_unit.version>1.1.0</testgencore_unit.version>
+    <testgencore_ui.version>0.0.1</testgencore_ui.version>
   </properties>
 
   <repositories>
@@ -95,6 +97,16 @@
       <groupId>org.evosuite</groupId>
       <artifactId>evosuite-standalone-runtime</artifactId>
       <version>${evosuite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.konveyor</groupId>
+      <artifactId>tackle-test-generator-ui</artifactId>
+      <version>${testgencore_ui.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.crawljax</groupId>
+      <artifactId>crawljax-examples</artifactId>
+      <version>${crawljax.version}</version>
     </dependency>
   </dependencies>
 

@@ -13,9 +13,14 @@
 
 import argparse
 import logging
+import sys
 
-from .tkltest import *
-from .util.ui import config_options_ui
+import toml
+
+from tkltest.tkltest import *
+from tkltest.util.ui import config_options_ui
+from tkltest.util.logging_util import *
+from tkltest.generate.ui import generate
 
 
 def __add_internal_config_options(loaded_config, internal_options):
@@ -53,6 +58,11 @@ def main():
     logging.debug('Loaded config (including internal options): {}'.format(tkltest_config))
 
     # TODO: process generate/execute commands
+    if args.command == 'generate':
+        generate.process_generate_command(config=tkltest_config)
+    elif args.command == 'execute':
+        tkltest_status('tkltest-ui execute command under development')
+        sys.exit(0)
 
 
 if __name__ == '__main__':  # pragma: no cover
