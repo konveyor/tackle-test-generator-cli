@@ -710,16 +710,16 @@ def __resolve_classpath(tkltest_config, command):
     Args:
          tkltest_config - the configuration - to get the relevant build files, and to update the classpath_file
     """
+    if command not in ["generate", 'execute']:
+        return
     app_name = tkltest_config['general']['app_name']
+    app_classpath_file = tkltest_config['general']['app_classpath_file']
+    if app_classpath_file:
+        return
     app_build_type = tkltest_config['generate']['app_build_type']
     app_build_file = tkltest_config['generate']['app_build_config_file']
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
-    app_classpath_file = tkltest_config['general']['app_classpath_file']
     build_classpath_file = os.path.join(os.getcwd(), app_name + "_build_classpath.txt")
-    if command not in ["generate", 'execute']:
-        return
-    if app_classpath_file:
-        return
 
     if command == 'execute':
         if os.path.isfile(build_classpath_file):
@@ -887,65 +887,85 @@ def __resolve_classpath(tkltest_config, command):
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
 
-def create_modules_tkltest_configs(tkltest_user_config):
+
+
+def resolve_tkltest_configs(tkltest_user_config, command):
     '''
-    creates a config for modules
+    creates the configs that we are going to run on
     :param tkltest_user_config: the user config that he wrote at the toml file
     :return: a list of configs, per generate/execute
     '''
 
-    tkltest_user_config['general']['module_name'] = ''
-    # todo: support ant at get_modules_properties, and remove this if
-    if tkltest_user_config['generate']['app_build_type'] == 'ant':
-        return [tkltest_user_config]
-    if not tkltest_user_config['generate']['app_build_config_files']:
-        return [tkltest_user_config]
     app_name = tkltest_user_config['general']['app_name']
-    #first read the properties from the build file
+    tkltest_config_file_sofix ='_generated_tkltest_config.toml'
+    tkltest_user_config['general']['module_name'] = ''
+    if command != 'generate':
+        app_dir = dir_util.get_app_dir(app_name)
+        toml_files = list( pathlib.Path(app_dir).glob('**/*' + tkltest_config_file_sofix))
+        if toml_files:
+             tkltest_configs = [toml.load(toml_file) for toml_file in toml_files]
+             return tkltest_configs
+        else:
+            #todo - this is just a comment, sould be an error if we drop backword competability:
+            tkltest_status('Could not find any generated toml files created by generate')
+            tkltest_configs = [tkltest_user_config]
+    elif tkltest_user_config['generate']['app_build_type'] == 'ant':
+        tkltest_configs = [tkltest_user_config]
+    elif not tkltest_user_config['generate']['app_build_config_files']:
+        tkltest_configs = [tkltest_user_config]
+    elif tkltest_user_config['general']['monolith_app_path']:
+        tkltest_configs = [tkltest_user_config]
+    else:
+        tkltest_configs = __resolve_modules_properties_into_tkltest_configs(tkltest_user_config)
+
+    for tkltest_config in tkltest_configs:
+        module_name = tkltest_config['general']['module_name']
+
+        __resolve_app_path(tkltest_config)
+        __resolve_classpath(tkltest_config, command)
+        if command == 'generate':
+            tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
+                                            app_name + '_' + module_name + tkltest_config_file_sofix)
+            with open(tkltest_config_file, 'w') as f:
+                toml.dump(tkltest_config, f)
+    return tkltest_configs
+
+def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config):
+    app_name = tkltest_user_config['general']['app_name']
+    # we first read the properties from the build file
     modules_properties = get_modules_properties(tkltest_user_config)
-    if len(modules_properties) == 0:
+    if not modules_properties:
         tkltest_status('Failed to automatically obtain modules from user build files', error=True)
         sys.exit(1)
-    if len(modules_properties) == 1:
-        # we have only one module, will run it under the app directory, and it has no module name
-        module_properties = modules_properties[0]
-        if not tkltest_user_config['general']['monolith_app_path']:
-            tkltest_user_config['general']['monolith_app_path'] = module_properties['app_path']
-        if not tkltest_user_config['general']['app_classpath_file'] and module_properties['classpath']:
-            build_classpath_file = os.path.join(dir_util.get_output_dir(app_name), app_name + "_build_classpath.txt")
-            with open(build_classpath_file, 'w') as f:
-                f.write('\n'.join(module_properties['classpath']))
-            tkltest_user_config['general']['app_classpath_file'] = build_classpath_file
-        return [tkltest_user_config]
 
-    # we have more than one module
+    multi_modules = len(modules_properties) > 1
     tkltest_configs = []
     for module_properties in modules_properties:
-        module_name = module_properties['name']
+        module_name = module_properties['name'] if multi_modules else ''
         tkltest_config = copy.deepcopy(tkltest_user_config)
         tkltest_config['general']['module_name'] = module_name
         tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
-        tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
-        if 'user_settings_file' in module_properties.keys():
-            tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
-        if tkltest_config['general']['test_directory']:
-            tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
-        if tkltest_config['general']['reports_path']:
-            tkltest_config['general']['reports_path'] = os.path.join(tkltest_config['general']['reports_path'], module_name)
+        if multi_modules:
+            tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
+            if 'user_settings_file' in module_properties.keys():
+                tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
+            if tkltest_config['general']['test_directory']:
+                tkltest_config['general']['test_directory'] = os.path.join(tkltest_config['general']['test_directory'], module_name)
+            if tkltest_config['general']['reports_path']:
+                tkltest_config['general']['reports_path'] = os.path.join(tkltest_config['general']['reports_path'], module_name)
 
         if module_properties['classpath']:
-            build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name), module_name + "_build_classpath.txt")
-            with open(build_classpath_file, 'w') as f:
-                f.write('\n'.join(module_properties['classpath']))
-            tkltest_config['general']['app_classpath_file'] = build_classpath_file
-
-        tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
-                                            module_name + "_tkltest_config.toml")
-        with open(tkltest_config_file, 'w') as f:
-            toml.dump(tkltest_config, f)
+            if multi_modules or not tkltest_user_config['general']['app_classpath_file']:
+                build_classpath_file = os.path.join(dir_util.get_output_dir(app_name, module_name), app_name + '_' + module_name + "_build_classpath.txt")
+                with open(build_classpath_file, 'w') as f:
+                    f.write('\n'.join(module_properties['classpath']))
+                tkltest_config['general']['app_classpath_file'] = build_classpath_file
 
         tkltest_configs.append(tkltest_config)
+
     return tkltest_configs
+
+
 
 def get_modules_properties(tkltest_user_config):
     '''
@@ -1090,6 +1110,7 @@ def get_modules_properties(tkltest_user_config):
     return modules
 
 
+# todo - remove this function
 def fix_config(tkltest_config, command):
     """
     fix the config before running generate
@@ -1100,7 +1121,9 @@ def fix_config(tkltest_config, command):
     Returns:
 
     """
+    #todo - can we move the following the the line to resolve_tkltest_configs()
     __fix_relative_paths(tkltest_config)
+    #todo - to remove the following two
     __resolve_app_path(tkltest_config)
     __resolve_classpath(tkltest_config, command)
 
