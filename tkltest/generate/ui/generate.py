@@ -116,11 +116,15 @@ def __cleanup_browser_instances(browser):
 def __kill_processes(proc_names):
     """Kills process with the given names"""
     for proc in psutil.process_iter():
-        procname = proc.name()
-        if procname in proc_names:
-            logging.info('Killing {} instance'.format(procname))
-            try:
-                proc.kill()
-            except ProcessLookupError:
-                logging.info('Could not find process "{}"'.format(procname))
-                pass
+        try:
+            procname = proc.name()
+        except (psutil.ZombieProcess, psutil.NoSuchProcess):
+            pass
+        else:
+            if procname in proc_names:
+                logging.info('Killing {} instance'.format(procname))
+                try:
+                    proc.kill()
+                except Exception:
+                    logging.info('Error terminating process "{}"'.format(procname))
+                    pass
