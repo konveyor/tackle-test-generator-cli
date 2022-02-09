@@ -64,11 +64,12 @@ def process_generate_command(config):
     tkltest_status('Running UI test generator with config: app={}, url="{}", time_limit={}min, browser={}'.format(
         app_name, app_url, time_limit, browser
     ))
+    # TODO: run command in a separate thread; the main thread can then monitor progress on the file system
     command_util.run_command(command=uitestgen_command, verbose=verbose)
 
-    # TODO: print progress messages: states discovered, %time
+    # TODO: print progress messages: number of states discovered, percent time elapsed
 
-    # TODO: print info about generated tests
+    # print info about generated tests
     tkltest_status('Crawl results written to {}'.format(
         __get_crawl_output_dir(app_name=app_name, app_url=app_url, time_limit=time_limit)))
     test_count, test_class_file = __get_generated_test_count(app_name=app_name, app_url=app_url, time_limit=time_limit)
@@ -83,6 +84,7 @@ def __run_ui_test_generator(command, verbose):
 
 
 def __get_crawl_output_dir(app_name, app_url, time_limit):
+    """Returns the crawl root directory for AUT for the latest run"""
     hostport = urllib.parse.urlparse(app_url).netloc
     output_crawl_dirs = os.path.join(TKLTEST_UI_OUTPUT_DIR_PREFIX + app_name,
                                     '{}_{}_{}mins'.format(app_name, hostport.split(':')[0], time_limit),
@@ -91,6 +93,10 @@ def __get_crawl_output_dir(app_name, app_url, time_limit):
 
 
 def __get_generated_test_count(app_name, app_url, time_limit):
+    """Returns the number of generated test cases
+
+    Computes test case count by counting @Test annotations in the genearted test class file
+    """
     last_crawl_dir = __get_crawl_output_dir(app_name=app_name, app_url=app_url, time_limit=time_limit)
     generated_test_class = os.path.join(last_crawl_dir, 'src', 'test', 'java', 'generated', 'GeneratedTests.java')
     with open(generated_test_class, 'r') as f:
