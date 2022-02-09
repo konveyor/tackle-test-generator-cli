@@ -166,4 +166,3 @@ CRAWLJAX_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'crawljax-examples-{}.j
 ANTLR_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'antlr4-runtime-4.7.2.jar')
 COMMONS_CLI_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'commons-cli-1.4.jar')
 TOML_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'tomlj-1.0.0.jar')
-

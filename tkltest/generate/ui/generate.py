@@ -11,9 +11,12 @@
 # limitations under the License.
 # ***************************************************************************
 
+import glob
 import logging
 import os.path
+import re
 import sys
+import urllib.parse
 
 import psutil
 import toml
@@ -36,8 +39,9 @@ def process_generate_command(config):
 
     app_name = config['general']['app_name']
     app_url = config['general']['app_url']
-    browser = config['generate']['browser']
     verbose = config['general']['verbose']
+    browser = config['generate']['browser']
+    time_limit = config['generate']['time_limit']
 
     # write config (with internal options added) to toml file to be passed as argument to the crawljax runner
     config_file_name = '__{}_tkltest_ui_config.toml'.format(config['general']['app_name'])
@@ -58,22 +62,49 @@ def process_generate_command(config):
     logging.info(uitestgen_command)
 
     tkltest_status('Running UI test generator with config: app={}, url="{}", time_limit={}min, browser={}'.format(
-        app_name, app_url, config['generate']['time_limit'], browser
+        app_name, app_url, time_limit, browser
     ))
     command_util.run_command(command=uitestgen_command, verbose=verbose)
 
+    # TODO: print progress messages: states discovered, %time
+
     # TODO: print info about generated tests
-    output_dir = TKLTEST_UI_OUTPUT_DIR_PREFIX + app_name
+    tkltest_status('Crawl results written to {}'.format(
+        __get_crawl_output_dir(app_name=app_name, app_url=app_url, time_limit=time_limit)))
+    test_count, test_class_file = __get_generated_test_count(app_name=app_name, app_url=app_url, time_limit=time_limit)
+    tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
 
     # cleanup browser instances
     __cleanup_browser_instances(browser)
 
 
+def __run_ui_test_generator(command, verbose):
+    pass
+
+
+def __get_crawl_output_dir(app_name, app_url, time_limit):
+    hostport = urllib.parse.urlparse(app_url).netloc
+    output_crawl_dirs = os.path.join(TKLTEST_UI_OUTPUT_DIR_PREFIX + app_name,
+                                    '{}_{}_{}mins'.format(app_name, hostport.split(':')[0], time_limit),
+                                    'crawl*')
+    return sorted(glob.iglob(output_crawl_dirs), key=os.path.getctime, reverse=True)[0]
+
+
+def __get_generated_test_count(app_name, app_url, time_limit):
+    last_crawl_dir = __get_crawl_output_dir(app_name=app_name, app_url=app_url, time_limit=time_limit)
+    generated_test_class = os.path.join(last_crawl_dir, 'src', 'test', 'java', 'generated', 'GeneratedTests.java')
+    with open(generated_test_class, 'r') as f:
+        teststr = f.read()
+    return len(re.findall('@Test', teststr)), generated_test_class
+
+
 def __cleanup_browser_instances(browser):
     """Performs process cleanup based on platform and browser"""
     if browser in ['chrome', 'chrome_headless']:
-        if sys.platform in ['darwin', 'linux', 'linux2']:
-            __kill_processes(['chromedriver'])
+        if sys.platform == 'darwin':
+            __kill_processes(['chromedriver', 'chrome'])
+        elif sys.platform in ['linux', 'linux2']:
+             __kill_processes(['chromedriver'])
         elif sys.platform in ['win32', 'win64']:
             # TODO: check
             __kill_processes(['chromedriver.exe'])
@@ -85,6 +116,11 @@ def __cleanup_browser_instances(browser):
 def __kill_processes(proc_names):
     """Kills process with the given names"""
     for proc in psutil.process_iter():
-        if proc.name() in proc_names:
-            logging.info('Killing {} instance'.format(proc.name()))
-            proc.kill()
+        procname = proc.name()
+        if procname in proc_names:
+            logging.info('Killing {} instance'.format(procname))
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                logging.info('Could not find process "{}"'.format(procname))
+                pass
