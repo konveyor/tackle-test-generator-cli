@@ -249,7 +249,7 @@ class UnitTests(unittest.TestCase):
         self.__assert_modules_properties(modules_names, modules)
 
     def test_getting_modules_configs(self) -> None:
-        """Test getting list of modules using gradle build file"""
+        """Test getting the configs for modules"""
         dir_util.cd_cli_dir()
         base_config = {}
         base_config['general'] = {}
@@ -280,15 +280,17 @@ class UnitTests(unittest.TestCase):
         2. we run execute - however, we did not split the user config during generate command 
         3. we have only one module
         '''
+        # case 1
         configs_to_test = []
         config = copy.deepcopy(base_config)
         config['general']['monolith_app_path'] = 'dummy_path'
         configs_to_test.append((config, 'gernerate'))
 
+        # case 2
         config = copy.deepcopy(base_config)
         configs_to_test.append((config, 'execute'))
 
-
+        # case 3
         config = copy.deepcopy(base_config)
         config['generate']['app_build_config_files'] = [build_file_list]
         config['generate']['app_build_settings_files'] = []
@@ -297,9 +299,8 @@ class UnitTests(unittest.TestCase):
         config['generate']['app_build_settings_file'] = ''
         configs_to_test.append((config, 'generate'))
 
-
+        shutil.rmtree(dir_util.get_app_output_dir(app_name))
         for config, command in configs_to_test:
-            shutil.rmtree(dir_util.get_app_output_dir(app_name))
             saved_config = copy.deepcopy(config)
             if not config['generate']['app_build_settings_files']:
                 os.rename(settings_file, settings_file + '.bkp')

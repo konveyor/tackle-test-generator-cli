@@ -70,7 +70,6 @@ def delete_app_output(app_name):
     for filename in os.listdir('.'):
         if filename.startswith(app_name):
             continue
-        #todo do not delete modules things
         try:
             if os.path.isfile(filename) or os.path.islink(filename):
                 os.unlink(filename)
