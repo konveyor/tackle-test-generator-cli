@@ -284,7 +284,7 @@ class UnitTests(unittest.TestCase):
         configs_to_test = []
         config = copy.deepcopy(base_config)
         config['general']['monolith_app_path'] = 'dummy_path'
-        configs_to_test.append((config, 'gernerate'))
+        configs_to_test.append((config, 'generate'))
 
         # case 2
         config = copy.deepcopy(base_config)
@@ -301,6 +301,7 @@ class UnitTests(unittest.TestCase):
 
         shutil.rmtree(dir_util.get_app_output_dir(app_name))
         for config, command in configs_to_test:
+            print('bbb {} {}'.format(command, str(config)))
             saved_config = copy.deepcopy(config)
             if not config['generate']['app_build_settings_files']:
                 os.rename(settings_file, settings_file + '.bkp')

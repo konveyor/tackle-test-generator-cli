@@ -714,23 +714,23 @@ def __resolve_classpath(tkltest_config, command):
     Args:
          tkltest_config - the configuration - to get the relevant build files, and to update the classpath_file
     """
-    if command not in ["generate", 'execute']:
-        return
     app_name = tkltest_config['general']['app_name']
-    app_classpath_file = tkltest_config['general']['app_classpath_file']
-    if app_classpath_file:
-        return
     app_build_type = tkltest_config['generate']['app_build_type']
     app_build_file = tkltest_config['generate']['app_build_config_file']
     app_settings_file = tkltest_config['generate']['app_build_settings_file']
+    app_classpath_file = tkltest_config['general']['app_classpath_file']
     build_classpath_file = os.path.join(os.getcwd(), app_name + "_build_classpath.txt")
+    if command not in ["generate", 'execute']:
+        return
+    if app_classpath_file:
+        return
 
     if command == 'execute':
         if os.path.isfile(build_classpath_file):
             tkltest_config['general']['app_classpath_file'] = build_classpath_file
             return
         else:
-            tkltest_status('app_classpath_file is missing for execute run {}\n'.format(build_classpath_file), error=True)
+            tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
 
     # create dependencies directory
