@@ -889,13 +889,12 @@ def __resolve_classpath(tkltest_config, command):
                 classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
-    tkltest_status('created an app path {}\n'.format(build_classpath_file))
 
 def resolve_tkltest_configs(tkltest_user_config, command):
     '''
     creates the configs that we are going to run on.
      we need to:
-      1. resolve some missing patameters (app apth, class path)
+      1. resolve some missing parameters (app apth, class path)
       2. see if there is more than one module, and create a toml per module
     :param tkltest_user_config: the user config that he wrote at the toml file
     :param command: the command to be run
@@ -938,20 +937,12 @@ def resolve_tkltest_configs(tkltest_user_config, command):
             return [tkltest_user_config]
         
         # here we got more than one module, we will create a config per module, and save it in a toml file
-        tkltest_configs = __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties)
+        tkltest_configs = __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_properties, command, tkltest_config_file_suffix)
         tkltest_status('Obtained {} modules from the build files. creating a config file per module.'.format(len(tkltest_configs)))
-        for tkltest_config in tkltest_configs:
-            module_name = tkltest_config['general']['module_name']
-            __resolve_classpath(tkltest_config, command)
-            tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
-                                           app_name + '_' + module_name + tkltest_config_file_suffix)
-            with open(tkltest_config_file, 'w') as f:
-                toml.dump(tkltest_config, f)
-
         return tkltest_configs
 
 
-def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties):
+def __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_properties, command, tkltest_config_file_suffix):
     '''
     create a config per module, and update the config with the module properties
     :param tkltest_user_config:
@@ -979,7 +970,12 @@ def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modul
             with open(build_classpath_file, 'w') as f:
                 f.write('\n'.join(module_properties['classpath']))
             tkltest_config['general']['app_classpath_file'] = build_classpath_file
-
+        else:
+            __resolve_classpath(tkltest_config, command)
+        tkltest_config_file = os.path.join(dir_util.get_output_dir(app_name, module_name),
+                                           app_name + '_' + module_name + tkltest_config_file_suffix)
+        with open(tkltest_config_file, 'w') as f:
+            toml.dump(tkltest_config, f)
         tkltest_configs.append(tkltest_config)
 
     return tkltest_configs
