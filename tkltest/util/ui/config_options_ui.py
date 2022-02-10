@@ -64,7 +64,7 @@ __options_spec = {
             'required': True,
             'is_toml_option': True,
             'is_cli_option': True,
-            'short_name': '-au',
+            'short_name': '-u',
             'long_name': '--app-url',
             'type': str,
             'default_value': '',
@@ -161,14 +161,16 @@ __options_spec = {
             'short_name': '-b',
             'long_name': '--browser',
             'type': str,
-            'choices': ['chrome', 'chrome_headless', 'firefox', 'firefox_headless', 'phantomjs'],
+            'choices': ['chrome', 'chrome_headless', 'firefox', 'firefox_headless'],
             'default_value': 'chrome',
             'help_message': 'browser on which to launch app under test for crawling and test generation; default is chrome'
         },
         'time_limit': {
             'required': False,
             'is_toml_option': True,
-            'is_cli_option': False,
+            'is_cli_option': True,
+            'short_name': '-t',
+            'long_name': '--time-limit',
             'type': int,
             'default_value': 5,
             'help_message': 'maximum crawl time (in minutes); default is 5 min'
@@ -214,7 +216,7 @@ __options_spec = {
             'default_value': 500,
             'help_message': 'the time to wait (in milliseconds) after URL load; default is 500; default is 500ms'
         },
-        'click_dont_click_spec_file': {
+        'clickables_spec_file': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
