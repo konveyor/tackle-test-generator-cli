@@ -17,7 +17,8 @@ setup(
         'yattag==1.14.0',
         'jinja2==3.0.2',
         'bs4==0.0.1',
-        'kaitaistruct==0.9'
+        'kaitaistruct==0.9',
+        'psutil==5.9.0'
     ],
     entry_points={
         "console_scripts": [
