@@ -730,7 +730,7 @@ def __resolve_classpath(tkltest_config, command):
             tkltest_config['general']['app_classpath_file'] = build_classpath_file
             return
         else:
-            tkltest_status('app_classpath_file is missing for execute run\n', error=True)
+            tkltest_status('app_classpath_file is missing for execute run {}\n'.format(build_classpath_file), error=True)
             sys.exit(1)
 
     # create dependencies directory
@@ -889,7 +889,7 @@ def __resolve_classpath(tkltest_config, command):
                 classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
-
+    tkltest_status('created an app path {}\n'.format(build_classpath_file))
 
 def resolve_tkltest_configs(tkltest_user_config, command):
     '''
