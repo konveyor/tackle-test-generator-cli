@@ -16,20 +16,6 @@ import shutil
 from ..constants import *
 
 
-output_to_cli_path_fix = ''
-
-def get_output_to_cli_path_fix():
-    global output_to_cli_path_fix
-    return output_to_cli_path_fix
-
-def __set_output_to_cli_path_fix_for_module(module_name):
-    global output_to_cli_path_fix
-    if module_name:
-        output_to_cli_path_fix = os.path.join('..', '..')
-    else:
-        output_to_cli_path_fix = '..'
-
-
 def cd_cli_dir():
     os.chdir(TKLTEST_CLI_DIR)
 
@@ -45,8 +31,6 @@ def get_output_dir(app_name, module_name=''):
     output_dir = get_app_output_dir(app_name)
     if module_name:
         output_dir = os.path.join(output_dir, module_name)
-
-    __set_output_to_cli_path_fix_for_module(module_name)
     # creating output dir if not exist
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)

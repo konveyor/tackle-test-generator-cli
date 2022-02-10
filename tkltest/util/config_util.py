@@ -286,43 +286,43 @@ def __merge_config(base_config, update_config):
             base_config[key] = val
 
 
-def __fix_relative_path(path):
-    if path != "" and not os.path.isabs(path):
-        return os.path.join(dir_util.get_output_to_cli_path_fix(), path)
+def __fix_relative_path(path, path_fix):
+    if path != '' and not os.path.isabs(path):
+        return os.path.join(path_fix, path)
     return path
 
 
-def __fix_relative_paths_recursively(options_spec, config):
+def __fix_relative_paths_recursively(options_spec, config, path_fix):
 
     for option_name, options in options_spec.items():
         if type(options) is not dict:
             continue
         if option_name == 'subcommands':
             for subcommands_option_name, subcommands_option in options.items():
-                __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name])
+                __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name], path_fix)
             return
         if option_name not in config.keys():
             continue
         fix_type = options_spec[option_name].get('relpath_fix_type', 'none')
         if fix_type == 'path':
             if options_spec[option_name].get('type') == str:
-                config[option_name] = __fix_relative_path(config[option_name])
+                config[option_name] = __fix_relative_path(config[option_name], path_fix)
             else:
-                config[option_name] = [__fix_relative_path(path) for path in config[option_name]]
+                config[option_name] = [__fix_relative_path(path, path_fix) for path in config[option_name]]
         elif fix_type == 'paths_list_file':
-            classpath_file = __fix_relative_path(config[option_name])
+            classpath_file = __fix_relative_path(config[option_name], path_fix)
 
             if classpath_file != "":
                 with open(classpath_file) as file:
                     lines = file.readlines()
-                lines = [__fix_relative_path(path) for path in lines if path.strip()]
+                lines = [__fix_relative_path(path, path_fix) for path in lines if path.strip()]
                 new_file = os.path.basename(classpath_file)
                 #todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
                     f.writelines(lines)
                 config[option_name] = new_file
         else:
-            __fix_relative_paths_recursively(options, config[option_name])
+            __fix_relative_paths_recursively(options, config[option_name], path_fix)
 
 
 def __fix_relative_paths(tkltest_config):
@@ -336,7 +336,11 @@ def __fix_relative_paths(tkltest_config):
     options_spec = config_options.get_options_spec()
     if tkltest_config.get('relative_fixed', False) == True:
         return
-    __fix_relative_paths_recursively(options_spec, tkltest_config)
+    if tkltest_config.get('module_name', ''):
+        path_fix = os.path.join('..', '..')
+    else:
+        path_fix = '..'
+    __fix_relative_paths_recursively(options_spec, tkltest_config, path_fix)
     tkltest_config['relative_fixed'] = True
 
 
