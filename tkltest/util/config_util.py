@@ -889,22 +889,28 @@ def __resolve_classpath(tkltest_config, command):
 
 def resolve_tkltest_configs(tkltest_user_config, command):
     '''
-    creates the configs that we are going to run on
+    creates the configs that we are going to run on.
+     we need to:
+      1. resolve some missing patameters (app apth, class path)
+      2. see if there is more than one module, and create a toml per module
     :param tkltest_user_config: the user config that he wrote at the toml file
-    :return: a list of configs, per generate/execute
+    :param command: the command to be run
+    :return: a list of tkltest_configs, each will be run with generate/execute command
     '''
-
     app_name = tkltest_user_config['general']['app_name']
     tkltest_config_file_suffix = '_generated_tkltest_config.toml'
     if tkltest_user_config['generate']['app_build_type'] == 'ant' or \
             not tkltest_user_config['generate']['app_build_config_files'] or \
             tkltest_user_config['general']['monolith_app_path']:
+        # this is the case in we can not try to get the modules (ant, no user build file), or already have app_path.
         if 'module_name' not in tkltest_user_config['general']:
+            # we might get a 'module_name', in the case that the user gives us a toml file that we created on generate
             tkltest_user_config['general']['module_name'] = ''
         __resolve_app_path(tkltest_user_config)
         __resolve_classpath(tkltest_user_config, command)
         return [tkltest_user_config]
     elif command != 'generate':
+        # it is not a generate - we will not look modules. we will look for toml files that was created during generate
         toml_files = list(pathlib.Path(dir_util.get_app_output_dir(app_name)).glob('**/*' + tkltest_config_file_suffix))
         if toml_files:
             tkltest_status('Running on {} config files that were created by the generate command  '.format(len(toml_files)))
@@ -915,20 +921,21 @@ def resolve_tkltest_configs(tkltest_user_config, command):
             __resolve_classpath(tkltest_user_config, command)
             return [tkltest_user_config]
     else:
-        # we first read the properties from the build file
+        # we first obtain the module properties from the build file
         modules_properties = get_modules_properties(tkltest_user_config)
         if not modules_properties:
             tkltest_status('Failed to automatically obtain modules from user build files', error=True)
             sys.exit(1)
         if len(modules_properties) == 1:
+            # we have only one module - we will use the user config
             tkltest_user_config['general']['module_name'] = ''
             __resolve_app_path(tkltest_user_config)
             __resolve_classpath(tkltest_user_config, command)
             return [tkltest_user_config]
-
+        
+        # here we got more than one module, we will create a config per module, and save it in a toml file
         tkltest_configs = __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties)
         tkltest_status('Obtained {} modules from the build files. creating a config file per module.'.format(len(tkltest_configs)))
-        # todo - print to the user
         for tkltest_config in tkltest_configs:
             module_name = tkltest_config['general']['module_name']
             __resolve_classpath(tkltest_config, command)
@@ -941,6 +948,12 @@ def resolve_tkltest_configs(tkltest_user_config, command):
 
 
 def __resolve_modules_properties_into_tkltest_configs(tkltest_user_config, modules_properties):
+    '''
+    create a config per module, and update the config with the module properties
+    :param tkltest_user_config:
+    :param modules_properties:
+    :return:
+    '''
     app_name = tkltest_user_config['general']['app_name']
     tkltest_configs = []
     for module_properties in modules_properties:

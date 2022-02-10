@@ -274,51 +274,66 @@ class UnitTests(unittest.TestCase):
         base_config['generate']['app_build_config_file'] = build_file_app
         base_config['generate']['app_build_settings_file'] = settings_file
 
-        for case in ['we have app_path', 'execute without generated toml', 'only one module']:
+        '''
+        here we check three cases, in all these cases, we should not split the config from the user to different modules: 
+        1. we already have app_path from the user, so we do not look for modules
+        2. we run execute - however, we did not split the user config during generate command 
+        3. we have only one module
+        '''
+        configs_to_test = []
+        config = copy.deepcopy(base_config)
+        config['general']['monolith_app_path'] = 'dummy_path'
+        configs_to_test.append((config, 'gernerate'))
+
+        config = copy.deepcopy(base_config)
+        configs_to_test.append((config, 'execute'))
+
+
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list]
+        config['generate']['app_build_settings_files'] = []
+        # todo - remove the following two lines:
+        config['generate']['app_build_config_file'] = build_file_list
+        config['generate']['app_build_settings_file'] = ''
+        configs_to_test.append((config, 'generate'))
+
+
+        for config, command in configs_to_test:
             shutil.rmtree(dir_util.get_app_output_dir(app_name))
-            config = copy.deepcopy(base_config)
-            if case == 'we have app_path':
-                config['general']['monolith_app_path'] = 'dummy_path'
-            if case == 'only one module':
-                config['generate']['app_build_config_files'] = [build_file_list]
-                config['generate']['app_build_settings_files'] = []
-                # todo - remove the following two lines:
-                config['generate']['app_build_config_file'] = build_file_list
-                config['generate']['app_build_settings_file'] = ''
-                os.rename(settings_file, settings_file + '.bkp')
             saved_config = copy.deepcopy(config)
-            if case == 'execute without generated toml':
-                resolved_configs = config_util.resolve_tkltest_configs(config, 'execute')
-            else:
-                resolved_configs = config_util.resolve_tkltest_configs(config, 'generate')
-            if case == 'only one module':
+            if not config['generate']['app_build_settings_files']:
+                os.rename(settings_file, settings_file + '.bkp')
+                resolved_configs = config_util.resolve_tkltest_configs(config, command)
                 os.rename(settings_file + '.bkp', settings_file)
-
-            self.assertTrue(len(resolved_configs) == 1)
-            self.assertTrue(os.path.isfile(resolved_configs[0]['general']['app_classpath_file']))
-
-            if case == 'we have app_path':
-                self.assertTrue(resolved_configs[0]['general']['monolith_app_path'] == 'dummy_path')
             else:
-                if case == 'only one module':
-                    self.assertTrue(len(resolved_configs[0]['general']['monolith_app_path']) == 1)
-                else:
-                    self.assertTrue(len(resolved_configs[0]['general']['monolith_app_path']) == 3)
-                for path in resolved_configs[0]['general']['monolith_app_path']:
-                    self.assertTrue(os.path.isdir(path))
-                saved_config['general']['monolith_app_path'] = resolved_configs[0]['general']['monolith_app_path']
+                resolved_configs = config_util.resolve_tkltest_configs(config, command)
 
-            saved_config['general']['app_classpath_file'] = resolved_configs[0]['general']['app_classpath_file']
-            saved_config['general']['module_name'] = ''
-            self.assertTrue(resolved_configs == [saved_config])
+        self.assertTrue(len(resolved_configs) == 1)
+        resolved_config = resolved_configs[0]
+        self.assertTrue(os.path.isfile(resolved_config['general']['app_classpath_file']))
 
+        if not config['generate']['app_build_settings_files']:
+            self.assertTrue(len(resolved_config['general']['monolith_app_path']) == 1)
+        else:
+            self.assertTrue(len(resolved_config['general']['monolith_app_path']) == 3)
 
+        if saved_config['general']['monolith_app_path']:
+            self.assertTrue(resolved_config['general']['monolith_app_path'] == saved_config['general']['monolith_app_path'])
+        else:
+            for path in resolved_config['general']['monolith_app_path']:
+                self.assertTrue(os.path.isdir(path))
 
+        saved_config['general']['monolith_app_path'] = resolved_config['general']['monolith_app_path']
+        saved_config['general']['app_classpath_file'] = resolved_config['general']['app_classpath_file']
+        saved_config['general']['module_name'] = ''
+        self.assertTrue(resolved_configs == [saved_config])
 
-
+        '''
+        here are two more cases: now we check that modules configs are generate during the generate command.
+        and that the same configs are loaded during the execute command
+        '''
         shutil.rmtree(dir_util.get_app_output_dir(app_name))
         modules_names = ['app', 'list', 'utilities']
-        #case 3  - generate multi modules
         config = copy.deepcopy(base_config)
         config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
@@ -327,7 +342,6 @@ class UnitTests(unittest.TestCase):
 
         configs_generate = config_util.resolve_tkltest_configs(config, 'generate')
 
-        #case 4  - execute with multi modules
         config = copy.deepcopy(base_config)
         config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
