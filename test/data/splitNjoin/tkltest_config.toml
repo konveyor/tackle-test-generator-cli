@@ -6,8 +6,6 @@ name = "TKLTEST_CONFIG_FILE"
     #monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
     # JDK home directory
     java_jdk_home = ""
-    test_directory = 'SNJ_test'
-    report_directory = 'SNJ_report'
 
 
 [generate]
@@ -21,8 +19,6 @@ time_limit = 10
 app_build_type = 'gradle'
 app_build_config_file = "test/data/splitNjoin/app/build.gradle"
 app_build_settings_file = "test/data/splitNjoin/settings.gradle"
-app_build_config_files = ["test/data/splitNjoin\\list/build.gradle", "test\\data/splitNjoin/app/build.gradle" ]
-app_build_settings_files = ["test/data/splitNjoin/settings.gradle", "test\\data/splitNjoin/settings.gradle" ]
 
 [execute]
 app_packages = ['splitNjoin.*']
