@@ -86,7 +86,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         base_ctd_coverage=base_test_coverage,
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
-        report_dir=report_dir
+        report_dir=report_dir,
+        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
     )
 
     if test_class_augment_pool:
@@ -102,7 +103,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         base_ctd_coverage=base_test_coverage,
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
-        report_dir=report_dir
+        report_dir=report_dir,
+        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
     final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
@@ -308,7 +310,7 @@ def __get_test_method_count(test_dir):
 
 
 def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, class_files,
-                                       raw_cov_dir, report_dir):
+                                       raw_cov_dir, report_dir, max_memory):
     """Computes coverage delta for each test class in the augment pool of tests.
 
     Computes for each test class in the test augment pool additional instruction, line, and branch coverage that
@@ -359,7 +361,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
                                                                               main_coverage_dir=main_coverage_dir,
                                                                               class_files=class_files,
                                                                               base_coverage=base_ctd_coverage,
-                                                                              remove_merged_cov_file=True)
+                                                                              remove_merged_cov_file=True,
+                                                                              max_memory=max_memory)
             #coverage_delta = coverage_util.get_coverage_for_test_suite(
             #    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
             #    report_dir=report_dir, base_coverage=base_ctd_coverage)
@@ -381,7 +384,7 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
 
 
 def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, class_files,
-                             raw_cov_dir, report_dir):
+                             raw_cov_dir, report_dir, max_memory):
     """Augments CTD test suite with tests that contribute to additional coverage.
 
     Iterates over test classes that contribute to coverage gain, and adds them to the augmented test suite
@@ -440,7 +443,8 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
                     ctd_raw_cov_file=current_raw_cov_file,
                     main_coverage_dir=main_coverage_dir, class_files=class_files,
                     base_coverage=curr_coverage,
-                    remove_merged_cov_file=first)
+                    remove_merged_cov_file=first,
+                    max_memory=max_memory)
                 first = False
             except subprocess.CalledProcessError as e:
                 logging.error('Error merging augmented test suite with class {}: {}'.format(test_class, e))

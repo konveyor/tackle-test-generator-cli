@@ -174,7 +174,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
 
 def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_dir, base_coverage, class_files,
-                       remove_merged_cov_file):
+                       remove_merged_cov_file, max_memory):
 
     """Merges two raw coverage data files and returns delta coverage information between respective test suites
 
@@ -208,13 +208,13 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
     try:
-        command_util.run_command("java -Xmx2048m -jar {} merge {} {} --destfile {}".
+        command_util.run_command("java -Xmx"+str(max_memory)+"m -jar {} merge {} {} --destfile {}".
                              format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
                                     output_exec_file), verbose=True)
     except subprocess.CalledProcessError as e:
         # If merging failed we skip current test file and assume it resulted in zero delta coverage
         # The reason to continue is that we may still gain from previous augmenting test files
-        tkltest_status('Merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr))
+        tkltest_status('Warning: merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr))
         return {
                    'instruction_cov_delta': 0,
                    'line_cov_delta': 0,
