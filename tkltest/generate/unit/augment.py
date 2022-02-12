@@ -69,7 +69,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
             build_type=build_type,
             report_dir=report_dir,
             class_files=config['general']['monolith_app_path'],
-            dev_tests=dev_tests,
+            dev_tests=dev_tests
     )
 
     if not has_coverage:
