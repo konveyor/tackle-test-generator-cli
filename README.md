@@ -81,7 +81,7 @@ directory:
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
 ```
 ```buildoutcfg
-docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
+docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
 ```
 
 Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
@@ -96,8 +96,11 @@ one of the following:
 alias tkltest='docker-compose run --rm tkltest-cli'
 ```
 ```buildoutcfg
-alias tkltest='docker run --rm -it -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
+alias tkltest='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
 ```
+
+If you are using a published TackleTest image ([TackleTest container images](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli)),
+specify `ghcr.io/konveyor/tackle-test-generator-cli` as the image name in the alias command.
 
 ### Running the CLI from local installation
 
