@@ -83,5 +83,6 @@ jobs:
         pip install .
         which tkltest-ui
         bats test/ui/test_cli.bats
-        bats test/ui/test_cli_generate.bats
+        tkltest-ui --verbose --config-file ./test/ui/data/petclinic/tkltest_ui_config.toml --test-directory ./__tkltest-output-ui-petclinic generate
+        ls -l ./__tkltest-output-ui-petclinic/**
         deactivate
