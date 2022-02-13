@@ -65,7 +65,7 @@ def main():
         if args.command == 'execute':
             execute.process_execute_command(args, tkltest_config)
         elif args.command == 'generate':
-            generate.process_generate_command(args, tkltest_config)
+             generate.process_generate_command(args, tkltest_config)
     finally:
         for path in unjar_paths:
             if os.path.isdir(path):

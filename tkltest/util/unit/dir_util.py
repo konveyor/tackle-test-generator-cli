@@ -13,42 +13,41 @@
 
 import os
 import shutil
-
-# from . import constants
 from ..constants import *
 
 
-cli_dir = os.getcwd()
 def cd_cli_dir():
-    os.chdir(cli_dir)
+    os.chdir(TKLTEST_CLI_DIR)
 
-def get_app_dir(app_name):
-    app_dir = os.path.join(cli_dir, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
+
+def get_app_output_dir(app_name):
+    app_dir = os.path.join(TKLTEST_CLI_DIR, TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name)
     if not os.path.isdir(app_dir):
         os.mkdir(app_dir)
     return app_dir
 
-def cd_output_dir(app_name):
-    # first we make sure that:
-    # 1. the cli dir is set (by referring to it)
-    # 2. we are at the cli dir
-    if os.getcwd() != cli_dir:
-        cd_cli_dir()
-    output_dir = TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name
+
+def get_output_dir(app_name, module_name=''):
+    output_dir = get_app_output_dir(app_name)
+    if module_name:
+        output_dir = os.path.join(output_dir, module_name)
     # creating output dir if not exist
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     # todo - consider resolve the following code. (BTW, soft links do not work on windows).
     # (currently, at the core, the locations of these jars are hard coded)
-    if os.path.isdir(os.path.join(output_dir, "lib")):
-        shutil.rmtree(os.path.join(output_dir, "lib"))
-    os.makedirs(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join("lib", "download", "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    if not os.path.isdir(os.path.join(output_dir, "lib")):
+        os.makedirs(os.path.join(output_dir, "lib", "download"))
+        shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+        shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
-    # cd output dir
-    os.chdir(output_dir)
+    return output_dir
+
+
+def cd_output_dir(app_name, module_name=''):
+    os.chdir(get_output_dir(app_name, module_name))
+
 
 
 def delete_app_output(app_name):
