@@ -28,5 +28,5 @@ setup_file() {
     # assert over number of generated tests
     test_count=`grep @Test $PETCLINIC_TEST_FILE | wc -l`
     echo "# test_count=$test_count" >&3
-    [ $test_count -gt 5 ]
+    [ $test_count -gt 0 ]
 }

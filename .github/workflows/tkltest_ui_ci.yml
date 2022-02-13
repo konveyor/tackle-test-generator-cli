@@ -84,5 +84,4 @@ jobs:
         which tkltest-ui
         bats test/ui/test_cli.bats
         bats test/ui/test_cli_generate.bats
-        ls -l ./__tkltest-output-ui-petclinic/**
         deactivate
