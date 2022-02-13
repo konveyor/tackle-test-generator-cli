@@ -40,8 +40,10 @@ jobs:
         distribution: 'adopt'
     - name: Install prerequisites
       run: |
-        sudo apt-get install -y bats libxml2-utils
+        sudo apt-get update
+        sudo apt-get install -y bats libgtk2.0-0 chromium-chromedriver
         bats --version
+        chromedriver --version
     - name: Create maven settings.xml
       uses: s4u/maven-settings-action@v2.4.0
       with:
@@ -83,4 +85,5 @@ jobs:
         pip install .
         which tkltest-ui
         bats test/ui/test_cli.bats
+        bats test/ui/test_cli_generate.bats
         deactivate
