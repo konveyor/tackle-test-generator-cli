@@ -18,13 +18,13 @@ teardown_file() {
 @test "Test 00: CLI main no args" {
     run tkltest-ui
     assert_success
-    assert_output --partial 'usage: tkltest-ui [-h] [-au APP_URL] [-cf CONFIG_FILE]'
+    assert_output --partial 'usage: tkltest-ui [-h] [-u APP_URL] [-cf CONFIG_FILE]'
 }
 
 @test "Test 01: CLI main help" {
     run tkltest-ui --help
     assert_success
-    assert_output --partial 'usage: tkltest-ui [-h] [-au APP_URL] [-cf CONFIG_FILE]'
+    assert_output --partial 'usage: tkltest-ui [-h] [-u APP_URL] [-cf CONFIG_FILE]'
 }
 
 @test "Test 02: CLI config command help" {
@@ -71,4 +71,10 @@ teardown_file() {
 @test "Test 06: CLI config file load" {
     run tkltest-ui -cf ./test/ui/tkltest_ui_config.toml -l DEBUG
     assert_success
+}
+
+@test "Test 07: CLI generate command help" {
+    run tkltest-ui generate --help
+    assert_success
+    assert_output --partial 'usage: tkltest-ui generate [-h]'
 }

@@ -25,10 +25,10 @@ TKLTEST_UNIT_OUTPUT_DIR_PREFIX = 'tkltest-output-unit-'
 TKLTEST_LIB_DIR = os.path.join('..', 'lib')
 TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 
-# version of testgen core
-TKLTEST_TESTGEN_CORE_VERSION = '1.0.0'
-TKLTEST_TESTGEN_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
-                                        'tackle-test-generator-core-{}-SNAPSHOT.jar'.format(TKLTEST_TESTGEN_CORE_VERSION))
+# version of unit testgen core
+TKLTEST_UNIT_CORE_VERSION = '1.1.0'
+TKLTEST_UNIT_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
+                                     'tackle-test-generator-unit-{}.jar'.format(TKLTEST_UNIT_CORE_VERSION))
 
 # suffix for the default test directory name (used if test directory is unspecified)
 # CTD amplified tests
@@ -145,3 +145,24 @@ JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
 # Suffix for dependencies directory
 
 DEPENDENCIES_DIR_SUFFIX = '-app-dependencies'
+
+####### tkltest-ui constants #######
+
+# output directory for generated UI tests
+TKLTEST_UI_OUTPUT_DIR_PREFIX = 'tkltest-output-ui-'
+
+# UI lib download dir
+TKLTEST_UI_LIB_DOWNLOAD_DIR = os.path.join('lib', 'download')
+
+# version of ui testgen core
+TKLTEST_UI_CORE_VERSION = '0.0.1'
+TKLTEST_UI_CORE_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR,
+                                   'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION))
+# crawljax version and jar
+CRAWLJAX_VERSION = '5.0-frag'
+CRAWLJAX_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'crawljax-examples-{}.jar'.format(CRAWLJAX_VERSION))
+
+# library jars
+ANTLR_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'antlr4-runtime-4.7.2.jar')
+COMMONS_CLI_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'commons-cli-1.4.jar')
+TOML_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'tomlj-1.0.0.jar')
