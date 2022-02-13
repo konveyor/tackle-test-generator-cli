@@ -29,15 +29,48 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
     - name: Install prerequisites
       run: |
         sudo apt-get install -y bats libxml2-utils
         bats --version
+    - name: Create maven settings.xml
+      uses: s4u/maven-settings-action@v2.4.0
+      with:
+        servers: '[
+          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
+          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
+        ]'
+    - name: Download Java libraries
+      run: |
+        cd lib
+        sed -ie "s|GITHUB_USERNAME|$GITHUB_ACTOR|g" settings.xml
+        sed -ie "s|GITHUB_TOKEN|${{ secrets.TKLTEST_PKGS_PAT }}|g" settings.xml
+        ./download_lib_jars.sh
+        cd ..; ls lib/*
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Pull test webapps
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run petclinic webapp for testing
+      run: |
+        cd tackle-test-generator-ui/test/data/webapps/spring-petclinic-rest
+        docker run -d -p 9966:9966 --name petclinic-rest springcommunity/spring-petclinic-rest
+        cd ../spring-petclinic-angular
+        docker build -t spring-petclinic-angular:latest .
+        docker run -d -p 8080:8080 --name petclinic-angular spring-petclinic-angular:latest
+        curl localhost:8080
     - name: Install tkltest-ui command and run bats tests
+      env:
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
         git submodule init
         git submodule update
