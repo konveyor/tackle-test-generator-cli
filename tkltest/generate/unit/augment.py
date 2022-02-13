@@ -107,8 +107,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         max_memory=config['generate']['ctd_amplified']['max_augment_memory']
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
-    final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
-    final_cov_efficiency = final_inst_cov_rate / final_test_method_count
+    final_inst_cov_rate = safe_div(augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'])
+    final_cov_efficiency = safe_div(final_inst_cov_rate, final_test_method_count)
 
     if tests_with_coverage_gain:
         print('')
@@ -121,12 +121,12 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'],
         final_inst_cov_rate,
         augmented_coverage['branch_covered'], augmented_coverage['branch_total'],
-        augmented_coverage['branch_covered'] / augmented_coverage['branch_total']
+        safe_div(augmented_coverage['branch_covered'], augmented_coverage['branch_total'])
     ) + 'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.format(
         augmented_coverage['line_covered'], augmented_coverage['line_total'],
-        augmented_coverage['line_covered'] / augmented_coverage['line_total'],
+        safe_div(augmented_coverage['line_covered'], augmented_coverage['line_total']),
         augmented_coverage['method_covered'], augmented_coverage['method_total'],
-        augmented_coverage['method_covered'] / augmented_coverage['method_total'],
+        safe_div(augmented_coverage['method_covered'], augmented_coverage['method_total']),
         final_cov_efficiency, final_test_method_count
     ))
 
@@ -251,21 +251,21 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
                                                               additional_test_suite=additional_test_suite)
     if not test_coverage:
         return None, None, None
-    inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
+    inst_cov_rate = safe_div(test_coverage['instruction_covered'], test_coverage['instruction_total'])
     test_method_count = __get_test_method_count(test_dir)
-    inst_cov_efficiency = inst_cov_rate / test_method_count
+    inst_cov_efficiency = safe_div(inst_cov_rate, test_method_count)
     tkltest_status('Coverage information for {} tests: instruction={}/{}({:.1%}), branch={}/{}({:.1%}), '.
                    format(test_suite_name,
                           test_coverage['instruction_covered'], test_coverage['instruction_total'],
                           inst_cov_rate,
                           test_coverage['branch_covered'], test_coverage['branch_total'],
-                          test_coverage['branch_covered'] / test_coverage['branch_total']
+                          safe_div(test_coverage['branch_covered'], test_coverage['branch_total'])
                           ) +
                    'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.
                    format(test_coverage['line_covered'], test_coverage['line_total'],
-                          test_coverage['line_covered'] / test_coverage['line_total'],
+                          safe_div(test_coverage['line_covered'], test_coverage['line_total']),
                           test_coverage['method_covered'], test_coverage['method_total'],
-                          test_coverage['method_covered'] / test_coverage['method_total'],
+                          safe_div(test_coverage['method_covered'], test_coverage['method_total']),
                           inst_cov_efficiency, test_method_count
                           )
                    )
@@ -492,3 +492,8 @@ def __print_test_counter(counter):
     sys.stdout.write('\r')
     sys.stdout.write('* {}'.format(counter))
     sys.stdout.flush()
+
+def safe_div(a, b):
+    if b:
+        return a/b
+    return 0
