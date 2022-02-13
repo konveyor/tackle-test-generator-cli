@@ -360,6 +360,16 @@ __options_spec = {
                     'default_value': False,
                     'help_message': 'do not augment CTD-guided tests with coverage-increasing base tests'
                 },
+                'max_augment_memory': {
+                    'required': False,
+                    'is_toml_option': True,
+                    'is_cli_option': True,
+                    'short_name': '-mam',
+                    'long_name': '--maximal-augment-memory',
+                    'type': int,
+                    'default_value': 4096,
+                    'help_message': 'maximal heap size (in MB) used for augmentation'
+                },
                 'no_ctd_coverage': {
                     'required': False,
                     'is_toml_option': True,
