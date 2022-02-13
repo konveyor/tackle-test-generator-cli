@@ -40,8 +40,8 @@ jobs:
         distribution: 'adopt'
     - name: Install prerequisites
       run: |
-        sudo apt-get update
-        sudo apt-get install -y bats libgtk2.0-0 chromium-chromedriver
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y bats libgtk2.0-0 chromium-chromedriver
         bats --version
         chromedriver --version
     - name: Create maven settings.xml
