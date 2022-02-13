@@ -9,6 +9,8 @@ on:
       - 'tkltest/tkltest_unit.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_unit_ci.yml'
+      - 'test/unit/**'
   pull_request:
     paths-ignore:
       - 'tkltest/generate/unit/**'
@@ -17,6 +19,8 @@ on:
       - 'tkltest/tkltest_unit.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_unit_ci.yml'
+      - 'test/unit/**'
 
 jobs:
   build:
@@ -62,7 +66,7 @@ jobs:
         git submodule update
     - name: Run petclinic webapp for testing
       run: |
-        cd tackle-test-generator-ui/test/data/webapps/spring-petclinic-rest
+        cd test/ui/data/webapps/spring-petclinic-rest
         docker run -d -p 9966:9966 --name petclinic-rest springcommunity/spring-petclinic-rest
         cd ../spring-petclinic-angular
         docker build -t spring-petclinic-angular:latest .
