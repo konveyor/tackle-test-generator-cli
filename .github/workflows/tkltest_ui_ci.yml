@@ -83,5 +83,5 @@ jobs:
         pip install .
         which tkltest-ui
         bats test/ui/test_cli.bats
-        bats test/ui/test_cli_generate.bats
+        bats test/ui/test_cli_generate_execute.bats
         deactivate

@@ -25,6 +25,7 @@ import toml
 from tkltest.util.logging_util import tkltest_status
 from tkltest.util import command_util
 from tkltest.util.constants import *
+from tkltest.util.ui import dir_util
 
 def process_generate_command(config):
     """Processes the tkltest-ui generate command.
@@ -43,13 +44,10 @@ def process_generate_command(config):
     verbose = config['general']['verbose']
     browser = config['generate']['browser']
     time_limit = config['generate']['time_limit']
+    host_name = urllib.parse.urlparse(config['general']['app_url']).netloc.split(':')[0]
 
     # set default test directory if unspecified
-    test_directory = config['general']['test_directory']
-    host_name = urllib.parse.urlparse(app_url).netloc.split(':')[0]
-    if not test_directory:
-        test_directory = os.path.join(TKLTEST_UI_OUTPUT_DIR_PREFIX + app_name,
-                                      '{}_{}_{}mins'.format(app_name, host_name, time_limit))
+    test_directory = dir_util.get_test_directory(config, host_name)
     logging.info('test directory: '.format(test_directory))
 
     # write config (with internal options added) to toml file to be passed as argument to the crawljax runner
@@ -78,7 +76,8 @@ def process_generate_command(config):
         command_util.run_command(command=uitestgen_command, verbose=verbose)
 
         # print info about generated tests
-        output_crawl_dir = __get_crawl_output_dir(test_directory=test_directory, host_name=host_name)
+        output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory,
+                                                                  host_name=host_name)
         tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
         test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
         tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
@@ -91,17 +90,6 @@ def process_generate_command(config):
 
     # cleanup browser instances
     __cleanup_browser_instances(browser)
-
-
-def __run_ui_test_generator(command, verbose):
-    pass
-
-
-def __get_crawl_output_dir(test_directory, host_name):
-    """Returns the crawl root directory for AUT for the latest run"""
-    output_crawl_dirs = os.path.join(test_directory, host_name, 'crawl*')
-    return sorted(glob.iglob(output_crawl_dirs), key=os.path.getctime, reverse=True)[0]
-
 
 def __get_generated_test_count(last_crawl_dir):
     """Returns the number of generated test cases

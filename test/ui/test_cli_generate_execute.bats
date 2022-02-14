@@ -30,3 +30,12 @@ setup_file() {
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 }
+
+@test "Test 02: CLI execute petclinic" {
+    # execute test cases for petclinic app
+    run tkltest-ui --verbose \
+        --config-file $PETCLINIC_CONFIG_FILE \
+        --test-directory $PETCLINIC_OUTPUT_DIR \
+        execute
+    [ $status -eq 0 ]
+}
