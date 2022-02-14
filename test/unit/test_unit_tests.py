@@ -15,7 +15,9 @@ import os
 from pathlib import PurePath
 import sys
 import unittest
-
+import toml
+import shutil
+import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.util import config_util, constants, command_util
 from tkltest.util.unit import  dir_util
@@ -125,8 +127,7 @@ class UnitTests(unittest.TestCase):
             if monolith_app_path[0] == '':
                 continue
             dir_util.cd_output_dir(app_name)
-            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
-
+            monolith_app_path[0] = os.path.join(constants.TKLTEST_CLI_DIR, monolith_app_path[0])
             # every target is a different test case
             for target_name in ant_test_apps[app_name]['targets_to_test_app_path']:
                 config['generate']['app_build_target'] = target_name
@@ -154,7 +155,7 @@ class UnitTests(unittest.TestCase):
             if maven_test_apps[app_name]['build_file_if_requires_build']:
                 pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
-                    pom_location = '..' + os.sep + pom_location
+                    pom_location = constants.TKLTEST_CLI_DIR + os.sep + pom_location
                 build_command = 'mvn clean install -f ' + pom_location
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
@@ -185,12 +186,12 @@ class UnitTests(unittest.TestCase):
                 continue
             config['general']['monolith_app_path'] = []
             dir_util.cd_output_dir(app_name)
-            monolith_app_path[0] = os.path.join('..', monolith_app_path[0])
+            monolith_app_path[0] = os.path.join(constants.TKLTEST_CLI_DIR, monolith_app_path[0])
 
             if maven_test_apps[app_name]['build_file_if_requires_build']:
                 pom_location = maven_test_apps[app_name]['build_file_if_requires_build']
                 if not os.path.isabs(pom_location):
-                    pom_location = '..' + os.sep + pom_location
+                    pom_location = constants.TKLTEST_CLI_DIR + os.sep + pom_location
                 build_command = 'mvn clean install -f ' + pom_location
                 command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
@@ -246,6 +247,131 @@ class UnitTests(unittest.TestCase):
                          'utilities']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
+
+    def test_getting_modules_configs(self) -> None:
+        """Test getting the configs for modules"""
+        dir_util.cd_cli_dir()
+        base_config = {}
+        base_config['general'] = {}
+        base_config['generate'] = {}
+        app_name = 'splitNjoin'
+        base_config['general']['app_name'] = app_name
+        base_config['general']['verbose'] = True
+
+        build_file_list = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
+        build_file_app = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
+        settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
+        base_config['generate']['app_build_type'] = 'gradle'
+        base_config['general']['test_directory'] = 'SNJ_test_dir'
+        base_config['general']['reports_path'] = 'SNJ_report_dir'
+
+        base_config['general']['app_classpath_file'] = ''
+        base_config['general']['monolith_app_path'] = ''
+
+        base_config['generate']['app_build_config_files'] = [build_file_app]
+        base_config['generate']['app_build_settings_files'] = [settings_file]
+        #todo - remove the following two lines:
+        base_config['generate']['app_build_config_file'] = build_file_app
+        base_config['generate']['app_build_settings_file'] = settings_file
+
+        '''
+        here we check three cases, in all these cases, we should not split the config from the user to different modules: 
+        1. we already have app_path from the user, so we do not look for modules
+        2. we run execute - however, we did not split the user config during generate command 
+        3. we have only one module
+        '''
+        # case 1
+        configs_to_test = []
+        config = copy.deepcopy(base_config)
+        config['general']['monolith_app_path'] = 'dummy_path'
+        configs_to_test.append((config, 'generate'))
+
+        # case 2
+        config = copy.deepcopy(base_config)
+        configs_to_test.append((config, 'execute'))
+
+        # case 3
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list]
+        config['generate']['app_build_settings_files'] = []
+        # todo - remove the following two lines:
+        config['generate']['app_build_config_file'] = build_file_list
+        config['generate']['app_build_settings_file'] = ''
+        configs_to_test.append((config, 'generate'))
+
+        shutil.rmtree(dir_util.get_app_output_dir(app_name))
+        for config, command in configs_to_test:
+            print('bbb {} {}'.format(command, str(config)))
+            saved_config = copy.deepcopy(config)
+            if not config['generate']['app_build_settings_files']:
+                os.rename(settings_file, settings_file + '.bkp')
+                resolved_configs = config_util.resolve_tkltest_configs(config, command)
+                os.rename(settings_file + '.bkp', settings_file)
+            else:
+                resolved_configs = config_util.resolve_tkltest_configs(config, command)
+
+        self.assertTrue(len(resolved_configs) == 1)
+        resolved_config = resolved_configs[0]
+        self.assertTrue(os.path.isfile(resolved_config['general']['app_classpath_file']))
+
+        if not config['generate']['app_build_settings_files']:
+            self.assertTrue(len(resolved_config['general']['monolith_app_path']) == 1)
+        else:
+            self.assertTrue(len(resolved_config['general']['monolith_app_path']) == 3)
+
+        if saved_config['general']['monolith_app_path']:
+            self.assertTrue(resolved_config['general']['monolith_app_path'] == saved_config['general']['monolith_app_path'])
+        else:
+            for path in resolved_config['general']['monolith_app_path']:
+                self.assertTrue(os.path.isdir(path))
+
+        saved_config['general']['monolith_app_path'] = resolved_config['general']['monolith_app_path']
+        saved_config['general']['app_classpath_file'] = resolved_config['general']['app_classpath_file']
+        saved_config['general']['module_name'] = ''
+        self.assertTrue(resolved_configs == [saved_config])
+
+        '''
+        here are two more cases: now we check that modules configs are generate during the generate command.
+        and that the same configs are loaded during the execute command
+        '''
+        shutil.rmtree(dir_util.get_app_output_dir(app_name))
+        modules_names = ['app', 'list', 'utilities']
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_settings_files'] = [settings_file, settings_file]
+        config['general']['app_classpath_file'] = ''
+        config['general']['monolith_app_path'] = ''
+
+        configs_generate = config_util.resolve_tkltest_configs(config, 'generate')
+
+        config = copy.deepcopy(base_config)
+        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_settings_files'] = [settings_file, settings_file]
+        config['general']['app_classpath_file'] = ''
+        config['general']['monolith_app_path'] = ''
+        configs_execute = config_util.resolve_tkltest_configs(config, 'execute')
+
+        self.assertTrue(len(configs_generate) == len(modules_names))
+        self.assertTrue(len(configs_execute) == len(modules_names))
+        self.assertTrue(os.path.isdir(dir_util.get_app_output_dir(app_name)))
+
+        for modules_name in modules_names:
+            outdir = dir_util.get_output_dir(app_name, modules_name)
+            self.assertTrue(os.path.isdir(outdir))
+            toml_file = os.path.join(outdir, app_name + '_' + modules_name + '_generated_tkltest_config.toml')
+            self.assertTrue(os.path.isfile(toml_file))
+            module_config = toml.load(toml_file)
+            self.assertTrue(module_config in configs_generate)
+            self.assertTrue(module_config in configs_execute)
+            self.assertTrue(len(module_config['general']['monolith_app_path']) == 1)
+            self.assertTrue(os.path.isdir(module_config['general']['monolith_app_path'][0]))
+            self.assertTrue(module_config['general']['module_name'] == modules_name)
+            self.assertTrue(len(module_config['generate']['app_build_config_files']) == 1)
+            self.assertTrue(os.path.isfile(module_config['generate']['app_build_config_files'][0]))
+            self.assertTrue(len(module_config['generate']['app_build_settings_files']) == 1)
+            self.assertTrue(os.path.isfile(module_config['generate']['app_build_settings_files'][0]))
+            self.assertTrue(os.path.isfile(module_config['general']['app_classpath_file']))
+
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
@@ -309,11 +435,11 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(jar_path), extended_message)
 
     def __assert_modules_properties(self, modules_names, modules):
-        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file', 'classpath']
+        module_keys = ['name', 'directory', 'build_file', 'app_path', 'user_build_file', 'user_settings_file', 'classpath']
         self.assertTrue(len(modules) == len(modules_names))
         for module in modules:
             self.assertTrue(module['name'] in modules_names)
-            self.assertTrue(len(module.keys()) == len(module_keys))
+            self.assertTrue(len(module.keys()) == len(module_keys) or len(module.keys()) == len(module_keys) - 1 )
             for key in module.keys():
                 self.assertTrue(key in module_keys)
             self.assertTrue(os.path.isdir(module['directory']))

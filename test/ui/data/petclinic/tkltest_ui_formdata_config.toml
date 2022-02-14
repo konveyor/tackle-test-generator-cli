@@ -1,0 +1,122 @@
+# The form data specification consists of a set of tables, one for each form, and each form
+# contains a set of field specifications along with one "before click" element specification
+#
+# A field specification identifies a field of a web form with the value to be used for that
+# field; it consists of three parts:
+#   1. input_type: enum with choices text, select, checkbox, radio, email, textarea, password, number
+#   2. identification: consists of two parts
+#        a. how: enum with choices name, id, tag, text, xpath, partial_text
+#        b. value: string value for how
+#   3 input_value: string value to be used as input
+#
+# A "before click" element specification identifies the web element that is clicked to submit
+# the form; it consists of two parts:
+#   1. tag_name: string specifying HTML tag
+#   2. one of with_attribute, with_text, or under_xpath, taking the following structure
+#        with_attribute = { attr_name = "", attr_value = ""}
+#        with_text = "<text>"
+#        under_xpath = "<xpath>"
+#
+[forms.add_owner]
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "firstName"}
+    input_value = "pipi"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "lastName"}
+    input_value = "yu"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "address"}
+    input_value = "2710 N"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "city"}
+    input_value = "Austin"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "telephone"}
+    input_value = "5122005208"
+
+  [forms.add_owner.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Add Owner" }
+
+[forms.add_pet]
+
+  [[forms.add_pet.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "name"}
+    input_value = "water"
+
+  [[forms.add_pet.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "birthDate"}
+    input_value = "2020/06/30"
+
+  [[forms.add_pet.input_fields]]
+    input_type = "select"
+    identification = { how = "name", value = "type"}
+    input_value = "cat"
+
+  [forms.add_pet.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Save Pet" }
+
+[forms.edit_owner]
+
+  [[forms.edit_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "address"}
+    input_value = "2710"
+
+  [forms.edit_owner.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Update Owner" }
+
+[forms.add_vet]
+
+  [[forms.add_vet.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "firstName"}
+    input_value = "pipi"
+
+  [[forms.add_vet.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "lastName"}
+    input_value = "yu"
+
+  [[forms.add_vet.input_fields]]
+    input_type = "select"
+    identification = { how = "name", value = "description"}
+    input_value = "surgery"
+
+  [forms.add_vet.before_click]
+    tag_name = "button"
+    with_text = "Save Vet"
+
+##### empty/incomplete spec
+[forms.empty_form]
+
+[forms.incomplete_spec]
+  [[forms.incomplete_spec.input_fields]]
+
+  [[forms.incomplete_spec.input_fields]]
+    identification = { how = "name", value = "address"}
+    input_value = "2710"
+
+  [[forms.incomplete_spec.input_fields]]
+    input_type = "text"
+    input_value = "water"
+
+  [[forms.incomplete_spec.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "name"}
+
+  [forms.incomplete_spec.before_click]

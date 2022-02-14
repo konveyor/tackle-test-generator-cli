@@ -86,7 +86,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         base_ctd_coverage=base_test_coverage,
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
-        report_dir=report_dir
+        report_dir=report_dir,
+        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
     )
 
     if test_class_augment_pool:
@@ -102,11 +103,12 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         base_ctd_coverage=base_test_coverage,
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
-        report_dir=report_dir
+        report_dir=report_dir,
+        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
-    final_inst_cov_rate = augmented_coverage['instruction_covered'] / augmented_coverage['instruction_total']
-    final_cov_efficiency = final_inst_cov_rate / final_test_method_count
+    final_inst_cov_rate = safe_div(augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'])
+    final_cov_efficiency = safe_div(final_inst_cov_rate, final_test_method_count)
 
     if tests_with_coverage_gain:
         print('')
@@ -119,12 +121,12 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'],
         final_inst_cov_rate,
         augmented_coverage['branch_covered'], augmented_coverage['branch_total'],
-        augmented_coverage['branch_covered'] / augmented_coverage['branch_total']
+        safe_div(augmented_coverage['branch_covered'], augmented_coverage['branch_total'])
     ) + 'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.format(
         augmented_coverage['line_covered'], augmented_coverage['line_total'],
-        augmented_coverage['line_covered'] / augmented_coverage['line_total'],
+        safe_div(augmented_coverage['line_covered'], augmented_coverage['line_total']),
         augmented_coverage['method_covered'], augmented_coverage['method_total'],
-        augmented_coverage['method_covered'] / augmented_coverage['method_total'],
+        safe_div(augmented_coverage['method_covered'], augmented_coverage['method_total']),
         final_cov_efficiency, final_test_method_count
     ))
 
@@ -249,21 +251,21 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
                                                               additional_test_suite=additional_test_suite)
     if not test_coverage:
         return None, None, None
-    inst_cov_rate = test_coverage['instruction_covered'] / test_coverage['instruction_total']
+    inst_cov_rate = safe_div(test_coverage['instruction_covered'], test_coverage['instruction_total'])
     test_method_count = __get_test_method_count(test_dir)
-    inst_cov_efficiency = inst_cov_rate / test_method_count
+    inst_cov_efficiency = safe_div(inst_cov_rate, test_method_count)
     tkltest_status('Coverage information for {} tests: instruction={}/{}({:.1%}), branch={}/{}({:.1%}), '.
                    format(test_suite_name,
                           test_coverage['instruction_covered'], test_coverage['instruction_total'],
                           inst_cov_rate,
                           test_coverage['branch_covered'], test_coverage['branch_total'],
-                          test_coverage['branch_covered'] / test_coverage['branch_total']
+                          safe_div(test_coverage['branch_covered'], test_coverage['branch_total'])
                           ) +
                    'line={}/{}({:.1%}), method={}/{}({:.1%})\n\t\t\t\t\t\t coverage_efficiency={} ({} test methods)'.
                    format(test_coverage['line_covered'], test_coverage['line_total'],
-                          test_coverage['line_covered'] / test_coverage['line_total'],
+                          safe_div(test_coverage['line_covered'], test_coverage['line_total']),
                           test_coverage['method_covered'], test_coverage['method_total'],
-                          test_coverage['method_covered'] / test_coverage['method_total'],
+                          safe_div(test_coverage['method_covered'], test_coverage['method_total']),
                           inst_cov_efficiency, test_method_count
                           )
                    )
@@ -308,7 +310,7 @@ def __get_test_method_count(test_dir):
 
 
 def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, class_files,
-                                       raw_cov_dir, report_dir):
+                                       raw_cov_dir, report_dir, max_memory):
     """Computes coverage delta for each test class in the augment pool of tests.
 
     Computes for each test class in the test augment pool additional instruction, line, and branch coverage that
@@ -359,7 +361,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
                                                                               main_coverage_dir=main_coverage_dir,
                                                                               class_files=class_files,
                                                                               base_coverage=base_ctd_coverage,
-                                                                              remove_merged_cov_file=True)
+                                                                              remove_merged_cov_file=True,
+                                                                              max_memory=max_memory)
             #coverage_delta = coverage_util.get_coverage_for_test_suite(
             #    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
             #    report_dir=report_dir, base_coverage=base_ctd_coverage)
@@ -381,7 +384,7 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
 
 
 def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, class_files,
-                             raw_cov_dir, report_dir):
+                             raw_cov_dir, report_dir, max_memory):
     """Augments CTD test suite with tests that contribute to additional coverage.
 
     Iterates over test classes that contribute to coverage gain, and adds them to the augmented test suite
@@ -440,7 +443,8 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
                     ctd_raw_cov_file=current_raw_cov_file,
                     main_coverage_dir=main_coverage_dir, class_files=class_files,
                     base_coverage=curr_coverage,
-                    remove_merged_cov_file=first)
+                    remove_merged_cov_file=first,
+                    max_memory=max_memory)
                 first = False
             except subprocess.CalledProcessError as e:
                 logging.error('Error merging augmented test suite with class {}: {}'.format(test_class, e))
@@ -488,3 +492,8 @@ def __print_test_counter(counter):
     sys.stdout.write('\r')
     sys.stdout.write('* {}'.format(counter))
     sys.stdout.flush()
+
+def safe_div(a, b):
+    if b:
+        return a/b
+    return 0

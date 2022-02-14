@@ -50,6 +50,7 @@ required, and the option description).
 | generate.ctd_amplified              |                                  | Use CTD for computing coverage goals                                                                                                    |
 | base_test_generator                 | -btg/--base-test-generator       | base test generator to use for creating building-block test sequences                                                                   |
 | no_augment_coverage                 | -nac/--no-augment-coverage       | do not augment CTD-guided tests with coverage-increasing base tests                                                                     |
+| max_augment_memory                  | -mam/--maximal-augment-memory    | maximal heap size (in MB) used for augmentation. Default is 4096. Increase if augmentation encounters our of memory exceptions.         | 
 | no_ctd_coverage                     | -nctd/--no-ctd-coverage          | do not generate CTD coverage report                                                                                                     |
 | interaction_level                   |                                  | CTD interaction level (strength) for test-plan generation                                                                               |
 | num_seq_executions                  |                                  | number of executions to perform to determine pass/fail status of generated sequences                                                    |

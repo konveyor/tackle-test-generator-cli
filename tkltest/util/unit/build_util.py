@@ -142,6 +142,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_src_dir))
+    #todo - fix for cases that user give test_root_dir:
     inst_app_path = os.path.join(os.path.dirname(test_root_src_dir), app_name + "-instrumented-classes")
     with tag('project', name='tkl_tests'):
 
@@ -454,6 +455,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
 
     #gradle accept only posix paths, so we uses PurePath to convert:
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
+    #todo - fix for cases that user give test_root_dir:
     inst_classes = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
     test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs if not os.path.basename(test_dir) == 'build']
     monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
@@ -466,7 +468,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     coverage_csv_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.csv')).as_posix()
 
     #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
-    env = Environment(loader=FileSystemLoader('..' + os.sep + 'tkltest' + os.sep + 'util' + os.sep + 'unit'))
+    env = Environment(loader=FileSystemLoader(os.path.join(constants.TKLTEST_CLI_DIR, 'tkltest', 'util', 'unit')))
     template = env.get_template('build_template.gradle')
 
     test_dependsOn = ''
