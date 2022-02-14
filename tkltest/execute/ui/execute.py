@@ -16,7 +16,7 @@ import sys
 import subprocess
 import urllib
 
-from tkltest.util.ui import config_options_ui
+from tkltest.util.ui import dir_util
 from tkltest.util import command_util
 from tkltest.util.logging_util import tkltest_status
 
@@ -31,8 +31,8 @@ def process_execute_command(config):
     """
 
     host_name = urllib.parse.urlparse(config['general']['app_url']).netloc.split(':')[0]
-    test_directory = config_options_ui.get_test_directory(config, host_name)
-    output_dir = config_options_ui.get_crawl_output_dir(test_directory, host_name)
+    test_directory = dir_util.get_test_directory(config, host_name)
+    output_dir = dir_util.get_crawl_output_dir(test_directory, host_name)
 
     cur_dir = os.curdir
     os.chdir(output_dir)

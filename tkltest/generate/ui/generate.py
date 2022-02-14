@@ -25,7 +25,7 @@ import toml
 from tkltest.util.logging_util import tkltest_status
 from tkltest.util import command_util
 from tkltest.util.constants import *
-from tkltest.util.ui import config_options_ui
+from tkltest.util.ui import dir_util
 
 def process_generate_command(config):
     """Processes the tkltest-ui generate command.
@@ -47,7 +47,7 @@ def process_generate_command(config):
     host_name = urllib.parse.urlparse(config['general']['app_url']).netloc.split(':')[0]
 
     # set default test directory if unspecified
-    test_directory = config_options_ui.get_test_directory(config, host_name)
+    test_directory = dir_util.get_test_directory(config, host_name)
     logging.info('test directory: '.format(test_directory))
 
     # write config (with internal options added) to toml file to be passed as argument to the crawljax runner
@@ -76,7 +76,7 @@ def process_generate_command(config):
         command_util.run_command(command=uitestgen_command, verbose=verbose)
 
         # print info about generated tests
-        output_crawl_dir = config_options_ui.get_crawl_output_dir(test_directory=test_directory,
+        output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory,
                                                                   host_name=host_name)
         tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
         test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
@@ -90,10 +90,6 @@ def process_generate_command(config):
 
     # cleanup browser instances
     __cleanup_browser_instances(browser)
-
-
-def __run_ui_test_generator(command, verbose):
-    pass
 
 def __get_generated_test_count(last_crawl_dir):
     """Returns the number of generated test cases
