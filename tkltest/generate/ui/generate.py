@@ -46,10 +46,10 @@ def process_generate_command(config):
 
     # set default test directory if unspecified
     test_directory = config['general']['test_directory']
+    host_name = urllib.parse.urlparse(app_url).netloc.split(':')[0]
     if not test_directory:
-        hostport = urllib.parse.urlparse(app_url).netloc
         test_directory = os.path.join(TKLTEST_UI_OUTPUT_DIR_PREFIX + app_name,
-                                      '{}_{}_{}mins'.format(app_name, hostport.split(':')[0], time_limit))
+                                      '{}_{}_{}mins'.format(app_name, host_name, time_limit))
     logging.info('test directory: '.format(test_directory))
 
     # write config (with internal options added) to toml file to be passed as argument to the crawljax runner
@@ -78,7 +78,7 @@ def process_generate_command(config):
         command_util.run_command(command=uitestgen_command, verbose=verbose)
 
         # print info about generated tests
-        output_crawl_dir = __get_crawl_output_dir(test_directory=test_directory)
+        output_crawl_dir = __get_crawl_output_dir(test_directory=test_directory, host_name=host_name)
         tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
         test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
         tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
@@ -97,9 +97,9 @@ def __run_ui_test_generator(command, verbose):
     pass
 
 
-def __get_crawl_output_dir(test_directory):
+def __get_crawl_output_dir(test_directory, host_name):
     """Returns the crawl root directory for AUT for the latest run"""
-    output_crawl_dirs = os.path.join(test_directory, 'crawl*')
+    output_crawl_dirs = os.path.join(test_directory, host_name, 'crawl*')
     return sorted(glob.iglob(output_crawl_dirs), key=os.path.getctime, reverse=True)[0]
 
 
