@@ -1,6 +1,6 @@
 PETCLINIC_CONFIG_FILE=./test/ui/data/petclinic/tkltest_ui_config.toml
 PETCLINIC_OUTPUT_DIR=./__tkltest-output-ui-petclinic
-PETCLINIC_CRAWL_DIR=$PETCLINIC_OUTPUT_DIR/crawl0
+PETCLINIC_CRAWL_DIR=$PETCLINIC_OUTPUT_DIR/localhost/crawl0
 PETCLINIC_TEST_FILE=$PETCLINIC_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
 
 # setup commands run before execution of tests in file
