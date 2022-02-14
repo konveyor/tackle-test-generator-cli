@@ -32,7 +32,7 @@ setup_file() {
 }
 
 @test "Test 02: CLI execute petclinic" {
-    # generate test cases for petclinic app
+    # execute test cases for petclinic app
     run tkltest-ui --verbose \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
