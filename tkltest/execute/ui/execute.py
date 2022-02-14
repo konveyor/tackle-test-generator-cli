@@ -40,7 +40,7 @@ def process_execute_command(config):
     try:
         command_util.run_command("mvn test", verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
-        tkltest_status('Error executing junit: {}\n{}'.format(e, e.stderr), error=True)
+        tkltest_status('Error executing tests: {}\n{}'.format(e, e.stderr), error=True)
         os.chdir(cur_dir)
         sys.exit(1)
 
