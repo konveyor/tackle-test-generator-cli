@@ -18,6 +18,8 @@ for required options.
 """
 import argparse
 import copy
+import os
+import glob
 
 from tkltest.util import constants
 
@@ -344,5 +346,19 @@ __options_spec_internal = {
         'is_cli_command': True,
         'help_message': 'Execute generated UI tests on the application under test',
     }
-
 }
+
+def get_test_directory(config, host_name):
+    test_directory = config['general']['test_directory']
+    if not test_directory:
+        test_directory = os.path.join(constants.TKLTEST_UI_OUTPUT_DIR_PREFIX +
+                                      config['general']['app_name'],
+                                      '{}_{}_{}mins'.format(config['general']['app_name'],
+                                                            host_name,
+                                                            config['generate']['time_limit']))
+    return test_directory
+
+def get_crawl_output_dir(test_directory, host_name):
+    """Returns the crawl root directory for AUT for the latest run"""
+    output_crawl_dirs = os.path.join(test_directory, host_name, 'crawl*')
+    return sorted(glob.iglob(output_crawl_dirs), key=os.path.getctime, reverse=True)[0]
