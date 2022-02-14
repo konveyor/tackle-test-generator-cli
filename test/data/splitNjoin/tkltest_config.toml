@@ -17,8 +17,9 @@ excluded_class_list = []
 time_limit = 10
 
 app_build_type = 'gradle'
-app_build_config_file = "test/data/splitNjoin/app/build.gradle"
-app_build_settings_file = "test/data/splitNjoin/settings.gradle"
+
+app_build_config_files = ["test/data/splitNjoin/app/build.gradle"]
+app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
 
 [execute]
 app_packages = ['splitNjoin.*']

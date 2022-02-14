@@ -35,8 +35,7 @@ def process_execute_command(args, config):
         args: command-line arguments
         config: loaded configuration options
     """
-    dir_util.cd_output_dir(config['general']['app_name'])
-    config_util.fix_config(config, args.command)
+    dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     __execute_base(args, config)
     if config['dev_tests']['compare_code_coverage']:
         __run_dev_tests(config)

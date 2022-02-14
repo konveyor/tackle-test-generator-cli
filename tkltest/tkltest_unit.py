@@ -58,18 +58,23 @@ def main():
     perform_checks_init_logger(args, parser, 'unit')
     tkltest_config = load_configuration(args, 'unit')
 
-    unjar_paths = __unjar_path(tkltest_config)
+    configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
 
-    # process generate/execute commands
-    try:
-        if args.command == 'execute':
-            execute.process_execute_command(args, tkltest_config)
-        elif args.command == 'generate':
-             generate.process_generate_command(args, tkltest_config)
-    finally:
-        for path in unjar_paths:
-            if os.path.isdir(path):
-                shutil.rmtree(path)
+    for config in configs:
+        if len(configs) > 1:
+            logging_util.tkltest_status('Running command {} with config of module {}. '.format(args.command, config['general']['module_name']))
+
+        unjar_paths = __unjar_path(config)
+        # process generate/execute commands
+        try:
+            if args.command == 'execute':
+                execute.process_execute_command(args, config)
+            elif args.command == 'generate':
+                 generate.process_generate_command(args, config)
+        finally:
+            for path in unjar_paths:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -831,8 +831,8 @@ class GenerateExecuteTest(unittest.TestCase):
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
 
 
-    def __assert_generate_resources(self, app_name, generate_subcmd):
-        dir_util.cd_output_dir(app_name)
+    def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
+        dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
             self.assertTrue(os.path.isfile(summary_file))
@@ -852,12 +852,12 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path='', compare_coverage=False):
+    def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False):
         if reports_path:
             main_report_dir = reports_path
         else:
             main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-            dir_util.cd_output_dir(app_name)
+            dir_util.cd_output_dir(app_name, module_name)
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
         self.assertTrue(os.path.isdir(junit_report_dir))
@@ -878,8 +878,8 @@ class GenerateExecuteTest(unittest.TestCase):
         if not reports_path:
             dir_util.cd_cli_dir()
 
-    def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, augment=True, reports_path=''):
-        dir_util.cd_output_dir(app_name)
+    def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
+        dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:
             main_report_dir = os.path.join(constants.TKLTEST_CLI_DIR, reports_path)
@@ -914,11 +914,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(coverage_counter[0].attrib['missed'] == '0')
 
     def __process_generate(self, subcommand, config):
+        config_util.fix_relative_paths(config)
         self.args.command = 'generate'
         self.args.sub_command = subcommand
         generate.process_generate_command(args=self.args, config=config)
 
     def __process_execute(self, config, subcommand=None):
+        config_util.fix_relative_paths(config)
         self.args.command = 'execute'
         if subcommand:
             self.args.sub_command = subcommand
