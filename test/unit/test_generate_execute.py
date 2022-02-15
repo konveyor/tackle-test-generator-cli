@@ -791,11 +791,33 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # execute tests
             config['general']['app_classpath_file'] = ''
+            config_util.resolve_classpath(config, 'execute')
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+
+    def test_generate_execute_multi_modules(self) -> None:
+        """Test obtain and run on multi modules"""
+        for app_name in self.test_list2:
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            user_config = app_info['config']
+            user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            for config in configs:
+                self.__process_generate(subcommand='ctd-amplified', config=config)
+                # assert that expected generate resources are created
+                self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=config['general']['module_name'])
+
+            configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            for config in configs:
+                # execute tests
+                self.__process_execute(config=config)
+                # assert that expected execute resources are created
+                self.__assert_execute_resources(app_name=app_name,module_name=config['general']['module_name'])
 
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
