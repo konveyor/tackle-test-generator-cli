@@ -593,7 +593,10 @@ def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task
             f.write("\nrootProject.buildFileName = '" + relative_app_build_file + "'\n")
 
     # run the task with gradle
-    get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
+    get_dependencies_command = 'gradle '
+    if not verbose:
+        get_dependencies_command += '-q '
+    get_dependencies_command += '-b ' + os.path.abspath(tkltest_app_build_file)
     if app_settings_file:
         get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
     get_dependencies_command += " " + task_name
@@ -638,7 +641,7 @@ def resolve_app_path(tkltest_config):
         task_name = 'tkltest_get_app_path'
         write_classes_dirs_line = '    fw.write("${project.sourceSets.main.output.classesDirs.getFiles()}\\n");'
         if app_settings_file:
-            write_classes_dirs_line = '    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }'
+            write_classes_dirs_line += '\n    project.rootProject.subprojects.forEach { fw.write( "${it.sourceSets.main.output.classesDirs.getFiles()}\\n" ); }'
         task_text = [
             'public class WriteStringClass extends DefaultTask {',
             '  @TaskAction',
@@ -658,8 +661,10 @@ def resolve_app_path(tkltest_config):
                                   verbose=tkltest_config['general']['verbose'])
 
         with open(app_path_file) as f:
-            tkltest_config['general']['monolith_app_path'] = [p.strip('[]') for p in f.read().split('\n')]
-            tkltest_config['general']['monolith_app_path'].remove('')
+            app_path = [p.strip('[]') for p in f.read().split('\n')]
+            app_path.remove('')
+            app_path = [path for path in app_path if os.path.isdir(path)]
+            tkltest_config['general']['monolith_app_path'] = app_path
 
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']
@@ -1078,10 +1083,9 @@ def get_modules_properties(tkltest_user_config):
 
             # gradle can not have " in the write(), so we replace it with _tkltest_quot_
             properties_dict = properties_dict.replace('"', '_tkltest_quot_')
+            print_properties_line = '     fw.write( "' + properties_dict + '\\n" ); '
             if app_settings_file:
-                print_properties_line = '    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict.replace('${project.', '${it.') + '\\n" ); }'
-            else:
-                print_properties_line = '     fw.write( "' + properties_dict + '\\n" ); '
+                print_properties_line += '\n    project.rootProject.subprojects.forEach { fw.write( "' + properties_dict.replace('${project.', '${it.') + '\\n" ); }'
 
             task_text = [
                 'public class WriteStringClass extends DefaultTask {',

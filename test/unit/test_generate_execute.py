@@ -782,6 +782,8 @@ class GenerateExecuteTest(unittest.TestCase):
             # set up config and generate tests
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            config_util.resolve_app_path(config)
+            config_util.resolve_classpath(config, 'generate')
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
