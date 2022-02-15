@@ -66,22 +66,21 @@ jobs:
       run: |
         git submodule init
         git submodule update
-    - name: Run petclinic webapp for testing
-      run: |
-        cd test/ui/data/webapps/spring-petclinic-rest
-        docker run -d -p 9966:9966 --name petclinic-rest springcommunity/spring-petclinic-rest
-        cd ../spring-petclinic-angular
-        docker build -t spring-petclinic-angular:latest .
-        docker run -d -p 8080:8080 --name petclinic-angular spring-petclinic-angular:latest
-        curl localhost:8080
-    - name: Install tkltest-ui command and run bats tests
+#    - name: Run petclinic webapp for testing
+#      run: |
+#        cd test/ui/data/webapps/spring-petclinic-rest
+#        docker run -d -p 9966:9966 --name petclinic-rest springcommunity/spring-petclinic-rest
+#        cd ../spring-petclinic-angular
+#        docker build -t spring-petclinic-angular:latest .
+#        docker run -d -p 8080:8080 --name petclinic-angular spring-petclinic-angular:latest
+#        curl localhost:8080
+    - name: Install tkltest-ui command
+        pip install .
+        which tkltest-ui
+    - name: Run CLI help/config tests
+        bats test/ui/test_cli.bats
+    - name: Run CLI generate/execute tests - petclinic
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install .
-        which tkltest-ui
-        bats test/ui/test_cli.bats
         bats test/ui/test_cli_generate_execute.bats
-        deactivate

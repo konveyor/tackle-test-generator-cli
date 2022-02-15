@@ -10,6 +10,16 @@ setup_file() {
     rm -rf $PETCLINIC_OUTPUT_DIR
 }
 
+teardown_file() {
+    echo "# teardown_file: stopping webapp" >&3
+    cd test/ui/data/petclinic && ./deploy_app.sh stop && cd ../../../..
+}
+
+setup() {
+    echo "# setup: deploying webapp" >&3
+    cd test/ui/data/petclinic && ./deploy_app.sh start && cd ../../../..
+}
+
 @test "Test 01: CLI generate petclinic" {
     # generate test cases for petclinic app
     run tkltest-ui --verbose \
