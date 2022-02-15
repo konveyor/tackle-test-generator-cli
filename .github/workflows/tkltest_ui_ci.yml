@@ -9,6 +9,8 @@ on:
       - 'tkltest/tkltest_unit.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_unit_ci.yml'
+      - 'test/unit/**'
   pull_request:
     paths-ignore:
       - 'tkltest/generate/unit/**'
@@ -17,6 +19,8 @@ on:
       - 'tkltest/tkltest_unit.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_unit_ci.yml'
+      - 'test/unit/**'
 
 jobs:
   build:
@@ -29,21 +33,49 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
     - name: Install prerequisites
       run: |
-        sudo apt-get install -y bats libxml2-utils
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y libgtk2.0-0 chromium-chromedriver
+        sudo npm install -g bats
         bats --version
+        chromedriver --version
+    - name: Create maven settings.xml
+      uses: s4u/maven-settings-action@v2.4.0
+      with:
+        servers: '[
+          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
+          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
+        ]'
+    - name: Download Java libraries
+      run: |
+        cd lib
+        sed -ie "s|GITHUB_USERNAME|$GITHUB_ACTOR|g" settings.xml
+        sed -ie "s|GITHUB_TOKEN|${{ secrets.TKLTEST_PKGS_PAT }}|g" settings.xml
+        ./download_lib_jars.sh
+        cd ..; ls lib/*
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Install tkltest-ui command and run bats tests
+    - name: Pull test webapps
       run: |
         git submodule init
         git submodule update
-        python -m venv venv
-        source venv/bin/activate
+    - name: Install tkltest-ui command
+      run: |
         pip install .
         which tkltest-ui
+    - name: Run CLI help/config tests
+      run: |
         bats test/ui/test_cli.bats
-        deactivate
+    - name: Run CLI generate/execute tests - petclinic
+      env:
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+      run: |
+        bats test/ui/test_cli_petclinic.bats

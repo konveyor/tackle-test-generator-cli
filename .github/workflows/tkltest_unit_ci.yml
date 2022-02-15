@@ -9,6 +9,8 @@ on:
       - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'test/ui/**'
   pull_request:
     paths-ignore:
       - 'tkltest/generate/ui/**'
@@ -17,6 +19,8 @@ on:
       - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'test/ui/**'
 
 jobs:
   build:

@@ -29,7 +29,7 @@ from tkltest.execute.unit.coverage_html_writer import CoverageStatisticsHtmlWrit
 def process_execute_command(args, config):
     """Processes the execute command.
 
-    Processes the execute command and executes test cases based on the subcommand specified
+    Processes the execute command and executes test cases
 
     Args:
         args: command-line arguments
