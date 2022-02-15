@@ -75,9 +75,11 @@ jobs:
 #        docker run -d -p 8080:8080 --name petclinic-angular spring-petclinic-angular:latest
 #        curl localhost:8080
     - name: Install tkltest-ui command
+      run: |
         pip install .
         which tkltest-ui
     - name: Run CLI help/config tests
+      run: |
         bats test/ui/test_cli.bats
     - name: Run CLI generate/execute tests - petclinic
       env:
