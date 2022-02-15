@@ -9,6 +9,8 @@ on:
       - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'test/ui/**'
   pull_request:
     paths-ignore:
       - 'tkltest/generate/ui/**'
@@ -17,6 +19,8 @@ on:
       - 'tkltest/tkltest_ui.py'
       - 'doc/**'
       - '**.md'
+      - '.github/workflows/tkltest_ui_ci.yml'
+      - 'test/ui/**'
 
 jobs:
   build:
@@ -62,7 +66,8 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_generate_execute.py test/unit/test_unit_tests.py
+        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
+        nosetests test/unit/test_generate_execute.py
     - name: Install tkltest-unit command and run bats tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64

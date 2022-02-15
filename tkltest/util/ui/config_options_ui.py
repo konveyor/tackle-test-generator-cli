@@ -344,5 +344,4 @@ __options_spec_internal = {
         'is_cli_command': True,
         'help_message': 'Execute generated UI tests on the application under test',
     }
-
 }
