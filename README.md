@@ -13,7 +13,7 @@ tooling for performing automated test generation and differential testing on two
    2. [The execute command](#execute-command)
 5. [Configuration options](doc/tkltest_unit_config_options.md)
 6. [Known tool issues](#known-tool-issues)
-7. [Additional Resources](#additional-resources)
+7. [Additional Resources (demos, presentations, blog)](#additional-resources)
 
 ## Overview
 
