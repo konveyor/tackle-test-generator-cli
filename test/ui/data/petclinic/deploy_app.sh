@@ -8,6 +8,7 @@ DOCKER_CONTAINER_NAME_ANGULAR="petclinic-angular"
 usage() {
     echo
     echo "Usage: $0 [command]"
+    echo "  build                 build app image"
     echo "  start [-b/--build]    start app container, optionally building the image"
     echo "  stop                  stop app container"
     echo
@@ -20,6 +21,12 @@ stop() {
     echo "=> Stopping and removing existing $DOCKER_CONTAINER_NAME_REST container"
     docker rm -f $DOCKER_CONTAINER_NAME_REST
     sleep 1
+}
+
+build() {
+    echo "=> Building $DOCKER_IMAGE_NAME_ANGULAR"
+    cd ../webapps/spring-petclinic-angular
+    docker build -t spring-petclinic-angular:latest .
 }
 
 start() {
@@ -45,6 +52,8 @@ fi
 
 if [[ $1 == "stop" ]]; then
     stop
+elif [[ $1 == "build" ]]; then
+    build
 elif [[ $1 == "start" ]]; then
     if [[ $# -eq 2 ]]; then
         if [[ $2 != "-b" && $2 != "--build" ]]; then

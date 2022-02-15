@@ -5,6 +5,8 @@ PETCLINIC_TEST_FILE=$PETCLINIC_CRAWL_DIR/src/test/java/generated/GeneratedTests.
 
 # setup commands run before execution of tests in file
 setup_file() {
+    echo "# setup_file: building webapp image" >&3
+    cd test/ui/data/petclinic && ./deploy_app.sh build && cd ../../../..
     echo "# setup_file: deleting output dirs" >&3
     echo "#   - deleting $PETCLINIC_OUTPUT_DIR" >&3
     rm -rf $PETCLINIC_OUTPUT_DIR
