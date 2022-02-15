@@ -78,4 +78,4 @@ jobs:
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
-        bats test/ui/test_cli_generate_execute.bats
+        bats test/ui/test_cli_petclinic.bats
