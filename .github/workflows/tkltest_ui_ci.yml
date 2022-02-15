@@ -67,14 +67,6 @@ jobs:
       run: |
         git submodule init
         git submodule update
-#    - name: Run petclinic webapp for testing
-#      run: |
-#        cd test/ui/data/webapps/spring-petclinic-rest
-#        docker run -d -p 9966:9966 --name petclinic-rest springcommunity/spring-petclinic-rest
-#        cd ../spring-petclinic-angular
-#        docker build -t spring-petclinic-angular:latest .
-#        docker run -d -p 8080:8080 --name petclinic-angular spring-petclinic-angular:latest
-#        curl localhost:8080
     - name: Install tkltest-ui command
       run: |
         pip install .
