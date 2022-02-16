@@ -62,7 +62,7 @@ def main():
 
     for config in configs:
         if len(configs) > 1:
-            logging_util.tkltest_status('Running command {} with config of module {}. '.format(args.command, config['general']['module_name']))
+            logging_util.tkltest_status('Running command {} with generated config of module {}. '.format(args.command, config['general']['module_name']))
 
         unjar_paths = __unjar_path(config)
         # process generate/execute commands

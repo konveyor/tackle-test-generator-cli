@@ -423,7 +423,7 @@ def __create_modified_build_file_for_dependencies(app_build_file, toy_program_di
 def __run_ant_command(modified_build_file_name,
                       app_settings_file,
                       app_build_target,
-                      ant_output_filename):
+                      output_dir):
     """
     Runs the ant command with the modified copy of the build file.
     Also, removes the modified build file copy after running command.
@@ -433,6 +433,7 @@ def __run_ant_command(modified_build_file_name,
     :return: path to the file containing the output
     """
     # create output file or override previous output
+    ant_output_filename = os.path.join(output_dir, 'tkltest_ant_output.txt')
     with open(ant_output_filename, 'w') as output_file:
         output_file.write('')
 
@@ -454,7 +455,7 @@ def __run_ant_command(modified_build_file_name,
         sys.exit(1)
 
     os.remove(modified_build_file_name)
-
+    return ant_output_filename
 
 def __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath):
     """
@@ -627,8 +628,8 @@ def resolve_app_path(tkltest_config):
     app_name = tkltest_config['general']['app_name']
     app_build_type = tkltest_config['generate']['app_build_type']
     if len(tkltest_config['generate']['app_build_config_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
-        # it is a rare case, in which the user suplly more that one build file, however we obtain only one module
-        tkltest_status('resolving app_path from more than on app_build_config_file is not supported', error=True)
+        # it is a rare case, in which the user gives more that one build file, however we obtain only one module
+        tkltest_status('resolving app_path supported for only a single app_build_config_file', error=True)
         sys.exit(1)
     app_build_file = tkltest_config['generate']['app_build_config_files'][0]
     if tkltest_config['generate']['app_build_settings_files']:
@@ -670,8 +671,7 @@ def resolve_app_path(tkltest_config):
         app_build_target = tkltest_config['generate']['app_build_target']
         # create a modified build file
         modified_build_file_name, build_base_dir = __create_modified_build_file_for_monolith_app_path(app_build_file)
-        ant_output_filename = os.path.join(output_dir, 'tkltest_ant_output.txt')
-        __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, ant_output_filename)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
 
         with open(ant_output_filename, 'r') as output_file:
             lines = output_file.read().splitlines()
@@ -747,8 +747,8 @@ def resolve_classpath(tkltest_config, command):
 
     app_build_type = tkltest_config['generate']['app_build_type']
     if len(tkltest_config['generate']['app_build_config_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
-        # it is a rare case, in which the user suplly more that one build file, however we obtain only one module
-        tkltest_status('resolving classpath from more than on app_build_config_file is not supported', error=True)
+        # it is a rare case, in which the user gives more that one build file, however we obtain only one module
+        tkltest_status('resolving classpath supported for only a single app_build_config_file', error=True)
         sys.exit(1)
 
     app_build_file = tkltest_config['generate']['app_build_config_files'][0]
@@ -837,8 +837,7 @@ def resolve_classpath(tkltest_config, command):
 
         # create a modified build file
         modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
-        ant_output_filename = os.path.join(output_dir, 'tkltest_ant_output.txt')
-        __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, ant_output_filename)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
         __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)

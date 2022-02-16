@@ -33,7 +33,7 @@ class GenerateExecuteTest(unittest.TestCase):
     # directory containing test applications
     test_data_dir = os.path.join('test', 'data')
     # test_data_dir = os.path.join('data')
-
+    begin_dir_content = os.listdir(os.getcwd())
     test_apps = {
         'irs': {
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
@@ -807,17 +807,24 @@ class GenerateExecuteTest(unittest.TestCase):
             user_config = app_info['config']
             user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            modules_names = ['app', 'utilities', 'list']
+            self.assertTrue(len(configs) == len(modules_names))
             for config in configs:
+                module_name = config['general']['module_name']
+                self.assertTrue(module_name in modules_names)
                 self.__process_generate(subcommand='ctd-amplified', config=config)
                 # assert that expected generate resources are created
-                self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=config['general']['module_name'])
+                self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=module_name)
 
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            self.assertTrue(len(configs)==len(modules_names))
             for config in configs:
+                module_name = config['general']['module_name']
+                self.assertTrue(module_name in modules_names)
                 # execute tests
                 self.__process_execute(config=config)
                 # assert that expected execute resources are created
-                self.__assert_execute_resources(app_name=app_name,module_name=config['general']['module_name'])
+                self.__assert_execute_resources(app_name=app_name,module_name=module_name)
 
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
@@ -856,6 +863,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
 
     def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
         dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
@@ -877,6 +885,7 @@ class GenerateExecuteTest(unittest.TestCase):
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False):
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -903,6 +912,7 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_cli_dir()
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
         dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:

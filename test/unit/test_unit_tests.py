@@ -78,6 +78,7 @@ class UnitTests(unittest.TestCase):
 
     def setUp(self) -> None:
         dir_util.cd_cli_dir()
+        self.begin_dir_content = os.listdir(os.getcwd())
 
     def test_getting_dependencies_ant(self) -> None:
         """Test getting dependencies using ant build file"""
@@ -108,6 +109,7 @@ class UnitTests(unittest.TestCase):
                                         os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                         failed_assertion_message,
                                         is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
+                self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_app_path_ant(self) -> None:
         """Test getting monolith app path using ant build file"""
@@ -136,6 +138,7 @@ class UnitTests(unittest.TestCase):
                 self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
                 self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
                 self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
+            self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -165,6 +168,7 @@ class UnitTests(unittest.TestCase):
                                     jars_location,
                                     failed_assertion_message,
                                     ordered_classpath=True)
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_app_path_maven(self) -> None:
         """Test getting monolith app path using maven build file"""
@@ -194,6 +198,7 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
             self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
             self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_modules_maven(self) -> None:
         """Test getting list of modules using maven build file"""
@@ -216,7 +221,7 @@ class UnitTests(unittest.TestCase):
                          'simple-sample-weblogic-web']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
-
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_modules_gradle(self) -> None:
         """Test getting list of modules using gradle build file"""
@@ -240,6 +245,7 @@ class UnitTests(unittest.TestCase):
                          'utilities']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def test_getting_modules_configs(self) -> None:
         """Test getting the configs for modules"""
@@ -360,6 +366,7 @@ class UnitTests(unittest.TestCase):
             config_util.fix_relative_paths(module_config)
             self.assertTrue(module_config in configs_generate)
             self.assertTrue(module_config in configs_execute)
+        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
 
 
@@ -393,6 +400,7 @@ class UnitTests(unittest.TestCase):
                                     generated_classpath,
                                     os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                     failed_assertion_message)
+            self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
