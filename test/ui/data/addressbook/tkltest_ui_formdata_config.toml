@@ -1,0 +1,101 @@
+# The form data specification consists of a set of tables, one for each form, and each form
+# contains a set of field specifications along with one "before click" element specification
+#
+# A field specification identifies a field of a web form with the value to be used for that
+# field; it consists of three parts:
+#   1. input_type: enum with choices text, select, checkbox, radio, email, textarea, password, number
+#   2. identification: consists of two parts
+#        a. how: enum with choices name, id, tag, text, xpath, partial_text
+#        b. value: string value for how
+#   3 input_value: string value to be used as input
+#
+# A "before click" element specification identifies the web element that is clicked to submit
+# the form; it consists of two parts:
+#   1. tag_name: string specifying HTML tag
+#   2. one of with_attribute, with_text, or under_xpath, taking the following structure
+#        with_attribute = { attr_name = "", attr_value = ""}
+#        with_text = "<text>"
+#        under_xpath = "<xpath>"
+#
+[forms.login]
+
+  [[forms.login.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "user"}
+    input_value = "admin"
+
+  [[forms.login.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "pass"}
+    input_value = "secret"
+
+  [forms.login.before_click]
+    tag_name = "input"
+    with_attribute = { attr_name = "value", attr_value = "Login" }
+
+[forms.new_user]
+
+  [[forms.new_user.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "email"}
+    input_value = "tsigalko18@gmail.com"
+
+  [[forms.new_user.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "password"}
+    input_value = "123456"
+
+  [forms.new_user.before_click]
+    tag_name = "input"
+    with_attribute = { attr_name = "value", attr_value = "Sign-Up" }
+
+[forms.new_entry_1]
+  [[forms.new_entry_1.input_fields]]
+    input_type = "textarea"
+    identification = { how = "name", value = "address"}
+    input_value = "123 Main Street"
+
+  [forms.new_entry_1.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Next" }
+
+[forms.new_entry_2]
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "firstname"}
+    input_value = "abc"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "lastname"}
+    input_value = "xyz"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "textarea"
+    identification = { how = "name", value = "address"}
+    input_value = "123 Main Street"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "email"}
+    input_value = "abcxyz@gmail.com"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "select"
+    identification = { how = "name", value = "bday"}
+    input_value = "9"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "select"
+    identification = { how = "name", value = "bmonth"}
+    input_value = "September"
+
+  [[forms.new_entry_2.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "byear"}
+    input_value = "2000"
+
+  [forms.new_entry_2.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Enter" }
