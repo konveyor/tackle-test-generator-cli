@@ -11,7 +11,6 @@
 # limitations under the License.
 # ***************************************************************************
 
-import glob
 import logging
 import os.path
 import re
@@ -19,13 +18,12 @@ import subprocess
 import sys
 import urllib.parse
 
-import psutil
 import toml
 
 from tkltest.util.logging_util import tkltest_status
 from tkltest.util import command_util
 from tkltest.util.constants import *
-from tkltest.util.ui import dir_util
+from tkltest.util.ui import dir_util, browser_util
 
 def process_generate_command(config):
     """Processes the tkltest-ui generate command.
@@ -89,7 +87,8 @@ def process_generate_command(config):
     # TODO: print progress messages: number of states discovered, percent time elapsed
 
     # cleanup browser instances
-    __cleanup_browser_instances(browser)
+    browser_util.cleanup_browser_instances(browser)
+
 
 def __get_generated_test_count(last_crawl_dir):
     """Returns the number of generated test cases
@@ -100,35 +99,3 @@ def __get_generated_test_count(last_crawl_dir):
     with open(generated_test_class, 'r') as f:
         teststr = f.read()
     return len(re.findall('@Test', teststr)), generated_test_class
-
-
-def __cleanup_browser_instances(browser):
-    """Performs process cleanup based on platform and browser"""
-    if browser in ['chrome', 'chrome_headless']:
-        if sys.platform == 'darwin':
-            __kill_processes(['chromedriver', 'chrome'])
-        elif sys.platform in ['linux', 'linux2']:
-             __kill_processes(['chromedriver'])
-        elif sys.platform in ['win32', 'win64']:
-            # TODO: check
-            __kill_processes(['chromedriver.exe'])
-    else:
-        # TODO: firefox
-        pass
-
-
-def __kill_processes(proc_names):
-    """Kills process with the given names"""
-    for proc in psutil.process_iter():
-        try:
-            procname = proc.name()
-        except (psutil.ZombieProcess, psutil.NoSuchProcess):
-            pass
-        else:
-            if procname in proc_names:
-                logging.info('Killing {} instance'.format(procname))
-                try:
-                    proc.kill()
-                except Exception:
-                    logging.info('Error terminating process "{}"'.format(procname))
-                    pass
