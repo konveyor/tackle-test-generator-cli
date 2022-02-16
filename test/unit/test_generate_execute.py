@@ -969,9 +969,10 @@ class GenerateExecuteTest(unittest.TestCase):
         Here we check that we do not leave anything in the cli directory
         '''
         current_dir_content = os.listdir(os.getcwd())
-        alowed_artifacts = []
+        allow_artifacts = []
         for app_name in (list(self.test_apps.keys())):
-            alowed_artifacts.append('tkltest-output-unit-' + app_name)
-            alowed_artifacts.append(self.test_apps[app_name]['test_directory'])
-            alowed_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+            allow_artifacts.append('tkltest-output-unit-' + app_name)
+            allow_artifacts.append(self.test_apps[app_name]['test_directory'])
+            allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+            allow_artifacts.append(app_name + '-user-reports')
         self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(alowed_artifacts))
