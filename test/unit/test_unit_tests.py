@@ -109,7 +109,7 @@ class UnitTests(unittest.TestCase):
                                         os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                         failed_assertion_message,
                                         is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
-                self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+                self.__assert_no_artifact_at_cli()
 
     def test_getting_app_path_ant(self) -> None:
         """Test getting monolith app path using ant build file"""
@@ -138,7 +138,7 @@ class UnitTests(unittest.TestCase):
                 self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
                 self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
                 self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
-            self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+            self.__assert_no_artifact_at_cli()
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -168,7 +168,7 @@ class UnitTests(unittest.TestCase):
                                     jars_location,
                                     failed_assertion_message,
                                     ordered_classpath=True)
-        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+        self.__assert_no_artifact_at_cli()
 
     def test_getting_app_path_maven(self) -> None:
         """Test getting monolith app path using maven build file"""
@@ -198,7 +198,7 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
             self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
             self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
-        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+        self.__assert_no_artifact_at_cli()
 
     def test_getting_modules_maven(self) -> None:
         """Test getting list of modules using maven build file"""
@@ -221,7 +221,7 @@ class UnitTests(unittest.TestCase):
                          'simple-sample-weblogic-web']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
-        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+        self.__assert_no_artifact_at_cli()
 
     def test_getting_modules_gradle(self) -> None:
         """Test getting list of modules using gradle build file"""
@@ -245,7 +245,7 @@ class UnitTests(unittest.TestCase):
                          'utilities']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
-        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+        self.__assert_no_artifact_at_cli()
 
     def test_getting_modules_configs(self) -> None:
         """Test getting the configs for modules"""
@@ -366,8 +366,7 @@ class UnitTests(unittest.TestCase):
             config_util.fix_relative_paths(module_config)
             self.assertTrue(module_config in configs_generate)
             self.assertTrue(module_config in configs_execute)
-        self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
-
+        self.__assert_no_artifact_at_cli()
 
 
     def test_getting_dependencies_gradle(self) -> None:
@@ -400,7 +399,7 @@ class UnitTests(unittest.TestCase):
                                     generated_classpath,
                                     os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                     failed_assertion_message)
-            self.assertFalse(set(os.listdir(os.getcwd())) ^ set(self.begin_dir_content))
+            self.__assert_no_artifact_at_cli()
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
@@ -446,3 +445,12 @@ class UnitTests(unittest.TestCase):
             for path in module['classpath']:
                 self.assertTrue(os.path.isfile(path))
 
+    def __assert_no_artifact_at_cli(self):
+        '''
+        Here we check that we do not leave anything in the cli directory
+        '''
+        current_dir_content = os.listdir(os.getcwd())
+        alowed_artifacts = []
+        for app in (list(self.maven_test_apps.keys()) + list(self.ant_test_apps.keys()) + ['splitNjoin', 'migration-sample-app-master']):
+            alowed_artifacts.append('tkltest-output-unit-' + app)
+        self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(alowed_artifacts))
