@@ -12,12 +12,12 @@ setup_file() {
 
 teardown_file() {
     echo "# teardown_file: stopping webapp" >&3
-    cd test/ui/data/addressbook && ./deploy_app.sh stop && cd ../../../..
+    cd test/ui/data/webapps/addressbook && ./deploy_app.sh stop && cd ../../../../..
 }
 
 setup() {
     echo "# setup: deploying webapp" >&3
-    cd test/ui/data/addressbook && ./deploy_app.sh start && cd ../../../..
+    cd test/ui/data/webapps/addressbook && ./deploy_app.sh start && cd ../../../../..
 }
 
 @test "Test 01: CLI generate addressbook" {
