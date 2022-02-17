@@ -16,7 +16,7 @@ import sys
 import subprocess
 import urllib
 
-from tkltest.util.ui import dir_util
+from tkltest.util.ui import dir_util, browser_util
 from tkltest.util import command_util
 from tkltest.util.logging_util import tkltest_status
 
@@ -42,14 +42,8 @@ def process_execute_command(config):
     except subprocess.CalledProcessError as e:
         tkltest_status('Error executing tests: {}\n{}'.format(e, e.stderr), error=True)
         os.chdir(cur_dir)
+        browser_util.cleanup_browser_instances(config['generate']['browser'])
         sys.exit(1)
 
     os.chdir(cur_dir)
-
-    #dir_util.cd_output_dir(config['general']['app_name'])
-    #config_util.fix_config(config, args.command)
-    #__execute_base(args, config)
-    #if config['dev_tests']['compare_code_coverage']:
-    #    __run_dev_tests(config)
-    #    __compare_to_dev_tests_coverage(config)
-    #dir_util.cd_cli_dir()
+    browser_util.cleanup_browser_instances(config['generate']['browser'])
