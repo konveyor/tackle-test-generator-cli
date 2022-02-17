@@ -35,16 +35,16 @@ def process_execute_command(args, config):
         args: command-line arguments
         config: loaded configuration options
     """
-    dir_util.cd_output_dir(config['general']['app_name'])
-    config_util.fix_config(config, args.command)
-    __execute_base(args, config)
+    output_dir = dir_util.get_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
+    dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
+    __execute_base(args, config, output_dir)
     if config['dev_tests']['compare_code_coverage']:
-        __run_dev_tests(config)
+        __run_dev_tests(config, output_dir)
         __compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
 
 
-def __run_dev_tests(config):
+def __run_dev_tests(config, output_dir):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     ant_build_file = ''
@@ -65,6 +65,7 @@ def __run_dev_tests(config):
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
+                     output_dir=output_dir
                      )
 
 
@@ -90,7 +91,7 @@ def __get_test_classes(test_root_dir):
 #                 os.remove(os.path.join(root, f))
 
 
-def __execute_base(args, config):
+def __execute_base(args, config, output_dir):
 
     # get list of test classes: either the specified class or the all test classes from the specified
     # test files dir
@@ -151,7 +152,8 @@ def __execute_base(args, config):
                      target_class_list=gen_config['generate']['target_class_list'],
                      reports_dir=config['general']['reports_path'],
                      offline_inst=offline_inst,
-                     verbose=config['general']['verbose']
+                     verbose=config['general']['verbose'],
+                     output_dir=output_dir
                      )
 
 
@@ -159,7 +161,7 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
                      create_build, build_type, ant_build_file, maven_build_file, gradle_build_file, build_targets='',
                      test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[],
                      app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='',
-                     env_vars={}, micro=False):
+                     env_vars={}, micro=False, output_dir=''):
 
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
 
@@ -181,7 +183,8 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
             main_reports_dir=main_reports_dir,
             app_packages=app_packages,
             collect_codecoverage=collect_codecoverage,
-            offline_instrumentation=offline_inst
+            offline_instrumentation=offline_inst,
+            output_dir=output_dir
         )
     partitions = [os.path.basename(dir) for dir in test_dirs]
 

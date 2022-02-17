@@ -19,11 +19,11 @@ import sys
 import json
 
 from tkltest.util import constants, command_util
-from tkltest.util.unit import build_util
+from tkltest.util.unit import build_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
-def generate_evosuite(config):
+def generate_evosuite(config, output_dir):
     """Generates test cases using evosuite.
 
     Generates test cases using the EvoSuite test generator standalone. The generated tests are stored in the
@@ -52,7 +52,7 @@ def generate_evosuite(config):
     else:
         evosuite_command += " -target " + app_copy_folder
 
-    evosuite_flags, output_dir = __get_evosuite_flags(config)
+    evosuite_flags, evosuite_output_dir = __get_evosuite_flags(config)
     evosuite_command += evosuite_flags
     logging.info(evosuite_command)
     try:
@@ -60,7 +60,7 @@ def generate_evosuite(config):
     except subprocess.CalledProcessError as e:
         tkltest_status('Generating test suite using Evosuite failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
-    tkltest_status('Generated Evosuite test suite written to {}'.format(output_dir))
+    tkltest_status('Generated Evosuite test suite written to {}'.format(evosuite_output_dir))
 
     if config['general']['reports_path']:
         reports_dir = config['general']['reports_path']
@@ -72,18 +72,19 @@ def generate_evosuite(config):
         app_name=app_name,
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=build_util.get_build_classpath(config),
-        test_root_dir=output_dir,
-        test_dirs=[output_dir],
+        test_root_dir=evosuite_output_dir,
+        test_dirs=[evosuite_output_dir],
         partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
-        main_reports_dir=reports_dir
+        main_reports_dir=reports_dir,
+        output_dir=output_dir
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
-    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
-    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(output_dir, gradle_build_file))))
+    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, ant_build_file))))
+    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, maven_build_file))))
+    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, gradle_build_file))))
 
 
-def generate_randoop(config):
+def generate_randoop(config, output_dir):
     """Generates test cases using randoop.
 
     Generates test cases using the Randoop test generator standalone. The generated tests are stored in the
@@ -109,11 +110,11 @@ def generate_randoop(config):
                       classpath
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':
-        output_dir = app_name+constants.TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX
+        randoop_output_dir = app_name+constants.TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX
     else:
-        output_dir = config['general']['test_directory']
+        randoop_output_dir = config['general']['test_directory']
 
-    randoop_command += " randoop.main.Main gentests --junit-output-dir="+output_dir
+    randoop_command += " randoop.main.Main gentests --junit-output-dir=" + randoop_output_dir
     if config['generate']['partitions_file']:
         randoop_command += " --classlist=" + __generate_class_list_file(__parse_partitions_file(config['generate']['partitions_file']),
                                                                         config['general']['app_name'],
@@ -135,22 +136,23 @@ def generate_randoop(config):
     except subprocess.CalledProcessError as e:
         tkltest_status('Generating test suite using Randoop failed: {}\n{}'.format(e, e.stderr), error=True)
         sys.exit(1)
-    tkltest_status('Generated Randoop test suite written to {}'.format(output_dir))
+    tkltest_status('Generated Randoop test suite written to {}'.format(randoop_output_dir))
 
     # generate ant build file
     ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
-        test_root_dir=output_dir,
-        test_dirs=[output_dir],
+        test_root_dir=randoop_output_dir,
+        test_dirs=[randoop_output_dir],
         partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
-        main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+        main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
+        output_dir=output_dir
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(output_dir, ant_build_file))))
-    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(output_dir, maven_build_file))))
-    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(output_dir, gradle_build_file))))
+    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, ant_build_file))))
+    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, maven_build_file))))
+    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, gradle_build_file))))
 
 
 def __arrange_folders_for_evosuite(paths_list,  config):
