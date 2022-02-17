@@ -346,7 +346,7 @@ def get_test_classes(test_root_dir):
     return test_files
 
 
-def generate_coverage_report(monolith_app_path, exec_file, xml_file, html_dir):
+def generate_coverage_report(monolith_app_path, exec_file, xml_file, html_dir, csv_file=''):
     """Generates jacoco XML file from raw coverage (.exec) files.
 
      runs the jacoco CLI to generate XML report from the raw coverage file.
@@ -361,6 +361,8 @@ def generate_coverage_report(monolith_app_path, exec_file, xml_file, html_dir):
     for classpath in monolith_app_path:
         jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
     jacoco_cmd = '{} {} {} {} --xml {} --html {}'.format(jacoco_cli_cmd, 'report', exec_file, jacoco_classfiles_ops, xml_file, html_dir)
+    if csv_file:
+        jacoco_cmd += ' --csv {}'.format(csv_file)
     try:
         command_util.run_command(jacoco_cmd, verbose=True)
     except subprocess.CalledProcessError as e:

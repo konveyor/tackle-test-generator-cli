@@ -27,8 +27,34 @@ from .augment import augment_with_code_coverage
 from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
 from tkltest.util import command_util, constants, config_util
-from tkltest.util.unit import  build_util, dir_util
+from tkltest.util.unit import  build_util, dir_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
+
+
+def get_covered_targets_by_dev_test(config):
+    app_name = config['general']['app_name']
+    main_reports_dir = config['general']['reports_path']
+    if not main_reports_dir:
+        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+    dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
+    if os.path.isdir(dev_report_dir):
+        shutil.rmtree(dev_report_dir)
+    os.mkdir(dev_report_dir)
+    #todo - run the user targets to obtain exec file
+
+    # calling generate_coverage_report() to create a xml file and html dir:
+    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
+    dev_coverage_xml = os.path.join(dev_report_dir, dev_test_name + '_coverage.xml')
+    dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv')
+    #todo - we do not need the html + xml
+    dev_html_dir = os.path.join(dev_report_dir, dev_test_name + '-html')
+    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                                           exec_file=dev_coverage_exec,
+                                           xml_file=dev_coverage_xml,
+                                           html_dir=dev_html_dir,
+                                           csv_file=dev_coverage_csv)
+
 
 
 def process_generate_command(args, config):
@@ -47,6 +73,7 @@ def process_generate_command(args, config):
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
+    get_covered_targets_by_dev_test(config)
     if args.sub_command == "ctd-amplified":
         generate_ctd_amplified_tests(config, output_dir)
     elif args.sub_command == "randoop":
