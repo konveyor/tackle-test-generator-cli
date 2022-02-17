@@ -46,7 +46,9 @@ def get_output_dir(app_name, module_name):
 
 
 def cd_output_dir(app_name, module_name):
-    os.chdir(get_output_dir(app_name, module_name))
+    output_dir = get_output_dir(app_name, module_name)
+    os.chdir(output_dir)
+    return output_dir
 
 
 

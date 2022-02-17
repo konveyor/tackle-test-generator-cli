@@ -61,8 +61,11 @@ def main():
     configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
 
     for config in configs:
-        if len(configs) > 1:
-            logging_util.tkltest_status('Running command {} with generated config of module {}. '.format(args.command, config['general']['module_name']))
+        logging_util.tkltest_status('{} tests for {} {} using config file {}.'.format(
+            'Generating' if args.command == 'generate' else 'Executing',
+            'module' if 'module_name' in config['general'] else 'app',
+            config['general'].get('module_name', config['general']['app_name']),
+            config['general'].get('config_file_path', args.config_file.name)))
 
         unjar_paths = __unjar_path(config)
         # process generate/execute commands

@@ -937,9 +937,12 @@ def resolve_tkltest_configs(tkltest_user_config, command):
         toml_files = list(pathlib.Path(dir_util.get_app_output_dir(app_name)).glob('**/*' + tkltest_config_file_suffix))
         if toml_files:
             tkltest_status('Running on {} config files that were created by the generate command  '.format(len(toml_files)))
-            configs = [toml.load(toml_file) for toml_file in toml_files]
-            for config in configs:
+            configs = []
+            for toml_file in toml_files:
+                config = toml.load(toml_file)
+                config['general']['config_file_path'] = os.path.abspath(toml_file)
                 fix_relative_paths(config)
+                configs.append(config)
             return configs
         else:
             resolve_app_path(tkltest_user_config)
@@ -999,6 +1002,7 @@ def __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_propert
                                            app_name + '_' + module_name + tkltest_config_file_suffix)
         with open(tkltest_config_file, 'w') as f:
             toml.dump(tkltest_config, f)
+        tkltest_config['general']['config_file_path'] = tkltest_config_file
         fix_relative_paths(tkltest_config)
         tkltest_configs.append(tkltest_config)
 
