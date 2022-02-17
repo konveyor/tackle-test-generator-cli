@@ -42,17 +42,16 @@ def process_generate_command(args, config):
         config: loaded configuration options
     """
     logging.info('Processing generate command')
-    dir_util.cd_output_dir(config['general']['app_name'])
-    config_util.fix_config(config, args.command)
+    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
     if args.sub_command == "ctd-amplified":
-        generate_ctd_amplified_tests(config)
+        generate_ctd_amplified_tests(config, output_dir)
     elif args.sub_command == "randoop":
-        generate_randoop(config)
+        generate_randoop(config, output_dir)
     elif args.sub_command == "evosuite":
-        generate_evosuite(config)
+        generate_evosuite(config, output_dir)
     else:
         tkltest_status("sub command "+args.sub_command+" not supported", error=True)
         sys.exit(1)
@@ -71,7 +70,7 @@ def process_generate_command(args, config):
     dir_util.cd_cli_dir()
 
 
-def generate_ctd_amplified_tests(config):
+def generate_ctd_amplified_tests(config, output_dir):
     """Performs CTD-guided test generation.
 
     Performs CTD-guided test generation in three main steps (by invoking the related Java components):
@@ -218,7 +217,8 @@ def generate_ctd_amplified_tests(config):
         main_reports_dir=reports_dir,
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
         collect_codecoverage=True,  # for coverage-based augmentation
-        offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False
+        offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False,
+        output_dir=output_dir
     )
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
@@ -252,7 +252,8 @@ def generate_ctd_amplified_tests(config):
                 main_reports_dir=reports_dir,
                 app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
                 collect_codecoverage=True,  # for coverage-based augmentation
-                offline_instrumentation=False
+                offline_instrumentation=False,
+                output_dir=output_dir
             )
             config['general']['offline_instrumentation'] = False
             augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,

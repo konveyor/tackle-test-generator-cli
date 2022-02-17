@@ -76,7 +76,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 
 def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
                            partitions_file, target_class_list, main_reports_dir, app_packages='',
-                           collect_codecoverage=False, offline_instrumentation=False):
+                           collect_codecoverage=False, offline_instrumentation=False, output_dir=''):
     """Generates Ant build.xml, Maven pom.xml, and Gradle build.gradle for running tests.
 
     Generates Ant build.xml, aMaven pom.xml and Gradle build.gradle for running generated tests and collecting coverage information.
@@ -93,6 +93,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         app_packages: app packages to be tracked for code coverage
         collect_codecoverage: whether to collect code coverage data
         offline_instrumentation whether to perform offline instrumentation of app classes
+        output_dir: running directory
     """
     if partitions_file:
         with open(app_name + constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX) as ctd_model:
@@ -114,7 +115,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
 
     __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                 app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                ant_build_xml_file)
+                ant_build_xml_file, output_dir)
 
     # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
     with open(ant_build_xml_file, 'r') as inp:
@@ -124,26 +125,25 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
 
     maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
     __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file)
+                  app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file,output_dir)
 
     gradle_build_file = test_root_dir + os.sep + 'build.gradle'
     __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, main_reports_dir, gradle_build_file)
+                  app_packages, offline_instrumentation, main_reports_dir, gradle_build_file, output_dir)
 
     return ant_build_xml_file, maven_build_xml_file, gradle_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
                 app_collected_packages, app_reported_classes, offline_instrumentation, report_output_dir,
-                build_xml_file):
+                build_xml_file, output_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text = Doc().tagtext()
     test_root_src_dir = os.path.abspath(test_root_src_dir)
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_src_dir))
-    #todo - fix for cases that user give test_root_dir:
-    inst_app_path = os.path.join(os.path.dirname(test_root_src_dir), app_name + "-instrumented-classes")
+    inst_app_path = os.path.join(output_dir, app_name + "-instrumented-classes")
     with tag('project', name='tkl_tests'):
 
         with tag('taskdef', uri="antlib:org.jacoco.ant", resource="org/jacoco/ant/antlib.xml"):
@@ -288,7 +288,7 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
-                  build_xml_file):
+                  build_xml_file, output_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
     test_root_dir = os.path.abspath(test_root_dir)
@@ -451,12 +451,11 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
 
 
 def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file):
+                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file, output_dir):
 
     #gradle accept only posix paths, so we uses PurePath to convert:
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
-    #todo - fix for cases that user give test_root_dir:
-    inst_classes = pathlib.PurePath(os.path.join(os.path.dirname(os.path.abspath(test_root_dir)), app_name + "-instrumented-classes")).as_posix()
+    inst_classes = pathlib.PurePath(os.path.join(output_dir, app_name + "-instrumented-classes")).as_posix()
     test_dirs = [pathlib.PurePath(os.path.abspath(test_dir)).as_posix() for test_dir in test_dirs if not os.path.basename(test_dir) == 'build']
     monolith_app_paths = [pathlib.PurePath(os.path.abspath(monolith_app_path)).as_posix() for monolith_app_path in monolith_app_paths]
     app_packages = [pathlib.PurePath(os.path.abspath(app_package)).as_posix() for app_package in app_packages]
