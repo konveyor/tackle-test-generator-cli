@@ -27,7 +27,7 @@ def get_app_output_dir(app_name):
     return app_dir
 
 
-def get_output_dir(app_name, module_name=''):
+def get_output_dir(app_name, module_name):
     output_dir = get_app_output_dir(app_name)
     if module_name:
         output_dir = os.path.join(output_dir, module_name)
@@ -45,8 +45,10 @@ def get_output_dir(app_name, module_name=''):
     return output_dir
 
 
-def cd_output_dir(app_name, module_name=''):
-    os.chdir(get_output_dir(app_name, module_name))
+def cd_output_dir(app_name, module_name):
+    output_dir = get_output_dir(app_name, module_name)
+    os.chdir(output_dir)
+    return output_dir
 
 
 
