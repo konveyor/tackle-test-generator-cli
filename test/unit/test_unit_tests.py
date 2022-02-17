@@ -75,6 +75,12 @@ class UnitTests(unittest.TestCase):
             'targets_to_test_app_path': ['compile', 'compile-antcall'],
         },
     }
+    gradle_test_apps = {
+        'splitNjoin': {
+            'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
+            'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
+        },
+    }
 
     def setUp(self) -> None:
         dir_util.cd_cli_dir()
@@ -109,7 +115,7 @@ class UnitTests(unittest.TestCase):
                                         os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                         failed_assertion_message,
                                         is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
-                self.__assert_no_artifact_at_cli()
+                self.__assert_no_artifact_at_cli(ant_test_apps.keys())
 
     def test_getting_app_path_ant(self) -> None:
         """Test getting monolith app path using ant build file"""
@@ -138,7 +144,7 @@ class UnitTests(unittest.TestCase):
                 self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
                 self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
                 self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
-            self.__assert_no_artifact_at_cli()
+            self.__assert_no_artifact_at_cli(ant_test_apps.keys())
 
     def test_getting_dependencies_maven(self) -> None:
         """Test getting dependencies using maven build file"""
@@ -168,7 +174,7 @@ class UnitTests(unittest.TestCase):
                                     jars_location,
                                     failed_assertion_message,
                                     ordered_classpath=True)
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli(maven_test_apps.keys())
 
     def test_getting_app_path_maven(self) -> None:
         """Test getting monolith app path using maven build file"""
@@ -198,7 +204,7 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(generated_monolith_app_path) == 1, failed_assertion_message)
             self.assertTrue(os.path.isdir(generated_monolith_app_path[0]), failed_assertion_message)
             self.assertTrue(os.path.samefile(generated_monolith_app_path[0], monolith_app_path[0]), failed_assertion_message)
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli(maven_test_apps.keys())
 
     def test_getting_modules_maven(self) -> None:
         """Test getting list of modules using maven build file"""
@@ -221,7 +227,7 @@ class UnitTests(unittest.TestCase):
                          'simple-sample-weblogic-web']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli([app_name])
 
     def test_getting_modules_gradle(self) -> None:
         """Test getting list of modules using gradle build file"""
@@ -245,7 +251,7 @@ class UnitTests(unittest.TestCase):
                          'utilities']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli([app_name])
 
     def test_getting_modules_configs(self) -> None:
         """Test getting the configs for modules"""
@@ -354,6 +360,7 @@ class UnitTests(unittest.TestCase):
             toml_file = os.path.join(outdir, app_name + '_' + modules_name + '_generated_tkltest_config.toml')
             self.assertTrue(os.path.isfile(toml_file))
             module_config = toml.load(toml_file)
+            module_config['general']['config_file_path'] = toml_file
             self.assertTrue(len(module_config['general']['monolith_app_path']) == 1)
             self.assertTrue(os.path.isdir(module_config['general']['monolith_app_path'][0]))
             self.assertTrue(module_config['general']['module_name'] == modules_name)
@@ -366,25 +373,18 @@ class UnitTests(unittest.TestCase):
             config_util.fix_relative_paths(module_config)
             self.assertTrue(module_config in configs_generate)
             self.assertTrue(module_config in configs_execute)
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli([app_name])
 
 
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test
         # app_build_type, app_build_config_file, app_build_settings_file are determined by the toml
-        gradle_test_apps = {
-            'splitNjoin': {
-                'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
-                'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
-            },
-        }
-
-        for app_name in gradle_test_apps.keys():
+        for app_name in self.gradle_test_apps.keys():
             dir_util.cd_cli_dir()
 
-            config = config_util.load_config(config_file=gradle_test_apps[app_name]['config_file'])
-            standard_classpath = os.path.abspath(gradle_test_apps[app_name]['standard_classpath'])
+            config = config_util.load_config(config_file=self.gradle_test_apps[app_name]['config_file'])
+            standard_classpath = os.path.abspath(self.gradle_test_apps[app_name]['standard_classpath'])
             dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
             config['general']['app_classpath_file'] = ''
 
@@ -399,7 +399,7 @@ class UnitTests(unittest.TestCase):
                                     generated_classpath,
                                     os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                     failed_assertion_message)
-            self.__assert_no_artifact_at_cli()
+            self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
@@ -445,12 +445,12 @@ class UnitTests(unittest.TestCase):
             for path in module['classpath']:
                 self.assertTrue(os.path.isfile(path))
 
-    def __assert_no_artifact_at_cli(self):
+    def __assert_no_artifact_at_cli(self, app_names):
         '''
         Here we check that we do not leave anything in the cli directory
         '''
         current_dir_content = os.listdir(os.getcwd())
         alowed_artifacts = []
-        for app in (list(self.maven_test_apps.keys()) + list(self.ant_test_apps.keys()) + ['splitNjoin', 'migration-sample-app-master']):
-            alowed_artifacts.append('tkltest-output-unit-' + app)
+        for app_name in app_names:
+            alowed_artifacts.append('tkltest-output-unit-' + app_name)
         self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(alowed_artifacts))

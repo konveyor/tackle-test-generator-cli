@@ -68,8 +68,7 @@ def process_generate_command(args, config):
         config: loaded configuration options
     """
     logging.info('Processing generate command')
-    dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
-    output_dir = dir_util.get_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
+    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
