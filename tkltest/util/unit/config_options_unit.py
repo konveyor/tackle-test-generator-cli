@@ -129,7 +129,7 @@ __options_spec = {
             'type': str,
             'choices': ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
             'default_value': 'ERROR',
-            'help_message': 'logging level for printing diagnostic messages'
+            'help_message': 'logging level for printing diagnostic messages; options are CRITICAL, ERROR, WARNING, INFO, DEBUG'
         },
         'monolith_app_path': {
             'required': __conditionally_required,
@@ -296,7 +296,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 10,
-            'help_message': 'time limit (in seconds) for evosuite/randoop test generation'
+            'help_message': 'time limit per class (in seconds) for evosuite/randoop test generation'
         },
         'app_build_type': {
             'required': __conditionally_required,
