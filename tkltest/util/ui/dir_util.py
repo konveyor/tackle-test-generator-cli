@@ -29,4 +29,6 @@ def get_test_directory(config, host_name):
 def get_crawl_output_dir(test_directory, host_name):
     """Returns the crawl root directory for AUT for the latest run"""
     output_crawl_dirs = os.path.join(test_directory, host_name, 'crawl*')
+    if not output_crawl_dirs:
+        return None
     return sorted(glob.iglob(output_crawl_dirs), key=os.path.getctime, reverse=True)[0]
