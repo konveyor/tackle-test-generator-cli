@@ -166,8 +166,9 @@ teardown_file() {
     run tkltest-unit --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR execute
     assert_failure 1
-    assert_line --index 1 --partial "Generate config file not found:"
-    assert_line --index 2 --partial "To execute tests in ../$IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"
+    assert_line --index 1 --partial "Executing tests for app irs using config file"
+    assert_line --index 2 --partial "Generate config file not found:"
+    assert_line --index 3 --partial "To execute tests in ../$IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"
 }
 
 @test "Test 17: CLI generate ctd-amplified parameter constraint violation" {

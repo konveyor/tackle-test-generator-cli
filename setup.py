@@ -18,7 +18,8 @@ setup(
         'jinja2==3.0.2',
         'bs4==0.0.1',
         'kaitaistruct==0.9',
-        'psutil==5.9.0'
+        'psutil==5.9.0',
+        'tqdm==4.62.3'
     ],
     entry_points={
         "console_scripts": [
