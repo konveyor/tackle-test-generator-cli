@@ -104,8 +104,15 @@ def __get_context_for_eventable(eventable):
     context = {
         'event_type': eventable['eventType'],
         'by_method': __get_by_method_for_eventable(eventable['identification']),
-        'form_inputs': eventable['relatedFormInputs']
+        'related_frame': eventable['relatedFrame'],
+        'form_inputs': []
     }
+    for form_input in eventable['relatedFormInputs']:
+        context['form_inputs'].append({
+            'type': form_input['type'],
+            'by_method': __get_by_method_for_eventable(form_input['identification']),
+            'value': form_input['inputValues'][0]['value']
+        })
     return context
 
 

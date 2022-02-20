@@ -63,34 +63,50 @@ public class GeneratedTests {
         // TODO: code related to test report
     }
 
-    private boolean fireEvent(WebElement webElement, String eventType) throws ElementNotVisibleException, InterruptedException {
+    private void switchToFrame(String frameIdentification) throws NoSuchFrameException {
+        if (frameIdentification.contains(".")) {
+            String[] frames = frameIdentification.split("\\.");
+            for(int i = 0; i < frames.length; ++i) {
+                String frameId = frames[i];
+                this.driver.switchTo().frame(frameId);
+            }
+        } else {
+            this.driver.switchTo().frame(frameIdentification);
+        }
+    }
+
+    // TODO: check code
+    private boolean fireEvent(WebElement webElement, String eventType, String frameId) throws ElementNotVisibleException, InterruptedException {
         if (webElement == null) {
             return false;
+        }
+        if (!frameId.isEmpty()) {
+            this.switchToFrame(frameId);
         }
         switch (eventType) {
         case "click":
             try {
                 webElement.click();
                 break;
-            } catch (ElementNotVisibleException var6) {
-                throw var6;
-            } catch (WebDriverException var7) {
+            } catch (ElementNotVisibleException enve) {
+                throw enve;
+            } catch (WebDriverException wde) {
                 return false;
             }
         case "enter":
             try {
                 webElement.sendKeys(new CharSequence[]{Keys.RETURN});
                 break;
-            } catch (ElementNotVisibleException var4) {
-                throw var4;
-            } catch (WebDriverException var5) {
+            } catch (ElementNotVisibleException enve) {
+                throw enve;
+            } catch (WebDriverException wde) {
                 return false;
             }
         case "hover":
-            // LOGGER.info("EventType hover called but this isn't implemented yet");
+            // TODO: logger.info("EventType hover called but this isn't implemented yet");
             break;
         default:
-            // LOGGER.info("EventType {} not supported in WebDriver.", eventable.getEventType());
+            // TODO: logger.info("EventType {} not supported in WebDriver.", eventable.getEventType());
             return false;
         }
         Thread.sleep(this.waitEvent);
@@ -110,7 +126,7 @@ public class GeneratedTests {
         {% for form_input in eventable.form_inputs %}
         {% endfor %}
         element = driver.findElement({{eventable.by_method}});
-        this.fireEvent(element, "{{eventable.event_type}}");
+        this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");
     {% endfor %}
     }
 
