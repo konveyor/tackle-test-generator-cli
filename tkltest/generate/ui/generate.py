@@ -11,21 +11,23 @@
 # limitations under the License.
 # ***************************************************************************
 
-import glob
 import logging
 import os.path
 import re
 import subprocess
 import sys
 import urllib.parse
+from tqdm import trange
+import time
+from threading import Thread
 
-import psutil
+import glob
 import toml
 
 from tkltest.util.logging_util import tkltest_status
 from tkltest.util import command_util
 from tkltest.util.constants import *
-from tkltest.util.ui import dir_util
+from tkltest.util.ui import dir_util, browser_util
 
 def process_generate_command(config):
     """Processes the tkltest-ui generate command.
@@ -71,25 +73,57 @@ def process_generate_command(config):
     tkltest_status('Running UI test generator with config: app={}, url="{}", time_limit={}min, browser={}'.format(
         app_name, app_url, time_limit, browser
     ))
-    try:
-        # TODO: run command in a separate thread; the main thread can then monitor progress on the file system
-        command_util.run_command(command=uitestgen_command, verbose=verbose)
 
-        # print info about generated tests
-        output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory,
-                                                                  host_name=host_name)
-        tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
-        test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
-        tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
+    # start CrawlJax in a separate thread and display a progress bar while it is generating tests
+    global crawler_error, crawler_e
+    crawler_error = False
+    crawler_e = None
 
-    except subprocess.CalledProcessError as e:
-        tkltest_status('UI test genenration failed: {}\n{}'.format(e, e.stderr), error=True)
+    thread = Thread(target=run_crawljax, args=[uitestgen_command, verbose])
+    thread.start()
+    closed_before_limit = False
+    for b in trange(
+        time_limit * 60, unit="seconds", desc="Generating tests",
+        bar_format="{l_bar}{bar}|{n:.1f}/{total_fmt} [{elapsed}<{remaining}]"
+):
+        if not thread.is_alive():
+            closed_before_limit = True
+            break
+        time.sleep(1)
+
+    if crawler_error:
+        tkltest_status('UI test genenration failed: {}\n{}'.format(crawler_e, crawler_e.stderr), error=True)
+        sys.exit(1)
+    elif closed_before_limit:
+        tkltest_status("Crawler exploration exhausted before time limit reached")
+    elif thread.is_alive():
+        tkltest_status("Waiting for the crawler to terminate")
+        thread.join()
+
+    # need to check crawler error again because it might have occurred after progress bar ended
+    # and while still waiting for the crawler to terminate
+    if crawler_error:
+        tkltest_status('UI test genenration failed: {}\n{}'.format(crawler_e, crawler_e.stderr), error=True)
         sys.exit(1)
 
-    # TODO: print progress messages: number of states discovered, percent time elapsed
+    # print info about generated tests
+    output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory,
+                                                                  host_name=host_name)
+    tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
+    test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
+    tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
+
 
     # cleanup browser instances
-    __cleanup_browser_instances(browser)
+    browser_util.cleanup_browser_instances(browser)
+
+def run_crawljax(uitestgen_command, verbose):
+    global crawler_error, crawler_e
+    try:
+        command_util.run_command(command=uitestgen_command, verbose=verbose)
+    except subprocess.CalledProcessError as e:
+        crawler_e = e
+        crawler_error = True
 
 def __get_generated_test_count(last_crawl_dir):
     """Returns the number of generated test cases
@@ -100,35 +134,3 @@ def __get_generated_test_count(last_crawl_dir):
     with open(generated_test_class, 'r') as f:
         teststr = f.read()
     return len(re.findall('@Test', teststr)), generated_test_class
-
-
-def __cleanup_browser_instances(browser):
-    """Performs process cleanup based on platform and browser"""
-    if browser in ['chrome', 'chrome_headless']:
-        if sys.platform == 'darwin':
-            __kill_processes(['chromedriver', 'chrome'])
-        elif sys.platform in ['linux', 'linux2']:
-             __kill_processes(['chromedriver'])
-        elif sys.platform in ['win32', 'win64']:
-            # TODO: check
-            __kill_processes(['chromedriver.exe'])
-    else:
-        # TODO: firefox
-        pass
-
-
-def __kill_processes(proc_names):
-    """Kills process with the given names"""
-    for proc in psutil.process_iter():
-        try:
-            procname = proc.name()
-        except (psutil.ZombieProcess, psutil.NoSuchProcess):
-            pass
-        else:
-            if procname in proc_names:
-                logging.info('Killing {} instance'.format(procname))
-                try:
-                    proc.kill()
-                except Exception:
-                    logging.info('Error terminating process "{}"'.format(procname))
-                    pass

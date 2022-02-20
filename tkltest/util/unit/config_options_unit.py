@@ -76,7 +76,7 @@ def __conditionally_required(opt_name, config):
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
-    elif opt_name == 'app_build_config_file':
+    elif opt_name == 'app_build_config_files':
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is specified'
@@ -129,7 +129,7 @@ __options_spec = {
             'type': str,
             'choices': ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
             'default_value': 'ERROR',
-            'help_message': 'logging level for printing diagnostic messages'
+            'help_message': 'logging level for printing diagnostic messages; options are CRITICAL, ERROR, WARNING, INFO, DEBUG'
         },
         'monolith_app_path': {
             'required': __conditionally_required,
@@ -296,7 +296,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 10,
-            'help_message': 'time limit (in seconds) for evosuite/randoop test generation'
+            'help_message': 'time limit per class (in seconds) for evosuite/randoop test generation'
         },
         'app_build_type': {
             'required': __conditionally_required,
@@ -307,23 +307,23 @@ __options_spec = {
             'default_value': None,
             'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
-        'app_build_config_file': {
+        'app_build_config_files': {
             'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
-            'type': str,
-            'default_value': '',
+            'type': list,
+            'default_value': [],
             'relpath_fix_type': 'path',
-            'help_message': 'path to app build file for the specified app build type'
+            'help_message': 'list of paths to app build files for the specified app build type'
         },
-        'app_build_settings_file': {
+        'app_build_settings_files': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
-            'type': str,
-            'default_value': '',
+            'type': list,
+            'default_value': [],
             'relpath_fix_type': 'path',
-            'help_message': 'path to app build settings file or property file for the specified app build type'
+            'help_message': 'list of paths to app build settings files or property files for the specified app build type'
         },
         'app_build_target': {
             'required': __conditionally_required,

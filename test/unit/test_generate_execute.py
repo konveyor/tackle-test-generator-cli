@@ -33,7 +33,7 @@ class GenerateExecuteTest(unittest.TestCase):
     # directory containing test applications
     test_data_dir = os.path.join('test', 'data')
     # test_data_dir = os.path.join('data')
-
+    begin_dir_content = os.listdir(os.getcwd())
     test_apps = {
         'irs': {
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
@@ -49,7 +49,6 @@ class GenerateExecuteTest(unittest.TestCase):
     }
     test_list1 = ['irs']
     test_list2 = ['splitNjoin']
-
     args = argparse.Namespace()
 
     def setUp(self) -> None:
@@ -782,6 +781,8 @@ class GenerateExecuteTest(unittest.TestCase):
             # set up config and generate tests
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            config_util.resolve_app_path(config)
+            config_util.resolve_classpath(config, 'generate')
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -789,11 +790,40 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # execute tests
             config['general']['app_classpath_file'] = ''
+            config_util.resolve_classpath(config, 'execute')
             self.__process_execute(config=config)
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+
+    def test_generate_execute_multi_modules(self) -> None:
+        """Test obtain and run on multi modules"""
+        for app_name in self.test_list2:
+            app_info = self.test_apps[app_name]
+
+            # set up config and generate tests
+            user_config = app_info['config']
+            user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            modules_names = ['app', 'utilities', 'list']
+            self.assertTrue(len(configs) == len(modules_names))
+            for config in configs:
+                module_name = config['general']['module_name']
+                self.assertTrue(module_name in modules_names)
+                self.__process_generate(subcommand='ctd-amplified', config=config)
+                # assert that expected generate resources are created
+                self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=module_name)
+
+            configs = config_util.resolve_tkltest_configs(user_config, 'generate')
+            self.assertTrue(len(configs)==len(modules_names))
+            for config in configs:
+                module_name = config['general']['module_name']
+                self.assertTrue(module_name in modules_names)
+                # execute tests
+                self.__process_execute(config=config)
+                # assert that expected execute resources are created
+                self.__assert_execute_resources(app_name=app_name,module_name=module_name)
 
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
@@ -802,7 +832,6 @@ class GenerateExecuteTest(unittest.TestCase):
             app_info = self.test_apps[app_name]
 
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-            generated_test_directory = 'irs-generated-testing'
             pre_generated_test = os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests')
             user_tests = os.path.join(self.test_data_dir, app_name, 'user-tests')
             # execute tests
@@ -812,10 +841,10 @@ class GenerateExecuteTest(unittest.TestCase):
                 config['execute']['code_coverage'] = True
                 config['dev_tests']['compare_code_coverage'] = True
                 shutil.rmtree(main_report_dir, ignore_errors=True)
+                generated_test_directory = config['general']['test_directory']
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
                 shutil.copytree(pre_generated_test, generated_test_directory)
                 config['general']['build_type'] = build_type
-                config['general']['test_directory'] = generated_test_directory
                 if build_type == 'gradle':
                     config['dev_tests']['build_type'] = 'ant'
                     config['dev_tests']['build_file'] = os.path.join(user_tests, 'build.xml')
@@ -831,8 +860,9 @@ class GenerateExecuteTest(unittest.TestCase):
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
 
 
-    def __assert_generate_resources(self, app_name, generate_subcmd):
-        dir_util.cd_output_dir(app_name)
+    def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
+        self.__assert_no_artifact_at_cli()
+        dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
             self.assertTrue(os.path.isfile(summary_file))
@@ -852,12 +882,13 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, code_coverage=True, reports_path='', compare_coverage=False):
+    def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False):
+        self.__assert_no_artifact_at_cli()
         if reports_path:
             main_report_dir = reports_path
         else:
             main_report_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-            dir_util.cd_output_dir(app_name)
+            dir_util.cd_output_dir(app_name, module_name)
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
         self.assertTrue(os.path.isdir(junit_report_dir))
@@ -878,8 +909,9 @@ class GenerateExecuteTest(unittest.TestCase):
         if not reports_path:
             dir_util.cd_cli_dir()
 
-    def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, augment=True, reports_path=''):
-        dir_util.cd_output_dir(app_name)
+    def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
+        self.__assert_no_artifact_at_cli()
+        dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:
             main_report_dir = os.path.join(constants.TKLTEST_CLI_DIR, reports_path)
@@ -914,11 +946,13 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(coverage_counter[0].attrib['missed'] == '0')
 
     def __process_generate(self, subcommand, config):
+        config_util.fix_relative_paths(config)
         self.args.command = 'generate'
         self.args.sub_command = subcommand
         generate.process_generate_command(args=self.args, config=config)
 
     def __process_execute(self, config, subcommand=None):
+        config_util.fix_relative_paths(config)
         self.args.command = 'execute'
         if subcommand:
             self.args.sub_command = subcommand
@@ -929,3 +963,16 @@ class GenerateExecuteTest(unittest.TestCase):
         shutil.rmtree(output_dir, ignore_errors=True)
         shutil.copytree(os.path.join(self.test_data_dir, app_name, 'basic_blocks'), output_dir)
         config['generate']['ctd_amplified']['reuse_base_tests'] = True
+
+    def __assert_no_artifact_at_cli(self):
+        '''
+        Here we check that we do not leave anything in the cli directory
+        '''
+        current_dir_content = os.listdir(os.getcwd())
+        allow_artifacts = []
+        for app_name in (list(self.test_apps.keys())):
+            allow_artifacts.append('tkltest-output-unit-' + app_name)
+            allow_artifacts.append(self.test_apps[app_name]['test_directory'])
+            allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+            allow_artifacts.append(app_name + '-user-reports')
+        self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(allow_artifacts))

@@ -7,4 +7,4 @@ app_classpath_file = ""
 
 [generate]
 app_build_type = "gradle"
-app_build_config_file = ""
+app_build_config_files = []
