@@ -15,6 +15,7 @@ import argparse
 import logging
 import logging.handlers
 import os
+import csv
 import shutil
 import subprocess
 import sys
@@ -27,34 +28,9 @@ from .augment import augment_with_code_coverage
 from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
 from tkltest.util import command_util, constants, config_util
-from tkltest.util.unit import  build_util, dir_util, coverage_util
+from tkltest.util.unit import build_util, dir_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
-
-
-def get_covered_targets_by_dev_test(config):
-    app_name = config['general']['app_name']
-    main_reports_dir = config['general']['reports_path']
-    if not main_reports_dir:
-        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-    dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
-    if os.path.isdir(dev_report_dir):
-        shutil.rmtree(dev_report_dir)
-    os.mkdir(dev_report_dir)
-    #todo - run the user targets to obtain exec file
-
-    # calling generate_coverage_report() to create a xml file and html dir:
-    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
-    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
-    dev_coverage_xml = os.path.join(dev_report_dir, dev_test_name + '_coverage.xml')
-    dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv')
-    #todo - we do not need the html + xml
-    dev_html_dir = os.path.join(dev_report_dir, dev_test_name + '-html')
-    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
-                                           exec_file=dev_coverage_exec,
-                                           xml_file=dev_coverage_xml,
-                                           html_dir=dev_html_dir,
-                                           csv_file=dev_coverage_csv)
-
+from tkltest.execute.unit import execute
 
 
 def process_generate_command(args, config):
@@ -72,7 +48,7 @@ def process_generate_command(args, config):
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
-    get_covered_targets_by_dev_test(config)
+    exclude_classes_covered_by_dev_test(config, output_dir)
     if args.sub_command == "ctd-amplified":
         generate_ctd_amplified_tests(config, output_dir)
     elif args.sub_command == "randoop":
@@ -571,6 +547,50 @@ def __reset_test_directory(args, config):
     shutil.rmtree(directory_to_reset, ignore_errors=True)
     os.makedirs(directory_to_reset)
     return test_directory
+
+
+def exclude_classes_covered_by_dev_test(config, output_dir):
+    '''
+    exclude classes that are already covered by the developer test suite.
+    first running the user test suite and the jacoco cli to get the coverage of the developer test suite
+    than add to the excluded_class_list all the classes that already covered
+    '''
+    if not config['dev_tests']['build_file']:
+        return
+    coverage_threshold = config['dev_tests']['coverage_threshold_percentage']/100
+    if coverage_threshold > 1:
+        return
+    app_name = config['general']['app_name']
+    main_reports_dir = config['general']['reports_path']
+    if not main_reports_dir:
+        main_reports_dir = os.path.join(output_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+    dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
+    if os.path.isdir(dev_report_dir):
+        shutil.rmtree(dev_report_dir)
+    os.mkdir(dev_report_dir)
+    # running the developer test, to obtain the .exec file
+    execute.run_dev_tests(config)
+    # calling generate_coverage_report() to create the csv file:
+    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
+    dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv')
+    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                                           exec_file=dev_coverage_exec,
+                                           csv_file=dev_coverage_csv)
+    # read the csv file
+    covered_classes = []
+    with open(dev_coverage_csv, newline='') as f:
+        coverage_info = csv.DictReader(f)
+        for row in coverage_info:
+            class_name = '{}.{}'.format(row['PACKAGE'], row['CLASS'])
+            inst_covered = int(row['INSTRUCTION_COVERED'])
+            inst_missed = int(row['INSTRUCTION_MISSED'])
+            total_inst = inst_missed + inst_covered
+            if not total_inst or inst_covered/total_inst >= coverage_threshold:
+                covered_classes.append(class_name)
+    config['generate']['excluded_class_list'] += covered_classes
+    if covered_classes:
+        tkltest_status('The following classes are already covered by developer test suite \n{}.'.format(covered_classes))
 
 
 if __name__ == '__main__':  # pragma: no cover

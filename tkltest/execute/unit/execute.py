@@ -35,15 +35,14 @@ def process_execute_command(args, config):
         args: command-line arguments
         config: loaded configuration options
     """
-    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
-    __execute_base(args, config, output_dir)
+    __execute_base(args, config)
     if config['dev_tests']['compare_code_coverage']:
-        __run_dev_tests(config, output_dir)
+        run_dev_tests(config)
         __compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
 
 
-def __run_dev_tests(config, output_dir):
+def run_dev_tests(config):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     ant_build_file = ''
@@ -64,7 +63,7 @@ def __run_dev_tests(config, output_dir):
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
-                     output_dir=output_dir
+                     output_dir=''
                      )
 
 
@@ -90,10 +89,11 @@ def __get_test_classes(test_root_dir):
 #                 os.remove(os.path.join(root, f))
 
 
-def __execute_base(args, config, output_dir):
+def __execute_base(args, config):
 
     # get list of test classes: either the specified class or the all test classes from the specified
     # test files dir
+    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     test_root_dir = config['general']['test_directory']
     if test_root_dir == '':
         test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX

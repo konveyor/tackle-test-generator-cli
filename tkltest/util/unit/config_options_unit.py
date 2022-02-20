@@ -555,6 +555,14 @@ __options_spec = {
             'default_value': False,
             'help_message': 'when augmenting with evosuite tests, consider developer-written test suite coverage'
         },
+        'coverage_threshold_percentage': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': int,
+            'default_value': 101,
+            'help_message': 'classes which thier developer-written test coverage is higher than the threshold, are excluded from test generation.'
+        },
     }
 
 }

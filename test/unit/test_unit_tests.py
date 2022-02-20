@@ -21,6 +21,7 @@ import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.util import config_util, constants, command_util
 from tkltest.util.unit import  dir_util
+from tkltest.generate.unit import generate
 
 
 class UnitTests(unittest.TestCase):
@@ -400,6 +401,33 @@ class UnitTests(unittest.TestCase):
                                     os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
                                     failed_assertion_message)
             self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
+
+
+    def test_exclude_classes_covered_by_dev_test(self) -> None:
+        """Test to exclude classes that was covered by the dev test suite"""
+        dir_util.cd_cli_dir()
+        app_name = 'irs'
+        config = config_util.load_config(config_file=self.ant_test_apps[app_name]['config_file'])
+
+        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+        self.assertTrue(not config['generate']['excluded_class_list'])
+
+        config['dev_tests']['coverage_threshold_percentage'] = 110
+        config['generate']['excluded_class_list'] = ['DummyClassName']
+        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+        self.assertTrue(config['generate']['excluded_class_list'] == ['DummyClassName'])
+
+        config['dev_tests']['coverage_threshold_percentage'] = 100
+        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+        self.assertTrue(config['generate']['excluded_class_list'] == ['DummyClassName', 'irs.Employer', 'irs.Salary'])
+
+        config['generate']['excluded_class_list'] = []
+        config['dev_tests']['coverage_threshold_percentage'] = 96
+        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+        self.assertTrue(config['generate']['excluded_class_list'] == ['irs.IRS', 'irs.Employer', 'irs.Salary'])
+
+
+        self.__assert_no_artifact_at_cli([app_name])
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
