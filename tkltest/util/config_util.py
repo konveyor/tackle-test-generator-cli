@@ -627,11 +627,11 @@ def resolve_app_path(tkltest_config):
         return
     app_name = tkltest_config['general']['app_name']
     app_build_type = tkltest_config['generate']['app_build_type']
-    if len(tkltest_config['generate']['app_build_config_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
+    if len(tkltest_config['generate']['app_build_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
         # it is a rare case, in which the user gives more that one build file, however we obtain only one module
-        tkltest_status('resolving app_path supported for only a single app_build_config_file', error=True)
+        tkltest_status('resolving app_path supported for only a single app_build_file', error=True)
         sys.exit(1)
-    app_build_file = tkltest_config['generate']['app_build_config_files'][0]
+    app_build_file = tkltest_config['generate']['app_build_files'][0]
     if tkltest_config['generate']['app_build_settings_files']:
         app_settings_file = tkltest_config['generate']['app_build_settings_files'][0]
     else:
@@ -746,12 +746,12 @@ def resolve_classpath(tkltest_config, command):
             sys.exit(1)
 
     app_build_type = tkltest_config['generate']['app_build_type']
-    if len(tkltest_config['generate']['app_build_config_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
+    if len(tkltest_config['generate']['app_build_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
         # it is a rare case, in which the user gives more that one build file, however we obtain only one module
-        tkltest_status('resolving classpath supported for only a single app_build_config_file', error=True)
+        tkltest_status('resolving classpath supported for only a single app_build_files', error=True)
         sys.exit(1)
 
-    app_build_file = tkltest_config['generate']['app_build_config_files'][0]
+    app_build_file = tkltest_config['generate']['app_build_files'][0]
     if tkltest_config['generate']['app_build_settings_files']:
         app_settings_file = tkltest_config['generate']['app_build_settings_files'][0]
     else:
@@ -925,7 +925,7 @@ def resolve_tkltest_configs(tkltest_user_config, command):
     app_name = tkltest_user_config['general']['app_name']
     tkltest_config_file_suffix = '_generated_tkltest_config.toml'
     if tkltest_user_config['generate']['app_build_type'] == 'ant' or \
-            not tkltest_user_config['generate']['app_build_config_files'] or \
+            not tkltest_user_config['generate']['app_build_files'] or \
             tkltest_user_config['general']['monolith_app_path']:
         # this is the case in we can not try to get the modules (ant, no user build file), or already have app_path.
         resolve_app_path(tkltest_user_config)
@@ -982,7 +982,7 @@ def __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_propert
         tkltest_config = copy.deepcopy(tkltest_user_config)
         tkltest_config['general']['module_name'] = module_name
         tkltest_config['general']['monolith_app_path'] = module_properties['app_path']
-        tkltest_config['generate']['app_build_config_files'] = [module_properties['build_file']]
+        tkltest_config['generate']['app_build_files'] = [module_properties['build_file']]
         if 'user_settings_file' in module_properties.keys():
             tkltest_config['generate']['app_build_settings_files'] = [module_properties['user_settings_file']]
         if tkltest_config['general']['test_directory']:
@@ -1020,7 +1020,7 @@ def get_modules_properties(tkltest_user_config):
 
     app_name = tkltest_user_config['general']['app_name']
     app_build_type = tkltest_user_config['generate']['app_build_type']
-    app_build_files = tkltest_user_config['generate']['app_build_config_files']
+    app_build_files = tkltest_user_config['generate']['app_build_files']
     app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
 
     modules_properties_file = os.path.join(dir_util.get_app_output_dir(app_name), app_name + '_modules_properties.json')

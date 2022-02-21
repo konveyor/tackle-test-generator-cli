@@ -6,4 +6,4 @@ monolith_app_path = ["test/data/irs/monolith/target/classes"]
 app_classpath_file = ""
 
 [generate]
-app_build_config_files = []
+app_build_files = []
