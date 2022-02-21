@@ -765,22 +765,27 @@ def resolve_classpath(tkltest_config, command):
     if app_build_type == 'gradle':
         # create build and settings files
         task_name = 'tkltest_get_dependencies'
-        posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
-
         gradle_classpath_file = os.path.join(output_dir, 'GradleClassPath.txt')
-        task_text = ['task ' + task_name + '(type: Copy) {',
-                     '    from sourceSets.main.runtimeClasspath',
-                     '    into \'' + posix_dependencies_dir + '\'',
-                     #'    fw = new FileWriter( "' + pathlib.PurePath(gradle_classpath_file).as_posix() + '");',
-                     #'    fw.write(sourceSets.main.runtimeClasspath)',
-                     #'    fw.close();',
-                     '}\n']
+        task_text = [
+            'public class WriteStringClass extends DefaultTask {',
+            '  @TaskAction',
+            '  void writeString(){',
+            '    FileWriter fw;',
+            '    fw = new FileWriter( "' + pathlib.PurePath(gradle_classpath_file).as_posix() + '", true);',
+            '    fw.write("${project.sourceSets.main.runtimeClasspath.getFiles()}")',
+            '    fw.close();',
+            '  }',
+            '}',
+            'task ' + task_name + ' (type:WriteStringClass) {}']
 
         __add_and_run_gradle_task(app_build_file=app_build_file,
                                   app_settings_file=app_settings_file,
                                   task_name=task_name,
                                   task_text=task_text,
                                   verbose=tkltest_config['general']['verbose'])
+        with open(gradle_classpath_file) as f:
+            class_path_order = f.read().replace('[', '').replace(']', '').replace(' ', '').split(',')
+        os.remove(gradle_classpath_file)
 
 
     elif app_build_type == 'maven':
@@ -858,7 +863,7 @@ def resolve_classpath(tkltest_config, command):
     # remove non jar entries
     # collect jars modules
     jars_modules = dict()
-    if app_build_type in ['ant', 'gradle']:
+    if app_build_type == 'ant':
         for jar_file in os.listdir(dependencies_dir):
             jar_file_path = os.path.join(dependencies_dir, jar_file)
             if os.path.isdir(jar_file_path):
@@ -867,7 +872,7 @@ def resolve_classpath(tkltest_config, command):
                 os.remove(jar_file_path)
             else:
                 __collect_jar_modules(jar_file_path, jars_modules)
-    elif app_build_type == 'maven':
+    elif app_build_type in ['maven', 'gradle']:
         for jar_file_path in class_path_order:
             if jar_file_path.endswith('.jar'):
                 __collect_jar_modules(jar_file_path, jars_modules)
