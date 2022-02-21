@@ -30,7 +30,6 @@ from .generate_standalone import generate_randoop, generate_evosuite
 from tkltest.util import command_util, constants, config_util
 from tkltest.util.unit import build_util, dir_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
-from tkltest.execute.unit import execute
 
 
 def process_generate_command(args, config):
@@ -557,27 +556,13 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
     '''
     if not config['dev_tests']['build_file']:
         return
-    coverage_threshold = config['dev_tests']['coverage_threshold_percentage']/100
-    if coverage_threshold > 1:
+    if config['dev_tests']['coverage_threshold_percentage'] >= 100:
         return
-    app_name = config['general']['app_name']
-    main_reports_dir = config['general']['reports_path']
-    if not main_reports_dir:
-        main_reports_dir = os.path.join(output_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
-    dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
-    if os.path.isdir(dev_report_dir):
-        shutil.rmtree(dev_report_dir)
-    os.mkdir(dev_report_dir)
-    # running the developer test, to obtain the .exec file
-    execute.run_dev_tests(config)
-    # calling generate_coverage_report() to create the csv file:
-    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
-    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
-    dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv')
-    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
-                                           exec_file=dev_coverage_exec,
-                                           csv_file=dev_coverage_csv)
+    dev_coverage_xnl, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(config, output_dir, create_csv=True)
     # read the csv file
+    if not os.path.isfile(dev_coverage_csv):
+        tkltest_status('Failed to obtain dev-tests coverage, generating tests for all classes')
+        return
     covered_classes = []
     with open(dev_coverage_csv, newline='') as f:
         coverage_info = csv.DictReader(f)
@@ -586,7 +571,7 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
             inst_covered = int(row['INSTRUCTION_COVERED'])
             inst_missed = int(row['INSTRUCTION_MISSED'])
             total_inst = inst_missed + inst_covered
-            if not total_inst or inst_covered/total_inst >= coverage_threshold:
+            if not total_inst or inst_covered*100/total_inst > config['dev_tests']['coverage_threshold_percentage']:
                 covered_classes.append(class_name)
     config['generate']['excluded_class_list'] += covered_classes
     if covered_classes:

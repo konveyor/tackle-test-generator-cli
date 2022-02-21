@@ -21,6 +21,7 @@ import sys
 
 from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
+from tkltest.execute.unit import execute
 
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
@@ -344,6 +345,32 @@ def get_test_classes(test_root_dir):
         dir : test_files[dir] for dir in test_files.keys() if test_files[dir]
     }
     return test_files
+
+def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False, create_html=False):
+
+    # running the developer test, to obtain the .exec file
+    execute.run_dev_tests(config)
+    dev_coverage_exec = config['dev_tests']['coverage_exec_file']
+    app_name = config['general']['app_name']
+    main_reports_dir = config['general']['reports_path']
+    if not main_reports_dir:
+        main_reports_dir = os.path.join(output_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+    dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
+    if os.path.isdir(dev_report_dir):
+        shutil.rmtree(dev_report_dir)
+    os.mkdir(dev_report_dir)
+    # calling generate_coverage_report() to create the csv file:
+    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv') if create_csv else ''
+    dev_coverage_xml = os.path.join(dev_report_dir, dev_test_name + '_coverage.xml') if create_xml else ''
+    dev_coverage_html = os.path.join(dev_report_dir, dev_test_name + '-coverage-html') if create_html else ''
+    generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                             exec_file=dev_coverage_exec,
+                             xml_file=dev_coverage_xml,
+                             html_dir=dev_coverage_html,
+                             csv_file=dev_coverage_csv)
+    return dev_coverage_xml, dev_coverage_html, dev_coverage_csv
+
 
 
 def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir='', csv_file=''):

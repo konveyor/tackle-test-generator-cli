@@ -560,8 +560,8 @@ __options_spec = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': int,
-            'default_value': 101,
-            'help_message': 'classes which thier developer-written test coverage is higher than the threshold, are excluded from test generation.'
+            'default_value': 100,
+            'help_message': 'classes with developer-written instruction coverage higher than the threshold, are excluded from test generation'
         },
     }
 

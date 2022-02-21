@@ -64,6 +64,7 @@ class UnitTests(unittest.TestCase):
                                          'compile-destdir-through-modulesourcepathref',
                                          'compile-destdir-through-src-elements',
                                          ],
+            'covered_classes': ['irs.IRS', 'irs.Employer', 'irs.Salary']
 
         },
         '84_ifx-framework': {
@@ -405,29 +406,21 @@ class UnitTests(unittest.TestCase):
 
     def test_exclude_classes_covered_by_dev_test(self) -> None:
         """Test to exclude classes that was covered by the dev test suite"""
-        dir_util.cd_cli_dir()
-        app_name = 'irs'
-        config = config_util.load_config(config_file=self.ant_test_apps[app_name]['config_file'])
+        test_apps = self.ant_test_apps
 
-        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
-        self.assertTrue(not config['generate']['excluded_class_list'])
+        for app_name in test_apps.keys():
+            if 'covered_classes' not in test_apps[app_name].keys():
+                continue
+            dir_util.cd_cli_dir()
+            config = config_util.load_config(config_file=test_apps[app_name]['config_file'])
+            generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+            self.assertTrue(not config['generate']['excluded_class_list'])
 
-        config['dev_tests']['coverage_threshold_percentage'] = 110
-        config['generate']['excluded_class_list'] = ['DummyClassName']
-        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
-        self.assertTrue(config['generate']['excluded_class_list'] == ['DummyClassName'])
+            config['dev_tests']['coverage_threshold_percentage'] = 96
+            generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+            self.assertTrue(config['generate']['excluded_class_list'] == test_apps[app_name]['covered_classes'])
 
-        config['dev_tests']['coverage_threshold_percentage'] = 100
-        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
-        self.assertTrue(config['generate']['excluded_class_list'] == ['DummyClassName', 'irs.Employer', 'irs.Salary'])
-
-        config['generate']['excluded_class_list'] = []
-        config['dev_tests']['coverage_threshold_percentage'] = 96
-        generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
-        self.assertTrue(config['generate']['excluded_class_list'] == ['irs.IRS', 'irs.Employer', 'irs.Salary'])
-
-
-        self.__assert_no_artifact_at_cli([app_name])
+        self.__assert_no_artifact_at_cli(test_apps.keys())
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
