@@ -278,8 +278,8 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
         app_name (str): name of the app
         partitions_file (str): name of file containing information about app partitions (if the modernization task
             involves partitioning the legacy app)
-        target_class_list (list): name of specific classes targeted for test generation
-        excluded_class_list (list): names of classes to omit from the set of test targets
+        target_class_list (list): name of specific classes or packages targeted for test generation
+        excluded_class_list (list): names of classes or packages to omit from the set of test targets
         monolith_app_path (list): paths to directories containing classes of the legacy app
         app_classpath_file (str): name of file containing library dependencies of app
         app_prefix (str): path prefix to root directory of refactored app version

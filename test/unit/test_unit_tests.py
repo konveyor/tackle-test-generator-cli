@@ -27,7 +27,7 @@ from tkltest.generate.unit import generate
 class UnitTests(unittest.TestCase):
 
     # dict with apps parameters for test
-    # app_build_type, app_build_config_file are determined by the toml
+    # app_build_type, app_build_files are determined by the toml
     maven_test_apps = {
         '14_spark': {
             'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
@@ -98,7 +98,7 @@ class UnitTests(unittest.TestCase):
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
-            config['generate']['app_build_config_files'] = [ant_test_apps[app_name]['build_file']]
+            config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
             dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
 
@@ -129,7 +129,7 @@ class UnitTests(unittest.TestCase):
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
-            config['generate']['app_build_config_files'] = [ant_test_apps[app_name]['build_file']]
+            config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             monolith_app_path = config['general']['monolith_app_path']
             self.assertTrue(len(monolith_app_path) == 1, failed_assertion_message)
             if monolith_app_path[0] == '':
@@ -220,7 +220,7 @@ class UnitTests(unittest.TestCase):
 
         pom_file1 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml')
         pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web', 'pom.xml')
-        config['generate']['app_build_config_files'] = [pom_file1, pom_file2]
+        config['generate']['app_build_files'] = [pom_file1, pom_file2]
         config['generate']['app_build_settings_files'] = ['', '']
         config['generate']['app_build_type'] = 'maven'
 
@@ -244,7 +244,7 @@ class UnitTests(unittest.TestCase):
         build_file1 = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
         build_file2 = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
         settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
-        config['generate']['app_build_config_files'] = [build_file1, build_file2]
+        config['generate']['app_build_files'] = [build_file1, build_file2]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['generate']['app_build_type'] = 'gradle'
 
@@ -275,7 +275,7 @@ class UnitTests(unittest.TestCase):
         base_config['general']['app_classpath_file'] = ''
         base_config['general']['monolith_app_path'] = ''
 
-        base_config['generate']['app_build_config_files'] = [build_file_app]
+        base_config['generate']['app_build_files'] = [build_file_app]
         base_config['generate']['app_build_settings_files'] = [settings_file]
 
         '''
@@ -296,7 +296,7 @@ class UnitTests(unittest.TestCase):
 
         # case 3
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list]
+        config['generate']['app_build_files'] = [build_file_list]
         config['generate']['app_build_settings_files'] = []
         configs_to_test.append((config, 'generate'))
 
@@ -338,7 +338,7 @@ class UnitTests(unittest.TestCase):
         shutil.rmtree(dir_util.get_app_output_dir(app_name))
         modules_names = ['app', 'list', 'utilities']
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['general']['app_classpath_file'] = ''
         config['general']['monolith_app_path'] = ''
@@ -346,7 +346,7 @@ class UnitTests(unittest.TestCase):
         configs_generate = config_util.resolve_tkltest_configs(config, 'generate')
 
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['general']['app_classpath_file'] = ''
         config['general']['monolith_app_path'] = ''
@@ -366,8 +366,8 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(module_config['general']['monolith_app_path']) == 1)
             self.assertTrue(os.path.isdir(module_config['general']['monolith_app_path'][0]))
             self.assertTrue(module_config['general']['module_name'] == modules_name)
-            self.assertTrue(len(module_config['generate']['app_build_config_files']) == 1)
-            self.assertTrue(os.path.isfile(module_config['generate']['app_build_config_files'][0]))
+            self.assertTrue(len(module_config['generate']['app_build_files']) == 1)
+            self.assertTrue(os.path.isfile(module_config['generate']['app_build_files'][0]))
             self.assertTrue(len(module_config['generate']['app_build_settings_files']) == 1)
             self.assertTrue(os.path.isfile(module_config['generate']['app_build_settings_files'][0]))
             self.assertTrue(os.path.isfile(module_config['general']['app_classpath_file']))
@@ -381,7 +381,7 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test
-        # app_build_type, app_build_config_file, app_build_settings_file are determined by the toml
+        # app_build_type, app_build_files, app_build_settings_file are determined by the toml
         for app_name in self.gradle_test_apps.keys():
             dir_util.cd_cli_dir()
 

@@ -18,7 +18,7 @@ time_limit = 10
 
 app_build_type = 'gradle'
 
-app_build_config_files = ["test/data/splitNjoin/app/build.gradle"]
+app_build_files = ["test/data/splitNjoin/app/build.gradle"]
 app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
 
 [execute]
