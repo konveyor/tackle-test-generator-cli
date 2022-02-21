@@ -7,3 +7,4 @@
 [submodule "test/ui/data/webapps"]
 	path = test/ui/data/webapps
 	url = https://github.com/sinha108/tkltest-ui-webapps
+	branch = main
