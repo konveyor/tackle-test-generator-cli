@@ -71,7 +71,7 @@ which builds the docker image for the CLI (called `tkltest-cli`) and then runs t
 container is removed upon completion of the CLI command.
 
 ```buildoutcfg
-docker-compose run --rm tkltest-cli --help
+docker-compose run --rm tkltest-cli tkltest-unit --help
 ```
 
 Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands in the CLI
@@ -81,7 +81,7 @@ directory:
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
 ```
 ```buildoutcfg
-docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
+docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit --help
 ```
 
 Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
@@ -93,10 +93,10 @@ For convenience in running the CLI via `docker-compose` or `docker`, you can cre
 one of the following:
 
 ```buildoutcfg
-alias tkltest='docker-compose run --rm tkltest-cli'
+alias tkltest='docker-compose run --rm tkltest-cli tkltest-unit'
 ```
 ```buildoutcfg
-alias tkltest='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
+alias tkltest='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit'
 ```
 
 If you are using a published TackleTest image ([TackleTest container images](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli)),
