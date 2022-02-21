@@ -182,7 +182,7 @@ teardown_file() {
 @test "Test 18: CLI generate ctd-amplified invalid build/classpath spec in toml" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR2 generate ctd-amplified
     assert_failure 1
-    assert_output --partial 'app_build_config_files (required if "app_build_type" is specified)'
+    assert_output --partial 'app_build_files (required if "app_build_type" is specified)'
 }
 
 @test "Test 19: CLI generate ctd-amplified invalid build/classpath spec in toml" {
