@@ -18,8 +18,8 @@ for required options.
 """
 import tabulate
 
-from .unit import config_options_unit
-from .ui import config_options_ui
+from tkltest.util.unit import config_options_unit
+from tkltest.util.ui import config_options_ui
 
 
 def get_options_spec(command=None, subcommand=None, load_format=True, test_level='unit'):
@@ -94,7 +94,7 @@ def __append_output_for_command(cmd, opt_spec, output, subcmd=None):
                 __append_output_for_command(cmd, opt_info[subcmd], output, subcmd)
         else:
             fmtname = opt_name
-            if opt_info['required']:
+            if opt_info['required'] == True:
                 fmtname += '*'
             if not opt_info['is_toml_option']:
                 fmtname += '^'
