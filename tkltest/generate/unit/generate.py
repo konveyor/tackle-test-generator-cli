@@ -556,7 +556,7 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
     '''
     if not config['dev_tests']['build_file']:
         return
-    if config['dev_tests']['coverage_threshold_percentage'] >= 100:
+    if config['dev_tests']['coverage_threshold'] >= 100:
         return
     dev_coverage_xml, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(config, output_dir, create_csv=True)
     # read the csv file
@@ -571,7 +571,7 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
             inst_covered = int(row['INSTRUCTION_COVERED'])
             inst_missed = int(row['INSTRUCTION_MISSED'])
             total_inst = inst_missed + inst_covered
-            if not total_inst or inst_covered*100/total_inst > config['dev_tests']['coverage_threshold_percentage']:
+            if not total_inst or inst_covered*100/total_inst > config['dev_tests']['coverage_threshold']:
                 covered_classes.append(class_name)
     config['generate']['excluded_class_list'] += covered_classes
     if covered_classes:

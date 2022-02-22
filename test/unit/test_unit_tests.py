@@ -416,7 +416,7 @@ class UnitTests(unittest.TestCase):
             generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
             self.assertTrue(not config['generate']['excluded_class_list'])
 
-            config['dev_tests']['coverage_threshold_percentage'] = 96
+            config['dev_tests']['coverage_threshold'] = 96
             generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
             self.assertTrue(config['generate']['excluded_class_list'] == test_apps[app_name]['covered_classes'])
 
