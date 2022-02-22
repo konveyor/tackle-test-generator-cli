@@ -562,7 +562,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 100,
-            'help_message': 'classes with developer-written instruction percentage of coverage higher than the threshold, are excluded from test generation'
+            'help_message': 'classes with developer-written instruction coverage percentage higher than the threshold are excluded from test generation'
         },
     }
 
