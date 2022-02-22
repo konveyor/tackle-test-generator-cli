@@ -142,7 +142,10 @@ public class GeneratedTests {
             case "INPUT":
             case "EMAIL":
             case "NUMBER":
-                webElement.clear();
+                try {
+                    webElement.clear();
+                }
+                catch (InvalidElementStateException iese) {}
                 webElement.sendKeys(value);
                 break;
             case "CHECKBOX":
@@ -178,10 +181,8 @@ public class GeneratedTests {
     {% for eventable in method.eventables %}
 
         {% for form_input in eventable.form_inputs %}
-            {% if form_input.by_method.startswith('By.xpath') %}
         element = driver.findElement({{form_input.by_method}});
         this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
-            {% endif %}
         {% endfor %}
         element = driver.findElement({{eventable.by_method}});
         this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");

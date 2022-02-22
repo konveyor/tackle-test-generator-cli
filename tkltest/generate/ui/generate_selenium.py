@@ -150,8 +150,10 @@ if __name__ == '__main__':  # pragma: no cover
     logging_util.init_logging('generate_selenium.log', 'INFO')
     config = {
         'general': {
-            'app_name': 'petclinic',
-            'app_url': 'http://localhost:8080'
+            # 'app_name': 'petclinic',
+            # 'app_url': 'http://localhost:8080'
+            'app_name': 'addressbook',
+            'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
@@ -160,4 +162,5 @@ if __name__ == '__main__':  # pragma: no cover
         }
     }
     crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl0'
+    crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_3mins/localhost/crawl0'
     generate_selenium_api_tests(config, crawl_dir)
