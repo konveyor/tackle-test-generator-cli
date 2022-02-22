@@ -408,13 +408,14 @@ class UnitTests(unittest.TestCase):
         :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
         :param message: An informative error message to print in case one of the assertions fails.
         """
-        std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
         if is_user_defined_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        # Paths inside standard_classpath must be in unix format for the test.
-        lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
+        if std_classpath_prefix:
+            # Paths inside standard_classpath must be in unix format for the test.
+            std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
+            lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -425,8 +426,10 @@ class UnitTests(unittest.TestCase):
         for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path
             if ordered_classpath:
-                self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
-                #self.assertTrue(lines_standard[i] == jar_path, extended_message)
+                if std_classpath_prefix:
+                    self.assertTrue(lines_standard[i] == jar_path, extended_message)
+                else:
+                    self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
             else:
                 self.assertTrue(jar_path in lines_standard, extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
