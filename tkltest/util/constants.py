@@ -48,6 +48,7 @@ TKLTEST_MAIN_REPORT_DIR_SUFFIX = '-tkltest-reports'
 TKL_CTD_REPORT_DIR = 'ctd-report'
 TKL_JUNIT_REPORT_DIR = 'junit-reports'
 TKL_CODE_COVERAGE_REPORT_DIR = 'jacoco-reports'
+TKL_CODE_COVERAGE_DEV_REPORT_DIR = 'dev-jacoco-reports'
 TKL_CODE_COVERAGE_COMPARE_REPORT_DIR = 'compare-reports'
 TKL_CODE_COVERAGE_COMPARE_HTML_DIR = 'compare-html'
 
