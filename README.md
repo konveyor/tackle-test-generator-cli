@@ -194,17 +194,13 @@ and executing them. More detailed description is available in the [CLI user guid
    
    - `app_name`: name of the app under test (this name is used as prefix of file/directories created
      during test generation)
-   
-   - `app_classpath_file`: relative or absolute path to a text file containing library 
-     dependencies of the app under test. For example, see [irs classpath file](test/data/irs/irsMonoClasspath.txt)
      
-   - `monolith_app_path`: a list of paths (relative or absolute) to directories containing 
-     app classes (jar files cannot be specified here). For example, see
-     [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L6)
+   - `app_build_files`: one or more build files for the application. TackleTest will automatically extract the following information 
+         from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, 
+         and (3) the identity of its modules, in case of a multi-module application
+  
+   - `app_build_type`: either maven, gradle or ant
      
-   - `app_packages`: a list of app package prefixes, with wildcards at the end. For example, see
-     [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L63)
-
 3. To generate test cases, run the command
    ```
    tkltest-unit --verbose generate ctd-amplified
