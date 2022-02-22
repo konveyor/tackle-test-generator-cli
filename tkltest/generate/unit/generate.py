@@ -15,6 +15,7 @@ import argparse
 import logging
 import logging.handlers
 import os
+import csv
 import shutil
 import subprocess
 import sys
@@ -27,7 +28,7 @@ from .augment import augment_with_code_coverage
 from .ctd_coverage import create_test_plan_report
 from .generate_standalone import generate_randoop, generate_evosuite
 from tkltest.util import command_util, constants, config_util
-from tkltest.util.unit import  build_util, dir_util
+from tkltest.util.unit import build_util, dir_util, coverage_util
 from tkltest.util.logging_util import tkltest_status
 
 
@@ -46,6 +47,7 @@ def process_generate_command(args, config):
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
+    exclude_classes_covered_by_dev_test(config, output_dir)
     if args.sub_command == "ctd-amplified":
         generate_ctd_amplified_tests(config, output_dir)
     elif args.sub_command == "randoop":
@@ -544,6 +546,36 @@ def __reset_test_directory(args, config):
     shutil.rmtree(directory_to_reset, ignore_errors=True)
     os.makedirs(directory_to_reset)
     return test_directory
+
+
+def exclude_classes_covered_by_dev_test(config, output_dir):
+    '''
+    exclude classes that are already covered by the developer test suite.
+    first running the user test suite and the jacoco cli to get the coverage of the developer test suite
+    than add to the excluded_class_list all the classes that already covered
+    '''
+    if not config['dev_tests']['build_file']:
+        return
+    if config['dev_tests']['coverage_threshold'] >= 100:
+        return
+    dev_coverage_xml, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(config, output_dir, create_csv=True)
+    # read the csv file
+    if not os.path.isfile(dev_coverage_csv):
+        tkltest_status('Warning: Failed to obtain dev-tests coverage, generating tests for all classes')
+        return
+    covered_classes = []
+    with open(dev_coverage_csv, newline='') as f:
+        coverage_info = csv.DictReader(f)
+        for row in coverage_info:
+            class_name = '{}.{}'.format(row['PACKAGE'], row['CLASS'])
+            inst_covered = int(row['INSTRUCTION_COVERED'])
+            inst_missed = int(row['INSTRUCTION_MISSED'])
+            total_inst = inst_missed + inst_covered
+            if not total_inst or inst_covered*100/total_inst > config['dev_tests']['coverage_threshold']:
+                covered_classes.append(class_name)
+    config['generate']['excluded_class_list'] += covered_classes
+    if covered_classes:
+        tkltest_status('The following classes are already covered by developer test suite \n{}.'.format(covered_classes))
 
 
 if __name__ == '__main__':  # pragma: no cover
