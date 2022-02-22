@@ -35,15 +35,14 @@ def process_execute_command(args, config):
         args: command-line arguments
         config: loaded configuration options
     """
-    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
-    __execute_base(args, config, output_dir)
+    __execute_base(args, config)
     if config['dev_tests']['compare_code_coverage']:
-        __run_dev_tests(config, output_dir)
+        run_dev_tests(config)
         __compare_to_dev_tests_coverage(config)
     dir_util.cd_cli_dir()
 
 
-def __run_dev_tests(config, output_dir):
+def run_dev_tests(config):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     ant_build_file = ''
@@ -64,7 +63,7 @@ def __run_dev_tests(config, output_dir):
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
-                     output_dir=output_dir
+                     output_dir=''
                      )
 
 
@@ -90,10 +89,11 @@ def __get_test_classes(test_root_dir):
 #                 os.remove(os.path.join(root, f))
 
 
-def __execute_base(args, config, output_dir):
+def __execute_base(args, config):
 
     # get list of test classes: either the specified class or the all test classes from the specified
     # test files dir
+    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     test_root_dir = config['general']['test_directory']
     if test_root_dir == '':
         test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
@@ -269,11 +269,12 @@ def __compare_to_dev_tests_coverage(config):
     app_name = config['general']['app_name']
     build_type = config['general']['build_type']
     test_root_dir = config['general']['test_directory']
+    output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
     if test_root_dir == '':
-        test_root_dir = app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
+        test_root_dir = os.path.join(output_dir, app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX)
     main_reports_dir = config['general']['reports_path']
     if not main_reports_dir:
-        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+        main_reports_dir = os.path.join(output_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
 
     tkltest_test_name = os.path.basename(test_root_dir)
     tkltest_html_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR, tkltest_test_name)
@@ -284,15 +285,14 @@ def __compare_to_dev_tests_coverage(config):
         shutil.rmtree(compare_report_dir)
     os.mkdir(compare_report_dir)
 
-    # calling generate_coverage_report() to create a xml file and html dir:
+    # calling get_dev_test_coverage() to create a xml file and html dir:
     dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
     dev_coverage_exec = config['dev_tests']['coverage_exec_file']
-    dev_coverage_xml = os.path.join(compare_report_dir, dev_test_name + '_coverage.xml')
-    dev_html_dir = os.path.join(compare_report_dir, dev_test_name + '-html')
-    coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
-                                           exec_file=dev_coverage_exec,
-                                           xml_file=dev_coverage_xml,
-                                           html_dir=dev_html_dir)
+    dev_coverage_xml, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(
+        config=config,
+        output_dir=output_dir,
+        create_xml=True,
+        create_html=True)
 
     # generating the compare data using the dev xml and the tkltest xml:
     html_compare_dir = os.path.join(compare_report_dir, constants.TKL_CODE_COVERAGE_COMPARE_HTML_DIR)
@@ -333,7 +333,7 @@ def __compare_to_dev_tests_coverage(config):
                                            xml_file=merged_coverage_xml,
                                            html_dir=merged_html_dir)
     #printing the html report
-    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_html_dir, tkltest_html_dir, merged_html_dir, html_compare_dir)
+    CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_coverage_html, tkltest_html_dir, merged_html_dir, html_compare_dir)
 
 
 
