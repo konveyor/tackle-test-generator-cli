@@ -63,6 +63,11 @@ public class GeneratedTests {
         // TODO: code related to test report
     }
 
+    /**
+     * Switches focus to the frame with the given frame ID.
+     * @param frameIdentification
+     * @throws NoSuchFrameException
+     */
     private void switchToFrame(String frameIdentification) throws NoSuchFrameException {
         if (frameIdentification.contains(".")) {
             String[] frames = frameIdentification.split("\\.");
@@ -75,7 +80,16 @@ public class GeneratedTests {
         }
     }
 
-    // TODO: check code
+    /**
+     * Fires event of the given type on the given web element (if the elemennt is not null). If frame ID is specified,
+     * switches focus to the frame with that ID before firing the event.
+     * @param webElement element to fire event on
+     * @param eventType event type: click or enter
+     * @param frameId ID of frame to switch focus to before event dispatch
+     * @return
+     * @throws ElementNotVisibleException
+     * @throws InterruptedException
+     */
     private boolean fireEvent(WebElement webElement, String eventType, String frameId) throws ElementNotVisibleException, InterruptedException {
         if (webElement == null) {
             return false;
@@ -95,7 +109,7 @@ public class GeneratedTests {
             }
         case "enter":
             try {
-                webElement.sendKeys(new CharSequence[]{Keys.RETURN});
+                webElement.sendKeys(Keys.RETURN);
                 break;
             } catch (ElementNotVisibleException enve) {
                 throw enve;
@@ -114,6 +128,50 @@ public class GeneratedTests {
     }
 
     /**
+     * Sets value of a web element representing a form field, depending on its type (text, textarea, password, input,
+     * email, number, checkbox, radio, select). If the field is hidden, executes javascript code to set its value.
+     * @param webElement
+     * @param inputType
+     * @param value
+     * @param check
+     */
+    private void handleFormField(WebElement webElement, String inputType, String value, boolean check) {
+        if (webElement == null) {
+            return;
+        }
+        switch (inputType) {
+            case "TEXT":
+            case "TEXTAREA":
+            case "PASSWORD":
+            case "INPUT":
+            case "EMAIL":
+            case "NUMBER":
+                webElement.clear();
+                webElement.sendKeys(value);
+                break;
+            case "CHECKBOX":
+                if (check && !webElement.isSelected()) {
+                    webElement.click();
+                } else if (!check && webElement.isSelected()) {
+                    webElement.click();
+                }
+                break;
+            case "RADIO":
+                if (check) {
+                    webElement.click();
+                }
+                break;
+            case "SELECT":
+                webElement.sendKeys(value);
+                break;
+            case "HIDDEN":
+                JavascriptExecutor js = (JavascriptExecutor)this.driver;
+                js.executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);", webElement, "value", value);
+        }
+    }
+
+
+    /**
      * Test methods ({{test_methods|length}})
      */
 
@@ -124,6 +182,10 @@ public class GeneratedTests {
     {% for eventable in method.eventables %}
 
         {% for form_input in eventable.form_inputs %}
+            {% if form_input.by_method.startswith('By.xpath') %}
+        element = driver.findElement({{form_input.by_method}});
+        this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
+            {% endif %}
         {% endfor %}
         element = driver.findElement({{eventable.by_method}});
         this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");
