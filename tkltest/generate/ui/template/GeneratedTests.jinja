@@ -98,30 +98,26 @@ public class GeneratedTests {
             this.switchToFrame(frameId);
         }
         switch (eventType) {
-        case "click":
-            try {
-                webElement.click();
-                break;
-            } catch (ElementNotVisibleException enve) {
-                throw enve;
-            } catch (WebDriverException wde) {
-                return false;
-            }
-        case "enter":
-            try {
-                webElement.sendKeys(Keys.RETURN);
-                break;
-            } catch (ElementNotVisibleException enve) {
-                throw enve;
-            } catch (WebDriverException wde) {
-                return false;
-            }
-        case "hover":
-            // TODO: logger.info("EventType hover called but this isn't implemented yet");
-            break;
-        default:
-            // TODO: logger.info("EventType {} not supported in WebDriver.", eventable.getEventType());
-            return false;
+            case "click":
+                try {
+                    webElement.click();
+                    break;
+                } catch (ElementNotVisibleException enve) {
+                    throw enve;
+                } catch (WebDriverException wde) {
+                    return false;
+                }
+            case "enter":
+                try {
+                    webElement.sendKeys(Keys.RETURN);
+                    break;
+                } catch (ElementNotVisibleException enve) {
+                    throw enve;
+                } catch (WebDriverException wde) {
+                    return false;
+                }
+            default:
+                throw new UnsupportedOperationException("Event type not supported: "+eventType);
         }
         Thread.sleep(this.waitEvent);
         return true;
