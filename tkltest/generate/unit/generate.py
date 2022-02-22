@@ -558,10 +558,10 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
         return
     if config['dev_tests']['coverage_threshold_percentage'] >= 100:
         return
-    dev_coverage_xnl, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(config, output_dir, create_csv=True)
+    dev_coverage_xml, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(config, output_dir, create_csv=True)
     # read the csv file
     if not os.path.isfile(dev_coverage_csv):
-        tkltest_status('Failed to obtain dev-tests coverage, generating tests for all classes')
+        tkltest_status('Warning: Failed to obtain dev-tests coverage, generating tests for all classes')
         return
     covered_classes = []
     with open(dev_coverage_csv, newline='') as f:
