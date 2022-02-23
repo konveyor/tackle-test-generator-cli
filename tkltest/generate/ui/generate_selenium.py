@@ -11,7 +11,10 @@
 # limitations under the License.
 # ***************************************************************************
 import datetime
+import glob
 import json
+import shutil
+
 import jinja2
 import logging
 import os.path
@@ -23,9 +26,20 @@ SELENIUM_API_TESTS_ROOT = 'selenium-api-tests'
 SELENIUM_API_TEST_CLASS_DIR = os.path.join(SELENIUM_API_TESTS_ROOT, 'src', 'test', 'java', 'generated')
 POM_FILE = 'pom.xml'
 TEST_CLASS_NAME = 'GeneratedTests.java'
+CRAWL_PATHS_FILE = 'CrawlPaths.json'
+
 
 def generate_selenium_api_tests(config, crawl_dir):
+    """Generates test cases that use the Selenium API.
 
+    Processes crawl path information created by crawljax to generate test cases that use the Selenium API
+    for performing actions on the app web UI. Removes crawljax-generated artifacts that are not required
+    for Selenium API test cases.
+
+    Args:
+        config (dict): Configuration information for test generation
+        crawl_dir (dict): Root crawl directory created by Crawljax for the current test-generation run
+    """
     app_name = config['general']['app_name']
     app_url = config['general']['app_url']
     browser = config['generate']['browser']
@@ -39,7 +53,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
     )
 
-    # load pom template, render it, annd write to pom.xml file
+    # load pom template, render it, and write to pom.xml file
     pom_template = jinja_env.get_template('pom.jinja')
     jinja_context = {
         'appname': app_name,
@@ -49,12 +63,12 @@ def generate_selenium_api_tests(config, crawl_dir):
     logging.info('Generated pom.xml for app {}, browser={}'.format(app_name, browser))
 
     # load crawl paths
-    crawl_paths_file = os.path.join(crawl_dir, 'CrawlPaths.json')
+    crawl_paths_file = os.path.join(crawl_dir, CRAWL_PATHS_FILE)
     with open(crawl_paths_file) as f:
         crawl_paths = json.load(f)
     logging.info('Generating tests for {} crawl paths'.format(len(crawl_paths)))
 
-    # load test class template and render it
+    # load test class template and initialize jinja context for it
     testclass_template = jinja_env.get_template('GeneratedTests.jinja')
     jinja_context = {
         'now': datetime.datetime.now().replace(microsecond=0).isoformat(),
@@ -66,7 +80,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         'test_methods': []
     }
 
-    # iterate over crawl paths
+    # iterate over crawl paths and construct context for each test method
     method_names = []
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
@@ -92,8 +106,20 @@ def generate_selenium_api_tests(config, crawl_dir):
     # write pom and test class to files
     __write_generated_code(pom_xml=pom_xml, test_class_code=testclass_code, crawl_dir=crawl_dir)
 
+    # clean up crawl folder
+    # __clean_up_crawl_artifacts(crawl_dir)
+
 
 def __create_method_name_for_path(path):
+    """Creates method name from crawl/test path.
+
+    Creates test method name for the given path by concatenating IDs of the states in the path.
+
+    Args:
+        path (str): crawl/test path to create test method name for
+    Returns:
+        str: method name
+    """
     eventable_ids = [
         str(eventable['id']) for eventable in path
     ]
@@ -101,11 +127,16 @@ def __create_method_name_for_path(path):
 
 
 def __get_context_for_eventable(eventable):
+    """Creates jinja context for an eventable.
+
+    Creates and returns jinja context for the given eventable for rendering the test class code template.
+    """
     context = {
         'event_type': eventable['eventType'],
         'by_method': __get_by_method_for_eventable(eventable['identification']),
         'related_frame': eventable['relatedFrame'],
-        'form_inputs': []
+        'form_inputs': [],
+        'comment': json.dumps(eventable['element'])
     }
     for form_input in eventable['relatedFormInputs']:
         context['form_inputs'].append({
@@ -118,6 +149,16 @@ def __get_context_for_eventable(eventable):
 
 
 def __get_by_method_for_eventable(elem_identification):
+    """Computes Selenium's By method to use for the given web element identification info.
+
+    Computes Selenium's By method to be used for locating the web element with the given identification
+    information. Maps identification's "how" value to one of the Selenium API methods.
+
+    Args:
+        elem_identification (dict): identification information for a web element
+    Returns:
+        str: Java code fragment representing a By method call
+    """
     ident_how = elem_identification['how']
     if ident_how in ['xpath', 'id', 'name']:
         how = ident_how
@@ -128,12 +169,17 @@ def __get_by_method_for_eventable(elem_identification):
     elif ident_how == 'partialText':
         how = 'partialLinkText'
     else:
-        raise Exception('Unknown identification how elemen: {}'.format(ident_how))
+        raise Exception('Unknown identification "how" element: {}'.format(ident_how))
     web_element = 'By.{}("{}")'.format(how, elem_identification['value'])
     return web_element
 
 
 def __write_generated_code(pom_xml, test_class_code, crawl_dir):
+    """Writes generates pom and test class code to files.
+
+    Writes pom and test class to files under selenium API test root dir. Copies testng.xml from the crawl
+    root dir to the selenium API test root dir
+    """
     # write pom and test class to files
     selenium_api_tests_root = os.path.join(crawl_dir, SELENIUM_API_TESTS_ROOT)
     selenium_api_test_class_dir = os.path.join(crawl_dir, SELENIUM_API_TEST_CLASS_DIR)
@@ -145,15 +191,38 @@ def __write_generated_code(pom_xml, test_class_code, crawl_dir):
         f.write(test_class_code)
     logging.info('Wrote test class to {}'.format(selenium_api_test_class_dir))
 
+    # copy testng xml from crawl root dir to test root dir
+    shutil.copy(os.path.join(crawl_dir, 'testng.xml'), selenium_api_tests_root)
+
+
+def __clean_up_crawl_artifacts(crawl_dir):
+    """Cleans up crawl artifacts.
+
+    Deletes crawl artifacts related to crawljax API test cases. Retains the crawl model and related visualization
+    artifacts.
+    """
+    # delete src tree from crawljax API tests
+    shutil.rmtree(os.path.join(crawl_dir, 'src'), ignore_errors=True)
+    # delete pom.xml and testng.xml
+    for file in glob.glob(os.path.join(crawl_dir, '*.xml')):
+        os.remove(file)
+    # delete all json files except the crawl paths file
+    for file in glob.glob(os.path.join(crawl_dir, '*.json')):
+        if not file.endswith(CRAWL_PATHS_FILE):
+            os.remove(file)
+    # remove run scripts
+    for file in glob.glob(os.path.join(crawl_dir, 'run.*')):
+        os.remove(file)
+
 
 if __name__ == '__main__':  # pragma: no cover
     logging_util.init_logging('generate_selenium.log', 'INFO')
-    config = {
+    app_config = {
         'general': {
-            # 'app_name': 'petclinic',
-            # 'app_url': 'http://localhost:8080'
-            'app_name': 'addressbook',
-            'app_url': 'http://localhost:3000/addressbook/'
+            'app_name': 'petclinic',
+            'app_url': 'http://localhost:8080'
+            # 'app_name': 'addressbook',
+            # 'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
@@ -161,6 +230,6 @@ if __name__ == '__main__':  # pragma: no cover
             'wait_after_reload': 500
         }
     }
-    crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl0'
-    crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_3mins/localhost/crawl0'
-    generate_selenium_api_tests(config, crawl_dir)
+    app_crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl0'
+    # app_crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_3mins/localhost/crawl0'
+    generate_selenium_api_tests(app_config, app_crawl_dir)

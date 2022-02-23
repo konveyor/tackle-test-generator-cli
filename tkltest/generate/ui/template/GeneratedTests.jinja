@@ -25,15 +25,23 @@ import io.github.bonigarcia.wdm.WebDriverManager;
  */
 
 public class GeneratedTests {
+
+    // URL where app under test is deployed
     private final String URL = "{{appurl}}";
+
+    // time in ms to wait after firing an event
     private final long waitEvent = {{wait_event}}L;
+
+    // time in ms to wait after reloading the app URL
     private final long waitReload = {{wait_reload}}L;
+
+    // web driver instance
     private WebDriver driver;
 
     @BeforeClass
 	public void oneTimeSetUp() {
 {% if browser == 'chrome' or browser == 'chrome_headless' %}
-        // create chrome driver instance       
+        // create chrome driver instance and set options
         WebDriverManager.chromedriver().setup();
         ChromeOptions chromeOptions = new ChromeOptions();
     {% if browser == 'chrome_headless' %}
@@ -184,6 +192,7 @@ public class GeneratedTests {
         element = driver.findElement({{form_input.by_method}});
         this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
         {% endfor %}
+        // {{eventable.comment}}
         element = driver.findElement({{eventable.by_method}});
         this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");
     {% endfor %}
