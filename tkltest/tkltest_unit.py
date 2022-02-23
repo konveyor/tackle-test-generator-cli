@@ -20,6 +20,7 @@ from .generate.unit import generate
 from .tkltest import *
 from .util import logging_util
 from .util.unit import config_options_unit
+from .util.unit import coverage_util
 from .util.constants import *
 
 
@@ -60,6 +61,9 @@ def main():
 
     configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
 
+    if args.command == 'execute' and len(configs) > 1:
+        coverage_util.merge_reports(tkltest_config, configs)
+
     for config in configs:
         logging_util.tkltest_status('{} tests for {} {} using config file {}.'.format(
             'Generating' if args.command == 'generate' else 'Executing',
@@ -79,6 +83,8 @@ def main():
                 if os.path.isdir(path):
                     shutil.rmtree(path)
 
+    if args.command == 'execute' and len(configs) > 1:
+        coverage_util.merge_reports(tkltest_config, configs)
 
 if __name__ == '__main__':  # pragma: no cover
     main()

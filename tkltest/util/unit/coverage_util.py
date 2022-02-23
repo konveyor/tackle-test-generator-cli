@@ -22,7 +22,7 @@ import sys
 from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
 from tkltest.execute.unit import execute
-
+from tkltest.util.unit import dir_util
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
                                 raw_cov_data_dir, raw_cov_data_file_pref,
@@ -372,7 +372,6 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
     return dev_coverage_xml, dev_coverage_html, dev_coverage_csv
 
 
-
 def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir='', csv_file=''):
     """Generates jacoco XML file from raw coverage (.exec) files.
 
@@ -401,3 +400,65 @@ def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir
         sys.exit(1)
 
 
+def merge_reports(tkltest_config, configs):
+    if not tkltest_config['execute']['code_coverage']:
+        return
+    dir_util.cd_cli_dir()
+    app_name = tkltest_config['general']['app_name']
+    app_dir = dir_util.get_app_output_dir(app_name)
+    exec_files = []
+    app_path = []
+    # first collect exec files and app_pathes
+    for config in configs:
+        output_dir = dir_util.get_output_dir(app_name, config['general'].get('module_name', ''))
+        test_root_dir = config['general']['test_directory']
+        if not test_root_dir:
+            test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
+        if not os.path.isabs(test_root_dir):
+            test_root_dir = os.path.join(output_dir, test_root_dir)
+        exec_file = os.path.join(test_root_dir, 'merged_jacoco.exec')
+        if not os.path.isfile(exec_file):
+            tkltest_status('exec_file {} does not exist'.format(exec_file), error=True)
+            sys.exit(1)
+        else:
+            exec_files.append(exec_file)
+            # todo - do we need add the path in case that there is no exec?
+            app_path += config['general']['monolith_app_path']
+
+
+    main_reports_dir = tkltest_config['general']['reports_path']
+    if not main_reports_dir:
+        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
+    if not os.path.isabs(main_reports_dir):
+        main_reports_dir = os.path.join(app_dir, main_reports_dir)
+    merged_report_dir = os.path.join(main_reports_dir, 'modules_merged_report')
+    if os.path.isdir(merged_report_dir):
+        shutil.rmtree(merged_report_dir)
+    os.makedirs(merged_report_dir)
+
+    if not exec_files:
+        tkltest_status('no exec_files found', error=True)
+        sys.exit(1)
+    elif len(exec_files) == 1:
+        merged_exec_file = exec_files[0]
+    else:
+        merged_exec_file = os.path.join(merged_report_dir, 'modules_jacoco_merged.exec')
+        jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+        try:
+            command_util.run_command("java -jar {} merge {} --destfile {}".
+                             format(jacoco_cli_file, ' '.join(exec_files), merged_exec_file), verbose=True)
+        except subprocess.CalledProcessError as e:
+            tkltest_status('fail to merge jacoco exec files: {}\n{}'.format(e, e.stderr))
+            sys.exit(1)
+
+    coverage_csv = os.path.join(merged_report_dir, 'coverage.csv')
+    coverage_xml = os.path.join(merged_report_dir, 'coverage.xml')
+    coverage_html = os.path.join(merged_report_dir, 'coverage-html')
+
+    generate_coverage_report(monolith_app_path=app_path,
+                             exec_file=merged_exec_file,
+                             xml_file=coverage_xml,
+                             html_dir=coverage_html,
+                             csv_file=coverage_csv)
+
+    sys.exit(0)
