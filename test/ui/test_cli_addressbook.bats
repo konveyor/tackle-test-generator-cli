@@ -25,7 +25,7 @@ setup() {
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
-        generate
+        generate --api-type crawljax
     [ $status -eq 0 ]
 
     # assert that the crawl directory is created

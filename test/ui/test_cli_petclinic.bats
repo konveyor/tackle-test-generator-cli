@@ -27,7 +27,7 @@ setup() {
     run tkltest-ui --verbose \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
-        generate
+        generate --api-type crawljax
     [ $status -eq 0 ]
 
     # assert that the crawl directory is created
