@@ -19,14 +19,11 @@ import jinja2
 import logging
 import os.path
 
-from tkltest.util import logging_util
+from tkltest.util import constants, logging_util
 
 # names and paths for generated code files
-SELENIUM_API_TESTS_ROOT = 'selenium-api-tests'
-SELENIUM_API_TEST_CLASS_DIR = os.path.join(SELENIUM_API_TESTS_ROOT, 'src', 'test', 'java', 'generated')
-POM_FILE = 'pom.xml'
-TEST_CLASS_NAME = 'GeneratedTests.java'
-CRAWL_PATHS_FILE = 'CrawlPaths.json'
+_POM_FILE = 'pom.xml'
+_CRAWL_PATHS_FILE = 'CrawlPaths.json'
 
 
 def generate_selenium_api_tests(config, crawl_dir):
@@ -63,7 +60,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     logging.info('Generated pom.xml for app {}, browser={}'.format(app_name, browser))
 
     # load crawl paths
-    crawl_paths_file = os.path.join(crawl_dir, CRAWL_PATHS_FILE)
+    crawl_paths_file = os.path.join(crawl_dir, _CRAWL_PATHS_FILE)
     with open(crawl_paths_file) as f:
         crawl_paths = json.load(f)
     logging.info('Generating tests for {} crawl paths'.format(len(crawl_paths)))
@@ -107,7 +104,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     __write_generated_code(pom_xml=pom_xml, test_class_code=testclass_code, crawl_dir=crawl_dir)
 
     # clean up crawl folder
-    # __clean_up_crawl_artifacts(crawl_dir)
+    __clean_up_crawl_artifacts(crawl_dir)
 
 
 def __create_method_name_for_path(path):
@@ -175,24 +172,24 @@ def __get_by_method_for_eventable(elem_identification):
 
 
 def __write_generated_code(pom_xml, test_class_code, crawl_dir):
-    """Writes generates pom and test class code to files.
+    """Writes generated pom and test class code to files.
 
     Writes pom and test class to files under selenium API test root dir. Copies testng.xml from the crawl
     root dir to the selenium API test root dir
     """
     # write pom and test class to files
-    selenium_api_tests_root = os.path.join(crawl_dir, SELENIUM_API_TESTS_ROOT)
-    selenium_api_test_class_dir = os.path.join(crawl_dir, SELENIUM_API_TEST_CLASS_DIR)
+    selenium_api_test_class_dir = os.path.join(crawl_dir, constants.SELENIUM_API_TEST_CLASS_DIR)
     os.makedirs(selenium_api_test_class_dir, exist_ok=True)
-    with open(os.path.join(selenium_api_tests_root, POM_FILE), 'w') as f:
+    selenium_api_test_root = os.path.join(crawl_dir, constants.SELENIUM_API_TEST_ROOT)
+    with open(os.path.join(selenium_api_test_root, _POM_FILE), 'w') as f:
         f.write(pom_xml)
-    logging.info('Wrote {} to {}'.format(POM_FILE, selenium_api_tests_root))
-    with open(os.path.join(selenium_api_test_class_dir, TEST_CLASS_NAME), 'w') as f:
+    logging.info('Wrote {} to {}'.format(_POM_FILE, os.path.join(crawl_dir, constants.SELENIUM_API_TEST_ROOT)))
+    with open(os.path.join(crawl_dir, constants.SELENIUM_API_TEST_FILE), 'w') as f:
         f.write(test_class_code)
     logging.info('Wrote test class to {}'.format(selenium_api_test_class_dir))
 
     # copy testng xml from crawl root dir to test root dir
-    shutil.copy(os.path.join(crawl_dir, 'testng.xml'), selenium_api_tests_root)
+    shutil.copy(os.path.join(crawl_dir, 'testng.xml'), selenium_api_test_root)
 
 
 def __clean_up_crawl_artifacts(crawl_dir):
@@ -208,7 +205,7 @@ def __clean_up_crawl_artifacts(crawl_dir):
         os.remove(file)
     # delete all json files except the crawl paths file
     for file in glob.glob(os.path.join(crawl_dir, '*.json')):
-        if not file.endswith(CRAWL_PATHS_FILE):
+        if not file.endswith(_CRAWL_PATHS_FILE):
             os.remove(file)
     # remove run scripts
     for file in glob.glob(os.path.join(crawl_dir, 'run.*')):

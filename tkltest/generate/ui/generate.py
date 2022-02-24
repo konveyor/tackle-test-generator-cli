@@ -28,6 +28,8 @@ from tkltest.util.logging_util import tkltest_status
 from tkltest.util import command_util
 from tkltest.util.constants import *
 from tkltest.util.ui import dir_util, browser_util
+from tkltest.generate.ui import generate_selenium
+
 
 def process_generate_command(config):
     """Processes the tkltest-ui generate command.
@@ -103,19 +105,32 @@ def process_generate_command(config):
     # need to check crawler error again because it might have occurred after progress bar ended
     # and while still waiting for the crawler to terminate
     if crawler_error:
-        tkltest_status('UI test genenration failed: {}\n{}'.format(crawler_e, crawler_e.stderr), error=True)
+        tkltest_status('UI test generation failed: {}\n{}'.format(crawler_e, crawler_e.stderr), error=True)
         sys.exit(1)
 
-    # print info about generated tests
-    output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory,
-                                                                  host_name=host_name)
+    # print info about crawl directory
+    output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory, host_name=host_name)
     tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
-    test_count, test_class_file = __get_generated_test_count(last_crawl_dir=output_crawl_dir)
-    tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
 
+    # generate selenium API tests if option specified
+    if config['generate']['api_type'] == 'selenium':
+        tkltest_status('Creating Selenium API test cases')
+        try:
+            generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
+            test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
+        except Exception as e:
+            tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(e), error=True)
+            browser_util.cleanup_browser_instances(browser)
+            sys.exit(1)
+    else:
+        test_class_file = os.path.join(output_crawl_dir, CRAWLJAX_API_TEST_FILE)
+
+    test_count = __get_generated_test_count(test_class_file=test_class_file)
+    tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
 
     # cleanup browser instances
     browser_util.cleanup_browser_instances(browser)
+
 
 def run_crawljax(uitestgen_command, verbose):
     global crawler_error, crawler_e
@@ -125,12 +140,12 @@ def run_crawljax(uitestgen_command, verbose):
         crawler_e = e
         crawler_error = True
 
-def __get_generated_test_count(last_crawl_dir):
+
+def __get_generated_test_count(test_class_file):
     """Returns the number of generated test cases
 
-    Computes test case count by counting @Test annotations in the genearted test class file
+    Computes test case count by counting @Test annotations in the generated test class file
     """
-    generated_test_class = os.path.join(last_crawl_dir, 'src', 'test', 'java', 'generated', 'GeneratedTests.java')
-    with open(generated_test_class, 'r') as f:
+    with open(test_class_file, 'r') as f:
         teststr = f.read()
-    return len(re.findall('@Test', teststr)), generated_test_class
+    return len(re.findall('@Test', teststr))
