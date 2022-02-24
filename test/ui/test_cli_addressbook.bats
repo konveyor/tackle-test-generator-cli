@@ -1,7 +1,10 @@
 ADDRESSBOOK_CONFIG_FILE=./test/ui/data/addressbook/tkltest_ui_config.toml
 ADDRESSBOOK_OUTPUT_DIR=./__tkltest-output-ui-addressbook
 ADDRESSBOOK_CRAWL_DIR=$ADDRESSBOOK_OUTPUT_DIR/localhost/crawl0
-ADDRESSBOOK_TEST_FILE=$ADDRESSBOOK_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
+ADDRESSBOOK_CRAWLJAX_API_TEST_FILE=$ADDRESSBOOK_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
+ADDRESSBOOK_SELENIUM_API_TEST_DIR=$ADDRESSBOOK_CRAWL_DIR/selenium-api-tests
+ADDRESSBOOK_SELENIUM_API_TEST_FILE=$ADDRESSBOOK_SELENIUM_API_TEST_DIR/src/test/java/generated/GeneratedTests.java
+
 
 # setup commands run before execution of tests in file
 setup_file() {
@@ -25,18 +28,27 @@ setup() {
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
-        generate --api-type crawljax
+        generate
     [ $status -eq 0 ]
 
     # assert that the crawl directory is created
     [ -d ./$ADDRESSBOOK_CRAWL_DIR ]
 
-    # assert that pom.xml and test class are generated
+    # assert that pom.xml and test class for crawljax API tests are generated
     [ -f ./$ADDRESSBOOK_CRAWL_DIR/pom.xml ]
-    [ -f ./$ADDRESSBOOK_TEST_FILE ]
+    [ -f ./$ADDRESSBOOK_CRAWLJAX_API_TEST_FILE ]
 
-    # assert over number of generated tests
-    test_count=`grep @Test $ADDRESSBOOK_TEST_FILE | wc -l`
+    # assert over number of generated crawljax API tests
+    test_count=`grep @Test $ADDRESSBOOK_CRAWLJAX_API_TEST_FILE | wc -l`
+    echo "# test_count=$test_count" >&3
+    [ $test_count -gt 0 ]
+
+        # assert that pom.xml and test class for selenium API tests are generated
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_DIR/pom.xml ]
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_FILE ]
+
+    # assert over number of generated selenium API tests
+    test_count=`grep @Test $ADDRESSBOOK_SELENIUM_API_TEST_FILE | wc -l`
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 }

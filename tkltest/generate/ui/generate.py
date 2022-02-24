@@ -43,19 +43,61 @@ def process_generate_command(config):
     """
     logging.info('Processing generate command')
 
-    app_name = config['general']['app_name']
-    app_url = config['general']['app_url']
-    verbose = config['general']['verbose']
     browser = config['generate']['browser']
-    time_limit = config['generate']['time_limit']
     host_name = urllib.parse.urlparse(config['general']['app_url']).netloc.split(':')[0]
 
     # set default test directory if unspecified
     test_directory = dir_util.get_test_directory(config, host_name)
     logging.info('test directory: '.format(test_directory))
 
+    # run crawljax and get output crawl directory
+    __run_crawljax(config=config)
+    output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory, host_name=host_name)
+    tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
+
+    # print message about generated crwaljax API tests
+    test_class_file = os.path.join(output_crawl_dir, CRAWLJAX_API_TEST_FILE)
+    test_count = __get_generated_test_count(test_class_file=test_class_file)
+    tkltest_status('Generated {} Crawljax API test cases; written to test class file "{}"'
+                   .format(test_count, test_class_file))
+
+    # generate Selenium API tests
+    tkltest_status('Creating Selenium API test cases from crawl paths')
+    try:
+        generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
+        test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
+        test_count = __get_generated_test_count(test_class_file=test_class_file)
+        tkltest_status('Generated {} Selenium API test cases; written to test class file "{}"'
+                       .format(test_count, test_class_file))
+    except Exception as e:
+        tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(e), error=True)
+        browser_util.cleanup_browser_instances(browser)
+        sys.exit(1)
+
+    # cleanup browser instances
+    browser_util.cleanup_browser_instances(browser)
+
+
+def __generate_selenium_tests(config, output_crawl_dir):
+    tkltest_status('Creating Selenium API test cases')
+    try:
+        generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
+        test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
+    except Exception as e:
+        tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(e), error=True)
+        browser_util.cleanup_browser_instances(browser)
+        sys.exit(1)
+
+
+def __run_crawljax(config):
+    app_name = config['general']['app_name']
+    app_url = config['general']['app_url']
+    verbose = config['general']['verbose']
+    browser = config['generate']['browser']
+    time_limit = config['generate']['time_limit']
+
     # write config (with internal options added) to toml file to be passed as argument to the crawljax runner
-    config_file_name = '__{}_tkltest_ui_config.toml'.format(config['general']['app_name'])
+    config_file_name = '__{}_tkltest_ui_config.toml'.format(app_name)
     with open(config_file_name, 'w') as f:
         toml.dump(config, f)
 
@@ -81,7 +123,7 @@ def process_generate_command(config):
     crawler_error = False
     crawler_e = None
 
-    thread = Thread(target=run_crawljax, args=[uitestgen_command, verbose])
+    thread = Thread(target=__run_crawljax_command, args=[uitestgen_command, verbose])
     thread.start()
     closed_before_limit = False
     for b in trange(
@@ -108,31 +150,9 @@ def process_generate_command(config):
         tkltest_status('UI test generation failed: {}\n{}'.format(crawler_e, crawler_e.stderr), error=True)
         sys.exit(1)
 
-    # print info about crawl directory
-    output_crawl_dir = dir_util.get_crawl_output_dir(test_directory=test_directory, host_name=host_name)
-    tkltest_status('Crawl results written to {}'.format(output_crawl_dir))
-
-    # generate selenium API tests if option specified
-    if config['generate']['api_type'] == 'selenium':
-        tkltest_status('Creating Selenium API test cases')
-        try:
-            generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
-            test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
-        except Exception as e:
-            tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(e), error=True)
-            browser_util.cleanup_browser_instances(browser)
-            sys.exit(1)
-    else:
-        test_class_file = os.path.join(output_crawl_dir, CRAWLJAX_API_TEST_FILE)
-
-    test_count = __get_generated_test_count(test_class_file=test_class_file)
-    tkltest_status('Generated {} test cases; written to test class file "{}"'.format(test_count, test_class_file))
-
-    # cleanup browser instances
-    browser_util.cleanup_browser_instances(browser)
 
 
-def run_crawljax(uitestgen_command, verbose):
+def __run_crawljax_command(uitestgen_command, verbose):
     global crawler_error, crawler_e
     try:
         command_util.run_command(command=uitestgen_command, verbose=verbose)

@@ -183,17 +183,28 @@ __options_spec = {
             'default_value': 0,
             'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
         },
-        'api_type': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-at',
-            'long_name': '--api-type',
-            'type': str,
-            'choices': ['crawljax', 'selenium'],
-            'default_value': 'selenium',
-            'help_message': 'Library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API'
-        },
+        # 'api_type': {
+        #     'required': False,
+        #     'is_toml_option': True,
+        #     'is_cli_option': True,
+        #     'short_name': '-at',
+        #     'long_name': '--api-type',
+        #     'type': str,
+        #     'choices': ['crawljax', 'selenium'],
+        #     'default_value': 'selenium',
+        #     'help_message': 'library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API'
+        # },
+        # 'reuse_crawl_paths': {
+        #     'required': False,
+        #     'is_toml_option': True,
+        #     'is_cli_option': True,
+        #     'short_name': '-rcp',
+        #     'long_name': '--reuse-crawl-paths',
+        #     'type': bool,
+        #     'default_value': False,
+        #     'help_message': 'reuse crawl paths for generating Selenium API tests instead of launching a new crawl session; default is False' +\
+        #         ' (this option applies only if --api-type is selenium)'
+        # },
         'include_iframes': {
             'required': False,
             'is_toml_option': True,
@@ -345,5 +356,16 @@ __options_spec_internal = {
     'execute': {
         'is_cli_command': True,
         'help_message': 'Execute generated UI tests on the application under test',
+        'api_type': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-at',
+            'long_name': '--api-type',
+            'type': str,
+            'choices': ['crawljax', 'selenium'],
+            'default_value': 'selenium',
+            'help_message': 'library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API'
+        },
     }
 }
