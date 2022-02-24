@@ -566,7 +566,6 @@ def __create_modified_build_file_for_monolith_app_path(app_build_file):
     return tkltest_app_build_file, basedir
 
 
-#todo - use this method at __resolve_classpath() - will be done after resolving __resolve_classpath issues
 def __add_and_run_gradle_task(app_build_file, app_settings_file, task_name, task_text, verbose):
     '''
     insert a task to the gradle build file, and run it
@@ -758,7 +757,6 @@ def resolve_classpath(tkltest_config, command):
         app_settings_file = ''
     # create dependencies directory
     dependencies_dir = os.path.join(output_dir, app_name + constants.DEPENDENCIES_DIR_SUFFIX)
-    posix_dependencies_dir = pathlib.PurePath(dependencies_dir).as_posix()
     if os.path.isdir(dependencies_dir):
         shutil.rmtree(dependencies_dir)
     os.mkdir(dependencies_dir)
@@ -766,41 +764,29 @@ def resolve_classpath(tkltest_config, command):
 
     if app_build_type == 'gradle':
         # create build and settings files
-        get_dependencies_task = 'tkltest_get_dependencies'
-        tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), "tkltest_build.gradle")
-        shutil.copyfile(app_build_file, tkltest_app_build_file)
-        with open(tkltest_app_build_file, "a") as f:
-            f.write("\ntask " + get_dependencies_task + "(type: Copy) {\n")
-            f.write("    from sourceSets.main.runtimeClasspath\n")
-            f.write("    into '" + posix_dependencies_dir + "'\n")
-            f.write("}\n")
+        task_name = 'tkltest_get_dependencies'
+        gradle_classpath_file = os.path.join(output_dir, 'GradleClassPath.txt')
+        task_text = [
+            'public class WriteStringClass extends DefaultTask {',
+            '  @TaskAction',
+            '  void writeString(){',
+            '    FileWriter fw;',
+            '    fw = new FileWriter( "' + pathlib.PurePath(gradle_classpath_file).as_posix() + '", true);',
+            '    fw.write("${project.sourceSets.main.runtimeClasspath.getFiles()}")',
+            '    fw.close();',
+            '  }',
+            '}',
+            'task ' + task_name + ' (type:WriteStringClass) {}']
 
-        if app_settings_file:
-            tkltest_app_settings_file = os.path.join(os.path.dirname(app_settings_file), "tkltest_settings.gradle")
-            shutil.copyfile(app_settings_file, tkltest_app_settings_file)
-            relative_app_build_file = pathlib.PurePath(os.path.relpath(tkltest_app_build_file, os.path.dirname(app_settings_file))).as_posix()
-            with open(tkltest_app_settings_file, "a") as f:
-                f.write("\nrootProject.buildFileName = '" + relative_app_build_file+"'\n")
+        __add_and_run_gradle_task(app_build_file=app_build_file,
+                                  app_settings_file=app_settings_file,
+                                  task_name=task_name,
+                                  task_text=task_text,
+                                  verbose=tkltest_config['general']['verbose'])
+        with open(gradle_classpath_file) as f:
+            class_path_order = f.read().replace('[', '').replace(']', '').replace(' ', '').split(',')
+        os.remove(gradle_classpath_file)
 
-        # run gradle
-        get_dependencies_command = "gradle -q -b " + os.path.abspath(tkltest_app_build_file)
-        if app_settings_file:
-            get_dependencies_command += " -c " + os.path.abspath(tkltest_app_settings_file)
-        get_dependencies_command += " " +get_dependencies_task
-        logging.info(get_dependencies_command)
-
-        try:
-            command_util.run_command(command=get_dependencies_command, verbose=tkltest_config['general']['verbose'])
-        except subprocess.CalledProcessError as e:
-            tkltest_status('running {} task {} failed: {}\n{}'.format(app_build_type, get_dependencies_task, e, e.stderr), error=True)
-            os.remove(tkltest_app_build_file)
-            if app_settings_file:
-                os.remove(tkltest_app_settings_file)
-            sys.exit(1)
-
-        os.remove(tkltest_app_build_file)
-        if app_settings_file:
-            os.remove(tkltest_app_settings_file)
 
     elif app_build_type == 'maven':
         shutil.rmtree(dependencies_dir)
@@ -877,7 +863,7 @@ def resolve_classpath(tkltest_config, command):
     # remove non jar entries
     # collect jars modules
     jars_modules = dict()
-    if app_build_type in ['ant', 'gradle']:
+    if app_build_type == 'ant':
         for jar_file in os.listdir(dependencies_dir):
             jar_file_path = os.path.join(dependencies_dir, jar_file)
             if os.path.isdir(jar_file_path):
@@ -886,7 +872,7 @@ def resolve_classpath(tkltest_config, command):
                 os.remove(jar_file_path)
             else:
                 __collect_jar_modules(jar_file_path, jars_modules)
-    elif app_build_type == 'maven':
+    elif app_build_type in ['maven', 'gradle']:
         for jar_file_path in class_path_order:
             if jar_file_path.endswith('.jar'):
                 __collect_jar_modules(jar_file_path, jars_modules)

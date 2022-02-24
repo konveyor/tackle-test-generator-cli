@@ -387,7 +387,6 @@ class UnitTests(unittest.TestCase):
 
             config = config_util.load_config(config_file=self.gradle_test_apps[app_name]['config_file'])
             standard_classpath = os.path.abspath(self.gradle_test_apps[app_name]['standard_classpath'])
-            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
             config['general']['app_classpath_file'] = ''
 
             config_util.resolve_app_path(config)
@@ -397,10 +396,11 @@ class UnitTests(unittest.TestCase):
             failed_assertion_message = 'failed for app = ' + app_name
             self.assertTrue(generated_classpath != '', failed_assertion_message)
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
-            self.__assert_classpath(standard_classpath,
-                                    generated_classpath,
-                                    os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
-                                    failed_assertion_message)
+            self.__assert_classpath(standard_classpath=standard_classpath,
+                                    generated_classpath=generated_classpath,
+                                    std_classpath_prefix='',
+                                    message=failed_assertion_message,
+                                    ordered_classpath=True)
             self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
 
 
@@ -429,13 +429,14 @@ class UnitTests(unittest.TestCase):
         :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
         :param message: An informative error message to print in case one of the assertions fails.
         """
-        std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
         if is_user_defined_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        # Paths inside standard_classpath must be in unix format for the test.
-        lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
+        if std_classpath_prefix:
+            # Paths inside standard_classpath must be in unix format for the test.
+            std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
+            lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -443,12 +444,15 @@ class UnitTests(unittest.TestCase):
 
         self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
-        for i, jar_path in enumerate(lines_standard):
+        for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path
             if ordered_classpath:
-                self.assertTrue(lines_generated[i] == jar_path, extended_message)
+                if std_classpath_prefix:
+                    self.assertTrue(lines_standard[i] == jar_path, extended_message)
+                else:
+                    self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
             else:
-                self.assertTrue(jar_path in lines_generated, extended_message)
+                self.assertTrue(jar_path in lines_standard, extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
 
     def __assert_modules_properties(self, modules_names, modules):
