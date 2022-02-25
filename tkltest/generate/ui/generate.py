@@ -48,7 +48,7 @@ def process_generate_command(config):
 
     # set default test directory if unspecified
     test_directory = dir_util.get_test_directory(config, host_name)
-    logging.info('test directory: '.format(test_directory))
+    logging.info('test directory: {}'.format(test_directory))
 
     # run crawljax and get output crawl directory
     __run_crawljax(config=config)

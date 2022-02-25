@@ -49,9 +49,11 @@ def generate_selenium_api_tests(config, crawl_dir):
         lstrip_blocks=True,
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
     )
+    logging.info('Created jinja environment with searchpath={})'.format(searchpath))
 
     # load pom template, render it, and write to pom.xml file
     pom_template = jinja_env.get_template('pom.jinja')
+    logging.info('POM template: {}'.format(pom_template))
     jinja_context = {
         'appname': app_name,
         'browser': browser
