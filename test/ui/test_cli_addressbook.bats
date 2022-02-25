@@ -25,7 +25,7 @@ setup() {
 
 @test "Test 01: CLI generate addressbook" {
     # generate test cases for addressbook app
-    run tkltest-ui --verbose \
+    run tkltest-ui --verbose --log-level INFO \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         generate

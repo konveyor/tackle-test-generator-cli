@@ -56,7 +56,7 @@ setup() {
 
 @test "Test 02: CLI execute petclinic" {
     # execute test cases for petclinic app
-    run tkltest-ui --verbose \
+    run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute
