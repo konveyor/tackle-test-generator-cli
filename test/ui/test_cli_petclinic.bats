@@ -26,7 +26,7 @@ setup() {
 
 @test "Test 01: CLI generate petclinic" {
     # generate test cases for petclinic app
-    tkltest-ui --verbose \
+    tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         generate
