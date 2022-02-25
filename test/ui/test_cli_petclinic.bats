@@ -24,9 +24,9 @@ setup() {
     cd test/ui/data/webapps/petclinic && ./deploy_app.sh start && cd ../../../../..
 }
 
-@test "Test 01: CLI generate petclinic [api_type=crawljax]" {
+@test "Test 01: CLI generate petclinic" {
     # generate test cases for petclinic app
-    run tkltest-ui --verbose \
+    tkltest-ui --verbose \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         generate
@@ -41,7 +41,7 @@ setup() {
 
     # assert over number of generated crawljax API tests
     test_count=`grep @Test $PETCLINIC_CRAWLJAX_API_TEST_FILE | wc -l`
-    echo "# test_count=$test_count" >&3
+    echo "# crawljax_api_test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 
     # assert that pom.xml and test class for selenium API tests are generated
@@ -50,9 +50,8 @@ setup() {
 
     # assert over number of generated selenium API tests
     test_count=`grep @Test $PETCLINIC_SELENIUM_API_TEST_FILE | wc -l`
-    echo "# test_count=$test_count" >&3
+    echo "# selenium_api_test_count=$test_count" >&3
     [ $test_count -gt 0 ]
-
 }
 
 @test "Test 02: CLI execute petclinic" {

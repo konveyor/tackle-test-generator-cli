@@ -40,7 +40,7 @@ setup() {
 
     # assert over number of generated crawljax API tests
     test_count=`grep @Test $ADDRESSBOOK_CRAWLJAX_API_TEST_FILE | wc -l`
-    echo "# test_count=$test_count" >&3
+    echo "# crawljax_api_test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 
         # assert that pom.xml and test class for selenium API tests are generated
@@ -49,7 +49,7 @@ setup() {
 
     # assert over number of generated selenium API tests
     test_count=`grep @Test $ADDRESSBOOK_SELENIUM_API_TEST_FILE | wc -l`
-    echo "# test_count=$test_count" >&3
+    echo "# selenium_api_test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 }
 
