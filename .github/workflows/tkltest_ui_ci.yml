@@ -62,7 +62,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
     - name: Pull test webapps
       run: |
         git submodule init
@@ -76,7 +75,7 @@ jobs:
     - name: Run CLI help/config tests
       run: |
         source venv/bin/activate
-        bats test/ui/test_cli.bats
+        bats --print-output-on-failure test/ui/test_cli.bats
     - name: Run CLI generate/execute tests - petclinic
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64

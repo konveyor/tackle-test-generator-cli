@@ -28,7 +28,7 @@ setup(
         ]
     },
     package_data={
-        'tkltest/generate/ui/template': ['tkltest/generate/ui/template/*.jinja']
+        'tkltest/generate/ui/templates': ['tkltest/generate/ui/templates/*.jinja']
     },
     classifiers=[
         'Programming Language :: Python :: 3',
