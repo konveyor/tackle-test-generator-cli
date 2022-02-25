@@ -73,7 +73,6 @@ jobs:
         source venv/bin/activate
         pip install .
         which tkltest-ui
-        ls -l /home/runner/work/tackle-test-generator-cli/tackle-test-generator-cli/venv/lib/python3.8/site-packages/tkltest/generate/ui/template
     - name: Run CLI help/config tests
       run: |
         source venv/bin/activate
