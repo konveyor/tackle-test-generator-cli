@@ -43,7 +43,8 @@ def generate_selenium_api_tests(config, crawl_dir):
     browser = config['generate']['browser']
 
     # initialize jinja env
-    searchpath = [os.path.dirname(os.path.abspath(__file__)) + os.sep + 'template']
+    # searchpath = [os.path.dirname(os.path.abspath(__file__)) + os.sep + 'template']
+    searchpath = [os.path.join(constants.TKLTEST_CLI_DIR, 'tkltest', 'generate', 'ui', 'template')]
     logging.info('Creating jinja environment with searchpath={})'.format(searchpath))
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(searchpath=searchpath),
