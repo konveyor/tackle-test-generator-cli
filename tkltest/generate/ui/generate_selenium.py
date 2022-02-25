@@ -37,19 +37,21 @@ def generate_selenium_api_tests(config, crawl_dir):
         config (dict): Configuration information for test generation
         crawl_dir (dict): Root crawl directory created by Crawljax for the current test-generation run
     """
+    logging.info('Creating Selenium API tests from paths in {}'.format(os.path.join(crawl_dir, _CRAWL_PATHS_FILE)))
     app_name = config['general']['app_name']
     app_url = config['general']['app_url']
     browser = config['generate']['browser']
 
     # initialize jinja env
     searchpath = [os.path.dirname(os.path.abspath(__file__)) + os.sep + 'template']
+    logging.info('Creating jinja environment with searchpath={})'.format(searchpath))
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(searchpath=searchpath),
         trim_blocks=True,
         lstrip_blocks=True,
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
     )
-    logging.info('Created jinja environment with searchpath={})'.format(searchpath))
+    logging.info('Jinja environment created')
 
     # load pom template, render it, and write to pom.xml file
     pom_template = jinja_env.get_template('pom.jinja')
