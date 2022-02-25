@@ -50,7 +50,12 @@ The CLI command can be installed locally to be run, or it can be run in a Docker
 the various dependencies (Java, Ant, and Maven) need not be installed locally.
 
 You can also download a released version of TackleTest from [here](https://github.com/konveyor/tackle-test-generator-cli/releases).
-> **NOTE:** If you are using a released version of TackleTest with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`) or a published TackleTest container image, please skip the [Prerequisite](#prerequisite) step and step 4 of [Running the CLI from local installation](#running-the-cli-from-local-installation). Those steps are required only if the Java dependencies of the TackleTest CLI need to be downloaded .
+> **NOTE:** If you are using a released version of TackleTest with all dependencies included 
+(i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`) or a published TackleTest 
+container image, please skip the [Prerequisite](#prerequisite) step and step 4 of 
+[Running the CLI from local installation](#running-the-cli-from-local-installation). 
+Those steps are required only if the Java dependencies of the TackleTest CLI need to be downloaded. Note also that step 5
+of [Running the CLI from local installation](#running-the-cli-from-local-installation) for installing or re-installing the tkltest-unit and tkltest-ui commands is still required. You can verify the tkltest version you are using by running the command `tkltest-unit -v`.
 
 ### Prerequisite
 
