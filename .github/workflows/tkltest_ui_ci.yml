@@ -69,6 +69,8 @@ jobs:
         git submodule update
     - name: Install tkltest-ui command
       run: |
+        python -m venv venv
+        source venv/bin/activate
         pip install .
         which tkltest-ui
     - name: Run CLI help/config tests
