@@ -62,3 +62,12 @@ setup() {
         execute
     [ $status -eq 0 ]
 }
+
+@test "Test 03: CLI execute [api_type=crawljax] petclinic" {
+    # execute test cases for petclinic app
+    run tkltest-ui --verbose --log-level INFO \
+        --config-file $PETCLINIC_CONFIG_FILE \
+        --test-directory $PETCLINIC_OUTPUT_DIR \
+        execute --api-type crawljax
+    [ $status -eq 0 ]
+}
