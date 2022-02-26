@@ -78,3 +78,9 @@ teardown_file() {
     assert_success
     assert_output --partial 'usage: tkltest-ui generate [-h]'
 }
+
+@test "Test 08: CLI execute command help" {
+    run tkltest-ui execute --help
+    assert_success
+    assert_output --partial 'usage: tkltest-ui execute [-h]'
+}
