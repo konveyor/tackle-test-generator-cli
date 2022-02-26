@@ -23,10 +23,10 @@ from tkltest.util.logging_util import tkltest_status
 def process_execute_command(config):
     """Processes the ui execute command.
 
-    Processes the execute command and executes test cases
+    Processes the execute command and executes either Selenium API test cases or Crawljax API test cases
+    based on the execution command api-type option.
 
     Args:
-        args: command-line arguments
         config: loaded configuration options
     """
 
@@ -38,6 +38,7 @@ def process_execute_command(config):
     test_directory = dir_util.get_test_directory(config, host_name)
     output_dir = dir_util.get_crawl_output_dir(test_directory, host_name)
 
+    # cd to root dir of crawljax API tests or selenium API tests
     cur_dir = os.curdir
     os.chdir(output_dir)
     if api_type == 'selenium':
@@ -46,14 +47,13 @@ def process_execute_command(config):
     tkltest_status('Executing {} API test suite with config: app={}, url="{}", browser={}'.format(
         api_type, app_name, app_url, browser
     ))
-
     try:
         command_util.run_command("mvn test", verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
         tkltest_status('Error executing tests: {}\n{}'.format(e, e.stderr), error=True)
         os.chdir(cur_dir)
-        browser_util.cleanup_browser_instances(config['generate']['browser'])
+        browser_util.cleanup_browser_instances(browser)
         sys.exit(1)
 
     os.chdir(cur_dir)
-    browser_util.cleanup_browser_instances(config['generate']['browser'])
+    browser_util.cleanup_browser_instances(browser)
