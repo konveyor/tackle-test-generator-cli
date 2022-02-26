@@ -21,13 +21,8 @@ RUN wget --no-verbose --output-document=gradle.zip https://services.gradle.org/d
     && ln --symbolic "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
     && gradle --version
 
-# copy cli code and install tkltest command
-WORKDIR /app/tackle-test-cli
-COPY tkltest ./tkltest
-COPY setup.py ./
-RUN pip install .
-
 # install java lib dependencies
+WORKDIR /app/tackle-test-cli
 COPY lib/*.jar ./lib/
 COPY lib/*.xml ./lib/
 COPY lib/download_lib_jars.sh ./lib/
@@ -37,9 +32,14 @@ RUN sed -ie "s|GITHUB_USERNAME|$GITHUB_USERNAME|g" settings.xml
 RUN sed -ie "s|GITHUB_TOKEN|$GITHUB_TOKEN|g" settings.xml
 RUN mvn -s ./settings.xml download:wget@get-randoop-jar download:wget@get-replacecall-jar
 RUN mvn -s ./settings.xml dependency:copy-dependencies -DoutputDirectory=./download
-#RUN ./download_lib_jars.sh
 RUN mv bak.settings.xml settings.xml
 
+# copy cli code and install tkltest command
 WORKDIR /app/tackle-test-cli
+COPY tkltest ./tkltest
+COPY setup.py ./
+RUN pip install .
 
-ENTRYPOINT ["tkltest-unit"]
+# set entrypoint
+COPY entrypoint.sh ./
+ENTRYPOINT ["./entrypoint.sh"]

@@ -76,7 +76,7 @@ def __conditionally_required(opt_name, config):
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
-    elif opt_name == 'app_build_config_files':
+    elif opt_name == 'app_build_files':
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is specified'
@@ -107,7 +107,8 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'paths_list_file',
-            'help_message': 'file containing paths to jar files that represent the library dependencies of app'
+            'help_message': 'file containing paths to jar files that represent the library dependencies of app. '
+                            'Required only if app_build_files is not given.'
         },
         'config_file': {
             'required': False,
@@ -138,7 +139,7 @@ __options_spec = {
             'type': list,
             'default_value': [],
             'relpath_fix_type': 'path',
-            'help_message': 'list of paths to application classes'
+            'help_message': 'list of paths to application classes.Required only if app_build_files is not given.'
         },
         'java_jdk_home': {
             'required': True,
@@ -280,7 +281,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of target classes to perform test generation on'
+            'help_message': 'list of target classes or packages to perform test generation on; packages must end with a wildcard'
         },
         'excluded_class_list': {
             'required': False,
@@ -307,7 +308,7 @@ __options_spec = {
             'default_value': None,
             'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
-        'app_build_config_files': {
+        'app_build_files': {
             'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
@@ -554,6 +555,14 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'when augmenting with evosuite tests, consider developer-written test suite coverage'
+        },
+        'coverage_threshold': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': int,
+            'default_value': 100,
+            'help_message': 'classes with developer-written instruction coverage percentage higher than the threshold are excluded from test generation'
         },
     }
 

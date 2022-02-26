@@ -21,12 +21,13 @@ import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.util import config_util, constants, command_util
 from tkltest.util.unit import  dir_util
+from tkltest.generate.unit import generate
 
 
 class UnitTests(unittest.TestCase):
 
     # dict with apps parameters for test
-    # app_build_type, app_build_config_file are determined by the toml
+    # app_build_type, app_build_files are determined by the toml
     maven_test_apps = {
         '14_spark': {
             'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
@@ -63,6 +64,7 @@ class UnitTests(unittest.TestCase):
                                          'compile-destdir-through-modulesourcepathref',
                                          'compile-destdir-through-src-elements',
                                          ],
+            'covered_classes': ['irs.IRS', 'irs.Employer', 'irs.Salary']
 
         },
         '84_ifx-framework': {
@@ -96,7 +98,7 @@ class UnitTests(unittest.TestCase):
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
-            config['generate']['app_build_config_files'] = [ant_test_apps[app_name]['build_file']]
+            config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
             dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
 
@@ -127,7 +129,7 @@ class UnitTests(unittest.TestCase):
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
             config['generate']['app_build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
-            config['generate']['app_build_config_files'] = [ant_test_apps[app_name]['build_file']]
+            config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             monolith_app_path = config['general']['monolith_app_path']
             self.assertTrue(len(monolith_app_path) == 1, failed_assertion_message)
             if monolith_app_path[0] == '':
@@ -218,7 +220,7 @@ class UnitTests(unittest.TestCase):
 
         pom_file1 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'pom.xml')
         pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web', 'pom.xml')
-        config['generate']['app_build_config_files'] = [pom_file1, pom_file2]
+        config['generate']['app_build_files'] = [pom_file1, pom_file2]
         config['generate']['app_build_settings_files'] = ['', '']
         config['generate']['app_build_type'] = 'maven'
 
@@ -242,7 +244,7 @@ class UnitTests(unittest.TestCase):
         build_file1 = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
         build_file2 = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
         settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
-        config['generate']['app_build_config_files'] = [build_file1, build_file2]
+        config['generate']['app_build_files'] = [build_file1, build_file2]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['generate']['app_build_type'] = 'gradle'
 
@@ -273,7 +275,7 @@ class UnitTests(unittest.TestCase):
         base_config['general']['app_classpath_file'] = ''
         base_config['general']['monolith_app_path'] = ''
 
-        base_config['generate']['app_build_config_files'] = [build_file_app]
+        base_config['generate']['app_build_files'] = [build_file_app]
         base_config['generate']['app_build_settings_files'] = [settings_file]
 
         '''
@@ -294,7 +296,7 @@ class UnitTests(unittest.TestCase):
 
         # case 3
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list]
+        config['generate']['app_build_files'] = [build_file_list]
         config['generate']['app_build_settings_files'] = []
         configs_to_test.append((config, 'generate'))
 
@@ -336,7 +338,7 @@ class UnitTests(unittest.TestCase):
         shutil.rmtree(dir_util.get_app_output_dir(app_name))
         modules_names = ['app', 'list', 'utilities']
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['general']['app_classpath_file'] = ''
         config['general']['monolith_app_path'] = ''
@@ -344,7 +346,7 @@ class UnitTests(unittest.TestCase):
         configs_generate = config_util.resolve_tkltest_configs(config, 'generate')
 
         config = copy.deepcopy(base_config)
-        config['generate']['app_build_config_files'] = [build_file_list, build_file_app]
+        config['generate']['app_build_files'] = [build_file_list, build_file_app]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
         config['general']['app_classpath_file'] = ''
         config['general']['monolith_app_path'] = ''
@@ -364,8 +366,8 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(len(module_config['general']['monolith_app_path']) == 1)
             self.assertTrue(os.path.isdir(module_config['general']['monolith_app_path'][0]))
             self.assertTrue(module_config['general']['module_name'] == modules_name)
-            self.assertTrue(len(module_config['generate']['app_build_config_files']) == 1)
-            self.assertTrue(os.path.isfile(module_config['generate']['app_build_config_files'][0]))
+            self.assertTrue(len(module_config['generate']['app_build_files']) == 1)
+            self.assertTrue(os.path.isfile(module_config['generate']['app_build_files'][0]))
             self.assertTrue(len(module_config['generate']['app_build_settings_files']) == 1)
             self.assertTrue(os.path.isfile(module_config['generate']['app_build_settings_files'][0]))
             self.assertTrue(os.path.isfile(module_config['general']['app_classpath_file']))
@@ -379,13 +381,12 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test
-        # app_build_type, app_build_config_file, app_build_settings_file are determined by the toml
+        # app_build_type, app_build_files, app_build_settings_file are determined by the toml
         for app_name in self.gradle_test_apps.keys():
             dir_util.cd_cli_dir()
 
             config = config_util.load_config(config_file=self.gradle_test_apps[app_name]['config_file'])
             standard_classpath = os.path.abspath(self.gradle_test_apps[app_name]['standard_classpath'])
-            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
             config['general']['app_classpath_file'] = ''
 
             config_util.resolve_app_path(config)
@@ -395,11 +396,31 @@ class UnitTests(unittest.TestCase):
             failed_assertion_message = 'failed for app = ' + app_name
             self.assertTrue(generated_classpath != '', failed_assertion_message)
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
-            self.__assert_classpath(standard_classpath,
-                                    generated_classpath,
-                                    os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
-                                    failed_assertion_message)
+            self.__assert_classpath(standard_classpath=standard_classpath,
+                                    generated_classpath=generated_classpath,
+                                    std_classpath_prefix='',
+                                    message=failed_assertion_message,
+                                    ordered_classpath=True)
             self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
+
+
+    def test_exclude_classes_covered_by_dev_test(self) -> None:
+        """Test to exclude classes that was covered by the dev test suite"""
+        test_apps = self.ant_test_apps
+
+        for app_name in test_apps.keys():
+            if 'covered_classes' not in test_apps[app_name].keys():
+                continue
+            dir_util.cd_cli_dir()
+            config = config_util.load_config(config_file=test_apps[app_name]['config_file'])
+            generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+            self.assertTrue(not config['generate']['excluded_class_list'])
+
+            config['dev_tests']['coverage_threshold'] = 96
+            generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
+            self.assertTrue(config['generate']['excluded_class_list'] == test_apps[app_name]['covered_classes'])
+
+        self.__assert_no_artifact_at_cli(test_apps.keys())
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
@@ -408,13 +429,14 @@ class UnitTests(unittest.TestCase):
         :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
         :param message: An informative error message to print in case one of the assertions fails.
         """
-        std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
         if is_user_defined_classpath:  # for ant apps
             lines_standard = [os.path.basename(line) for line in lines_standard]
-        # Paths inside standard_classpath must be in unix format for the test.
-        lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
+        if std_classpath_prefix:
+            # Paths inside standard_classpath must be in unix format for the test.
+            std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
+            lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -422,12 +444,15 @@ class UnitTests(unittest.TestCase):
 
         self.assertTrue(len(lines_generated) == len(lines_standard), message)
 
-        for i, jar_path in enumerate(lines_standard):
+        for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path
             if ordered_classpath:
-                self.assertTrue(lines_generated[i] == jar_path, extended_message)
+                if std_classpath_prefix:
+                    self.assertTrue(lines_standard[i] == jar_path, extended_message)
+                else:
+                    self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
             else:
-                self.assertTrue(jar_path in lines_generated, extended_message)
+                self.assertTrue(jar_path in lines_standard, extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
 
     def __assert_modules_properties(self, modules_names, modules):

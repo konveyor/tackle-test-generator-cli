@@ -50,7 +50,12 @@ The CLI command can be installed locally to be run, or it can be run in a Docker
 the various dependencies (Java, Ant, and Maven) need not be installed locally.
 
 You can also download a released version of TackleTest from [here](https://github.com/konveyor/tackle-test-generator-cli/releases).
-> **NOTE:** If you are using a released version of TackleTest with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`) or a published TackleTest container image, please skip the [Prerequisite](#prerequisite) step and step 4 of [Running the CLI from local installation](#running-the-cli-from-local-installation). Those steps are required only if the Java dependencies of the TackleTest CLI need to be downloaded .
+> **NOTE:** If you are using a released version of TackleTest with all dependencies included 
+(i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`) or a published TackleTest 
+container image, please skip the [Prerequisite](#prerequisite) step and step 4 of 
+[Running the CLI from local installation](#running-the-cli-from-local-installation). 
+Those steps are required only if the Java dependencies of the TackleTest CLI need to be downloaded. Note also that step 5
+of [Running the CLI from local installation](#running-the-cli-from-local-installation) for installing or re-installing the tkltest-unit and tkltest-ui commands is still required. You can verify the tkltest version you are using by running the command `tkltest-unit -v`.
 
 ### Prerequisite
 
@@ -71,7 +76,7 @@ which builds the docker image for the CLI (called `tkltest-cli`) and then runs t
 container is removed upon completion of the CLI command.
 
 ```buildoutcfg
-docker-compose run --rm tkltest-cli --help
+docker-compose run --rm tkltest-cli tkltest-unit --help
 ```
 
 Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run the commands in the CLI
@@ -81,7 +86,7 @@ directory:
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
 ```
 ```buildoutcfg
-docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli --help
+docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit --help
 ```
 
 Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
@@ -93,10 +98,10 @@ For convenience in running the CLI via `docker-compose` or `docker`, you can cre
 one of the following:
 
 ```buildoutcfg
-alias tkltest='docker-compose run --rm tkltest-cli'
+alias tkltest='docker-compose run --rm tkltest-cli tkltest-unit'
 ```
 ```buildoutcfg
-alias tkltest='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli'
+alias tkltest='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit'
 ```
 
 If you are using a published TackleTest image ([TackleTest container images](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli)),
@@ -194,17 +199,13 @@ and executing them. More detailed description is available in the [CLI user guid
    
    - `app_name`: name of the app under test (this name is used as prefix of file/directories created
      during test generation)
-   
-   - `app_classpath_file`: relative or absolute path to a text file containing library 
-     dependencies of the app under test. For example, see [irs classpath file](test/data/irs/irsMonoClasspath.txt)
      
-   - `monolith_app_path`: a list of paths (relative or absolute) to directories containing 
-     app classes (jar files cannot be specified here). For example, see
-     [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L6)
+   - `app_build_files`: one or more build files for the application. TackleTest will automatically extract the following information 
+         from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, 
+         and (3) the identity of its modules, in case of a multi-module application
+  
+   - `app_build_type`: either maven, gradle or ant
      
-   - `app_packages`: a list of app package prefixes, with wildcards at the end. For example, see
-     [daytrader toml spec](test/data/daytrader7/tkltest_config.toml#L63)
-
 3. To generate test cases, run the command
    ```
    tkltest-unit --verbose generate ctd-amplified
