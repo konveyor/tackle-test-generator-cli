@@ -17,7 +17,7 @@ import subprocess
 import urllib
 
 from tkltest.util.ui import dir_util, browser_util
-from tkltest.util import command_util
+from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
 
 def process_execute_command(config):
@@ -30,12 +30,22 @@ def process_execute_command(config):
         config: loaded configuration options
     """
 
-    host_name = urllib.parse.urlparse(config['general']['app_url']).netloc.split(':')[0]
+    app_name = config['general']['app_name']
+    app_url = config['general']['app_url']
+    browser = config['generate']['browser']
+    api_type = config['execute']['api_type']
+    host_name = urllib.parse.urlparse(app_url).netloc.split(':')[0]
     test_directory = dir_util.get_test_directory(config, host_name)
     output_dir = dir_util.get_crawl_output_dir(test_directory, host_name)
 
     cur_dir = os.curdir
     os.chdir(output_dir)
+    if api_type == 'selenium':
+        os.chdir(constants.SELENIUM_API_TEST_ROOT)
+
+    tkltest_status('Executing {} API test suite with config: app={}, url="{}", browser={}'.format(
+        api_type, app_name, app_url, browser
+    ))
 
     try:
         command_util.run_command("mvn test", verbose=config['general']['verbose'])

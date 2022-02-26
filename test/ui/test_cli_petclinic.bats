@@ -54,7 +54,7 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: CLI execute petclinic" {
+@test "Test 02: CLI execute [api_type=selenium] petclinic" {
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
