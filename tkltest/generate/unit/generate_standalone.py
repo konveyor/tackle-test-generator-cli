@@ -42,10 +42,11 @@ def generate_evosuite(config, output_dir):
     classpath = __get_classpath(config)
     tkltest_status('Generating test suite using Evosuite for application: ' + app_name)
     app_copy_folder, target_folder = __arrange_folders_for_evosuite(config['general']['monolith_app_path'], config)
-    evosuite_command = "java -cp " + classpath + os.pathsep + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR,
+    evosuite_command = "java -cp \"" + classpath + os.pathsep + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR,
                                         'evosuite-standalone-runtime-'+constants.EVOSUITE_VERSION+'.jar')
     if target_folder:
         evosuite_command += os.pathsep + app_copy_folder + os.sep
+    evosuite_command += "\"" #end of -cp
     evosuite_command += " -jar " + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-master-"+constants.EVOSUITE_VERSION+".jar")
     if target_folder:
         evosuite_command += " -target " + target_folder
@@ -106,8 +107,8 @@ def generate_randoop(config, output_dir):
     classpath = __get_classpath(config)
     classpath += os.pathsep + os.pathsep.join(monolith_app_path)
     classpath += os.pathsep + os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, 'randoop-all-'+constants.RANDOOP_VERSION+'.jar')
-    randoop_command = "\"" + os.path.join(config['general']['java_jdk_home'], "bin", "java") + "\" -classpath " + \
-                      classpath
+    randoop_command = "\"" + os.path.join(config['general']['java_jdk_home'], "bin", "java") + "\" -classpath \"" + \
+                      classpath + "\""
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':
         randoop_output_dir = app_name+constants.TKLTEST_DEFAULT_RANDOOP_TEST_DIR_SUFFIX
