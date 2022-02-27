@@ -427,7 +427,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command = "\"" + jdk_path + "\""
     te_command += " -Xmx2048m -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+\
                   ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+".jar"
-    te_command += " -cp\"" + os.path.join(constants.TKLTEST_UNIT_CORE_JAR) + os.pathsep
+    te_command += " -cp \"" + os.path.join(constants.TKLTEST_UNIT_CORE_JAR) + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     te_command += os.path.abspath(app_name+constants.TKL_EVOSUITE_OUTDIR_SUFFIX) + os.pathsep
     if jee_support:
@@ -467,7 +467,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -ne " + str(num_executions)
 
     logging.info(te_command)
-    print(te_command)
+
     coverage_file_name = app_name+constants.TKL_EXTENDER_COVERAGE_FILE_SUFFIX
 
     # remove existing coverage file - its presence will signal completion of extender
