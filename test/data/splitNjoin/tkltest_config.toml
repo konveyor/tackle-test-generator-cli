@@ -6,6 +6,7 @@ name = "TKLTEST_CONFIG_FILE"
     #monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
     # JDK home directory
     java_jdk_home = ""
+    build_type = "maven"
 
 
 [generate]
@@ -23,7 +24,6 @@ app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
 
 [execute]
 app_packages = ['splitNjoin.*']
-build_type = "gradle"
 create_build_file = true
 code_coverage = true
 online_instrumentation = false
@@ -42,3 +42,13 @@ criterion = [ "BRANCH",]
 
 [generate.randoop]
 no_error_revealing_tests = false
+
+
+[dev_tests]
+    build_type = "gradle"
+    build_file = "test/data/splitNjoin/user-tests/build.gradle"
+    build_targets =  ["clean", "test"]
+    coverage_exec_file = "test/data/splitNjoin/user-tests/jacoco/jacoco.exec"
+    compare_code_coverage = true
+    use_for_augmentation = true
+

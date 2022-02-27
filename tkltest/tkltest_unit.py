@@ -60,10 +60,6 @@ def main():
     tkltest_config = load_configuration(args, 'unit')
 
     configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
-
-    if args.command == 'execute' and len(configs) > 1:
-        coverage_util.merge_reports(tkltest_config, configs)
-
     for config in configs:
         logging_util.tkltest_status('{} tests for {} {} using config file {}.'.format(
             'Generating' if args.command == 'generate' else 'Executing',
@@ -83,8 +79,8 @@ def main():
                 if os.path.isdir(path):
                     shutil.rmtree(path)
 
-    if args.command == 'execute' and len(configs) > 1:
-        coverage_util.merge_reports(tkltest_config, configs)
+    if args.command == 'execute':
+        execute.merge_modules_coverage_reports(tkltest_config, configs)
 
 if __name__ == '__main__':  # pragma: no cover
     main()

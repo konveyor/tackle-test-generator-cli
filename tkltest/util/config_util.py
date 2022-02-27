@@ -929,6 +929,8 @@ def resolve_tkltest_configs(tkltest_user_config, command):
                 config['general']['config_file_path'] = os.path.abspath(toml_file)
                 fix_relative_paths(config)
                 configs.append(config)
+            # fixing the user config too:
+            fix_relative_paths(tkltest_user_config)
             return configs
         else:
             resolve_app_path(tkltest_user_config)
@@ -950,6 +952,8 @@ def resolve_tkltest_configs(tkltest_user_config, command):
         
         # here we got more than one module, we will create a config per module, and save it in a toml file
         tkltest_configs = __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_properties, command, tkltest_config_file_suffix)
+        #fixing the user config too:
+        fix_relative_paths(tkltest_user_config)
         tkltest_status('Obtained {} modules from the build files. creating a config file per module.'.format(len(tkltest_configs)))
         return tkltest_configs
 

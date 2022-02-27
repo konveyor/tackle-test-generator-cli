@@ -499,6 +499,14 @@ __options_spec = {
             'default_value': '',
             'help_message': 'path to a test class file (.java) to compile and run'
         },
+        'merge_modules_coverage_reports': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': bool,
+            'default_value': True,
+            'help_message': 'when test suites are generated per module, merge the modules coverage reports'
+        },
     },
 
     # "dev_tests" options

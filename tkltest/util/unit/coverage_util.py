@@ -59,22 +59,16 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     # run tests using build file
     if build_type == 'ant':
         cmd = "ant -f {} merge-coverage-report".format(build_file)
-        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
         cmd = "mvn -f {} clean verify site".format(build_file)
-        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
-        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
-            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
-        else:
-            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
-    else: #gradle
+    else:
         cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
-        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     try:
         command_util.run_command(cmd, verbose=False)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
         return None
+    jacoco_raw_date_file = get_jacoco_exec_file(build_type, test_root_dir)
     if not os.path.exists(jacoco_raw_date_file):
         tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
         return None
@@ -400,65 +394,15 @@ def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir
         sys.exit(1)
 
 
-def merge_reports(tkltest_config, configs):
-    if not tkltest_config['execute']['code_coverage']:
-        return
-    dir_util.cd_cli_dir()
-    app_name = tkltest_config['general']['app_name']
-    app_dir = dir_util.get_app_output_dir(app_name)
-    exec_files = []
-    app_path = []
-    # first collect exec files and app_pathes
-    for config in configs:
-        output_dir = dir_util.get_output_dir(app_name, config['general'].get('module_name', ''))
-        test_root_dir = config['general']['test_directory']
-        if not test_root_dir:
-            test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
-        if not os.path.isabs(test_root_dir):
-            test_root_dir = os.path.join(output_dir, test_root_dir)
-        exec_file = os.path.join(test_root_dir, 'merged_jacoco.exec')
-        if not os.path.isfile(exec_file):
-            tkltest_status('exec_file {} does not exist'.format(exec_file), error=True)
-            sys.exit(1)
+def get_jacoco_exec_file(build_type, test_root_dir):
+    if build_type == 'ant':
+        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+    elif build_type == 'maven':
+        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
+        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
+            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
         else:
-            exec_files.append(exec_file)
-            # todo - do we need add the path in case that there is no exec?
-            app_path += config['general']['monolith_app_path']
-
-
-    main_reports_dir = tkltest_config['general']['reports_path']
-    if not main_reports_dir:
-        main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
-    if not os.path.isabs(main_reports_dir):
-        main_reports_dir = os.path.join(app_dir, main_reports_dir)
-    merged_report_dir = os.path.join(main_reports_dir, 'modules_merged_report')
-    if os.path.isdir(merged_report_dir):
-        shutil.rmtree(merged_report_dir)
-    os.makedirs(merged_report_dir)
-
-    if not exec_files:
-        tkltest_status('no exec_files found', error=True)
-        sys.exit(1)
-    elif len(exec_files) == 1:
-        merged_exec_file = exec_files[0]
-    else:
-        merged_exec_file = os.path.join(merged_report_dir, 'modules_jacoco_merged.exec')
-        jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
-        try:
-            command_util.run_command("java -jar {} merge {} --destfile {}".
-                             format(jacoco_cli_file, ' '.join(exec_files), merged_exec_file), verbose=True)
-        except subprocess.CalledProcessError as e:
-            tkltest_status('fail to merge jacoco exec files: {}\n{}'.format(e, e.stderr))
-            sys.exit(1)
-
-    coverage_csv = os.path.join(merged_report_dir, 'coverage.csv')
-    coverage_xml = os.path.join(merged_report_dir, 'coverage.xml')
-    coverage_html = os.path.join(merged_report_dir, 'coverage-html')
-
-    generate_coverage_report(monolith_app_path=app_path,
-                             exec_file=merged_exec_file,
-                             xml_file=coverage_xml,
-                             html_dir=coverage_html,
-                             csv_file=coverage_csv)
-
-    sys.exit(0)
+            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    else: #gradle
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    return jacoco_raw_date_file
