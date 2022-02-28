@@ -60,7 +60,7 @@ setup() {
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute
-    # [ $status -eq 0 ]
+    [ $status -eq 0 ]
 }
 
 @test "Test 03: CLI execute [api_type=crawljax] petclinic" {
@@ -69,5 +69,5 @@ setup() {
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute --api-type crawljax
-    # [ $status -eq 0 ]
+    [ $status -eq 0 ]
 }
