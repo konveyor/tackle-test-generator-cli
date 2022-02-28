@@ -803,7 +803,7 @@ class GenerateExecuteTest(unittest.TestCase):
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
-            user_config = app_info['config']
+            user_config = copy.deepcopy(app_info['config'])
             user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
             modules_names = ['app', 'utilities', 'list']
@@ -815,16 +815,19 @@ class GenerateExecuteTest(unittest.TestCase):
                 # assert that expected generate resources are created
                 self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=module_name)
 
+            user_config = copy.deepcopy(app_info['config'])
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
-            self.assertTrue(len(configs)==len(modules_names))
+            self.assertTrue(len(configs) == len(modules_names))
             for config in configs:
                 module_name = config['general']['module_name']
                 self.assertTrue(module_name in modules_names)
                 # execute tests
                 self.__process_execute(config=config)
                 # assert that expected execute resources are created
-                self.__assert_execute_resources(app_name=app_name,module_name=module_name)
-
+                self.__assert_execute_resources(app_name=app_name, module_name=module_name)
+            user_config['dev_tests']['compare_code_coverage'] = True
+            execute.merge_modules_coverage_reports(user_config, configs)
+            self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
         """execute": comparing coverage reports"""

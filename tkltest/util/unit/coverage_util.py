@@ -22,7 +22,7 @@ import sys
 from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
 from tkltest.execute.unit import execute
-from tkltest.util.unit import dir_util
+
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
                                 raw_cov_data_dir, raw_cov_data_file_pref,

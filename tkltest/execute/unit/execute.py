@@ -332,15 +332,11 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
     creating one coverage report, by merging the exec files that was created per for each modules
     :param tkltest_config: the user config
     :param modules_configs: the modules configs
-    :return:
     '''
     if len(modules_configs) <= 1:
         return
     if not tkltest_config['execute']['code_coverage']:
         return
-    if not tkltest_config['execute']['merge_modules_coverage_reports']:
-        return
-    dir_util.cd_cli_dir()
     app_name = tkltest_config['general']['app_name']
     app_dir = dir_util.cd_app_output_dir(app_name)
     jacoco_exec_files = []
@@ -354,34 +350,30 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
         # since we are not at the output dir, we need to get full path:
         if not os.path.isabs(test_root_dir):
             test_root_dir = os.path.join(module_output_dir, test_root_dir)
-        jacoco_exec_file = coverage_util.get_jacoco_exec_file(config['general']['build_type'], test_root_dir)
 
+        jacoco_exec_file = coverage_util.get_jacoco_exec_file(config['general']['build_type'], test_root_dir)
         if not os.path.isfile(jacoco_exec_file):
-            tkltest_status('exec_file {} does not exist'.format(jacoco_exec_file))
+            tkltest_status('exec_file {} does not exist gor module {}'.format(jacoco_exec_file, config['module_name']))
         else:
             jacoco_exec_files.append(jacoco_exec_file)
             app_path |= set(config['general']['monolith_app_path'])
 
+    if not jacoco_exec_files:
+        tkltest_status('Warning: Fail to create a merged coverage report, No modules .exec files were found,  ')
+        return
 
-
-    test_root_dir = config['general']['test_directory']
-    tkltest_test_name = os.path.basename(test_root_dir) if test_root_dir else app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
-
-
-
+    test_root_dir = tkltest_config['general']['test_directory']
+    if not test_root_dir:
+        test_root_dir = tkltest_config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
     main_reports_dir = tkltest_config['general']['reports_path']
     if not main_reports_dir:
         main_reports_dir = os.path.join(app_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
 
-    if not jacoco_exec_files:
-        tkltest_status('Warning: Fail to create a merged coverage report, No modules .exec files were found,  ')
-        return
-    elif len(jacoco_exec_files) == 1:
+    # get the merged exec file:
+    if len(jacoco_exec_files) == 1:
         merged_exec_file = jacoco_exec_files[0]
     else:
-        # todo:
-        merged_exec_file = coverage_util.get_jacoco_exec_file(config['general']['build_type'], test_root_dir)
-        merged_exec_file = os.path.join(main_reports_dir, 'modules_jacoco_merged.exec')
+        merged_exec_file = coverage_util.get_jacoco_exec_file(tkltest_config['general']['build_type'], test_root_dir)
         jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
         max_memory = 4096
         try:
@@ -392,6 +384,7 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
             return
 
     # create the reports:
+    tkltest_test_name = os.path.basename(test_root_dir)
     coverage_html = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR, tkltest_test_name)
     coverage_xml = os.path.join(coverage_html, 'jacoco.xml')
     coverage_csv = os.path.join(coverage_html, 'jacoco.csv')
@@ -403,6 +396,7 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
                                            html_dir=coverage_html,
                                            csv_file=coverage_csv)
 
+    # compare the the dev tests:
     if tkltest_config['dev_tests']['compare_code_coverage']:
         tkltest_config['general']['monolith_app_path'] = app_path
         run_dev_tests(tkltest_config)

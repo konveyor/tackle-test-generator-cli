@@ -20,7 +20,6 @@ from .generate.unit import generate
 from .tkltest import *
 from .util import logging_util
 from .util.unit import config_options_unit
-from .util.unit import coverage_util
 from .util.constants import *
 
 
@@ -79,7 +78,7 @@ def main():
                 if os.path.isdir(path):
                     shutil.rmtree(path)
 
-    if args.command == 'execute':
+    if args.command == 'execute' and tkltest_config['execute']['merge_modules_coverage_reports']:
         execute.merge_modules_coverage_reports(tkltest_config, configs)
 
 if __name__ == '__main__':  # pragma: no cover

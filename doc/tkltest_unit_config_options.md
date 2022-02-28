@@ -19,7 +19,7 @@ required, and the option description).
 | app_classpath_file                  |                                  | file containing paths to jar files that represent the library dependencies of app. Required only if app_build_files is not given.       |
 | config_file^                        | -cf/--config-file                | path to TOML file containing configuration options                                                                                      |
 | log_level^                          | -l/--log-level                   | logging level for printing diagnostic messages; options are CRITICAL, ERROR, WARNING, INFO, DEBUG                                       |
-| monolith_app_path                   |                                  | list of paths to application classes. Required only if app_build_files is not given.                                                    |
+| monolith_app_path                   |                                  | list of paths to application classes. Required only if app_build_files is not given.                                                     |
 | java_jdk_home*                      |                                  | root directory for JDK installation (must be JDK; JRE will not suffice); alternatively, can be set as environment variable JAVA_HOME    |
 | test_directory                      | -td/--test-directory             | name of root test directory containing the generated JUnit test classes                                                                 |
 | reports_path                        | -rp/--reports-path               | path to the reports directory                                                                                                           |
@@ -44,7 +44,7 @@ required, and the option description).
 | time_limit                          |                                  | time limit per class (in seconds) for evosuite/randoop test generation                                                                  |
 | app_build_type                      |                                  | build type for collecting app dependencies: ant, maven, or gradle                                                                       |
 | app_build_files                     |                                  | list of paths to app build files for the specified app build type                                                                       |
-| app_build_settings_files            |                                  | list of paths to app build settings files or property file for the specified app build type                                             |
+| app_build_settings_files            |                                  | list of paths to app build settings files or property files for the specified app build type                                            |
 | app_build_target                    |                                  | Name of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file       |
 |                                     |                                  |                                                                                                                                         |
 | generate.ctd_amplified              |                                  | Use CTD for computing coverage goals                                                                                                    |
@@ -69,6 +69,7 @@ required, and the option description).
 | create_build_file                   | -nbf/--no-build-file-creation    | whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used |
 | code_coverage                       | -cc/--code-coverage              | generate code coverage report with JaCoCo agent                                                                                         |
 | test_class                          | -tc/--test-class                 | path to a test class file (.java) to compile and run                                                                                    |
+| merge_modules_coverage_reports      |                                  | when test suites are generated per module, merge the modules coverage reports                                                           |
 |                                     |                                  |                                                                                                                                         |
 | dev_tests                           |                                  | information about developer-written test suite                                                                                          |
 | build_type*                         |                                  | build type for compiling and running the developer-written test suite: ant, maven, or gradle                                            |
@@ -77,4 +78,4 @@ required, and the option description).
 | coverage_exec_file                  |                                  | the path to the Jacoco coverage .exec file, generated by the developer-written build file                                               |
 | compare_code_coverage               |                                  | create a code coverage report that compares between the automatically generated test suite and the developer-written test suite         |
 | use_for_augmentation                |                                  | when augmenting with evosuite tests, consider developer-written test suite coverage                                                     |
-| coverage_threshold                  |                                  | classes with developer-written instruction percentage of coverage higher than the threshold, are excluded from test generation               
+| coverage_threshold                  |                                  | classes with developer-written instruction coverage percentage higher than the threshold are excluded from test generation              |
