@@ -51,6 +51,11 @@ def cd_output_dir(app_name, module_name):
     return output_dir
 
 
+def cd_app_output_dir(app_name):
+    output_dir = get_app_output_dir(app_name)
+    os.chdir(output_dir)
+    return output_dir
+
 
 def delete_app_output(app_name):
     for filename in os.listdir('.'):
