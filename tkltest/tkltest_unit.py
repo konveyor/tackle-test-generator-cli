@@ -78,7 +78,7 @@ def main():
                 if os.path.isdir(path):
                     shutil.rmtree(path)
 
-    if args.command == 'execute' and tkltest_config['execute']['merge_modules_coverage_reports']:
+    if args.command == 'execute' and tkltest_config['execute']['combine_modules_coverage_reports']:
         execute.merge_modules_coverage_reports(tkltest_config, configs)
 
 if __name__ == '__main__':  # pragma: no cover
