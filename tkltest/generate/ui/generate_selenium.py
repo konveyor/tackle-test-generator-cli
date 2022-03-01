@@ -82,15 +82,17 @@ def generate_selenium_api_tests(config, crawl_dir):
     }
 
     # iterate over crawl paths and construct context for each test method
-    method_names = []
+    method_name_count = {}
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
         method_name = __create_method_name_for_path(crawl_path)
         logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_name))
-        if method_name in method_names:
-            logging.warning('Found duplicate crawl path: {} ... skipping'.format(method_name))
-            continue
-        method_names.append(method_name)
+        if method_name in method_name_count:
+            method_name_count[method_name] = method_name_count[method_name] + 1
+            method_name = '{}_dup{}'.format(method_name, method_name_count[method_name])
+            logging.info('Creating duplicate test method: {}'.format(method_name))
+        else:
+            method_name_count[method_name] = 0
         method_context = {
             'priority': path_num,
             'name': method_name,
@@ -223,10 +225,11 @@ if __name__ == '__main__':  # pragma: no cover
     logging_util.init_logging('generate_selenium.log', 'INFO')
     app_config = {
         'general': {
+            'log-level': 'WARNING',
             # 'app_name': 'petclinic',
             # 'app_url': 'http://localhost:8080'
-            'app_name': 'addressbook',
-            'app_url': 'http://localhost:3000/addressbook/'
+            # 'app_name': 'addressbook',
+            # 'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
