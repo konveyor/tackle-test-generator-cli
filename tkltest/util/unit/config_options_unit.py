@@ -214,7 +214,17 @@ __options_spec = {
             'choices': ['ant', 'maven',  'gradle'],
             'default_value': 'ant',
             'help_message': 'build file type for compiling and running the tests: ant, maven, or gradle'
-        }
+        },
+        'max_memory_for_coverage': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-mam',
+            'long_name': '--maximal-memory-for-coverage',
+            'type': int,
+            'default_value': 4096,
+            'help_message': 'maximal heap size (in MB) used for obtaining coverage data'
+        },
     },
 
     # "config" command options
@@ -361,16 +371,6 @@ __options_spec = {
                     'default_value': False,
                     'help_message': 'do not augment CTD-guided tests with coverage-increasing base tests'
                 },
-                'max_augment_memory': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': True,
-                    'short_name': '-mam',
-                    'long_name': '--maximal-augment-memory',
-                    'type': int,
-                    'default_value': 4096,
-                    'help_message': 'maximal heap size (in MB) used for augmentation'
-                },
                 'no_ctd_coverage': {
                     'required': False,
                     'is_toml_option': True,
@@ -499,13 +499,13 @@ __options_spec = {
             'default_value': '',
             'help_message': 'path to a test class file (.java) to compile and run'
         },
-        'merge_modules_coverage_reports': {
+        'combine_modules_coverage_reports': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': bool,
-            'default_value': True,
-            'help_message': 'when test suites are generated per module, merge the modules coverage reports'
+            'default_value': False,
+            'help_message': 'when test suites are generated per module, create a combined coverage report'
         },
     },
 

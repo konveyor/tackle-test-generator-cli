@@ -352,7 +352,7 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
     dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
     if os.path.isdir(dev_report_dir):
         shutil.rmtree(dev_report_dir)
-    os.mkdir(dev_report_dir)
+    os.makedirs(dev_report_dir)
     # calling generate_coverage_report() to create the csv file:
     dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
     dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv') if create_csv else ''

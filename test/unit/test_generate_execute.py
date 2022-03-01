@@ -158,7 +158,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['interaction_level'] = 2
-            config['generate']['ctd_amplified']['max_augment_memory'] = 8192
+            config['general']['max_memory_for_coverage'] = 8192
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
