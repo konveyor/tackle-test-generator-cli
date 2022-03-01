@@ -16,8 +16,12 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 {% endif %}
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+
+import java.time.Duration;
 
 /**
  * UI test cases for {{appname}}
@@ -30,13 +34,14 @@ public class GeneratedTests {
     private final String URL = "{{appurl}}";
 
     // time in ms to wait after firing an event
-    private final long waitEvent = {{wait_event}}L;
+    private final long waitAfterEvent = {{wait_event}}L;
 
     // time in ms to wait after reloading the app URL
-    private final long waitReload = {{wait_reload}}L;
+    private final long waitAfterReload = {{wait_reload}}L;
 
-    // web driver instance
-    private WebDriver driver;
+    // web driver and wait instance
+    private WebDriver webDriver;
+    private WebDriverWait webDriverWait;
 
     @BeforeClass
 	public void oneTimeSetUp() {
@@ -47,23 +52,26 @@ public class GeneratedTests {
     {% if browser == 'chrome_headless' %}
     	chromeOptions.addArguments("--headless");
     {% endif %}
-        this.driver = new ChromeDriver(chromeOptions);
+        this.webDriver = new ChromeDriver(chromeOptions);
         Dimension dim = new Dimension(1200, 890);
-        this.driver.manage().window().setSize(dim);
+        this.webDriver.manage().window().setSize(dim);
 {% elif browser == 'firefox' or browser == 'firefox_headless' %}
         // create firefox driver instance
 {% endif %}
+
+        // create wait instance
+        this.webDriverWait = new WebDriverWait(webDriver, Duration.ofMillis(waitAfterEvent));
     }
 
 	@AfterClass
 	public void oneTimeTearDown() {
-        this.driver.quit();
+        this.webDriver.quit();
     }
 
 	@BeforeMethod
 	public void setUp() throws InterruptedException {
-        this.driver.navigate().to(URL);
-        Thread.sleep(this.waitReload);
+        this.webDriver.navigate().to(URL);
+        Thread.sleep(this.waitAfterReload);
     }
 
 	@AfterMethod
@@ -81,10 +89,10 @@ public class GeneratedTests {
             String[] frames = frameIdentification.split("\\.");
             for(int i = 0; i < frames.length; ++i) {
                 String frameId = frames[i];
-                this.driver.switchTo().frame(frameId);
+                this.webDriver.switchTo().frame(frameId);
             }
         } else {
-            this.driver.switchTo().frame(frameIdentification);
+            this.webDriver.switchTo().frame(frameIdentification);
         }
     }
 
@@ -127,7 +135,7 @@ public class GeneratedTests {
             default:
                 throw new UnsupportedOperationException("Event type not supported: "+eventType);
         }
-        Thread.sleep(this.waitEvent);
+        Thread.sleep(this.waitAfterEvent);
         return true;
     }
 
@@ -172,7 +180,7 @@ public class GeneratedTests {
                 webElement.sendKeys(value);
                 break;
             case "HIDDEN":
-                JavascriptExecutor js = (JavascriptExecutor)this.driver;
+                JavascriptExecutor js = (JavascriptExecutor)this.webDriver;
                 js.executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);", webElement, "value", value);
         }
     }
@@ -189,11 +197,13 @@ public class GeneratedTests {
     {% for eventable in method.eventables %}
 
         {% for form_input in eventable.form_inputs %}
-        element = driver.findElement({{form_input.by_method}});
+        {# element = driver.findElement({{form_input.by_method}}); #}
+        element = this.webDriverWait.until(ExpectedConditions.presenceOfElementLocated({{form_input.by_method}}));
         this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
         {% endfor %}
         // {{eventable.comment}}
-        element = driver.findElement({{eventable.by_method}});
+        {# element = driver.findElement({{eventable.by_method}}); #}
+        element = this.webDriverWait.until(ExpectedConditions.elementToBeClickable({{eventable.by_method}}));
         this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");
     {% endfor %}
     }

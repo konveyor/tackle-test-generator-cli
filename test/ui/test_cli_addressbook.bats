@@ -53,13 +53,20 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-# commented out this test because it is too flaky
+@test "Test 02: CLI execute [api_type=selenium] addressbook" {
+   # execute test cases for addressbook app
+   run tkltest-ui --verbose \
+       --config-file $ADDRESSBOOK_CONFIG_FILE \
+       --test-directory $ADDRESSBOOK_OUTPUT_DIR \
+       execute
+   [ $status -eq 0 ]
+}
 
-#@test "Test 02: CLI execute addressbook" {
-#    # execute test cases for addressbook app
-#    run tkltest-ui --verbose \
-#        --config-file $ADDRESSBOOK_CONFIG_FILE \
-#        --test-directory $ADDRESSBOOK_OUTPUT_DIR \
-#        execute
-#    [ $status -eq 0 ]
-#}
+@test "Test 03: CLI execute [api_type=crawljax] addressbook" {
+   # execute test cases for addressbook app
+   run tkltest-ui --verbose \
+       --config-file $ADDRESSBOOK_CONFIG_FILE \
+       --test-directory $ADDRESSBOOK_OUTPUT_DIR \
+       execute --api-type crawljax
+   [ $status -eq 0 ]
+}
