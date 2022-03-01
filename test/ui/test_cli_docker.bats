@@ -8,22 +8,22 @@ teardown_file() {
     rm -f $TEST_CONFIG_FILE1
 }
 
-@test "Test 00: entrypoint help" {
+@test "Test 00: docker entrypoint help" {
     run docker-compose run --rm tkltest-cli --help
     [ $status -eq 0 ]
 }
 
-@test "Test 01: CLI main help" {
+@test "Test 01: tkltest-ui docker ain help" {
     run docker-compose run --rm tkltest-cli tkltest-ui --help
     [ $status -eq 0 ]
 }
 
-@test "Test 02: CLI config command help" {
+@test "Test 02: tkltest-ui docker config command help" {
     run docker-compose run --rm tkltest-cli tkltest-ui config --help
     [ $status -eq 0 ]
 }
 
-@test "Test 03: CLI config subcommands help" {
+@test "Test 03: tkltest-ui docker config subcommands help" {
     run docker-compose run --rm tkltest-cli tkltest-ui config init --help
     [ $status -eq 0 ]
 
@@ -31,7 +31,7 @@ teardown_file() {
     [ $status -eq 0 ]
 }
 
-@test "Test 04: CLI config init" {
+@test "Test 04: tkltest-ui docker config init" {
     run docker-compose run --rm tkltest-cli tkltest-ui config init
     [ $status -eq 0 ]
 
@@ -43,17 +43,17 @@ teardown_file() {
     [ -f $TEST_CONFIG_FILE1 ]
 }
 
-@test "Test 05: CLI config list" {
+@test "Test 05: tkltest-ui docker config list" {
     run docker-compose run --rm tkltest-cli tkltest-ui config list
     [ $status -eq 0 ]
 }
 
-@test "Test 06: CLI generate command help" {
+@test "Test 06: tkltest-ui docker generate command help" {
     run docker-compose run --rm tkltest-cli tkltest-ui generate --help
     [ $status -eq 0 ]
 }
 
-@test "Test 07: CLI execute command help" {
+@test "Test 07: tkltest-ui docker execute command help" {
     run docker-compose run --rm tkltest-cli tkltest-ui execute --help
     [ $status -eq 0 ]
 }

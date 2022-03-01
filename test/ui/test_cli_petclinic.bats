@@ -24,7 +24,7 @@ setup() {
     cd test/ui/data/webapps/petclinic && ./deploy_app.sh start && cd ../../../../..
 }
 
-@test "Test 01: CLI generate petclinic" {
+@test "Test 01: tkltest-ui generate petclinic" {
     # generate test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
@@ -54,7 +54,7 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: CLI execute [api_type=selenium] petclinic" {
+@test "Test 02: tkltest-ui execute [api_type=selenium] petclinic" {
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
@@ -63,7 +63,7 @@ setup() {
     [ $status -eq 0 ]
 }
 
-@test "Test 03: CLI execute [api_type=crawljax] petclinic" {
+@test "Test 03: tkltest-ui execute [api_type=crawljax] petclinic" {
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \

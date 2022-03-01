@@ -23,7 +23,7 @@ setup() {
     cd test/ui/data/webapps/addressbook && ./deploy_app.sh start && cd ../../../../..
 }
 
-@test "Test 01: CLI generate addressbook" {
+@test "Test 01: tkltest-ui generate addressbook" {
     # generate test cases for addressbook app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
@@ -53,7 +53,7 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: CLI execute [api_type=selenium] addressbook" {
+@test "Test 02: tkltest-ui execute [api_type=selenium] addressbook" {
     # execute test cases for addressbook app
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
@@ -62,7 +62,7 @@ setup() {
     [ $status -eq 0 ]
 }
 
-@test "Test 03: CLI execute [api_type=crawljax] addressbook" {
+@test "Test 03: tkltest-ui execute [api_type=crawljax] addressbook" {
     # execute test cases for addressbook app
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
