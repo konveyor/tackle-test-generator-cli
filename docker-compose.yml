@@ -12,3 +12,4 @@ services:
       - ./:/app/tackle-test-cli
     stdin_open: true
     tty: true
+    network_mode: host
