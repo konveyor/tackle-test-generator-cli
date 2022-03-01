@@ -11,7 +11,7 @@ tooling for performing automated test generation and differential testing on two
 4. [Usage](#usage)
    1. [The generate command](#generate-command)
    2. [The execute command](#execute-command)
-5. [Configuration options](doc/tkltest_unit_config_options.md)
+5. [Configuration options](doc/unit/tkltest_unit_config_options.md)
 6. [Known tool issues](#known-tool-issues)
 7. [Additional resources (demos, presentations, blog)](#additional-resources)
 
@@ -114,13 +114,13 @@ To run the CLI from local installation, JDK and one or more of Ant, Maven, and G
 1. Install Python 3.8
 
 2. Install JDK 8. The JDK home directory has to be specified as a configuration option;
-   see [tkltest-unit Configuration Options](doc/tkltest_unit_config_options.md) for details on available configuration option.
+   see [tkltest-unit Configuration Options](doc/unit/tkltest_unit_config_options.md) for details on available configuration option.
    
 3. Install one or more of the required build systems depending on the TackleTest features used: Ant, Maven, Gradle. Of these systems, Maven is required for installing the CLI; the others are optional and are required only if the respective tool features are used. TackleTest uses these build systems in two ways:
 
-   - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [tkltest-unit Configuration Options](doc/tkltest_unit_config_options.md)). Install the build system that you prefer for running the tests.
+   - To run the generated tests: Along with generating JUnit test cases, the CLI generates an Ant `build.xml`, a Maven `pom.xml` or a Gradle `build.gradle`, which can be used for building and running the generated tests. The build system to use can be configured using the `execute` command option `-bt/--build-type` (see [tkltest-unit Configuration Options](doc/unit/tkltest_unit_config_options.md)). Install the build system that you prefer for running the tests.
    
-   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. This feature is supported for Gradle, Ant and Maven. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/user_guide.md#specifying-the-app-under-test)). If you plan to use the dependency computation feature with a Gradle or Ant build file, install Gradle or Ant respectively.
+   - To collect library dependencies of the application under test (AUT): The CLI can use the AUT's build file to collect the AUT's library dependencies automatically. This feature is supported for Gradle, Ant and Maven. Alternatively, the user has to specify the dependencies manually in a text file (see [Specifying the app under test](doc/unit/user_guide.md#specifying-the-app-under-test)). If you plan to use the dependency computation feature with a Gradle or Ant build file, install Gradle or Ant respectively.
 
    > **NOTE:** For Ant, please make sure to install the optional JUnit task as well. On Linux, for example, this can be done via the package manager.
    > 
@@ -186,7 +186,7 @@ and re-install it.
 ## Quick Start Guide
 
 We list the minimal steps required to use the tool for its two main functions: generating unit tests
-and executing them. More detailed description is available in the [CLI user guide](doc/user_guide.md).
+and executing them. More detailed description is available in the [CLI user guide](doc/unit/user_guide.md).
 
 1. Created an empty configuration file, named `tkltest_config.toml`, by running the command
    ```
@@ -195,7 +195,7 @@ and executing them. More detailed description is available in the [CLI user guid
    `tkltest_config.toml` will be created in the working directory.
 
 2. Assign values to the following configuration options in the configuration file
-   (details on all configuration options are available [here](doc/tkltest_unit_config_options.md)):
+   (details on all configuration options are available [here](doc/unit/tkltest_unit_config_options.md)):
    
    - `app_name`: name of the app under test (this name is used as prefix of file/directories created
      during test generation)
@@ -315,7 +315,7 @@ optional arguments:
 
 ```
 
-For details on the `execute` command options, see [tkltest-unit Configuration Options](doc/tkltest_unit_config_options.md).
+For details on the `execute` command options, see [tkltest-unit Configuration Options](doc/unit/tkltest_unit_config_options.md).
 
 
 ## Known Tool Issues
