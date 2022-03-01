@@ -25,7 +25,8 @@ setup() {
 
 @test "Test 01: CLI generate addressbook" {
     # generate test cases for addressbook app
-    run tkltest-ui --verbose --log-level INFO \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose --log-level INFO \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         generate
@@ -55,18 +56,20 @@ setup() {
 
 @test "Test 02: CLI execute [api_type=selenium] addressbook" {
     # execute test cases for addressbook app
-    run tkltest-ui --verbose \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute
-    [ $status -eq 0 ]
+   [ $status -eq 0 ]
 }
 
 @test "Test 03: CLI execute [api_type=crawljax] addressbook" {
     # execute test cases for addressbook app
-    run tkltest-ui --verbose \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute --api-type crawljax
-    [ $status -eq 0 ]
+   [ $status -eq 0 ]
 }

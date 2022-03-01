@@ -99,5 +99,10 @@ jobs:
         GITHUB_USERNAME: $GITHUB_ACTOR
         GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
       run: |
-        bats test/ui/test_cli_docker.bats
-
+        bats test/ui/test_cli_docker_petclinic.bats
+    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
+      env:
+        GITHUB_USERNAME: $GITHUB_ACTOR
+        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
+      run: |
+        bats test/ui/test_cli_docker_addressbook.bats
