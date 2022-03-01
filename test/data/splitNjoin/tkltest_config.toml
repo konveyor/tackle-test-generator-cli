@@ -6,7 +6,7 @@ name = "TKLTEST_CONFIG_FILE"
     #monolith_app_path = ["test/data/splitNjoin/app/build/classes/java/main/","test/data/splitNjoin/utilities/build/classes/java/main/","test/data/splitNjoin/list/build/classes/java/main/"]
     # JDK home directory
     java_jdk_home = ""
-    build_type = "maven"
+    build_type = "gradle"
 
 
 [generate]
