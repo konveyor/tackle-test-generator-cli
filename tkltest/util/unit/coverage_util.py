@@ -59,22 +59,16 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     # run tests using build file
     if build_type == 'ant':
         cmd = "ant -f {} merge-coverage-report".format(build_file)
-        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
         cmd = "mvn -f {} clean verify site".format(build_file)
-        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
-        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
-            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
-        else:
-            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
-    else: #gradle
+    else:
         cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
-        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
     try:
         command_util.run_command(cmd, verbose=False)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
         return None
+    jacoco_raw_date_file = get_jacoco_exec_file(build_type, test_root_dir)
     if not os.path.exists(jacoco_raw_date_file):
         tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
         return None
@@ -358,7 +352,7 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
     dev_report_dir = os.path.join(main_reports_dir, constants.TKL_CODE_COVERAGE_DEV_REPORT_DIR)
     if os.path.isdir(dev_report_dir):
         shutil.rmtree(dev_report_dir)
-    os.mkdir(dev_report_dir)
+    os.makedirs(dev_report_dir)
     # calling generate_coverage_report() to create the csv file:
     dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
     dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv') if create_csv else ''
@@ -370,7 +364,6 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
                              html_dir=dev_coverage_html,
                              csv_file=dev_coverage_csv)
     return dev_coverage_xml, dev_coverage_html, dev_coverage_csv
-
 
 
 def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir='', csv_file=''):
@@ -401,3 +394,15 @@ def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir
         sys.exit(1)
 
 
+def get_jacoco_exec_file(build_type, test_root_dir):
+    if build_type == 'ant':
+        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+    elif build_type == 'maven':
+        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
+        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
+            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
+        else:
+            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    else: #gradle
+        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+    return jacoco_raw_date_file

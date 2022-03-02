@@ -158,7 +158,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['interaction_level'] = 2
-            config['generate']['ctd_amplified']['max_augment_memory'] = 8192
+            config['general']['max_memory_for_coverage'] = 8192
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -803,7 +803,7 @@ class GenerateExecuteTest(unittest.TestCase):
             app_info = self.test_apps[app_name]
 
             # set up config and generate tests
-            user_config = app_info['config']
+            user_config = copy.deepcopy(app_info['config'])
             user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
             modules_names = ['app', 'utilities', 'list']
@@ -815,16 +815,19 @@ class GenerateExecuteTest(unittest.TestCase):
                 # assert that expected generate resources are created
                 self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', module_name=module_name)
 
+            user_config = copy.deepcopy(app_info['config'])
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
-            self.assertTrue(len(configs)==len(modules_names))
+            self.assertTrue(len(configs) == len(modules_names))
             for config in configs:
                 module_name = config['general']['module_name']
                 self.assertTrue(module_name in modules_names)
                 # execute tests
                 self.__process_execute(config=config)
                 # assert that expected execute resources are created
-                self.__assert_execute_resources(app_name=app_name,module_name=module_name)
-
+                self.__assert_execute_resources(app_name=app_name, module_name=module_name)
+            user_config['dev_tests']['compare_code_coverage'] = True
+            execute.merge_modules_coverage_reports(user_config, configs)
+            self.__assert_execute_resources(app_name=app_name, compare_coverage=True, has_junit_report=False)
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
         """execute": comparing coverage reports"""
@@ -882,7 +885,7 @@ class GenerateExecuteTest(unittest.TestCase):
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
 
-    def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False):
+    def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
         self.__assert_no_artifact_at_cli()
         if reports_path:
             main_report_dir = reports_path
@@ -891,7 +894,7 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_output_dir(app_name, module_name)
         self.assertTrue(os.path.isdir(main_report_dir))
         junit_report_dir = os.path.join(main_report_dir, constants.TKL_JUNIT_REPORT_DIR)
-        self.assertTrue(os.path.isdir(junit_report_dir))
+        self.assertTrue(os.path.isdir(junit_report_dir) == has_junit_report)
         cov_report_dir = os.path.join(main_report_dir, constants.TKL_CODE_COVERAGE_REPORT_DIR)
         if code_coverage:
             self.assertTrue(os.path.isdir(cov_report_dir))
@@ -968,6 +971,7 @@ class GenerateExecuteTest(unittest.TestCase):
         '''
         Here we check that we do not leave anything in the cli directory
         '''
+        dir_util.cd_cli_dir()
         current_dir_content = os.listdir(os.getcwd())
         allow_artifacts = []
         for app_name in (list(self.test_apps.keys())):
