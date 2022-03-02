@@ -5,7 +5,7 @@ PETCLINIC_CRAWLJAX_API_TEST_FILE=$PETCLINIC_CRAWL_DIR/src/test/java/generated/Ge
 PETCLINIC_SELENIUM_API_TEST_DIR=$PETCLINIC_CRAWL_DIR/selenium-api-tests
 PETCLINIC_SELENIUM_API_TEST_FILE=$PETCLINIC_SELENIUM_API_TEST_DIR/src/test/java/generated/GeneratedTests.java
 
-# setup commands run before execution of tests in file
+# setup commands run befeore execution of tests in file
 setup_file() {
     echo "# setup_file: building webapp image" >&3
     cd test/ui/data/webapps/petclinic && ./deploy_app.sh build && cd ../../../../..
@@ -24,9 +24,10 @@ setup() {
     cd test/ui/data/webapps/petclinic && ./deploy_app.sh start && cd ../../../../..
 }
 
-@test "Test 01: tkltest-ui generate petclinic" {
+@test "Test 01: tkltest-ui docker generate petclinic" {
     # generate test cases for petclinic app
-    run tkltest-ui --verbose --log-level INFO \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         generate
@@ -54,18 +55,20 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: tkltest-ui execute [api_type=selenium] petclinic" {
+@test "Test 02: tkltest-ui docker execute [api_type=selenium] petclinic" {
     # execute test cases for petclinic app
-    run tkltest-ui --verbose --log-level INFO \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute
     [ $status -eq 0 ]
 }
 
-@test "Test 03: tkltest-ui execute [api_type=crawljax] petclinic" {
+@test "Test 03: tkltest-ui docker execute [api_type=crawljax] petclinic" {
     # execute test cases for petclinic app
-    run tkltest-ui --verbose --log-level INFO \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute --api-type crawljax
