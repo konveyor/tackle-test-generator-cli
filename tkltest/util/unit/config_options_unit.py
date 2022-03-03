@@ -90,6 +90,8 @@ def __conditionally_required(opt_name, config):
 __options_spec = {
 
     # "general" options: applicable to more than one of the subcommands (generate, execute, config)
+    # when adding a cli option, make sure its long name is similar to the option name,
+    # with hyphens instead of underscores
     'general': {
         'is_cli_command': False,
         'app_name': {
@@ -336,6 +338,16 @@ __options_spec = {
             'relpath_fix_type': 'path',
             'help_message': 'list of paths to app build settings files or property files for the specified app build type'
         },
+        'bad_path': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-bp',
+            'long_name': '--bad-path',
+            'type': bool,
+            'default_value': False,
+            'help_message': 'Generate also bad path tests; assertions will validate that the exception observed during generation is thrown also during execution'
+        },
         'app_build_target': {
             'required': __conditionally_required,
             'is_toml_option': True,
@@ -445,14 +457,6 @@ __options_spec = {
             # "generate randoop" command options
             'randoop': {
                 'help_message': 'Use Randoop for generating a test suite',
-                'no_error_revealing_tests': {
-                    'required': False,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': bool,
-                    'default_value': False,
-                    'help_message': 'do not generate error-revealing tests with randoop'
-                }
             }
         }
     },
