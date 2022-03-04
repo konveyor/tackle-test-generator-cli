@@ -2,8 +2,8 @@
 
 1. [Downloading Java library Dependencies](#downloading-java-library-dependencies)
 2. [Installing Prerequisites](#installing-prerequisites)
-   1. [Prerequisites for TacklteTest-Unit](#prerequisites-for-tackltetest-unit)
-   2. [Prerequisites for TacklteTest-UI](#prerequisites-for-tackltetest-ui)
+   1. [Prerequisites for TackleTest-Unit](#prerequisites-for-tackltetest-unit)
+   2. [Prerequisites for TackleTest-UI](#prerequisites-for-tackltetest-ui)
 3. [Installing the TackleTest CLI](#installing-the-tackletest-cli)
 4. [Building the Docker image and running the CLI via docker or docker-compose](#building-the-docker-image-and-running-the-cli-via-docker-or-docker-compose)
 
@@ -32,7 +32,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 ## Installing Prerequisites
 
-### Prerequisites for TacklteTest-Unit
+### Prerequisites for TackleTest-Unit
 
 1. Install Python 3.8
 
@@ -58,7 +58,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
    > sudo dnf install ant-junit
    > ```
 
-### Prerequisites for TacklteTest-UI
+### Prerequisites for TackleTest-UI
 
 1. Install Python 3.8
 
