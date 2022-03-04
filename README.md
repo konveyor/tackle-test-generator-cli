@@ -10,7 +10,7 @@ These CLI commands invoke code test generators, whose code base resides in the r
 [tackle-test-generator-core](https://github.com/konveyor/tackle-test-generator-core) repository.
 
 1. [Overview](#overview)
-2. [Installing and running the CLI](#installing-and-running-the-cli)
+2. [Installing and running the CLI](#installing-and-running-tackletest-cli)
 3. [TackleTest CLI in action on sample apps](#tackletest-cli-in-action-on-sample-apps)
 4. TackleTest-Unit documentation: [quick-start guide](doc/unit/quick_start_guide.md), [detailed user guide](doc/unit/user_guide.md)
 5. TackleTest-UI documentation: [quick-start guide](doc/ui/quick_start_guide.md), [detailed user guide](doc/ui/quick_start_guide.md)

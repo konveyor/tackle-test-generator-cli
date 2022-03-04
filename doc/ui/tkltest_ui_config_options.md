@@ -1,4 +1,13 @@
-## tkltest-ui Main Configuration Options
+# TackleTest Configuration Options
 
-## tkltest-ui Form Data Specification
+## Main configuration options
 
+TBD
+
+## Form Data Specification
+
+TBD
+
+## Clickables Specification
+
+TBD
