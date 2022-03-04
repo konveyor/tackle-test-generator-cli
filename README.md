@@ -6,7 +6,7 @@ test-generation capabilities for Java unit testing and end-to-end testing of web
 TackleTest-UI (supported by the CLI command `tkltest-ui`), automatically generates end-to-end test cases for
 web applications that exercise the application under test via its user interface.
 
-These CLI commands invoke code test generators, whose code base resides in the related
+These CLI commands invoke core test generators, whose codebase resides in the related
 [tackle-test-generator-core](https://github.com/konveyor/tackle-test-generator-core) repository.
 
 1. [Overview](#overview)
@@ -65,7 +65,7 @@ alias tkltest-ui='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test
 
 substituting `/path-to-the-cli-directory` with the path to be mounted onto the container---this would be the path
 to the CLI directory or the directory where the app under test would be set up for test generation.
-Also, if you are using an image tagged other than `latest`, substiute the tag for `latest` in the alias command.
+Also, if you are using an image tagged other than `latest`, substitute the tag for `latest` in the alias command.
 
 The results of test generation or execution in the container are available in `/path-to-the-cli-directory` on the
 host machine. This also requires that the classes, the library dependencies, and the configuration file for the app
@@ -75,17 +75,17 @@ under the CLI directory, so that they are available in the container.
 ### Installing a released version with all dependencies included
 
 - Download and unzip [a released version of TackleTest](https://github.com/konveyor/tackle-test-generator-cli/releases)
-with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`).
+with all dependencies included (i.e., a release archive file named `*-all-deps.tgz` or `*-all-deps.zip`)
 
-- Install TackleTest CLI by following the [command installation instructions](doc/installation.md#installing-the-tackletest-cli).
+- Install TackleTest CLI by following the [command installation instructions](doc/installation.md#installing-the-tackletest-cli)
 
 ### Installing from a repo snapshot
 
 - Clone the repo or download codebase zip
 
-- Download all library dependencies by following the [library download instructions](./doc/installation.md#downloading-library-dependencies).
+- Download all library dependencies by following the [library download instructions](./doc/installation.md#downloading-library-dependencies)
 
-- Install TackleTest CLI by following the [command installation instructions](doc/installation.md#installing-the-tackletest-cli).
+- Install TackleTest CLI by following the [command installation instructions](doc/installation.md#installing-the-tackletest-cli)
 
 After the CLI has been installed, try out the `tkltest-unit` and `tkltest-ui` commands:
 ```buildoutcfg
@@ -115,7 +115,7 @@ To see the TackleTest-UI in action on a sample web application, follow these ste
    ```buildoutcfg
    cd test/ui/data/webapps/petclinic && ./deploy_app.sh start && cd ../../../../../
    ```
-   The deployed web app `petclinic` can be opened at `http://localhost:8080/`
+   The deployed webapp `petclinic` can be opened at `http://localhost:8080/`
 
 2. Run UI test generation on the app:
    ```buildoutcfg
@@ -123,7 +123,7 @@ To see the TackleTest-UI in action on a sample web application, follow these ste
    ```
 
 This command will take a few minutes to run; during its execution, the Chrome browser will be started in headless
-mode to launch the petclinic web for crawling and test generation.
+mode to launch the petclinic webapp for crawling and test generation.
 
 ## Known Tool Issues
 
@@ -135,7 +135,7 @@ mode to launch the petclinic web for crawling and test generation.
 
 2. Coverage in JEE apps could be low because of limited JEE mocking support.
 
-3. A known issue on Windows OS is that Tackle-test might exceed Windows limit of 260 characters for a file system folder path name length. 
+3. A known issue on Windows OS is that TackleTest might exceed Windows limit of 260 characters for a file system folder path name length. 
  Tackle-test mimics the structure of the application under its output directory, to enable generating 
 tests in the same package as the class under test, and gaining access to all its non-private members and methods. 
 If your application has a deep package hierarchy, these paths might exceed the 260 characters length limit. For Windows 10,
