@@ -2,8 +2,8 @@
 
 1. [Downloading Java library Dependencies](#downloading-java-library-dependencies)
 2. [Installing Prerequisites](#installing-prerequisites)
-   1. [Prerequisites for TackleTest-Unit](#prerequisites-for-tackltetest-unit)
-   2. [Prerequisites for TackleTest-UI](#prerequisites-for-tackltetest-ui)
+   1. [Prerequisites for TackleTest-Unit](#prerequisites-for-tackletest-unit)
+   2. [Prerequisites for TackleTest-UI](#prerequisites-for-tackletest-ui)
 3. [Installing the TackleTest CLI](#installing-the-tackletest-cli)
 4. [Building the Docker image and running the CLI via docker or docker-compose](#building-the-docker-image-and-running-the-cli-via-docker-or-docker-compose)
 
