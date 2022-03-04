@@ -1,5 +1,12 @@
 # TackleTest Installation Guide
 
+1. [Downloading Java library Dependencies](#downloading-java-library-dependencies)
+2. [Installing Prerequisites](#installing-prerequisites)
+   1. [Prerequisites for TacklteTest-Unit](#prerequisites-for-tackltetest-unit)
+   2. [Prerequisites for TacklteTest-UI](#prerequisites-for-tackltetest-ui)
+3. [Installing the TackleTest CLI](#installing-the-tackletest-cli)
+4. [Building the Docker image and running the CLI via docker or docker-compose](#building-the-docker-image-and-running-the-cli-via-docker-or-docker-compose)
+
 ## Downloading Java library Dependencies
 
 To run TackleTest CLI from a locally built Docker image or a local installation, a few jar files need to be downloaded from Maven repositories hosted on GitHub, which
@@ -99,7 +106,7 @@ tkltest-ui --help
 You can then continue to develop it and make changes and simply run the command without having to package
 and re-install it.
 
-## Building the Docker image locally and running the CLI via docker or docker-compose
+## Building the Docker image and running the CLI via docker or docker-compose
 
 For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry. These images can be pulled and used without requiring any set up. For the available images and instructions on using them, please visit the [TackleTest container images](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli) page. To the build the TackleTest container locally using the latest (or a particular) code version, please go through the following instructions.
 
