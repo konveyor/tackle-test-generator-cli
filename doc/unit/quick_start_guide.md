@@ -1,4 +1,4 @@
-## tkltest-unit Quick Start Guide
+## TackleTest-Unit Quick Start Guide
 
 We list the minimal steps required to use the tool for its two main functions: generating unit tests
 and executing them. More detailed description is available in the [CLI user guide](./user_guide.md).

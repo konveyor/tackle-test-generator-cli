@@ -1,4 +1,4 @@
-## tkltest-unit Configuration Options
+## TackleTest-Unit Configuration Options
 
 All configuration options for `tkltest-unit` commands  can be specified in a [toml](https://toml.io/en/)
 file, containing sections for different commands and subcommands.
