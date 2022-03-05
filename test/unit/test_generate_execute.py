@@ -777,7 +777,8 @@ class GenerateExecuteTest(unittest.TestCase):
         """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
 
         # set up config and generate tests
-        config = os.path.join(os.path.join('test', 'data'), 'failingApp', 'tkltest_config.toml')
+        config = config_util.load_config(config_file=os.path.join(os.path.join('test', 'data'),
+                                                                  'failingApp', 'tkltest_config.toml'))
 
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
