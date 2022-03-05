@@ -782,7 +782,8 @@ class GenerateExecuteTest(unittest.TestCase):
 
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
-        config['generate']['test_directory'] = '__failing-generated-tests'
+        config['general']['test_directory'] = '__failing-generated-tests'
+        config['general']['reports_path'] = "failing-user-reports"
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
         # assert that expected generate resources are created
@@ -887,7 +888,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
 
     def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli(app_name)
         dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
@@ -916,7 +917,7 @@ class GenerateExecuteTest(unittest.TestCase):
         self.assertTrue(test_files)
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli(app_name)
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -943,7 +944,7 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_cli_dir()
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
-        self.__assert_no_artifact_at_cli()
+        self.__assert_no_artifact_at_cli(app_name)
         dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:
@@ -997,16 +998,15 @@ class GenerateExecuteTest(unittest.TestCase):
         shutil.copytree(os.path.join(self.test_data_dir, app_name, 'basic_blocks'), output_dir)
         config['generate']['ctd_amplified']['reuse_base_tests'] = True
 
-    def __assert_no_artifact_at_cli(self):
+    def __assert_no_artifact_at_cli(self, app_name):
         '''
         Here we check that we do not leave anything in the cli directory
         '''
         dir_util.cd_cli_dir()
         current_dir_content = os.listdir(os.getcwd())
         allow_artifacts = []
-        for app_name in (list(self.test_apps.keys())):
-            allow_artifacts.append('tkltest-output-unit-' + app_name)
-            allow_artifacts.append(self.test_apps[app_name]['test_directory'])
-            allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
-            allow_artifacts.append(app_name + '-user-reports')
+        allow_artifacts.append('tkltest-output-unit-' + app_name)
+        allow_artifacts.append(self.test_apps[app_name]['test_directory'])
+        allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+        allow_artifacts.append(app_name + '-user-reports')
         self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(allow_artifacts))
