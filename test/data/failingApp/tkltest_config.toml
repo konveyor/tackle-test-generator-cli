@@ -1,0 +1,57 @@
+[general]
+app_name = "failing"
+app_classpath_file = "test/data/failingApp/classpath.txt"
+monolith_app_path = ["test/data/failingApp/target/classes"]
+java_jdk_home = ""
+test_directory = ""
+reports_path = ""
+verbose = false
+offline_instrumentation = false
+build_type = "ant"
+
+[generate]
+jee_support = false
+no_diff_assertions = false
+partitions_file = ""
+target_class_list = []
+excluded_class_list = []
+time_limit = 10
+app_build_files = []
+app_build_settings_files = []
+app_build_target = ""
+
+[execute]
+app_packages = ["failing.*"]
+create_build_file = true
+code_coverage = true
+test_class = ""
+
+[dev_tests]
+build_type = "ant"
+build_file = ""
+build_targets = []
+coverage_exec_file = ""
+compare_code_coverage = false
+use_for_augmentation = false
+coverage_threshold = 100
+
+[config.init]
+
+[config.list]
+
+[generate.ctd_amplified]
+base_test_generator = "combined"
+no_augment_coverage = false
+max_augment_memory = 4096
+no_ctd_coverage = false
+interaction_level = 1
+num_seq_executions = 10
+refactored_app_path_prefix = ""
+refactored_app_path_suffix = []
+reuse_base_tests = false
+
+[generate.evosuite]
+criterion = [ "BRANCH",]
+
+[generate.randoop]
+no_error_revealing_tests = false

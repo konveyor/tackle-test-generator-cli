@@ -773,6 +773,28 @@ class GenerateExecuteTest(unittest.TestCase):
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
 
+    def test_generate_execute_ctdamplified_bad_path_diff_assertions(self) -> None:
+        """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
+
+        # set up config and generate tests
+        config = os.path.join(os.path.join('test', 'data'), 'failingApp', 'tkltest_config.toml')
+
+        config['generate']['bad_path'] = True
+        config['generate']['ctd_amplified']['no_augment_coverage'] = True
+        config['generate']['test_directory'] = '__failing-generated-tests'
+        self.__process_generate(subcommand='ctd-amplified', config=config)
+
+        # assert that expected generate resources are created
+        self.__assert_generate_resources(app_name='failing', generate_subcmd='ctd-amplified')
+        self.__assert_bad_path_tests(test_directory=config['generate']['test_directory'])
+
+        # execute tests
+        config['execute']['code_coverage'] = True
+        self.__process_execute(config=config)
+
+        # assert that expected execute resources are created
+        self.__assert_execute_resources(app_name='failing', code_coverage=True)
+
     def test_generate_execute_gradle(self) -> None:
         """Test getting dependencies and "execute": using gradle"""
         for app_name in self.test_list2:
@@ -884,6 +906,13 @@ class GenerateExecuteTest(unittest.TestCase):
 
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
+
+    def __assert_bad_path_tests(self, test_directory):
+        test_files = []
+        for root, subFolders, files in os.walk(test_directory):
+            test_files.extend(files)
+        test_files = [f for f in test_files if f.endswith('BadPath_Test.java')]
+        self.assertTrue(test_files)
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
         self.__assert_no_artifact_at_cli()
