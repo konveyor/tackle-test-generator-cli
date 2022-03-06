@@ -33,7 +33,7 @@ class GenerateExecuteTest(unittest.TestCase):
     # directory containing test applications
     test_data_dir = os.path.join('test', 'data')
     # test_data_dir = os.path.join('data')
-    begin_dir_content = os.listdir(os.getcwd())
+
     test_apps = {
         'irs': {
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
@@ -57,6 +57,7 @@ class GenerateExecuteTest(unittest.TestCase):
     args = argparse.Namespace()
 
     def setUp(self) -> None:
+        begin_dir_content = os.listdir(os.getcwd())
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             dir_util.cd_cli_dir()
@@ -788,7 +789,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
-        config['general']['verbose'] = True
+        config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
         # assert that expected generate resources are created
@@ -893,7 +894,6 @@ class GenerateExecuteTest(unittest.TestCase):
 
 
     def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
-        #self.__assert_no_artifact_at_cli()
         dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
@@ -913,6 +913,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         dir_util.cd_cli_dir()
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
+        self.__assert_no_artifact_at_cli()
 
     def __assert_bad_path_tests(self, test_directory):
         test_files = []
@@ -922,7 +923,6 @@ class GenerateExecuteTest(unittest.TestCase):
         self.assertTrue(test_files)
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
-        #self.__assert_no_artifact_at_cli()
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -945,11 +945,11 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(os.path.isfile(compare_html_file))
         else:
             self.assertFalse(os.path.isdir(compare_report_dir))
+        self.__assert_no_artifact_at_cli()
         if not reports_path:
             dir_util.cd_cli_dir()
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
-        #self.__assert_no_artifact_at_cli()
         dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:
@@ -983,6 +983,9 @@ class GenerateExecuteTest(unittest.TestCase):
             coverage_counter = [counter for counter in xml_entry if 'type' in counter.attrib and counter.attrib['type'] == coverage_type]
             self.assertTrue(len(coverage_counter) == 1)
             self.assertTrue(coverage_counter[0].attrib['missed'] == '0')
+
+        self.__assert_no_artifact_at_cli()
+
 
     def __process_generate(self, subcommand, config):
         config_util.fix_relative_paths(config)
