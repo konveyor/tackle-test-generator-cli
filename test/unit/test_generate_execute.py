@@ -788,6 +788,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
+        config['general']['verbose'] = True
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
         # assert that expected generate resources are created
@@ -892,7 +893,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
 
     def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
-        self.__assert_no_artifact_at_cli()
+        #self.__assert_no_artifact_at_cli()
         dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
