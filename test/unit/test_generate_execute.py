@@ -794,7 +794,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         # assert that expected generate resources are created
         self.__assert_generate_resources(app_name='failing', generate_subcmd='ctd-amplified', is_bad_path=True)
-        self.__assert_bad_path_tests(test_directory=config['generate']['test_directory'])
+        self.__assert_bad_path_tests(test_directory=config['general']['test_directory'])
 
         # execute tests
         config['execute']['code_coverage'] = True
@@ -948,9 +948,9 @@ class GenerateExecuteTest(unittest.TestCase):
             self.assertTrue(os.path.isfile(compare_html_file))
         else:
             self.assertFalse(os.path.isdir(compare_report_dir))
-        self.__assert_no_artifact_at_cli()
         if not reports_path:
             dir_util.cd_cli_dir()
+        self.__assert_no_artifact_at_cli()
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
         dir_util.cd_output_dir(app_name, module_name)
