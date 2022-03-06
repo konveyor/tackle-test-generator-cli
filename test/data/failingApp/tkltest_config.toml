@@ -1,6 +1,6 @@
 [general]
 app_name = "failing"
-app_classpath_file = "test/data/failingApp/classpath.txt"
+app_classpath_file = "./test/data/failingApp/classpath.txt"
 monolith_app_path = ["test/data/failingApp/target/classes"]
 java_jdk_home = ""
 test_directory = ""
