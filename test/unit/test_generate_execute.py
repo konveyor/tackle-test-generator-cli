@@ -84,6 +84,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -98,7 +99,10 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'),
+                augment=False
+            )
+
 
     def test_generate_execute_ctdamplified_randoop_classlist_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list"""
@@ -191,6 +195,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['excluded_class_list'] = app_info['excluded_class_list']
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -204,7 +209,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
     def test_generate_execute_ctdamplified_randoop_allclasses_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes"""
@@ -215,6 +221,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -228,7 +235,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'),
+            augment=False)
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_diffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes"""
@@ -239,6 +247,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -252,8 +261,10 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
+    unittest.skip('')
     def test_generate_ctdamplified_evosuite_allclasses_augmentcoverage(self) -> None:
         """Test "generate ctd-amplified": base_test_generator=evosuite scope=all_classes no_augment_coverage=false"""
         for app_name in self.test_list1:
@@ -391,6 +402,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -412,7 +424,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
     def test_generate_execute_ctdamplified_randoop_classlist_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=target_class_list no_diff_assertions"""
@@ -424,6 +437,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -437,7 +451,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
     def test_generate_execute_ctdamplified_evosuite_classlist_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=target_class_list no_diff_assertions"""
@@ -449,6 +464,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -462,7 +478,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
     def test_generate_execute_ctdamplified_combined_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=combined scope=all_classes no_diff_assertions"""
@@ -496,6 +513,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['general']['reports_path'] = app_name+"-user-reports"
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -511,7 +529,7 @@ class GenerateExecuteTest(unittest.TestCase):
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
                 orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'),
-                reports_path=app_name+"-user-reports")
+                reports_path=app_name+"-user-reports", augment=False)
 
     def test_generate_execute_ctdamplified_evosuite_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=evosuite scope=all_classes no_diff_assertions"""
@@ -523,6 +541,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -533,7 +552,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'),
+            augment=False)
 
     @unittest.skip('')
     def test_generate_execute_ctdamplified_combined_partitions_nodiffassert(self) -> None:
@@ -924,9 +944,7 @@ class GenerateExecuteTest(unittest.TestCase):
     def __assert_bad_path_tests(self, app_name, test_directory):
         dir_util.cd_output_dir(app_name, '')
         test_files = list(Path(test_directory).glob('**/*.java'))
-        print(test_directory)
-        print(test_files)
-        test_files = [f for f in test_files if f.endswith('_BadPath_Test.java')]
+        test_files = [f for f in test_files if f.name.endswith('_BadPath_Test.java')]
         self.assertTrue(test_files)
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
