@@ -72,6 +72,7 @@ class GenerateExecuteTest(unittest.TestCase):
             app_config['generate']['time_limit'] = 1
             app_config['generate']['ctd_amplified']['num_seq_executions'] = 1
             app_info['config'] = app_config
+            print('classpath file for '+app_name+' is '+app_config['general']['app_classpath_file'])
 
         self.begin_dir_content = os.listdir(os.getcwd())
 
@@ -604,7 +605,6 @@ class GenerateExecuteTest(unittest.TestCase):
 
         # execute tests
         config['execute']['code_coverage'] = True
-        print(config['general']['app_classpath_file'] )
         self.__process_execute(config=config)
 
         # assert that expected execute resources are created
