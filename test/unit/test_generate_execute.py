@@ -793,7 +793,7 @@ class GenerateExecuteTest(unittest.TestCase):
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
         # assert that expected generate resources are created
-        self.__assert_generate_resources(app_name='failing', generate_subcmd='ctd-amplified')
+        self.__assert_generate_resources(app_name='failing', generate_subcmd='ctd-amplified', is_bad_path=True)
         self.__assert_bad_path_tests(test_directory=config['generate']['test_directory'])
 
         # execute tests
@@ -893,14 +893,17 @@ class GenerateExecuteTest(unittest.TestCase):
                 shutil.rmtree(generated_test_directory, ignore_errors=True)
 
 
-    def __assert_generate_resources(self, app_name, generate_subcmd, module_name=''):
+    def __assert_generate_resources(self, app_name, generate_subcmd, is_bad_path=False, module_name=''):
         dir_util.cd_output_dir(app_name, module_name)
         if generate_subcmd == 'ctd-amplified':
             summary_file = app_name+constants.TKL_EXTENDER_SUMMARY_FILE_SUFFIX
             self.assertTrue(os.path.isfile(summary_file))
             with open(summary_file) as f:
                 testgen_summary = json.load(f)
-            self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
+            if is_bad_path:
+                self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
+            else:
+                self.assertGreater(testgen_summary['extended_sequences_info']['failing_sequences_bad_path'], 0)
 
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
             self.assertTrue(os.path.isdir(main_report_dir))
