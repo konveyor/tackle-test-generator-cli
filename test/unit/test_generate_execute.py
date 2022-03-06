@@ -45,10 +45,15 @@ class GenerateExecuteTest(unittest.TestCase):
         'splitNjoin': {
             'config_file': os.path.join(test_data_dir, 'splitNjoin', 'tkltest_config.toml'),
             'test_directory': '__splitNjoin-generated-tests',
+        },
+        'failing' : {
+            'config_file': os.path.join(test_data_dir, 'failingApp', 'tkltest_config.toml'),
+            'test_directory': '__failing-generated-tests',
         }
     }
     test_list1 = ['irs']
     test_list2 = ['splitNjoin']
+    good_path_test_list = ['irs', 'splitNjoin']
     args = argparse.Namespace()
 
     def setUp(self) -> None:
@@ -776,14 +781,13 @@ class GenerateExecuteTest(unittest.TestCase):
     def test_generate_execute_ctdamplified_bad_path_diff_assertions(self) -> None:
         """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
 
+        app_info = self.test_apps['failing']
+
         # set up config and generate tests
-        config = config_util.load_config(config_file=os.path.join(os.path.join('test', 'data'),
-                                                                  'failingApp', 'tkltest_config.toml'))
+        config = app_info['config']
 
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
-        config['general']['test_directory'] = '__failing-generated-tests'
-        config['general']['reports_path'] = "failing-user-reports"
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
         # assert that expected generate resources are created
@@ -998,15 +1002,16 @@ class GenerateExecuteTest(unittest.TestCase):
         shutil.copytree(os.path.join(self.test_data_dir, app_name, 'basic_blocks'), output_dir)
         config['generate']['ctd_amplified']['reuse_base_tests'] = True
 
-    def __assert_no_artifact_at_cli(self, app_name):
+    def __assert_no_artifact_at_cli(self):
         '''
         Here we check that we do not leave anything in the cli directory
         '''
         dir_util.cd_cli_dir()
         current_dir_content = os.listdir(os.getcwd())
         allow_artifacts = []
-        allow_artifacts.append('tkltest-output-unit-' + app_name)
-        allow_artifacts.append(self.test_apps[app_name]['test_directory'])
-        allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
-        allow_artifacts.append(app_name + '-user-reports')
+        for app_name in self.test_apps:
+            allow_artifacts.append('tkltest-output-unit-' + app_name)
+            allow_artifacts.append(self.test_apps[app_name]['test_directory'])
+            allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
+            allow_artifacts.append(app_name + '-user-reports')
         self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(allow_artifacts))
