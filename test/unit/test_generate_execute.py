@@ -491,6 +491,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
+            config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
             # assert that expected generate resources are created
@@ -501,7 +502,8 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_augment_resources(
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
-                orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+                orig_test_directory=os.path.join(self.test_data_dir, app_name,
+                                                 app_name + '-ctd-amplified-tests'), augment=False)
 
     def test_generate_execute_ctdamplified_randoop_allclasses_nodiffassert(self) -> None:
         """Test "generate ctd-amplified" and "execute": base_test_generator=randoop scope=all_classes no_diff_assertions"""
@@ -580,6 +582,33 @@ class GenerateExecuteTest(unittest.TestCase):
                 app_name=app_name,
                 test_directory=config['general']['test_directory'],
                 orig_test_directory=os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests'))
+
+    def test_generate_execute_ctdamplified_bad_path_diff_assertions(self) -> None:
+        """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
+
+        app_name = 'failing'
+
+        app_info = self.test_apps[app_name]
+
+        # set up config and generate tests
+        config = app_info['config']
+
+        config['generate']['bad_path'] = True
+        config['generate']['ctd_amplified']['no_augment_coverage'] = True
+        config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+        self.__process_generate(subcommand='ctd-amplified', config=config)
+
+        # assert that expected generate resources are created
+        self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', is_bad_path=True)
+        self.__assert_bad_path_tests(test_directory=config['general']['test_directory'], app_name=app_name)
+
+        # execute tests
+        config['execute']['code_coverage'] = True
+        print(config['general']['app_classpath_file'] )
+        self.__process_execute(config=config)
+
+        # assert that expected execute resources are created
+        self.__assert_execute_resources(app_name='failing', code_coverage=True)
 
     @unittest.skip('')
     def test_generate_execute_ctdamplified_randoop_partitions_nodiffassert(self) -> None:
@@ -799,32 +828,6 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # assert that expected execute resources are created
             self.__assert_execute_resources(app_name=app_name)
-
-    def test_generate_execute_ctdamplified_bad_path_diff_assertions(self) -> None:
-        """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
-
-        app_name = 'failing'
-
-        app_info = self.test_apps[app_name]
-
-        # set up config and generate tests
-        config = app_info['config']
-
-        config['generate']['bad_path'] = True
-        config['generate']['ctd_amplified']['no_augment_coverage'] = True
-        config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-        self.__process_generate(subcommand='ctd-amplified', config=config)
-
-        # assert that expected generate resources are created
-        self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', is_bad_path=True)
-        self.__assert_bad_path_tests(test_directory=config['general']['test_directory'], app_name=app_name)
-
-        # execute tests
-        config['execute']['code_coverage'] = True
-        self.__process_execute(config=config)
-
-        # assert that expected execute resources are created
-        self.__assert_execute_resources(app_name='failing', code_coverage=True)
 
     def test_generate_execute_gradle(self) -> None:
         """Test getting dependencies and "execute": using gradle"""
