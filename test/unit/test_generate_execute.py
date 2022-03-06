@@ -901,9 +901,9 @@ class GenerateExecuteTest(unittest.TestCase):
             with open(summary_file) as f:
                 testgen_summary = json.load(f)
             if is_bad_path:
-                self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
-            else:
                 self.assertGreater(testgen_summary['extended_sequences_info']['failing_sequences_bad_path'], 0)
+            else:
+                self.assertGreater(testgen_summary['extended_sequences_info']['final_sequences'], 0)
 
             main_report_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
             self.assertTrue(os.path.isdir(main_report_dir))
