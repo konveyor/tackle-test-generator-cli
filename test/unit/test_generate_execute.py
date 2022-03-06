@@ -922,7 +922,7 @@ class GenerateExecuteTest(unittest.TestCase):
         self.assertTrue(test_files)
 
     def __assert_execute_resources(self, app_name, module_name='', code_coverage=True, reports_path='', compare_coverage=False, has_junit_report=True):
-        self.__assert_no_artifact_at_cli()
+        #self.__assert_no_artifact_at_cli()
         if reports_path:
             main_report_dir = reports_path
         else:
@@ -949,7 +949,7 @@ class GenerateExecuteTest(unittest.TestCase):
             dir_util.cd_cli_dir()
 
     def __assert_augment_resources(self, app_name, test_directory, orig_test_directory, module_name='', augment=True, reports_path=''):
-        self.__assert_no_artifact_at_cli()
+        #self.__assert_no_artifact_at_cli()
         dir_util.cd_output_dir(app_name, module_name)
         orig_test_directory = os.path.join(constants.TKLTEST_CLI_DIR, orig_test_directory)
         if reports_path:
