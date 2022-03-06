@@ -594,14 +594,20 @@ class GenerateExecuteTest(unittest.TestCase):
         # set up config and generate tests
         config = app_info['config']
 
+        print('initial classpath file for ' + app_name + ' is ' + config['general']['app_classpath_file'])
+
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
         config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
+        print('classpath file after generate for ' + app_name + ' is ' + config['general']['app_classpath_file'])
+
         # assert that expected generate resources are created
         self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', is_bad_path=True)
         self.__assert_bad_path_tests(test_directory=config['general']['test_directory'], app_name=app_name)
+
+        print('classpath file after assert for ' + app_name + ' is ' + config['general']['app_classpath_file'])
 
         # execute tests
         config['execute']['code_coverage'] = True
@@ -944,8 +950,8 @@ class GenerateExecuteTest(unittest.TestCase):
         self.assertTrue(os.path.isdir(self.test_apps[app_name]['test_directory']))
         self.__assert_no_artifact_at_cli()
 
-    def __assert_bad_path_tests(self, app_name, test_directory):
-        dir_util.cd_output_dir(app_name, '')
+    def __assert_bad_path_tests(self, app_name, test_directory, module_name=''):
+        dir_util.cd_output_dir(app_name, module_name)
         test_files = list(Path(test_directory).glob('**/*.java'))
         test_files = [f for f in test_files if f.name.endswith('_BadPath_Test.java')]
         self.assertTrue(test_files)
