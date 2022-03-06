@@ -57,7 +57,7 @@ class GenerateExecuteTest(unittest.TestCase):
     args = argparse.Namespace()
 
     def setUp(self) -> None:
-        begin_dir_content = os.listdir(os.getcwd())
+        self.begin_dir_content = os.listdir(os.getcwd())
         for app_name in self.test_apps.keys():
             app_info = self.test_apps[app_name]
             dir_util.cd_cli_dir()
