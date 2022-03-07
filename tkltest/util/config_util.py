@@ -292,7 +292,7 @@ def __fix_relative_path(path, path_fix):
     return path
 
 
-def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix):
+def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix, app_name):
 
     for option_name, options in options_spec.items():
         if type(options) is not dict:
@@ -300,7 +300,7 @@ def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix)
         if option_name == 'subcommands':
             for subcommands_option_name, subcommands_option in options.items():
                 if subcommands_option_name in config.keys():
-                    __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name], output_dir, path_fix)
+                    __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name], output_dir, path_fix, app_name)
             return
         if option_name not in config.keys():
             continue
@@ -316,13 +316,17 @@ def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix)
                 with open(file_path) as file:
                     lines = file.readlines()
                 lines = [__fix_relative_path(path, path_fix) for path in lines if path.strip()]
-                new_file = os.path.join(output_dir, os.path.basename(file_path))
+                file_base_name = os.path.basename(file_path)
+                if not file_base_name.startswith(app_name):
+                    # we add app_name so the file will not be deleted
+                    file_base_name = app_name + file_base_name
+                new_file = os.path.join(output_dir, file_base_name)
                 #todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
                     f.writelines(lines)
                 config[option_name] = new_file
         else:
-            __fix_relative_paths_recursively(options, config[option_name], output_dir, path_fix)
+            __fix_relative_paths_recursively(options, config[option_name], output_dir, path_fix, app_name)
 
 
 def fix_relative_paths(tkltest_config):
@@ -342,7 +346,7 @@ def fix_relative_paths(tkltest_config):
     else:
         path_fix = '..'
     output_dir = dir_util.get_output_dir(tkltest_config['general']['app_name'], module_name)
-    __fix_relative_paths_recursively(options_spec, tkltest_config, output_dir, path_fix)
+    __fix_relative_paths_recursively(options_spec, tkltest_config, output_dir, path_fix, tkltest_config['general']['app_name'])
     tkltest_config['relative_fixed'] = True
 
 
