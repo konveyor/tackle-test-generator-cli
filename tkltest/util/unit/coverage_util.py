@@ -58,7 +58,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     except OSError:
         pass
 
-
+    jacoco_raw_date_file = ''
     if has_test_suite:
     # run tests using build file
         if build_type == 'ant':
@@ -131,19 +131,19 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         if no_failure:
             jacoco_raw_date_file = merged_exec_file
             coverage_csv_file = merged_csv_file
-        elif has_test_suite:
-            tkltest_status('Warning: Failed to obtain coverage from dev-written test suite using {}, using only coverage from ctd-amplified test suite {}'.format(additional_build_file, build_file))
         else:
-            return {
-                'instruction_covered': 0,
-                'line_covered': 0,
-                'branch_covered': 0,
-                'method_covered': 0,
-                'instruction_total': 0,
-                'line_total': 0,
-                'branch_total': 0,
-                'method_total': 0,
-            }
+            tkltest_status('Warning: Failed to obtain coverage from dev-written test suite using {}, using only coverage from ctd-amplified test suite {}'.format(additional_build_file, build_file))
+    if not jacoco_raw_date_file:
+        return {
+            'instruction_covered': 0,
+            'line_covered': 0,
+            'branch_covered': 0,
+            'method_covered': 0,
+            'instruction_total': 0,
+            'line_total': 0,
+            'branch_total': 0,
+            'method_total': 0,
+        }
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
