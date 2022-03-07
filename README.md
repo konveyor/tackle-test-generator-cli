@@ -143,7 +143,12 @@ there are online instructions available on how to enable long paths and avoid th
 
 ### TackleTest-UI
 
-1. TBD
+1. CrawlJax doesn't know which actions are available for a clickable element, and tries all of them. 
+Hence, invalid actions or actions on disabled elements may appear in the generated tests. These tests should still pass, since the
+invalid action is translated to NOP.  
+
+2. Currently support is available only from Chrome and Chrome headless browsers. Support for FireFox will 
+be added soon.
 
 
 ## Additional Resources
