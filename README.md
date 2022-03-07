@@ -34,7 +34,7 @@ Among its many features, TackleTest-Unit:
 For more details of TackleTest-Unit, see the [quick-start guide](doc/unit/quick_start_guide.md) and the
 [detailed user guide](doc/unit/user_guide.md).
 
-**TackleTest-UI** supports generation of end-to-end test cases for web applications. These test cases
+**TackleTest-UI** supports automatic generation of end-to-end test cases for web applications. These test cases
 exercise the application under test via its user interface and drive execution through different application
 tiers. Some of the features of TackleTest-UI include
 
