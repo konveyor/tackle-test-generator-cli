@@ -159,13 +159,15 @@ def generate_ctd_amplified_tests(config, output_dir):
 
     tmp_test_directory = test_directory + constants.TKLTEST_TEMP_DIR_SUFFIX
     # generate extended test sequences
-    extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     config['generate']['no_diff_assertions'],
-                     config['generate']['ctd_amplified']['no_ctd_coverage'],
-                     config['generate']['ctd_amplified']['interaction_level'],
-                     config['generate']['jee_support'],
-                     config['generate']['ctd_amplified']['num_seq_executions'],
-                     tmp_test_directory, verbose)
+    extend_sequences(app_name=app_name, monolith_app_path=monolith_app_path, app_classpath_file=app_classpath_file,
+                     ctd_file=ctd_file, bb_seq_file=bb_seq_file, jdk_path=jdk_path,
+                     no_diff_assertions=config['generate']['no_diff_assertions'],
+                     no_ctd_coverage=config['generate']['ctd_amplified']['no_ctd_coverage'],
+                     interaction_level=config['generate']['ctd_amplified']['interaction_level'],
+                     jee_support=config['generate']['jee_support'],
+                     bad_path=config['generate']['bad_path'],
+                     num_executions=config['generate']['ctd_amplified']['num_seq_executions'],
+                     test_directory=tmp_test_directory, verbose=verbose)
 
     if os.path.exists(test_directory):
         shutil.rmtree(test_directory)
@@ -403,7 +405,8 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
 
 
 def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     no_diff_assertions, no_ctd_coverage, interaction_level, jee_support, num_executions, test_directory, verbose=False):
+                     no_diff_assertions, no_ctd_coverage, interaction_level, jee_support, bad_path, num_executions,
+                     test_directory, verbose=False):
     """Generates the final CTD-guided test cases.
 
     Generates extended test sequences for covering the CTD test plan rows that are written as JUnit
@@ -418,6 +421,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         jdk_path (str): path to Java VM
         no_diff_assertions (bool): do not add assertions for differential testing to the generated tests
         jee_support (bool): add support JEE mocking in generated tests cases
+        bad_path (bool): whether to enerate bad path tests cases
         num_executions (int): number of executions to perform to determine pass/fail status of generated sequences
         test_directory (str): name of root test directory to write JUnit test classes to
         verbose (bool): run in verbose mode printing detailed status messages
@@ -460,6 +464,9 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -od " + test_directory
     if jee_support:
         te_command += " -jee"
+
+    if bad_path:
+        te_command += " -bp"
     if not no_diff_assertions:
         te_command += " -da"
     if not no_ctd_coverage:

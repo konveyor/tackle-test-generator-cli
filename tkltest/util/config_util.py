@@ -292,7 +292,7 @@ def __fix_relative_path(path, path_fix):
     return path
 
 
-def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix):
+def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix, app_name):
 
     for option_name, options in options_spec.items():
         if type(options) is not dict:
@@ -300,7 +300,7 @@ def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix)
         if option_name == 'subcommands':
             for subcommands_option_name, subcommands_option in options.items():
                 if subcommands_option_name in config.keys():
-                    __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name], output_dir, path_fix)
+                    __fix_relative_paths_recursively(subcommands_option, config[subcommands_option_name], output_dir, path_fix, app_name)
             return
         if option_name not in config.keys():
             continue
@@ -316,13 +316,17 @@ def __fix_relative_paths_recursively(options_spec, config, output_dir, path_fix)
                 with open(file_path) as file:
                     lines = file.readlines()
                 lines = [__fix_relative_path(path, path_fix) for path in lines if path.strip()]
-                new_file = os.path.join(output_dir, os.path.basename(file_path))
+                file_base_name = os.path.basename(file_path)
+                if not file_base_name.startswith(app_name):
+                    # we add app_name so the file will not be deleted
+                    file_base_name = app_name + file_base_name
+                new_file = os.path.join(output_dir, file_base_name)
                 #todo - we will have a bug if the users uses two different files with the same name
                 with open(new_file, 'w') as f:
                     f.writelines(lines)
                 config[option_name] = new_file
         else:
-            __fix_relative_paths_recursively(options, config[option_name], output_dir, path_fix)
+            __fix_relative_paths_recursively(options, config[option_name], output_dir, path_fix, app_name)
 
 
 def fix_relative_paths(tkltest_config):
@@ -342,7 +346,7 @@ def fix_relative_paths(tkltest_config):
     else:
         path_fix = '..'
     output_dir = dir_util.get_output_dir(tkltest_config['general']['app_name'], module_name)
-    __fix_relative_paths_recursively(options_spec, tkltest_config, output_dir, path_fix)
+    __fix_relative_paths_recursively(options_spec, tkltest_config, output_dir, path_fix, tkltest_config['general']['app_name'])
     tkltest_config['relative_fixed'] = True
 
 
@@ -709,14 +713,14 @@ def resolve_app_path(tkltest_config):
         tkltest_config['general']['monolith_app_path'] = app_path_lines
 
 
-def __collect_jar_modules(jar_file_path, jars_modules):
-    """ Collects the modules of the jar and adds them to the dictionary jars_modules. """
+def __collect_jar_packages(jar_file_path, jars_packages):
+    """ Collects the packages of the jar and adds them to the dictionary jars_packages. """
     archive = zipfile.ZipFile(jar_file_path, 'r')
     class_files = set([file for file in archive.namelist() if file.endswith(".class")])
     archive.close()
-    jars_modules[jar_file_path] = set(
+    jars_packages[jar_file_path] = set(
         ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
-
+    print(jars_packages[jar_file_path])
 
 def resolve_classpath(tkltest_config, command):
     """
@@ -838,31 +842,31 @@ def resolve_classpath(tkltest_config, command):
     the dependencies directory contains files to remove:
      1. app class files
      2. directories
-     3. jar files with app modules
+     3. jar files with app packages
 
     so we:
      1. delete directories and non jars files
-     2. collect the app modules in a dict: monolit_path -> set of modules name
-     3. collect the app modules in a dict: jar files -> set of modules name
+     2. collect the app packages in a dict: monolit_path -> set of packages name
+     3. collect the app packages in a dict: jar files -> set of packages name
 
      if the set of a monolit_path equal to the set of the jar file, we delete the jar file
      (a jar file is represent as a list of directories)
     """
 
-    # collect monolith modules
+    # collect monolith packages
     monolith_app_paths = tkltest_config['general']['monolith_app_path']
-    app_paths_modules = dict()
+    app_paths_packages = dict()
     for monolith_app_path in monolith_app_paths:
-        app_path_modules = set()
+        app_path_packages = set()
         for root, dirs, files in os.walk(monolith_app_path):
             if len([file for file in files if file.endswith(".class")]):
                 posix_module_path = "-".join(re.split("[\\\\/]+", root.replace(monolith_app_path, "").lstrip('\\/')))
-                app_path_modules.add(posix_module_path)
-        app_paths_modules[monolith_app_path] = app_path_modules
+                app_path_packages.add(posix_module_path)
+        app_paths_packages[monolith_app_path] = app_path_packages
 
     # remove non jar entries
-    # collect jars modules
-    jars_modules = dict()
+    # collect jars packages
+    jars_packages = dict()
     if app_build_type == 'ant':
         for jar_file in os.listdir(dependencies_dir):
             jar_file_path = os.path.join(dependencies_dir, jar_file)
@@ -871,29 +875,29 @@ def resolve_classpath(tkltest_config, command):
             elif not jar_file_path.endswith(".jar"):
                 os.remove(jar_file_path)
             else:
-                __collect_jar_modules(jar_file_path, jars_modules)
+                __collect_jar_packages(jar_file_path, jars_packages)
     elif app_build_type in ['maven', 'gradle']:
         for jar_file_path in class_path_order:
             if jar_file_path.endswith('.jar'):
-                __collect_jar_modules(jar_file_path, jars_modules)
+                __collect_jar_packages(jar_file_path, jars_packages)
 
-    # compare jars modules to monolith modules, remove matching jars
-    for app_path, app_path_modules in app_paths_modules.items():
-        for jar_file, jar_modules in jars_modules.items():
-            if len(jar_modules) and jar_modules == app_path_modules:
+    # compare jars packages to monolith packages, remove matching jars
+    for app_path, app_path_packages in app_paths_packages.items():
+        for jar_file, jar_packages in jars_packages.items():
+            if len(jar_packages) and jar_packages == app_path_packages:
                 if jar_file.startswith(dependencies_dir):
                     os.remove(jar_file)
-                del jars_modules[jar_file]
+                del jars_packages[jar_file]
                 break
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
     if not len(class_path_order):  # there is no specific order for classpath jars
-        for jar_file in jars_modules.keys():
+        for jar_file in jars_packages.keys():
             classpath_fd.write(jar_file + "\n")
     else:
         for jar_file in class_path_order:
-            if jar_file in jars_modules.keys():
+            if jar_file in jars_packages.keys():
                 classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
@@ -929,6 +933,8 @@ def resolve_tkltest_configs(tkltest_user_config, command):
                 config['general']['config_file_path'] = os.path.abspath(toml_file)
                 fix_relative_paths(config)
                 configs.append(config)
+            # fixing the user config too:
+            fix_relative_paths(tkltest_user_config)
             return configs
         else:
             resolve_app_path(tkltest_user_config)
@@ -950,6 +956,8 @@ def resolve_tkltest_configs(tkltest_user_config, command):
         
         # here we got more than one module, we will create a config per module, and save it in a toml file
         tkltest_configs = __resolve_multi_modules_tkltest_configs(tkltest_user_config, modules_properties, command, tkltest_config_file_suffix)
+        #fixing the user config too:
+        fix_relative_paths(tkltest_user_config)
         tkltest_status('Obtained {} modules from the build files. creating a config file per module.'.format(len(tkltest_configs)))
         return tkltest_configs
 
