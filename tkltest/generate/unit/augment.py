@@ -88,7 +88,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir,
-        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
+        max_memory=config['general']['max_memory_for_coverage']
     )
 
     if test_class_augment_pool:
@@ -105,7 +105,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir,
-        max_memory=config['generate']['ctd_amplified']['max_augment_memory']
+        max_memory=config['general']['max_memory_for_coverage']
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
     final_inst_cov_rate = safe_div(augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'])
