@@ -47,6 +47,7 @@ required, and the option description).
 | app_build_files                     |                                    | list of paths to app build files for the specified app build type                                                                       |
 | app_build_settings_files            |                                    | list of paths to app build settings files or property files for the specified app build type                                            |
 | app_build_target                    |                                    | Name of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file       |
+| bad_path                            | -bp/--bad-path                     | Generate also bad path tests; assertions will validate that the exception observed during generation is thrown also during execution    |
 |                                     |                                    |                                                                                                                                         |
 | generate.ctd_amplified              |                                    | Use CTD for computing coverage goals                                                                                                    |
 | base_test_generator                 | -btg/--base-test-generator         | base test generator to use for creating building-block test sequences                                                                   |
