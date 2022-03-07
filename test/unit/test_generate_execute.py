@@ -588,26 +588,18 @@ class GenerateExecuteTest(unittest.TestCase):
         """Test "generate ctd-amplified" and "execute": scope=bad_path no_diff_assertions"""
 
         app_name = 'failing'
-
         app_info = self.test_apps[app_name]
 
         # set up config and generate tests
         config = app_info['config']
-
-        print('initial classpath file for ' + app_name + ' is ' + config['general']['app_classpath_file'])
-
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
         config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
         self.__process_generate(subcommand='ctd-amplified', config=config)
 
-        print('classpath file after generate for ' + app_name + ' is ' + config['general']['app_classpath_file'])
-
         # assert that expected generate resources are created
         self.__assert_generate_resources(app_name=app_name, generate_subcmd='ctd-amplified', is_bad_path=True)
         self.__assert_bad_path_tests(test_directory=config['general']['test_directory'], app_name=app_name)
-
-        print('classpath file after assert for ' + app_name + ' is ' + config['general']['app_classpath_file'])
 
         # execute tests
         config['execute']['code_coverage'] = True
