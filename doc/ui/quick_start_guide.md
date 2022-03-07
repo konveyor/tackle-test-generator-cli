@@ -3,7 +3,7 @@
 We list the minimal steps required to use the tool for its two main functions: generating UI tests
 and executing them. More detailed description is available in the [CLI user guide](./user_guide.md).
 
-1. Created an empty configuration file, named `tkltest_config.toml`, by running the command
+1. Create an empty configuration file, named `tkltest_config.toml`, by running the command
    ```
    tkltest-ui config init --file tkltest_config.toml
    ````
@@ -16,7 +16,7 @@ and executing them. More detailed description is available in the [CLI user guid
      during test generation)
      
    - `app_url`: URL where application under test is deployed. Note that you will need to have a running instance of the application 
-   in the provided url
+   at the provided url
      
 3. To generate test cases, run the command
    ```
@@ -36,6 +36,6 @@ and executing them. More detailed description is available in the [CLI user guid
 Note that, if the `--config-file` option is not specified on the command line (as in the commands above),
 the CLI uses by default `./tkltest_config.toml` as the configuration file.
 
-Note also that typically, test data such as login information and various data forms input will also need to be provided in order to generate meaningful 
-tests. These can be optionally given in another configuration file, whose location should be specified in the 'form_data_spec_file' config option.
-More details about input data specification is available [here](./user_guide.md)).
+Note also that, typically, test data such as login information and various data forms input will also need to be provided in order to generate meaningful 
+tests. These can be optionally given in another configuration file, whose location should be specified in the `form_data_spec_file` config option.
+More details about input data specification is available [here](./tkltest_ui_config_options.md#form-data-specification).
