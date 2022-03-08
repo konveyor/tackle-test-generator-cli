@@ -86,7 +86,7 @@ data for a particular form of the app under test, please assess whether random s
 that require other types of data could restrict the crawler's exploration of the app.
 
 The form data specification is provided in TOML format in a particular schema.
-For an example specification, see the [form data spec for sample Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
+For an example specification, see the [form data spec for the Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
 
 For each form, you need to specify a table with the form name `[forms.<form name>]`. In the 
 table of each form, you specify a list of input data for different fields. For each field,
@@ -149,4 +149,92 @@ Note that the value of an `xpath` field in the specification can be specified as
 
 ## Clickables Specification
 
-TBD
+A clickable is a web element on which actions (e.g., click, select, enter text) can be performed.
+Some of these actions can transition the webapp from one state to another.
+The clickables specification, as mentioned above, serves two purposes:
+first, it lets the crawling scope to be limited by instructing the crawler to avoid certain clickable elements;
+second, it lets the user specify additional HTML elements to be explored that the crawler may not recognize by
+default as clickable (e.g., HTML `<div>` tags).
+
+For most webapps, there is a huge space (often unbounded) of navigation options, some of them irrelevant to
+the functionality being tested. Thus, restricting the state space of the application to be explored can make
+crawling more effective by avoiding irrelevant or less interesting parts of the application. Note that if the crawler
+reaches a state that is outside the domain of the URL at which the app under test is hosted, it will not explore
+that state; moreover, such "external" states will not be represented in the crawl model. So the clickables
+specifications need not cover such scenarios and can focus on state space within the application domain for
+exclusion.
+
+Specification of constraints on clickables is done in a separate configuration file, as in the case of data form
+specification. The location of the clickables specification file should be given in the config option
+`clickables_spec_file` in the main configuration file.
+
+The clickables specification consists of `click` and `dont_click` parts, corresponding to the two usage scenarios,
+that are specified in the same way---consisting of a set of element-level specifications. An element-level
+specification identifies one or more web elements as follows:
+
+1. `tag_name`: string specifying HTML tag
+2. optionally, one of `with_attribute`, `with_text`, or `under_xpath`, taking the following structure
+    ```buildoutcfg
+    with_attribute = { attr_name = "", attr_value = ""}
+    with_text = "<text>"
+    under_xpath = "<xpath>"
+    ```
+If the second part is omitted from an element specification, the click or don't click directive applies
+to all occurrences of the given tag name.
+
+To illustrate, here are a few examples of `click` specifications:
+
+```buildoutcfg
+# click all elements with tag "tag1"
+[[click.element]]
+  tag_name = "tag1"
+
+# click div elements with id "is_clickable"
+[[click.element]]
+  tag_name = "div"
+  with_attribute = { attr_name = "id", attr_value = "is_clickable"}
+
+# click tag1 elements with text "some text"
+[[click.element]]
+  tag_name = "tag1"
+  with_text = "some text"
+
+# click div elements that occur under the matching xpath
+[[click.element]]
+  tag_name = "div"
+  under_xpath = "//*[@id=\"primary-links\"]/li"
+```
+
+`dont_click` specifications follow the same structure, as illustrated by the following examples:
+
+```buildoutcfg
+# do not click any anchor element
+# (do not click spec for all occurrences of a tag is unlikely to be used but is supported)
+[[dont_click.element]]
+  tag_name = "a"
+
+# do not click input elements with id "Delete records"
+[[dont_click.element]]
+  tag_name = "input"
+  with_attribute = { attr_name = "id", attr_value = "Delete records"}
+
+# do not click button elements with name "Update record..."
+[[dont_click.element]]
+  tag_name = "button"
+  with_attribute = { attr_name = "name", attr_value = "Update record..."}
+
+# do not click anchor elements with text "Upload file"
+[[dont_click.element]]
+  tag_name = "a"
+  with_text = "Upload file"
+
+# do not click anchor elements that occur under the matching xpath
+[[dont_click.element]]
+  tag_name = "a"
+  under_xpath = "//*[@id=\"xyz\"]"
+```
+
+It also possible to exclude an entire tree of web elements by using the `under_xpath` specifier with
+a wildcard. For example, a `dont_click` specifier `under_xpath = //div[@id='xyz']//*` would exclude
+all web elements in the tree rooted at the web element with id `xyz`. This can be a conveient way
+of omitting exploration, for example, of web elements locateds in the header or footer section of a web page.
