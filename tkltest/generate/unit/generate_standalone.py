@@ -260,8 +260,8 @@ def __generate_class_list_file(class_list, app_name, excluded_class_list):
 
 
 def __get_randoop_flags(config, time_limit):
-    flags = " --no-error-revealing-tests=" + str(config['generate']['randoop']['no_error_revealing_tests']).lower()
-    flags += " --no-regression-assertions=" + str(not config['generate']['no_diff_assertions']).lower()
+    flags = " --no-error-revealing-tests=" + str(not config['generate']['bad_path']).lower()
+    flags += " --no-regression-assertions=" + str(config['generate']['no_diff_assertions']).lower()
     if int(time_limit) > 0:
         flags += " --time-limit=" + str(time_limit)
     return flags

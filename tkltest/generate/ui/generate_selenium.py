@@ -110,7 +110,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     __write_generated_code(pom_xml=pom_xml, test_class_code=testclass_code, crawl_dir=crawl_dir)
 
     # clean up crawl folder
-    # __clean_up_crawl_artifacts(crawl_dir)
+    __clean_up_crawl_artifacts(crawl_dir)
 
 
 def __create_method_name_for_path(path):
@@ -204,18 +204,24 @@ def __clean_up_crawl_artifacts(crawl_dir):
     Deletes crawl artifacts related to crawljax API test cases. Retains the crawl model and related visualization
     artifacts.
     """
-    # delete src tree from crawljax API tests
-    shutil.rmtree(os.path.join(crawl_dir, 'src'), ignore_errors=True)
-    # delete pom.xml
-    root_pom = os.path.join(crawl_dir, 'pom.xml')
-    if os.path.exists(root_pom):
-        os.remove(root_pom)
-    # for file in glob.glob(os.path.join(crawl_dir, '*.xml')):
-    #     os.remove(file)
-    # delete all json files except the crawl paths file
+    # # delete src tree for crawljax API tests
+    # shutil.rmtree(os.path.join(crawl_dir, 'src'), ignore_errors=True)
+    # # delete pom.xml
+    # root_pom = os.path.join(crawl_dir, 'pom.xml')
+    # if os.path.exists(root_pom):
+    #     os.remove(root_pom)
+    # # for file in glob.glob(os.path.join(crawl_dir, '*.xml')):
+    # #     os.remove(file)
+
+    # delete all json files except the crawl paths files and files required for running crawljax API tests
+    files_to_keep = [
+        os.path.join(crawl_dir, file)
+        for file in [_CRAWL_PATHS_FILE, 'config.json', 'crawlPathsInfo.json', 'result.json']
+    ]
     for file in glob.glob(os.path.join(crawl_dir, '*.json')):
-        if not file.endswith(_CRAWL_PATHS_FILE):
+        if file not in files_to_keep:
             os.remove(file)
+
     # remove run scripts
     for file in glob.glob(os.path.join(crawl_dir, 'run.*')):
         os.remove(file)
@@ -228,8 +234,8 @@ if __name__ == '__main__':  # pragma: no cover
             'log-level': 'WARNING',
             # 'app_name': 'petclinic',
             # 'app_url': 'http://localhost:8080'
-            # 'app_name': 'addressbook',
-            # 'app_url': 'http://localhost:3000/addressbook/'
+            'app_name': 'addressbook',
+            'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
