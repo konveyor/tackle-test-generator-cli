@@ -245,7 +245,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
                        'branch_total': base_coverage['branch_total'],
                        'method_total': base_coverage['method_total']}
     else:
-        shutil.copy(test_raw_cov_file,output_exec_file)
+        shutil.copy(test_raw_cov_file, output_exec_file)
     # run jacoco cli report command
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
     coverage_xml_file = os.path.join(main_coverage_dir, 'jacoco.xml')
