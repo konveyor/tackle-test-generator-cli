@@ -17,10 +17,10 @@ specified in TOML format): one for specifying input data to be used web forms of
 the other for specifying which web elements to explore as clickables. The names of the auxiliary
 configuration files are specified in the main configuration and both them are optional. Form data specification
 would typically be needed for the crawler to explore the app state space effectively (e.g., for getting
-past authentication form). Clickables specification would usually not be needed: TackleTest-UI, via Crawljax,
-can automatically infer clickable web elements; this specification would have to be provided only if additional
-HTML  elements (e.g., the `<div>` tag) that are typically not clickable need to be explored in the webapp
-under test.
+past authentication form). Clickables specification serves two purposes: first, it lets the crawling scope
+to be limited by instructing the crawler to avoid certain clickable elements; second, it lets the user
+specify additional HTML elements to be explored that the crawler may not recognize by default as
+clickable (e.g., HTML `<div>` tags).
 
 ## Main Configuration Options
 
@@ -78,38 +78,74 @@ The form data specification for the webapp under test is specified in a separate
 provided  as main configuration option `form_data_spec_file`. The user has to decide which web forms of the
 app under  test to provide data for. At a minimum, this would be required for screens, such as
 login or authentication,  so that the crawler can get past such screens and explore the app under test.
-For the forms for which data  is not provided, the crawler uses random values. Therefore, for the forms
+For the forms for which data is not provided, the crawler uses random values. Therefore, for the forms
 where random values do not affect app exploration, form data need not be provided. Note however that the
 random data used by the crawler would be of string type because the crawler cannot know whether specifically
-typed data is needed for a form field (e.g., integer or date values). So while deciding whether to provide
-data for  a particular form of the app under test, please assess whether random string values for form fields
-that require other types of data could restrict the crawler's exploration.
+typed data is needed for a form field (e.g., integer or date values). So, while deciding whether to provide
+data for a particular form of the app under test, please assess whether random string values for form fields
+that require other types of data could restrict the crawler's exploration of the app.
 
-The form data specification is provided in TOML format in a particular schema, which is illustrated
-below. For an example specification, see the [form data spec for a sample webapp](../../test/ui/data/addressbook/tkltest_ui_formdata_config.toml).
+The form data specification is provided in TOML format in a particular schema.
+For an example specification, see the [form data spec for sample Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
 
+For each form, you need to specify a table with the form name `[forms.<form name>]`. In the 
+table of each form, you specify a list of input data for different fields. For each field,
+you need to specify (1) `input_type`, (2) `identification`, and (3) `input_value`.  
+1. `input type` is either `text`, `select`, `checkbox`, `radio`, `email`, `textarea`, `password`, or `number`.
+2. `identification` consists of two parts:
+   1. `how`: enum with choices `name`, `id`, `tag`, `text`, `xpath`, `partial_text`
+   2. `value`: string value for `how`
+3. `input_value` is the string value to be used as input. 
+
+In addition, for each form, you need to specify one `before_click` element to identify the web element that is 
+clicked to submit the form. It consists of two parts:
+
+1. `tag_name`: string specifying HTML tag
+2. one of `with_attribute`, `with_text`, or `under_xpath`, taking the following structure
+    ```buildoutcfg
+    with_attribute = { attr_name = "", attr_value = ""}
+    with_text = "<text>"
+    under_xpath = "<xpath>"
+    ```
+
+To illustrate with an example, the following is a data specification for the add-owner form
+in the Petclinic webapp:
+
+```buildoutcfg
+[forms.add_owner]
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "firstName"}
+    input_value = "pipi"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "lastName"}
+    input_value = "yu"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "address"}
+    input_value = "2710 N"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "city"}
+    input_value = "Austin"
+
+  [[forms.add_owner.input_fields]]
+    input_type = "text"
+    identification = { how = "name", value = "telephone"}
+    input_value = "5122005208"
+
+  [forms.add_owner.before_click]
+    tag_name = "button"
+    with_attribute = { attr_name = "value", attr_value = "Add Owner" }
 ```
-# The form data specification consists of a set of tables, one for each form, and each form
-# contains a set of field specifications along with one "before click" element specification
-#
-# A field specification identifies a field of a web form with the value to be used for that
-# field; it consists of three parts:
-#   1. input_type: enum with choices text, select, checkbox, radio, email, textarea, password, number
-#   2. identification: consists of two parts
-#        a. how: enum with choices name, id, tag, text, xpath, partial_text
-#        b. value: string value for how
-#   3 input_value: string value to be used as input
-#
-# A "before click" element specification identifies the web element that is clicked to submit
-# the form; it consists of two parts:
-#   1. tag_name: string specifying HTML tag
-#   2. one of with_attribute, with_text, or under_xpath, taking the following structure
-#        with_attribute = { attr_name = "", attr_value = ""}
-#        with_text = "<text>"
-#        under_xpath = "<xpath>"
-```
 
-TBD: explain the format with examples
+Note that the value of an `xpath` field in the specification can be specified as absolute (or full) XPath or relative XPath. For example, for the "First Name" text field in the add-owner form in Petclinic webapp, the absolute XPath is `/html/body/app-root/app-owner-add/div/div/form/div[2]/div/input`, whereas the relative XPath is `//*[@id=“firstName”]`.
+
 
 ## Clickables Specification
 

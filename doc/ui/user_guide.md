@@ -8,7 +8,7 @@
 
 ## Overview
 
-*TackleTest-UI** supports automatic generation of end-to-end test cases for web applications. These test cases
+*TackleTest-UI* supports automatic generation of end-to-end test cases for web applications. These test cases
 exercise the application under test via its user interface and drive execution through different application
 tiers. Some of the features of TackleTest-UI include
 
@@ -16,8 +16,8 @@ tiers. Some of the features of TackleTest-UI include
 - Integration with the state-of-the-art web-crawling tool [Crawljax](https://github.com/crawljax/crawljax)
 - Generation two test suites using the TestNG framework: one using Crawljax API and the other using Selenium API
 
-The web crawler randomly crawls applications paths; while it mimics user interaction with the application, the crawling may not 
-necessarily be similar to the way a user would navigate the application, i.e., via meaningful functional paths.
+The web crawler randomly traverses navigation paths through the app's web UI; although it mimics user interaction with the application, the crawling may not 
+necessarily be similar to the way a user would navigate the application, i.e., via meaningful functional flows or use cases.
 
 ``` 
 usage: tkltest-ui [-h] [-u APP_URL] [-cf CONFIG_FILE]
@@ -57,7 +57,7 @@ Test generation is supported by the `tkltest-ui generate` command. Currently, th
 which performs model-based test generation. CrawlJax automatically crawls the application via its DOM interface, 
 and creates a state transition model based on the crawled paths. The test cases are derived from the model by
 enumerating the model paths. The resulting test cases are using the TestNG framework. They are exported in 
-two different versions: using CrawlJax API, and using Selenium API only. Test cases in Selenium API will be generated in a folder named `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/selenium-api-tests/src`. 
+two different versions: using CrawlJax API and using Selenium API only. Test cases in Selenium API will be generated in a folder named `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/selenium-api-tests/src`. 
 Each `crawl##` folder contains output of a different run. Your latest run will be in the `crawl` folder with the largest number. 
 These test cases depend on Selenium only, and not on CrawlJax. In addition, test cases in CrawlJax API will be generated in `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/src`
 
@@ -84,38 +84,26 @@ The specification of the app under test is provided using the following configur
 
 2. `app_url`: URL where application under test is deployed. Note that you will need to have a running instance of the application 
    at the provided url.
+
+For details of additional parameters for configuring test generation, see [main configuration options](./tkltest_ui_config_options.md#main-configuration-options).
    
 ### Specifying input data
 
 Specification of input data is optional. If you do not specify input data, random data will 
-be used. However, in such a case there is a high chance that the crawling will not be able to progress
-beyond initial login attempt, or otherwise fail early due to invalid input, Hence, it is advised
-to specify form data, to the very least for forms that are critical for proceeding in navigation, such as login forms.
-Form data is specified in a separate configuration file in toml format. The location of the 
+be used. However, in such cases, the crawling will not be able to progress
+forme that perform login/authentication, or will otherwise get error responses by submitting
+forms with invalid input values. This can limit the exploration that the crawler can perform.
+Therefoire, it is advised  to specify form data, at the very least for forms that are critical for
+proceeding in navigation, such as login forms.
+
+Form data is specified in a separate configuration file in TOML format. The location of the 
 form data specification file should be provided in the `form_data_spec_file` option in the 
-main configuration file. For an example of a form data specification file see `test/ui/data/petclinic/tkltest_ui_formdata_config.toml`.
+main configuration file.
 
-For each form, you need to specify a table with the form name `[forms.<form name>]`. In the 
-table of each form, you specify a list of input data for different fields. For each field,
-you need to specify (1) `input_type`, (2) `identification`, and (3) `input_value`.  
-1. `input type` is either `text`, `select`, `checkbox`, `radio`, `email`, `textarea`, `password`, or `number`.
-2. `identification` consists of two parts:
+For details on how to specify form data, see [form data specification](./tkltest_ui_config_options.md#form-data-specification).
 
-        a. `how`: enum with choices `name`, `id`, `tag`, `text`, `xpath`, `partial_text`
-        b. `value`: string value for how
-3. `input_value` is the string value to be used as input. 
-
-In addition, for each form, you need to specify one `before_click` element to identify the web element that is 
-clicked to submit the form. It consists of two parts:
-
-1. `tag_name`: string specifying HTML tag
-2. one of `with_attribute`, `with_text`, or `under_xpath`, taking the following structure
-        `with_attribute` = { attr_name = "", attr_value = ""}
-        `with_text` = "<text>"
-        `under_xpath` = "<xpath>"
-
-Follow the provided example for more details on data form specification.
-  
+For an example specification, see the [form data spec for Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
+ 
 ### Specifying constraints on clickable elements
 
 Clickables are web elements that can be clicked to trigger actions that transform the 
