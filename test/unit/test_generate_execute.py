@@ -47,7 +47,7 @@ class GenerateExecuteTest(unittest.TestCase):
             'test_directory': '__splitNjoin-generated-tests',
         },
         'failing' : {
-            'config_file': os.path.join(test_data_dir, 'failingApp', 'tkltest_config.toml'),
+            'config_file': os.path.join(test_data_dir, 'failing', 'tkltest_config.toml'),
             'test_directory': '__failing-generated-tests',
         }
     }
@@ -591,6 +591,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         # set up config and generate tests
         config = app_info['config']
+        self.__reuse_basic_blocks(app_name, config)
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
         config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']

@@ -49,6 +49,8 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     main_coverage_dir = os.path.abspath(os.path.join(report_dir,
                                                      constants.TKL_CODE_COVERAGE_REPORT_DIR,
                                                      os.path.basename(test_root_dir)))
+    if not os.path.isdir(main_coverage_dir):
+        os.makedirs(main_coverage_dir)
     if build_type == 'ant':
         coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test_root_dir) + '.csv')
     else:
@@ -106,6 +108,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
             jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
             if has_test_suite:
                 merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
+                merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
                 try:
                     command_util.run_command("java -jar {} merge {} {} --destfile {}".
                                              format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
@@ -115,8 +118,8 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                     no_failure = False
             else:
                 merged_exec_file = additional_exec_file
+                merged_csv_file = os.path.join(main_coverage_dir, os.path.basename(additional_exec_file) + '.csv')
         if no_failure:
-            merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
             try:
                 jacoco_classfiles_ops = ''
                 for classpath in class_files:
