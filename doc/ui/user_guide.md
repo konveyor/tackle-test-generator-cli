@@ -168,14 +168,18 @@ optional arguments:
 ``` 
 
 When test execution completes, a Maven Surfire report is generated, summarizing all test case results.
-The report is generated in a folder named `test-output` (for Selenium API test) or `testOutput` (for 
-CrawlJax API tests), next to the test suite `src` folder.
+The report is generated in the folder `crawl##/selenium-api-tests/test-results` for Selenium API tests;
+it is the standard TestNG test execution report, as illustrated in this image:
+
+For the Crawljax API tests, a custom test report showing visualization of the executed tests with screenshots
+is created in the folder `crawl##/test-results`. The following image is an illustrative example of the report:
 
 ## Best Practices and Troubleshooting Tips
 
 1. Ensuring that the application (persistent) state is reset between test generation and test execution and consecutive test executions will help avoid unexpected (and false) test failures. To avoid such failures, to the extent possible, test executions should be done with the same persistent state in which crawling and test generation were done.
 2. If test generation ends immediately without loading the app URL, perform the following checks: all [TackleTest-UI prerequisites](../installation.md#prerequisites-for-tackletest-ui) are installed, the app URL is not malformed, and the app is in fact available at the given URL.
 3. To help with failure diagnosis, capturing the crawl logs can help; run test generation with the `--verbose` option to redirect crawl logs to a file.
-4. To check whether a crawl and test-generation run completed successfully, check for the generated artifacts. TBD
-5. Advanced: Check that the screenshots and DOMs are correctly captured for specific states TBD
-6. Advanced: Check test-execution reports and correlate with captured application model if necessary TBD
+4. To check whether a crawl and test-generation run completed successfully, check for the generated artifacts. Among the [generated artifacts](#generated-artifacts), the contents of `doms/` and `screenshots/` directories are updated dynamically as new states and discovered during crawling. `css/`, `img/`, `js/`, and `lib/` directories contain static content that is initialized before crawling starts. The remaining artifacts, including the two test suites, are created after crawling has completed.
+
+[comment]: <> (5. Advanced: Check that the screenshots and DOMs are correctly captured for specific states TBD)
+[comment]: <> (6. Advanced: Check test-execution reports and correlate with captured application model if necessary TBD)
