@@ -100,26 +100,55 @@ Form data is specified in a separate configuration file in TOML format. The loca
 form data specification file should be provided in the `form_data_spec_file` option in the 
 main configuration file.
 
-For details on how to specify form data, see [form data specification](./tkltest_ui_config_options.md#form-data-specification).
+For details on how to specify form data, see [form data specification](./tkltest_ui_config_options.md#Form-data-specification).
 
 For an example specification, see the [form data spec for Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
  
 ### Specifying constraints on clickable elements
 
 Clickables are web elements that can be clicked to trigger actions that transform the 
-web application from one state to another. For some applications, there is a huge 
-space of navigation options, some of them irrelevant to the functionality being tested (for 
-example, buttons navigating to external sites). In such cases, it is advised to restrict 
-the navigation space by restricting the Crawler on which elements encountered during crawling should be clicked, 
-and which ones should be avoided.
-Specification of constraints on clickables is done in a separate configuration file, as in the case of data form specification.
+web application from one state to another. Complex applications typically have a huge 
+space of navigation options, some of them may be irrelevant to the functionality being tested (for 
+example, headers and footers). In such cases, it is advised to constraint 
+the navigation space by specifying which clickable elements encountered during crawling should be avoided.
+Clickables specification can be also required in the other direction: some html tags (such as `<div>`) 
+are not automatically recognized as clickables by CrawlJax, but in some applications may actually trigger 
+navigation actions via embedded JavaScript code. Hence, they need to be specified in order for CrawlJax to 
+navigate through them.
+Specification of clickables is done in a separate configuration file, as in the case of data form specification.
 The location of the clickables specification file should be given in the config option `clickables_spec_file`
 in the main configuration file. 
+
+For details on how to specify form data, see [clickables specification](./tkltest_ui_config_options.md#Clickables Specification).
+ 
     
 
 ## Test Execution
 
-TBD
+As mentioned [here](#test-generation), two test suites are generated from CrawlJax output: one using Selenium API 
+and one using CrawlJax API. Corresponding `pom.xml` build files are generated for each of the test
+suites. Test execution can be performed in three different ways:
+
+1. Running the command `tkltest-ui execute`
+2. Running the command `mvn test` in the folder where the generated `pom.xml` is located
+3. Running the `pom.xml` via an IDE 
+
+In the following, we provide more details about the `tkltest-ui execute` command. It takes 
+one optional parameter:
+
+``` 
+usage: tkltest-ui execute [-h] [-at {crawljax,selenium}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -at {crawljax,selenium}, --api-type {crawljax,selenium}
+                        library API type used by the generated (Java) test
+                        cases: Selenium or Crawljax; default is Selenium API
+``` 
+
+When test execution completes, a Maven Surfire report is generated, summarizing all test case results.
+The report is generated in a folder named `test-output` (for Selenium API test) or `testOutput` (for 
+CrawlJax API tests), next to the test suite `src` folder.
 
 ## Best Practices and Troubleshooting Tips
 
