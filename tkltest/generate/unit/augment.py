@@ -60,6 +60,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
 
     # compute initial coverage of CTD test suite and of each evosuite test file
+
     test_class_augment_pool, base_test_coverage, raw_cov_data_dir, has_coverage = \
         __compute_base_and_augmenting_tests_coverage(
             ctd_test_dir=ctd_test_dir,
