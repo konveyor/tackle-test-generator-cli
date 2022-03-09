@@ -124,8 +124,8 @@ TBD
 ## Best Practices and Troubleshooting Tips
 
 1. Ensuring that the application (persistent) state is reset between test generation and test execution and consecutive test executions will help avoid unexpected (and false) test failures. To avoid such failures, to the extent possible, test executions should be done with the same persistent state in which crawling and test generation were done.
-2. If test generation ends immediately without loading the app URL, perform the following check: all [TackleTest-UI prerequisites](../installation.md#prerequisites-for-tackletest-ui) are installed, the app URL is not malformed, and the app is available at the given URL.
+2. If test generation ends immediately without loading the app URL, perform the following checks: all [TackleTest-UI prerequisites](../installation.md#prerequisites-for-tackletest-ui) are installed, the app URL is not malformed, and the app is in fact available at the given URL.
 3. To help with failure diagnosis, capturing the crawl logs can help; run test generation with the `--verbose` option to redirect crawl logs to a file.
 4. To check whether a crawl and test-generation run completed successfully, check for the generated artifacts. TBD
-5. Advanced: Check if screenshot and dom are correctly captured for specific states TBD
-6. Advanced: Check Test report  after execution and correlate with captured applicaiton model if necessary TBD
+5. Advanced: Check that the screenshots and DOMs are correctly captured for specific states TBD
+6. Advanced: Check test-execution reports and correlate with captured application model if necessary TBD
