@@ -171,8 +171,15 @@ When test execution completes, a Maven Surfire report is generated, summarizing 
 The report is generated in the folder `crawl##/selenium-api-tests/test-results` for Selenium API tests;
 it is the standard TestNG test execution report, as illustrated in this image:
 
+<img width="931" alt="image" src="https://user-images.githubusercontent.com/2688521/157544658-fc20455a-93e9-441a-b9ef-f549d7efe0c1.png">
+
 For the Crawljax API tests, a custom test report showing visualization of the executed tests with screenshots
 is created in the folder `crawl##/test-results`. The following image is an illustrative example of the report:
+
+<img width="1177" alt="image" src="https://user-images.githubusercontent.com/2688521/157544777-a50f26a4-4a18-4811-86d4-51c154d2f7cc.png">
+
+Each execution of the Crawljax API test suite generates a new execution report in a new directory (with an integer ID, starting at `0`) under
+`crawl##/test-results`.
 
 ## Best Practices and Troubleshooting Tips
 
