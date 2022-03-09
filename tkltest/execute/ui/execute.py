@@ -60,8 +60,6 @@ def process_execute_command(config):
 
     # cleanup after execution of crawljax API tests
     if api_type == 'crawljax':
-        tkltest_status('Deleting "{}"; curr_dir={} '.format(os.path.join(output_dir, 'testOutput'), cur_dir))
-        # os.rmdir(os.path.join(output_dir, 'testOutput'))
         shutil.rmtree(os.path.join(output_dir, 'testOutput'))
 
     browser_util.cleanup_browser_instances(browser)
