@@ -13,7 +13,7 @@ These CLI commands invoke core test generators, whose codebase resides in the re
 2. [Installing and running the CLI](#installing-and-running-tackletest-cli)
 3. [TackleTest CLI in action on sample apps](#tackletest-cli-in-action-on-sample-apps)
 4. TackleTest-Unit documentation: [quick-start guide](doc/unit/quick_start_guide.md), [detailed user guide](doc/unit/user_guide.md), [configuration options](doc/unit/tkltest_unit_config_options.md)
-5. TackleTest-UI documentation: [quick-start guide](doc/ui/quick_start_guide.md), [detailed user guide](doc/ui/quick_start_guide.md), [configuration options](doc/ui/tkltest_ui_config_options.md)
+5. TackleTest-UI documentation: [quick-start guide](doc/ui/quick_start_guide.md), [detailed user guide](doc/ui/user_guide.md), [configuration options](doc/ui/tkltest_ui_config_options.md)
 6. [Known tool issues](#known-tool-issues)
 7. [Additional resources (demos, presentations, blog)](#additional-resources)
 
