@@ -121,7 +121,28 @@ in the main configuration file.
 
 For details on how to specify form data, see [clickables specification](./tkltest_ui_config_options.md#Clickables Specification).
  
-    
+### Generated artifacts      
+
+The main artifacts created by the `tkltest-ui generate` command are the two test suites, one using Selenium API
+and the other using Crawljax API. In addition to these, a number of other artifacts are created from the automated
+crawling in the `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##` directory.
+The following tree illustrates the created `crawl##` directory structure:
+
+<img width="309" alt="image" src="https://user-images.githubusercontent.com/2688521/157508099-e59eea34-028e-4221-b506-f3efb6f2ec31.png">
+
+- The Selenium API tests, the Maven build file, and the TestNG config file appear under directory `selenium-api-tests`.
+
+- The Crawljax API tests, along with JSON files containing data required by Crawljax test helper methods, reside
+in the `src/` directory at the top-level. The top-level directory contains the Maven build file and the TestNG
+config file for these tests.
+
+- The index.html file provides visualization of the crawl model as well as statistics about the crawl.
+
+- The JSON files at the top level contain information about crawl paths traversed and states reached, some of which are used by Crawljax test helper methods.
+
+- The `css/`, `img/`, `js/`, and `lib/` directories contain JavaScript and CSS code and images to support the crawl model visualization.
+
+- The `doms/`, `screenshots/`, and `states/` directories contain informations about the states reached (HTML, captured images, etc.)
 
 ## Test Execution
 
