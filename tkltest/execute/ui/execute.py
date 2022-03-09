@@ -12,6 +12,7 @@
 # ***************************************************************************
 
 import os
+import shutil
 import sys
 import subprocess
 import urllib
@@ -39,7 +40,7 @@ def process_execute_command(config):
     output_dir = dir_util.get_crawl_output_dir(test_directory, host_name)
 
     # cd to root dir of crawljax API tests or selenium API tests
-    cur_dir = os.curdir
+    cur_dir = os.path.abspath(os.curdir)
     os.chdir(output_dir)
     if api_type == 'selenium':
         os.chdir(constants.SELENIUM_API_TEST_ROOT)
@@ -56,4 +57,11 @@ def process_execute_command(config):
         sys.exit(1)
 
     os.chdir(cur_dir)
+
+    # cleanup after execution of crawljax API tests
+    if api_type == 'crawljax':
+        tkltest_status('Deleting "{}"; curr_dir={} '.format(os.path.join(output_dir, 'testOutput'), cur_dir))
+        # os.rmdir(os.path.join(output_dir, 'testOutput'))
+        shutil.rmtree(os.path.join(output_dir, 'testOutput'))
+
     browser_util.cleanup_browser_instances(browser)
