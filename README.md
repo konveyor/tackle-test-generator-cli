@@ -143,11 +143,9 @@ there are online instructions available on how to enable long paths and avoid th
 
 ### TackleTest-UI
 
-1. CrawlJax doesn't know which actions are available for a clickable element, and tries all of them. 
-Hence, invalid actions or actions on disabled elements may appear in the generated tests. These tests should still pass, since the
-invalid action is translated to NOP.  
+1. The form-fill actions performed by Crawljax have some limitations. Crawljax does not have information about disabled form fields and attempts to perform actions on them (e.g., via Selenium `sendKeys` method) without encountering exceptions. This can result in such actions occuring also in the generated test cases, but these tests would still pass (the action on a disabled field essentially becomes a NOP). Crawljax also does not perform any verification after performing the form-fill actions or analysis to associate form fields with submit buttons (other than the association provided in [form data specification](./doc/ui/tkltest_ui_config_options.md#form-data-specification)). Aside from the specified forms, Crawljax simply performs all form-fill actions available on a web page before performing any clicks. 
 
-2. Currently support is available only from Chrome and Chrome headless browsers. Support for FireFox will 
+2. Currently, support is available for only the Chrome browser (in normal and "headless" modes); support for Firefox will 
 be added soon.
 
 
