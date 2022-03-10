@@ -86,8 +86,8 @@ class UnitTests(unittest.TestCase):
 
     bad_path_test_apps = {
         'failing': {
-            'config_file': os.path.join('test', 'data', 'failing', 'tkltest_config.toml'),
-            'basic_blocks': os.path.join('test', 'data', 'failing', 'basic_blocks'),
+            'config_file': os.path.join('test', 'data', 'failingApp', 'tkltest_config.toml'),
+            'basic_blocks': os.path.join('test', 'data', 'failingApp', 'basic_blocks'),
         },
     }
     def setUp(self) -> None:

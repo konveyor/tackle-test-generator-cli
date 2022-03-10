@@ -1,7 +1,7 @@
 [general]
 app_name = "failing"
-app_classpath_file = "./test/data/failing/classpath.txt"
-monolith_app_path = ["test/data/failing/target/classes"]
+app_classpath_file = "./test/data/failingApp/classpath.txt"
+monolith_app_path = ["test/data/failingApp/target/classes"]
 java_jdk_home = ""
 test_directory = ""
 reports_path = ""
@@ -51,6 +51,8 @@ no_error_revealing_tests = false
 
 [dev_tests]
     build_type = "gradle"
-    build_file = "test/data/failing/user-tests/build.gradle"
+    build_file = "test/data/failingApp/user-tests/build.gradle"
     build_targets =  ["clean", "test"]
-    coverage_exec_file = "test/data/failing/user-tests/jacoco/jacoco.exec"
+    coverage_exec_file = "test/data/failingApp/user-tests/jacoco/jacoco.exec"
+#    compare_code_coverage = true
+#    use_for_augmentation = true
