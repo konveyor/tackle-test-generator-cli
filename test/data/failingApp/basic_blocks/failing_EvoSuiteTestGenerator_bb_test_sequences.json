@@ -1,0 +1,15 @@
+{
+  "test_sequences" : {
+    "failing.Failing2" : {
+      "sequences" : [ "{\r\n    Failing2 failing2_0 = new Failing2();\r\n    try {\r\n        failing2_0.throwCaughtException(249);\r\n    } catch (IOException e) {\r\n        // \r\n        // Throwing IOException\r\n        // \r\n        verifyException(\"failing.Failing2\", e);\r\n    }\r\n}" ],
+      "imports" : [ "failing.Failing2", "static org.junit.Assert.assertNull", "org.evosuite.runtime.EvoRunnerParameters", "org.evosuite.runtime.EvoRunner", "org.junit.runner.RunWith", "static org.evosuite.runtime.EvoAssertions.*", "org.junit.Test", "java.io.IOException", "static org.junit.Assert.*", "static org.junit.Assert.assertEquals" ],
+      "before_after_code_segments" : [ "initEvoSuiteFramework", "initTestCase", "doneWithTestCase" ]
+    },
+    "failing.Failing" : {
+      "sequences" : [ "{\r\n    Failing failing0 = new Failing();\r\n    try {\r\n        failing0.throwUncaughtException((String) null);\r\n    } catch (NullPointerException e) {\r\n        // \r\n        // Throwing NullPointerException\r\n        // \r\n        verifyException(\"failing.Failing\", e);\r\n    }\r\n}", "{\r\n    Failing failing0 = new Failing();\r\n    try {\r\n        failing0.throwCaughtException(805);\r\n    } catch (IOException e) {\r\n        // \r\n        // Throwing IOException\r\n        // \r\n        verifyException(\"failing.Failing\", e);\r\n    }\r\n}" ],
+      "imports" : [ "static org.junit.Assert.assertNull", "org.evosuite.runtime.EvoRunnerParameters", "org.evosuite.runtime.EvoRunner", "org.junit.runner.RunWith", "static org.evosuite.runtime.EvoAssertions.*", "org.junit.Test", "java.io.IOException", "static org.junit.Assert.*", "static org.junit.Assert.assertEquals", "failing.Failing" ],
+      "before_after_code_segments" : [ "initEvoSuiteFramework", "initTestCase", "doneWithTestCase" ]
+    }
+  },
+  "test_generation_tool" : "EvoSuiteTestGenerator"
+}
