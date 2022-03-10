@@ -424,7 +424,7 @@ class UnitTests(unittest.TestCase):
 
             config['dev_tests']['coverage_threshold'] = 96
             generate.exclude_classes_covered_by_dev_test(config, dir_util.get_app_output_dir(app_name))
-            self.assertTrue(config['generate']['excluded_class_list'] == test_apps[app_name]['covered_classes'])
+            self.assertTrue(set(config['generate']['excluded_class_list']) == set(test_apps[app_name]['covered_classes']))
 
         self.__assert_no_artifact_at_cli(test_apps.keys())
 
