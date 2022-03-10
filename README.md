@@ -72,6 +72,8 @@ host machine. This also requires that the classes, the library dependencies, and
 under test be placed in a directory
 under the CLI directory, so that they are available in the container.
 
+>Note: For running `tkltest-unit` via Docker, the option `java_jdk_home` (see [tkltest-unit configuration options](./doc/unit/tkltest_unit_config_options.md)) should be left empty because the environment variable JAVA_HOME is set in the container envrionment. Providing a value for `java_jdk_home` will override the JAVA_HOME setting in the container, resulting in failure.
+
 ### Installing a released version with all dependencies included
 
 - Download and unzip [a released version of TackleTest](https://github.com/konveyor/tackle-test-generator-cli/releases)
@@ -123,7 +125,9 @@ To see the TackleTest-UI in action on a sample web application, follow these ste
    ```
 
 This command will take a few minutes to run; during its execution, the Chrome browser will be started in headless
-mode to launch the petclinic webapp for crawling and test generation.
+mode to launch the petclinic webapp for crawling and test generation. The  `--verbose` option redirects crawl
+logs to a file called `<app-nane>_crawljax_runner.log`. You can view the progress of crawling via the
+command `tail -f <logfile>`.
 
 ## Known Tool Issues
 

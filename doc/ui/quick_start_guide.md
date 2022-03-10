@@ -22,7 +22,7 @@ and executing them. More detailed description is available in the [CLI user guid
    ```
    tkltest-ui --verbose generate 
    ```
-   Test cases in Selenium API will be generated in a folder named `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/selenium-api-tests/src`.
+   The  `--verbose` option redirects crawl logs to a file called `<app-nane>_crawljax_runner.log`. You can view the progress of crawling via the command `tail -f <logfile>`. Test cases in Selenium API will be generated in a folder named `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/selenium-api-tests/src`.
    Each `crawl##` folder contains output of a different run. Your latest run will be in the `crawl` folder with the largest number.
    These test cases depend on Selenium only, and not on CrawlJax. In addition, test cases in CrawlJax API will be generated in `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/src`
 

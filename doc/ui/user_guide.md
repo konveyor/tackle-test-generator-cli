@@ -119,7 +119,7 @@ Specification of clickables is done in a separate configuration file, as in the 
 The location of the clickables specification file should be given in the config option `clickables_spec_file`
 in the main configuration file. 
 
-For details on how to specify form data, see [clickables specification](./tkltest_ui_config_options.md#Clickables Specification).
+For details on how to specify clickables, see [clickables specification](./tkltest_ui_config_options.md#clickables-specification).
  
 ### Generated artifacts      
 
@@ -183,10 +183,11 @@ Each execution of the Crawljax API test suite generates a new execution report c
 
 ## Best Practices and Troubleshooting Tips
 
-1. Ensuring that the application (persistent) state is reset between test generation and test execution and consecutive test executions will help avoid unexpected (and false) test failures. To avoid such failures, to the extent possible, test executions should be done with the same persistent state in which crawling and test generation were done.
-2. If test generation ends immediately without loading the app URL, perform the following checks: all [TackleTest-UI prerequisites](../installation.md#prerequisites-for-tackletest-ui) are installed, the app URL is not malformed, and the app is in fact available at the given URL.
-3. To help with failure diagnosis, capturing the crawl logs can help; run test generation with the `--verbose` option to redirect crawl logs to a file.
-4. To check whether a crawl and test-generation run completed successfully, check for the generated artifacts. Among the [generated artifacts](#generated-artifacts), the contents of `doms/` and `screenshots/` directories are updated dynamically as new states and discovered during crawling. `css/`, `img/`, `js/`, and `lib/` directories contain static content that is initialized before crawling starts. The remaining artifacts, including the two test suites, are created after crawling has completed.
+1. Be aware that the crawler will typically update the persistent state of the application under test as it traverses various application states and submits input forms. So it is advised to perform test generation in a development or test environment only where pertsistent state updates do not have undesired effects.
+2. Ensuring that the application (persistent) state is reset between test generation and test execution and consecutive test executions will help avoid unexpected (and false) test failures. To avoid such failures, to the extent possible, test executions should be done with the same persistent state in which crawling and test generation were done.
+3. If test generation ends immediately without loading the app URL, perform the following checks: all [TackleTest-UI prerequisites](../installation.md#prerequisites-for-tackletest-ui) are installed, the app URL is not malformed, and the app is in fact available at the given URL.
+4. To help with failure diagnosis, capturing the crawl logs can help; run test generation with the `--verbose` option to redirect crawl logs to a file.
+5. To check whether a crawl and test-generation run completed successfully, check for the generated artifacts. Among the [generated artifacts](#generated-artifacts), the contents of `doms/` and `screenshots/` directories are updated dynamically as new states and discovered during crawling. `css/`, `img/`, `js/`, and `lib/` directories contain static content that is initialized before crawling starts. The remaining artifacts, including the two test suites, are created after crawling has completed.
 
 [comment]: <> (5. Advanced: Check that the screenshots and DOMs are correctly captured for specific states TBD)
 [comment]: <> (6. Advanced: Check test-execution reports and correlate with captured application model if necessary TBD)
