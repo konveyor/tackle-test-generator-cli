@@ -1,10 +1,10 @@
-## tkltest-unit Configuration Options
+## TackleTest-Unit Configuration Options
 
-All configuration options for `tkltest-unit` commands  can be specified in a [toml](https://toml.io/en/)
+All configuration options for `tkltest-unit` commands  can be specified in a [TOML](https://toml.io/en/)
 file, containing sections for different commands and subcommands.
 
-A subset of the configuration options can also be specified on the command line, as the
-examples above illustrate. If an option is specified both on the command line
+A subset of the configuration options can also be specified on the command line.
+If an option is specified both on the command line
 and in the configuration file, the command-line value overrides the configuration-file value.
 
 The configuration file can be initialized via `tkltest-unit config init`. `tkltest-unit config list` lists
