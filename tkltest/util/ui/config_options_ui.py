@@ -161,9 +161,9 @@ __options_spec = {
             'short_name': '-b',
             'long_name': '--browser',
             'type': str,
-            'choices': ['chrome', 'chrome_headless', 'firefox', 'firefox_headless'],
-            'default_value': 'chrome',
-            'help_message': 'browser on which to launch app under test for crawling and test generation; default is chrome'
+            'choices': ['chrome', 'chrome_headless'],
+            'default_value': 'chrome_headless',
+            'help_message': 'browser on which to launch app under test for crawling and test generation; default is chrome_headless'
         },
         'time_limit': {
             'required': False,
@@ -182,15 +182,6 @@ __options_spec = {
             'type': int,
             'default_value': 0,
             'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
-        },
-        'add_state_diff_assertions': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['dom', 'visual', 'both', 'hybrid', 'none'],
-            'default_value': 'none',
-            'help_message': 'types of assertions to add to generated test cases (see doc for explanation); default is none'
         },
         'include_iframes': {
             'required': False,
@@ -238,6 +229,17 @@ __options_spec = {
     'execute': {
         'is_cli_command': True,
         'help_message': 'Execute generated UI tests on the application under test',
+        'api_type': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': True,
+            'short_name': '-at',
+            'long_name': '--api-type',
+            'type': str,
+            'choices': ['crawljax', 'selenium'],
+            'default_value': 'selenium',
+            'help_message': 'library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API'
+        }
     }
 
 }

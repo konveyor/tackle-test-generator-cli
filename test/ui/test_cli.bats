@@ -15,25 +15,25 @@ teardown_file() {
     rm -f $TEST_CONFIG_FILE
 }
 
-@test "Test 00: CLI main no args" {
+@test "Test 00: tkltest-ui main no args" {
     run tkltest-ui
     assert_success
     assert_output --partial 'usage: tkltest-ui [-h] [-u APP_URL] [-cf CONFIG_FILE]'
 }
 
-@test "Test 01: CLI main help" {
+@test "Test 01: tkltest-ui main help" {
     run tkltest-ui --help
     assert_success
     assert_output --partial 'usage: tkltest-ui [-h] [-u APP_URL] [-cf CONFIG_FILE]'
 }
 
-@test "Test 02: CLI config command help" {
+@test "Test 02: tkltest-ui config command help" {
     run tkltest-ui config --help
     assert_success
     assert_output --partial 'usage: tkltest-ui config [-h] {init,list} ...'
 }
 
-@test "Test 03: CLI config subcommands help" {
+@test "Test 03: tkltest-ui config subcommands help" {
     run tkltest-ui config init --help
     assert_success
     assert_output --partial 'usage: tkltest-ui config init [-h] [-f FILE]'
@@ -43,7 +43,7 @@ teardown_file() {
     assert_output --partial 'usage: tkltest-ui config list [-h]'
 }
 
-@test "Test 04: CLI config init" {
+@test "Test 04: tkltest-ui config init" {
     run tkltest-ui config init
     assert_success
 
@@ -63,18 +63,24 @@ teardown_file() {
     # [ $? -eq 0 ]
 }
 
-@test "Test 05: CLI config list" {
+@test "Test 05: tkltest-ui config list" {
     run tkltest-ui config list
     assert_success
 }
 
-@test "Test 06: CLI config file load" {
+@test "Test 06: tkltest-ui config file load" {
     run tkltest-ui -cf ./test/ui/tkltest_ui_config.toml -l DEBUG
     assert_success
 }
 
-@test "Test 07: CLI generate command help" {
+@test "Test 07: tkltest-ui generate command help" {
     run tkltest-ui generate --help
     assert_success
     assert_output --partial 'usage: tkltest-ui generate [-h]'
+}
+
+@test "Test 08: tkltest-ui execute command help" {
+    run tkltest-ui execute --help
+    assert_success
+    assert_output --partial 'usage: tkltest-ui execute [-h]'
 }

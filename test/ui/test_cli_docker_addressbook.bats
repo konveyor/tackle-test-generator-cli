@@ -23,9 +23,10 @@ setup() {
     cd test/ui/data/webapps/addressbook && ./deploy_app.sh start && cd ../../../../..
 }
 
-@test "Test 01: tkltest-ui generate addressbook" {
+@test "Test 01: tkltest-ui docker generate addressbook" {
     # generate test cases for addressbook app
-    run tkltest-ui --verbose --log-level INFO \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose --log-level INFO \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         generate
@@ -53,18 +54,20 @@ setup() {
     [ $test_count -gt 0 ]
 }
 
-@test "Test 02: tkltest-ui execute [api_type=selenium] addressbook" {
+@test "Test 02: tkltest-ui docker execute [api_type=selenium] addressbook" {
     # execute test cases for addressbook app
-    run tkltest-ui --verbose \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute
     [ $status -eq 0 ]
 }
 
-@test "Test 03: tkltest-ui execute [api_type=crawljax] addressbook" {
+@test "Test 03: tkltest-ui docker execute [api_type=crawljax] addressbook" {
     # execute test cases for addressbook app
-    run tkltest-ui --verbose \
+    run docker-compose run --rm tkltest-cli \
+        tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute --api-type crawljax

@@ -1,0 +1,212 @@
+package generated;
+
+import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import org.openqa.selenium.*;
+{% if browser == 'chrome' or browser == 'chrome_headless' %}
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+{% elif browser == 'firefox' or browser == 'firefox_headless' %}
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+{% endif %}
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+import java.time.Duration;
+
+/**
+ * UI test cases for {{appname}}
+ * Generated @ {{now}}
+ */
+
+public class GeneratedTests {
+
+    // URL where app under test is deployed
+    private final String URL = "{{appurl}}";
+
+    // time in ms to wait after firing an event
+    private final long waitAfterEvent = {{wait_event}}L;
+
+    // time in ms to wait after reloading the app URL
+    private final long waitAfterReload = {{wait_reload}}L;
+
+    // web driver and wait instance
+    private WebDriver webDriver;
+    private WebDriverWait webDriverWait;
+
+    @BeforeClass
+	public void oneTimeSetUp() {
+{% if browser == 'chrome' or browser == 'chrome_headless' %}
+        // create chrome driver instance and set options
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions chromeOptions = new ChromeOptions();
+    {% if browser == 'chrome_headless' %}
+    	chromeOptions.addArguments("--headless");
+    {% endif %}
+        this.webDriver = new ChromeDriver(chromeOptions);
+        Dimension dim = new Dimension(1200, 890);
+        this.webDriver.manage().window().setSize(dim);
+{% elif browser == 'firefox' or browser == 'firefox_headless' %}
+        // create firefox driver instance
+{% endif %}
+
+        // create wait instance
+        this.webDriverWait = new WebDriverWait(webDriver, Duration.ofMillis(waitAfterEvent));
+    }
+
+	@AfterClass
+	public void oneTimeTearDown() {
+        this.webDriver.quit();
+    }
+
+	@BeforeMethod
+	public void setUp() throws InterruptedException {
+        this.webDriver.navigate().to(URL);
+        Thread.sleep(this.waitAfterReload);
+    }
+
+	@AfterMethod
+	public void getStatusAndDuration(ITestResult tr) {
+        // TODO: code related to test report
+    }
+
+    /**
+     * Switches focus to the frame with the given frame ID.
+     * @param frameIdentification
+     * @throws NoSuchFrameException
+     */
+    private void switchToFrame(String frameIdentification) throws NoSuchFrameException {
+        if (frameIdentification.contains(".")) {
+            String[] frames = frameIdentification.split("\\.");
+            for(int i = 0; i < frames.length; ++i) {
+                String frameId = frames[i];
+                this.webDriver.switchTo().frame(frameId);
+            }
+        } else {
+            this.webDriver.switchTo().frame(frameIdentification);
+        }
+    }
+
+    /**
+     * Fires event of the given type on the given web element (if the elemennt is not null). If frame ID is specified,
+     * switches focus to the frame with that ID before firing the event.
+     * @param webElement element to fire event on
+     * @param eventType event type: click or enter
+     * @param frameId ID of frame to switch focus to before event dispatch
+     * @return
+     * @throws ElementNotVisibleException
+     * @throws InterruptedException
+     */
+    private boolean fireEvent(WebElement webElement, String eventType, String frameId) throws ElementNotVisibleException, InterruptedException {
+        if (webElement == null) {
+            return false;
+        }
+        if (!frameId.isEmpty()) {
+            this.switchToFrame(frameId);
+        }
+        switch (eventType) {
+            case "click":
+                try {
+                    webElement.click();
+                    break;
+                } catch (ElementNotVisibleException enve) {
+                    throw enve;
+                } catch (WebDriverException wde) {
+                    return false;
+                }
+            case "enter":
+                try {
+                    webElement.sendKeys(Keys.RETURN);
+                    break;
+                } catch (ElementNotVisibleException enve) {
+                    throw enve;
+                } catch (WebDriverException wde) {
+                    return false;
+                }
+            default:
+                throw new UnsupportedOperationException("Event type not supported: "+eventType);
+        }
+        Thread.sleep(this.waitAfterEvent);
+        return true;
+    }
+
+    /**
+     * Sets value of a web element representing a form field, depending on its type (text, textarea, password, input,
+     * email, number, checkbox, radio, select). If the field is hidden, executes javascript code to set its value.
+     * @param webElement
+     * @param inputType
+     * @param value
+     * @param check
+     */
+    private void handleFormField(WebElement webElement, String inputType, String value, boolean check) {
+        if (webElement == null) {
+            return;
+        }
+        switch (inputType) {
+            case "TEXT":
+            case "TEXTAREA":
+            case "PASSWORD":
+            case "INPUT":
+            case "EMAIL":
+            case "NUMBER":
+                try {
+                    webElement.clear();
+                }
+                catch (InvalidElementStateException iese) {}
+                webElement.sendKeys(value);
+                break;
+            case "CHECKBOX":
+                if (check && !webElement.isSelected()) {
+                    webElement.click();
+                } else if (!check && webElement.isSelected()) {
+                    webElement.click();
+                }
+                break;
+            case "RADIO":
+                if (check) {
+                    webElement.click();
+                }
+                break;
+            case "SELECT":
+                webElement.sendKeys(value);
+                break;
+            case "HIDDEN":
+                JavascriptExecutor js = (JavascriptExecutor)this.webDriver;
+                js.executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);", webElement, "value", value);
+        }
+    }
+
+
+    /**
+     * Test methods ({{test_methods|length}})
+     */
+
+{% for method in test_methods %}
+	@Test(priority={{method.priority}})
+    public void {{method.name}}() throws InterruptedException {
+        WebElement element;
+    {% for eventable in method.eventables %}
+
+        {% for form_input in eventable.form_inputs %}
+        {# element = driver.findElement({{form_input.by_method}}); #}
+        element = this.webDriverWait.until(ExpectedConditions.presenceOfElementLocated({{form_input.by_method}}));
+        this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
+        {% endfor %}
+        // {{eventable.comment}}
+        {# element = driver.findElement({{eventable.by_method}}); #}
+        element = this.webDriverWait.until(ExpectedConditions.elementToBeClickable({{eventable.by_method}}));
+        this.fireEvent(element, "{{eventable.event_type}}", "{{eventable.related_frame}}");
+    {% endfor %}
+    }
+
+{% endfor %} 
+}
