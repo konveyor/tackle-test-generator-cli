@@ -10,6 +10,7 @@ on:
       - 'doc/**'
       - '**.md'
       - '.github/workflows/tkltest_unit_ci.yml'
+      - '.gitattributes'
       - 'test/unit/**'
   pull_request:
     paths-ignore:
@@ -20,6 +21,7 @@ on:
       - 'doc/**'
       - '**.md'
       - '.github/workflows/tkltest_unit_ci.yml'
+      - '.gitattributes'
       - 'test/unit/**'
 
 jobs:
