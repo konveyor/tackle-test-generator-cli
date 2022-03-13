@@ -430,57 +430,56 @@ class UnitTests(unittest.TestCase):
 
     def test_augment_on_empty_test_suite(self) -> None:
         """Test that we can augment on an empty ctd test suite"""
-        test_apps = self.bad_path_test_apps
-
-        for app_name in test_apps.keys():
-            dir_util.cd_cli_dir()
-            config = config_util.load_config(config_file=test_apps[app_name]['config_file'])
-            output_dir = dir_util.get_output_dir(app_name, '')
-            shutil.rmtree(output_dir)
-            shutil.copytree(os.path.join(constants.TKLTEST_CLI_DIR, test_apps[app_name]['basic_blocks']), output_dir)
-            config_util.fix_relative_paths(config)
-            dir_util.cd_output_dir(app_name, '')
-            if not config['general']['test_directory']:
-                config['general']['test_directory'] = app_name + '-test_directory'
-            if not config['general']['reports_path']:
-                config['general']['reports_path'] = app_name + '-reports_dir'
-            shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
-            os.makedirs(config['general']['test_directory'])
-            monolithic_dir = os.path.join(config['general']['test_directory'], 'monolithic')
-            ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
-                app_name=app_name,
-                monolith_app_path=config['general']['monolith_app_path'],
-                app_classpath=build_util.get_build_classpath(config),
-                test_root_dir=config['general']['test_directory'],
-                test_dirs=[monolithic_dir],
-                partitions_file=None,
-                target_class_list=[],
-                main_reports_dir=config['general']['reports_path'],
-                app_packages=[],  # for coverage-based augmentation
-                collect_codecoverage=True,  # for coverage-based augmentation
-                offline_instrumentation=True,
-                output_dir=output_dir
-            )
-            config['general']['build_type'] = 'gradle'
-            test_files = [None, None]
-            for use_for_augmentation in [False, True]:
-                config['dev_tests']['use_for_augmentation'] = use_for_augmentation
-                shutil.rmtree(monolithic_dir, ignore_errors=True)
-                os.makedirs(monolithic_dir)
-                shutil.rmtree(config['general']['reports_path'], ignore_errors=True)
-                augment.augment_with_code_coverage(config, gradle_build_file,
-                                                   config['general']['build_type'],
-                                                   config['general']['test_directory'],
-                                                   config['general']['reports_path'])
-                test_files[use_for_augmentation] = list(os.path.basename(path) for path in Path(config['general']['test_directory']).glob('**/*.java'))
-                self.assertTrue(test_files[use_for_augmentation])
-                for f in test_files[use_for_augmentation]:
-                    self.assertTrue(f.endswith('_ESTest.java') or f.endswith('_ESTest_scaffolding.java'))
-
-            self.assertFalse(set(test_files[False]).issubset(set(test_files[True])))
-            self.assertTrue(set(test_files[True]).issubset(set(test_files[False])))
+        app_name = 'failing'
+        test_app = self.bad_path_test_apps[app_name]
         dir_util.cd_cli_dir()
-        self.__assert_no_artifact_at_cli(test_apps.keys())
+        config = config_util.load_config(config_file=test_app['config_file'])
+        output_dir = dir_util.get_output_dir(app_name, '')
+        shutil.rmtree(output_dir)
+        shutil.copytree(os.path.join(constants.TKLTEST_CLI_DIR, test_app['basic_blocks']), output_dir)
+        config_util.fix_relative_paths(config)
+        dir_util.cd_output_dir(app_name, '')
+        if not config['general']['test_directory']:
+            config['general']['test_directory'] = app_name + '-test_directory'
+        if not config['general']['reports_path']:
+            config['general']['reports_path'] = app_name + '-reports_dir'
+        shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
+        os.makedirs(config['general']['test_directory'])
+        monolithic_dir = os.path.join(config['general']['test_directory'], 'monolithic')
+        ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+            app_name=app_name,
+            monolith_app_path=config['general']['monolith_app_path'],
+            app_classpath=build_util.get_build_classpath(config),
+            test_root_dir=config['general']['test_directory'],
+            test_dirs=[monolithic_dir],
+            partitions_file=None,
+            target_class_list=[],
+            main_reports_dir=config['general']['reports_path'],
+            app_packages=[],  # for coverage-based augmentation
+            collect_codecoverage=True,  # for coverage-based augmentation
+            offline_instrumentation=True,
+            output_dir=output_dir
+        )
+        config['general']['build_type'] = 'gradle'
+        test_files = [None, None]
+        for use_for_augmentation in [False, True]:
+            config['dev_tests']['use_for_augmentation'] = use_for_augmentation
+            shutil.rmtree(monolithic_dir, ignore_errors=True)
+            os.makedirs(monolithic_dir)
+            shutil.rmtree(config['general']['reports_path'], ignore_errors=True)
+            augment.augment_with_code_coverage(config, gradle_build_file,
+                                               config['general']['build_type'],
+                                               config['general']['test_directory'],
+                                               config['general']['reports_path'])
+            test_files[use_for_augmentation] = list(os.path.basename(path) for path in Path(config['general']['test_directory']).glob('**/*.java'))
+            self.assertTrue(test_files[use_for_augmentation])
+            for f in test_files[use_for_augmentation]:
+                self.assertTrue(f.endswith('_ESTest.java') or f.endswith('_ESTest_scaffolding.java'))
+
+        self.assertFalse(set(test_files[False]).issubset(set(test_files[True])))
+        self.assertTrue(set(test_files[True]).issubset(set(test_files[False])))
+        dir_util.cd_cli_dir()
+        self.__assert_no_artifact_at_cli([app_name])
 
     def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
         """
