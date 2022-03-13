@@ -100,7 +100,6 @@ class UnitTests(unittest.TestCase):
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
             config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
-            dependencies_dir = app_name + constants.DEPENDENCIES_DIR_SUFFIX
 
             # every target is a different test case and is being compared to the standard classpath
             for target_name in ant_test_apps[app_name]['targets_to_test_dependencies']:
@@ -112,10 +111,10 @@ class UnitTests(unittest.TestCase):
                 failed_assertion_message = 'failed for app = ' + app_name + ', target = ' + target_name
                 self.assertTrue(generated_classpath != '', failed_assertion_message)
                 self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
-                self.__assert_classpath(standard_classpath,
-                                        generated_classpath,
-                                        os.path.join(dir_util.get_output_dir(app_name, config['general'].get('module_name', '')), dependencies_dir),
-                                        failed_assertion_message,
+                self.__assert_classpath(standard_classpath=standard_classpath,
+                                        generated_classpath=generated_classpath,
+                                        std_classpath_prefix='',
+                                        message=failed_assertion_message,
                                         is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
                 self.__assert_no_artifact_at_cli(ant_test_apps.keys())
 
@@ -174,8 +173,7 @@ class UnitTests(unittest.TestCase):
             self.__assert_classpath(standard_classpath,
                                     generated_classpath,
                                     jars_location,
-                                    failed_assertion_message,
-                                    ordered_classpath=True)
+                                    failed_assertion_message)
         self.__assert_no_artifact_at_cli(maven_test_apps.keys())
 
     def test_getting_app_path_maven(self) -> None:
@@ -399,8 +397,7 @@ class UnitTests(unittest.TestCase):
             self.__assert_classpath(standard_classpath=standard_classpath,
                                     generated_classpath=generated_classpath,
                                     std_classpath_prefix='',
-                                    message=failed_assertion_message,
-                                    ordered_classpath=True)
+                                    message=failed_assertion_message)
             self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
 
 
@@ -422,7 +419,7 @@ class UnitTests(unittest.TestCase):
 
         self.__assert_no_artifact_at_cli(test_apps.keys())
 
-    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, ordered_classpath=False, is_user_defined_classpath=False):
+    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, is_user_defined_classpath=False):
         """
         :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
@@ -431,8 +428,6 @@ class UnitTests(unittest.TestCase):
         """
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if is_user_defined_classpath:  # for ant apps
-            lines_standard = [os.path.basename(line) for line in lines_standard]
         if std_classpath_prefix:
             # Paths inside standard_classpath must be in unix format for the test.
             std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
@@ -446,13 +441,12 @@ class UnitTests(unittest.TestCase):
 
         for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path
-            if ordered_classpath:
-                if std_classpath_prefix:
-                    self.assertTrue(lines_standard[i] == jar_path, extended_message)
-                else:
-                    self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
+            if is_user_defined_classpath:
+                self.assertTrue(os.path.samefile(lines_standard[i], jar_path), extended_message)
+            elif std_classpath_prefix:
+                self.assertTrue(lines_standard[i] == jar_path, extended_message)
             else:
-                self.assertTrue(jar_path in lines_standard, extended_message)
+                self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
 
     def __assert_modules_properties(self, modules_names, modules):
