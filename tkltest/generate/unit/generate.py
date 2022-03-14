@@ -199,6 +199,9 @@ def generate_ctd_amplified_tests(config, output_dir):
                     os.path.join(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX + os.sep +
                     constants.TKL_CTD_REPORT_DIR, app_name + constants.TKL_EXTENDER_CTD_COVERAGE_FILE_SUFFIX))
 
+    # we create this directory, so it will be at the build files, and will be later used for augmentation
+    if not os.path.isdir(os.path.join(test_directory, 'monolithic')):
+        os.mkdir(os.path.join(test_directory, 'monolithic'))
     # generate ant build file
     test_dirs = [
         os.path.join(test_directory, dir) for dir in os.listdir(test_directory)

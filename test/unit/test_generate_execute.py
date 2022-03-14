@@ -40,15 +40,17 @@ class GenerateExecuteTest(unittest.TestCase):
             'test_directory': '__irs-generated-tests',
             'partitions_file': os.path.join(test_data_dir, 'irs', 'refactored', 'PartitionsFile.json'),
             'target_class_list': ["irs.IRS"],
-            'excluded_class_list': ["irs.Employer"]
+            'excluded_class_list': ["irs.Employer"],
+            'basic_blocks': os.path.join(test_data_dir, 'irs', 'basic_blocks'),
         },
         'splitNjoin': {
             'config_file': os.path.join(test_data_dir, 'splitNjoin', 'tkltest_config.toml'),
             'test_directory': '__splitNjoin-generated-tests',
         },
-        'failing' : {
+        'failing': {
             'config_file': os.path.join(test_data_dir, 'failingApp', 'tkltest_config.toml'),
             'test_directory': '__failing-generated-tests',
+            'basic_blocks': os.path.join(test_data_dir, 'failingApp', 'basic_blocks'),
         }
     }
     test_list1 = ['irs']
@@ -111,7 +113,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
@@ -164,7 +166,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -190,7 +192,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -217,7 +219,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -243,7 +245,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -299,7 +301,7 @@ class GenerateExecuteTest(unittest.TestCase):
             for tests_option in tests_options:
                 dir_util.cd_cli_dir()
                 config = copy.deepcopy(app_info['config'])
-                self.__reuse_basic_blocks(app_name, config)
+                self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
                 shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
                 config['general']['build_type'] = tests_option['build_type']
                 config['general']['offline_instrumentation'] = tests_option['off_inst']
@@ -323,7 +325,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -348,7 +350,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -373,7 +375,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -397,7 +399,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
@@ -432,7 +434,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
@@ -459,7 +461,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
@@ -486,7 +488,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -510,7 +512,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -538,7 +540,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
@@ -563,7 +565,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -591,6 +593,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
         # set up config and generate tests
         config = app_info['config']
+        self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
         config['generate']['bad_path'] = True
         config['generate']['ctd_amplified']['no_augment_coverage'] = True
         config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
@@ -613,7 +616,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -640,7 +643,7 @@ class GenerateExecuteTest(unittest.TestCase):
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
             config = app_info['config']
-            self.__reuse_basic_blocks(app_name, config)
+            self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
@@ -1025,10 +1028,10 @@ class GenerateExecuteTest(unittest.TestCase):
             self.args.sub_command = subcommand
         execute.process_execute_command(args=self.args, config=config)
 
-    def __reuse_basic_blocks(self, app_name, config):
+    def __reuse_basic_blocks(self, app_name, config, basic_blocks):
         output_dir = constants.TKLTEST_UNIT_OUTPUT_DIR_PREFIX + app_name
         shutil.rmtree(output_dir, ignore_errors=True)
-        shutil.copytree(os.path.join(self.test_data_dir, app_name, 'basic_blocks'), output_dir)
+        shutil.copytree(basic_blocks, output_dir)
         config['generate']['ctd_amplified']['reuse_base_tests'] = True
 
     def __assert_no_artifact_at_cli(self):

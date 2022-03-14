@@ -3,7 +3,7 @@ package failing;
 import java.io.*;
 import java.lang.*;
 
-public class Failing {
+public class Failing2 {
 	
 	public int myIntInput;
 
@@ -13,10 +13,5 @@ public class Failing {
 		throw new IOException("Throwing IOException");
 	}
 
-	public void throwUncaughtException(String input) throws NullPointerException {
-
-		throw new NullPointerException("Throwing NullPointerException");
-	}
-
-
+	
  }

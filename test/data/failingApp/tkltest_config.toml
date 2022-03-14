@@ -26,14 +26,6 @@ create_build_file = true
 code_coverage = true
 test_class = ""
 
-[dev_tests]
-build_type = "ant"
-build_file = ""
-build_targets = []
-coverage_exec_file = ""
-compare_code_coverage = false
-use_for_augmentation = false
-coverage_threshold = 100
 
 [config.init]
 
@@ -55,3 +47,12 @@ criterion = [ "BRANCH",]
 
 [generate.randoop]
 no_error_revealing_tests = false
+
+
+[dev_tests]
+    build_type = "gradle"
+    build_file = "test/data/failingApp/user-tests/build.gradle"
+    build_targets =  ["clean", "test"]
+    coverage_exec_file = "test/data/failingApp/user-tests/jacoco/jacoco.exec"
+#    compare_code_coverage = true
+#    use_for_augmentation = true
