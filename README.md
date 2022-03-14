@@ -38,7 +38,7 @@ For more details of TackleTest-Unit, see the [quick-start guide](doc/unit/quick_
 exercise the application under test via its user interface and drive execution through different application
 tiers. Some of the features of TackleTest-UI include
 
-- Model-based generation of test cases for web applications: infers state-transition model of the webapp under test and generated test cases from paths in the model 
+- Model-based generation of test cases for web applications: infers state-transition model of the webapp under test and generates test cases from paths in the model 
 - Integration with the state-of-the-art web-crawling tool [Crawljax](https://github.com/crawljax/crawljax)
 - Generation two test suites using the TestNG framework: one using Crawljax API and the other using Selenium API
 
@@ -52,7 +52,7 @@ the various dependencies (e.g., Python, Java, Maven) need not be installed.
 
 ### Using a published Docker image
 
-The simplest way is to run the CLI is using a [published Docker image](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli). For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry.
+The simplest way is to run the CLI using a [published Docker image](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli). For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry.
 
 After pulling the image, set up the following alias commands for convenience:
 
