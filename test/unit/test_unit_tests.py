@@ -56,14 +56,12 @@ class UnitTests(unittest.TestCase):
             'targets_to_test_dependencies': ['compile-classpath-attribute',
                                              'compile-classpathref-attribute',
                                              'compile-classpath-element'],
-            'is_user_defined_classpath': True,
             'targets_to_test_app_path': ['compile-classpath-attribute',
                                          'compile-classpathref-attribute',
                                          'compile-classpath-element',
                                          'compile-destdir-through-modulesourcepath',
                                          'compile-destdir-through-modulesourcepathref',
-                                         'compile-destdir-through-src-elements',
-                                         ],
+                                         'compile-destdir-through-src-elements'],
             'covered_classes': ['irs.IRS', 'irs.Employer', 'irs.Salary']
 
         },
@@ -73,10 +71,10 @@ class UnitTests(unittest.TestCase):
             'build_file': os.path.join('test', 'data', '84_ifx-framework', 'build.xml'),
             'property_file': os.path.join('test', 'data', '84_ifx-framework', 'build.properties'),
             'targets_to_test_dependencies': ['compile', 'compile-antcall'],
-            'is_user_defined_classpath': True,
             'targets_to_test_app_path': ['compile', 'compile-antcall'],
         },
     }
+
     gradle_test_apps = {
         'splitNjoin': {
             'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
@@ -113,9 +111,8 @@ class UnitTests(unittest.TestCase):
                 self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
                 self.__assert_classpath(standard_classpath=standard_classpath,
                                         generated_classpath=generated_classpath,
-                                        std_classpath_prefix='',
-                                        message=failed_assertion_message,
-                                        is_user_defined_classpath=ant_test_apps[app_name]['is_user_defined_classpath'])
+                                        build_type='ant',
+                                        message=failed_assertion_message)
                 self.__assert_no_artifact_at_cli(ant_test_apps.keys())
 
     def test_getting_app_path_ant(self) -> None:
@@ -166,14 +163,13 @@ class UnitTests(unittest.TestCase):
             config_util.resolve_classpath(config, 'generate')
 
             generated_classpath = config['general']['app_classpath_file']
-            jars_location = os.path.expanduser(os.path.join('~', '.m2', 'repository'))
             failed_assertion_message = 'failed for app = ' + app_name
             self.assertTrue(generated_classpath != '', failed_assertion_message)
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
-            self.__assert_classpath(standard_classpath,
-                                    generated_classpath,
-                                    jars_location,
-                                    failed_assertion_message)
+            self.__assert_classpath(standard_classpath=standard_classpath,
+                                    generated_classpath=generated_classpath,
+                                    build_type='maven',
+                                    message=failed_assertion_message)
         self.__assert_no_artifact_at_cli(maven_test_apps.keys())
 
     def test_getting_app_path_maven(self) -> None:
@@ -375,7 +371,6 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(module_config in configs_execute)
         self.__assert_no_artifact_at_cli([app_name])
 
-
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test
@@ -396,10 +391,9 @@ class UnitTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(generated_classpath), failed_assertion_message)
             self.__assert_classpath(standard_classpath=standard_classpath,
                                     generated_classpath=generated_classpath,
-                                    std_classpath_prefix='',
+                                    build_type='gradle',
                                     message=failed_assertion_message)
             self.__assert_no_artifact_at_cli(self.gradle_test_apps.keys())
-
 
     def test_exclude_classes_covered_by_dev_test(self) -> None:
         """Test to exclude classes that was covered by the dev test suite"""
@@ -419,18 +413,20 @@ class UnitTests(unittest.TestCase):
 
         self.__assert_no_artifact_at_cli(test_apps.keys())
 
-    def __assert_classpath(self, standard_classpath, generated_classpath, std_classpath_prefix, message, is_user_defined_classpath=False):
+    def __assert_classpath(self, standard_classpath, generated_classpath, build_type, message):
         """
         :param standard_classpath: Path to the standard classpath for comparison.
         :param generated_classpath: Path to the generated classpath, containing absolute paths of the dependency jars.
-        :param std_classpath_prefix: Prefix to add to every path in the standard classpath.
+        :param build_type: ant, maven or gradle
         :param message: An informative error message to print in case one of the assertions fails.
         """
+        self.assertTrue(build_type in ['ant', 'maven', 'gradle'])
+
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if std_classpath_prefix:
+        if build_type == 'maven':
             # Paths inside standard_classpath must be in unix format for the test.
-            std_classpath_prefix = PurePath(std_classpath_prefix).as_posix()
+            std_classpath_prefix = PurePath(os.path.expanduser(os.path.join('~', '.m2', 'repository'))).as_posix()
             lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
@@ -441,9 +437,9 @@ class UnitTests(unittest.TestCase):
 
         for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path
-            if is_user_defined_classpath:
+            if build_type == 'ant':
                 self.assertTrue(os.path.samefile(lines_standard[i], jar_path), extended_message)
-            elif std_classpath_prefix:
+            elif build_type == 'maven':
                 self.assertTrue(lines_standard[i] == jar_path, extended_message)
             else:
                 self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)

@@ -722,7 +722,6 @@ def __collect_jar_packages(jar_file_path, jars_packages):
     archive.close()
     jars_packages[jar_file_path] = set(
         ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
-    # print(jars_packages[jar_file_path])  # TODO ask Haim
 
 
 def resolve_classpath(tkltest_config, command):
