@@ -461,12 +461,12 @@ def __run_ant_command(modified_build_file_name,
     os.remove(modified_build_file_name)
     return ant_output_filename
 
-def __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath):
+
+def __parse_ant_output_for_dependencies(ant_output_filename):
     """
     Parses Ant output for extracting dependencies, deletes output file when finished.
     :param ant_output_filename: filename of the Ant command output
-    :param targets_classpath: set for the united dependencies of the compilation process
-    :return: None
+    :return: class_path_order: list of the united dependencies of the compilation process
     """
     # parse ant output
     java_home_prefix = '[echo] Java home: '
@@ -486,17 +486,20 @@ def __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath):
 
     # parse javac_class_files, those are the actual locations and jars that ant uses for compiling the target.
     javac_files_lines = [s.replace(javac_class_files_prefix, '').lstrip().rstrip(']') for s in line_list if s.lstrip().startswith(javac_class_files_prefix)]
-    javac_class_files_set = set([path for line in javac_files_lines for path in line.split(',')])
+    javac_class_files = [path for line in javac_files_lines for path in line.split(',')]
+    javac_class_files_set = list(dict.fromkeys(javac_class_files))  # removing duplicates while preserving order
 
     # collect all relevant jars
     # we need the jars that are from javac_class_files_set, that are not in java_class_path_set, and are not from a java_home directory
+    class_path_order = []
     for item in javac_class_files_set:
         if (item not in java_class_path_set) and (item.endswith('.jar')):
             # exclude item if it is from a directory inside one of the java_home_paths
             if not [path for path in java_home_paths if path in item]:
-                targets_classpath.add(item)
+                class_path_order.append(item)
 
     os.remove(ant_output_filename)
+    return class_path_order
 
 
 def __get_source_of_ant_javac(javac_task):
@@ -720,7 +723,7 @@ def __collect_jar_packages(jar_file_path, jars_packages):
     archive.close()
     jars_packages[jar_file_path] = set(
         ["-".join(re.split("[\\\\/]+", os.path.dirname(class_file))) for class_file in class_files])
-    print(jars_packages[jar_file_path])
+
 
 def resolve_classpath(tkltest_config, command):
     """
@@ -759,11 +762,7 @@ def resolve_classpath(tkltest_config, command):
         app_settings_file = tkltest_config['generate']['app_build_settings_files'][0]
     else:
         app_settings_file = ''
-    # create dependencies directory
-    dependencies_dir = os.path.join(output_dir, app_name + constants.DEPENDENCIES_DIR_SUFFIX)
-    if os.path.isdir(dependencies_dir):
-        shutil.rmtree(dependencies_dir)
-    os.mkdir(dependencies_dir)
+    # list for keeping ordered classpath jars
     class_path_order = []
 
     if app_build_type == 'gradle':
@@ -791,9 +790,7 @@ def resolve_classpath(tkltest_config, command):
             class_path_order = f.read().replace('[', '').replace(']', '').replace(' ', '').split(',')
         os.remove(gradle_classpath_file)
 
-
     elif app_build_type == 'maven':
-        shutil.rmtree(dependencies_dir)
         mvn_classpath_file = os.path.abspath('MavenClassPath.txt')
         get_cpfile_command = 'mvn dependency:build-classpath -f ' + app_build_file + ' -Dmdep.outputFile=' + mvn_classpath_file
         get_cpfile_command += ' "-Dmdep.pathSeparator=;"'
@@ -810,11 +807,6 @@ def resolve_classpath(tkltest_config, command):
     elif app_build_type == 'ant':
         app_build_target = tkltest_config['generate']['app_build_target']
 
-        # a set for the united dependencies of the compilation process
-        targets_classpath = set()
-
-        # file name for ant output, deleted after parsing the output
-
         # writing a toy program for compiling when running ant command
         toy_program_dir_path = os.path.abspath(os.path.join(output_dir, 'tkltest_toy_program'))
         if os.path.isdir(toy_program_dir_path):
@@ -828,18 +820,12 @@ def resolve_classpath(tkltest_config, command):
         # create a modified build file
         modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
         ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
-        __parse_ant_output_for_dependencies(ant_output_filename, targets_classpath)
+        class_path_order = __parse_ant_output_for_dependencies(ant_output_filename)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)
 
-        # copy classpath jars to dependencies directory
-        for jar_path in targets_classpath:
-            jar_name = os.path.basename(jar_path)
-            jar_copy_path = os.path.join(dependencies_dir, jar_name)
-            shutil.copyfile(jar_path, jar_copy_path)
-
     """
-    the dependencies directory contains files to remove:
+    the class_path_order contains files to remove:
      1. app class files
      2. directories
      3. jar files with app packages
@@ -867,40 +853,25 @@ def resolve_classpath(tkltest_config, command):
     # remove non jar entries
     # collect jars packages
     jars_packages = dict()
-    if app_build_type == 'ant':
-        for jar_file in os.listdir(dependencies_dir):
-            jar_file_path = os.path.join(dependencies_dir, jar_file)
-            if os.path.isdir(jar_file_path):
-                shutil.rmtree(jar_file_path)
-            elif not jar_file_path.endswith(".jar"):
-                os.remove(jar_file_path)
-            else:
-                __collect_jar_packages(jar_file_path, jars_packages)
-    elif app_build_type in ['maven', 'gradle']:
-        for jar_file_path in class_path_order:
-            if jar_file_path.endswith('.jar'):
-                __collect_jar_packages(jar_file_path, jars_packages)
+    for jar_file_path in class_path_order:
+        if jar_file_path.endswith('.jar'):
+            __collect_jar_packages(jar_file_path, jars_packages)
 
     # compare jars packages to monolith packages, remove matching jars
     for app_path, app_path_packages in app_paths_packages.items():
         for jar_file, jar_packages in jars_packages.items():
             if len(jar_packages) and jar_packages == app_path_packages:
-                if jar_file.startswith(dependencies_dir):
-                    os.remove(jar_file)
                 del jars_packages[jar_file]
                 break
 
     # write the classpath file
     classpath_fd = open(build_classpath_file, "w")
-    if not len(class_path_order):  # there is no specific order for classpath jars
-        for jar_file in jars_packages.keys():
-            classpath_fd.write(jar_file + "\n")
-    else:
-        for jar_file in class_path_order:
-            if jar_file in jars_packages.keys():
-                classpath_fd.write(jar_file + '\n')
+    for jar_file in class_path_order:
+        if jar_file in jars_packages.keys():
+            classpath_fd.write(jar_file + '\n')
     classpath_fd.close()
     tkltest_config['general']['app_classpath_file'] = build_classpath_file
+
 
 def resolve_tkltest_configs(tkltest_user_config, command):
     '''

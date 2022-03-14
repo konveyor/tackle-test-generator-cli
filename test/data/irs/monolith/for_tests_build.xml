@@ -13,9 +13,15 @@
 
   <!-- The dependency libraries -->
   <path id="source.lib">
-      <fileset dir="${lib.dir}">
-         <include name="*.jar"/>
-      </fileset>
+       <filelist dir="${lib.dir}">
+           <file name="commons-logging-1.1.2.jar"/>
+           <file name="javax.annotation-api-1.3.2.jar"/>
+           <file name="javax.json-api-1.0.jar"/>
+           <file name="javax.servlet-api-3.1.0.jar"/>
+           <file name="javax.ws.rs-api-2.0.jar"/>
+           <file name="resteasy-client-3.0.8.Final.jar"/>
+           <file name="resteasy-jaxrs-3.0.8.Final.jar"/>
+       </filelist>
   </path>
   
   <pathconvert refid="source.lib"
@@ -27,17 +33,21 @@
                property="build.classes.refid" />
   
 
-  <path id="source.lib.only.javax">
+  <path id="source.lib.only.commons">
       <fileset dir="${lib.dir}">
-          <include name="javax*.jar"/>
+          <include name="commons*.jar"/>
       </fileset>
   </path>
 
   <path id="source.lib.other">
-      <fileset dir="${lib.dir}">
-          <include name="**.jar"/>
-          <exclude name="javax.*.jar"/>
-      </fileset>
+      <filelist dir="${lib.dir}">
+           <file name="javax.annotation-api-1.3.2.jar"/>
+           <file name="javax.json-api-1.0.jar"/>
+           <file name="javax.servlet-api-3.1.0.jar"/>
+           <file name="javax.ws.rs-api-2.0.jar"/>
+           <file name="resteasy-client-3.0.8.Final.jar"/>
+           <file name="resteasy-jaxrs-3.0.8.Final.jar"/>
+       </filelist>
   </path>    
     
 
@@ -89,11 +99,8 @@
     <javac  srcdir="${build.classes}"
             includeantruntime="no">
           <classpath>
-              <path refid="source.lib.only.javax"/>
-              <fileset dir="${lib.dir}">
-                  <include name="resteasy-*.jar"/>
-                  <include name="commons-logging-1.1.2.jar"/>
-              </fileset>
+              <path refid="source.lib.only.commons"/>
+              <path refid="source.lib.other"/>
           </classpath>
     </javac>          
   </target>

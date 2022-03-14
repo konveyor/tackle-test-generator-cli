@@ -5,9 +5,12 @@
 <project name="ifx-framework" default="help" basedir=".">
 <!-- Class path setting -->
   <path id="class.path">
-    <fileset dir="${lib.dir}/">
-      <include name="**.jar" />
-    </fileset>
+    <filelist dir="${lib.dir}/">
+      <file name="jdom.jar" />
+      <file name="poolman.jar" />
+      <file name="velocity-dep-1.4.jar" />
+      <file name="xercesImpl.jar" />
+    </filelist>
     <pathelement location="etc/" />
     <pathelement location="build/" />
   </path>
