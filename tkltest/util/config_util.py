@@ -462,12 +462,11 @@ def __run_ant_command(modified_build_file_name,
     return ant_output_filename
 
 
-def __parse_ant_output_for_dependencies(ant_output_filename, class_path_order):
+def __parse_ant_output_for_dependencies(ant_output_filename):
     """
     Parses Ant output for extracting dependencies, deletes output file when finished.
     :param ant_output_filename: filename of the Ant command output
-    :param class_path_order: list for the united dependencies of the compilation process
-    :return: None
+    :return: class_path_order: list of the united dependencies of the compilation process
     """
     # parse ant output
     java_home_prefix = '[echo] Java home: '
@@ -492,6 +491,7 @@ def __parse_ant_output_for_dependencies(ant_output_filename, class_path_order):
 
     # collect all relevant jars
     # we need the jars that are from javac_class_files_set, that are not in java_class_path_set, and are not from a java_home directory
+    class_path_order = []
     for item in javac_class_files_set:
         if (item not in java_class_path_set) and (item.endswith('.jar')):
             # exclude item if it is from a directory inside one of the java_home_paths
@@ -499,6 +499,7 @@ def __parse_ant_output_for_dependencies(ant_output_filename, class_path_order):
                 class_path_order.append(item)
 
     os.remove(ant_output_filename)
+    return class_path_order
 
 
 def __get_source_of_ant_javac(javac_task):
@@ -819,7 +820,7 @@ def resolve_classpath(tkltest_config, command):
         # create a modified build file
         modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
         ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
-        __parse_ant_output_for_dependencies(ant_output_filename, class_path_order)
+        class_path_order = __parse_ant_output_for_dependencies(ant_output_filename)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)
 

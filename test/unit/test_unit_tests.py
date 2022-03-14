@@ -483,10 +483,6 @@ class UnitTests(unittest.TestCase):
 
         with open(standard_classpath, 'r') as file:
             lines_standard = file.read().splitlines()
-        if build_type == 'maven':
-            # Paths inside standard_classpath must be in unix format for the test.
-            std_classpath_prefix = PurePath(os.path.expanduser(os.path.join('~', '.m2', 'repository'))).as_posix()
-            lines_standard = [std_classpath_prefix + '/' + line for line in lines_standard]
 
         with open(generated_classpath, 'r') as file:
             lines_generated = file.read().splitlines()
@@ -499,7 +495,8 @@ class UnitTests(unittest.TestCase):
             if build_type == 'ant':
                 self.assertTrue(os.path.samefile(lines_standard[i], jar_path), extended_message)
             elif build_type == 'maven':
-                self.assertTrue(lines_standard[i] == jar_path, extended_message)
+                std_classpath_prefix = PurePath(os.path.expanduser(os.path.join('~', '.m2', 'repository'))).as_posix()
+                self.assertTrue(std_classpath_prefix + '/' + lines_standard[i] == jar_path, extended_message)
             else:
                 self.assertTrue(os.path.basename(lines_standard[i]) == os.path.basename(jar_path), extended_message)
             self.assertTrue(os.path.isfile(jar_path), extended_message)
