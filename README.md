@@ -113,13 +113,27 @@ You can open those log (via `tail -f <logfile>`) to view the progress during thi
 
 To see the TackleTest-UI in action on a sample web application, follow these steps:
 
-1. Deploy sample web application in Docker:
+1. Make sure that the sample web applications, which are included as Git submodules, are checked out:
    ```buildoutcfg
-   cd test/ui/data/webapps/petclinic && ./deploy_app.sh start && cd ../../../../../
+   git submodule init
+   git submodule update
    ```
-   The deployed webapp `petclinic` can be opened at `http://localhost:8080/`
 
-2. Run UI test generation on the app:
+2. Deploy one of the sample web applications, `addressbook` or `petclinic`, in Docker:
+   ```buildoutcfg
+   cd test/ui/data/webapps/addressbook && ./deploy_app.sh start && cd ../../../../../
+   ```
+   The `addressbook` webapp can be opened at `http://localhost:3000/addressbook/`
+   ```buildoutcfg
+   cd test/ui/data/webapps/petclinic && ./deploy_app.sh start --build && cd ../../../../../
+   ```
+   The `petclinic` webapp can be opened at `http://localhost:8080/`
+
+3. Run UI test generation on the app:
+   ```buildoutcfg
+   tkltest-ui --config-file ./test/ui/data/addressbook/tkltest_ui_config.toml --verbose generate
+   ```
+   or
    ```buildoutcfg
    tkltest-ui --config-file ./test/ui/data/petclinic/tkltest_ui_config.toml --verbose generate
    ```
