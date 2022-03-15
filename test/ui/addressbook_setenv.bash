@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+ADDRESSBOOK_CONFIG_FILE=./test/ui/data/addressbook/tkltest_ui_config.toml
+ADDRESSBOOK_OUTPUT_DIR=./__tkltest-output-ui-addressbook
+ADDRESSBOOK_CRAWL_DIR=$ADDRESSBOOK_OUTPUT_DIR/localhost/crawl0
+ADDRESSBOOK_CRAWLJAX_API_TEST_FILE=$ADDRESSBOOK_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
+ADDRESSBOOK_CRAWLJAX_API_TEST_REPORT=$ADDRESSBOOK_CRAWL_DIR/test-results/0/TestResults.html
+ADDRESSBOOK_SELENIUM_API_TEST_DIR=$ADDRESSBOOK_CRAWL_DIR/selenium-api-tests
+ADDRESSBOOK_SELENIUM_API_TEST_FILE=$ADDRESSBOOK_SELENIUM_API_TEST_DIR/src/test/java/generated/GeneratedTests.java
+ADDRESSBOOK_SELENIUM_API_TEST_REPORT=$ADDRESSBOOK_SELENIUM_API_TEST_DIR/test-results/index.html

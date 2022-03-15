@@ -1,10 +1,4 @@
-ADDRESSBOOK_CONFIG_FILE=./test/ui/data/addressbook/tkltest_ui_config.toml
-ADDRESSBOOK_OUTPUT_DIR=./__tkltest-output-ui-addressbook
-ADDRESSBOOK_CRAWL_DIR=$ADDRESSBOOK_OUTPUT_DIR/localhost/crawl0
-ADDRESSBOOK_CRAWLJAX_API_TEST_FILE=$ADDRESSBOOK_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
-ADDRESSBOOK_SELENIUM_API_TEST_DIR=$ADDRESSBOOK_CRAWL_DIR/selenium-api-tests
-ADDRESSBOOK_SELENIUM_API_TEST_FILE=$ADDRESSBOOK_SELENIUM_API_TEST_DIR/src/test/java/generated/GeneratedTests.java
-
+load './addressbook_setenv'
 
 # setup commands run before execution of tests in file
 setup_file() {
@@ -59,7 +53,10 @@ setup() {
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute
-    [ $status -eq 0 ]
+    # [ $status -eq 0 ]
+
+    # assert that test report is created
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_REPORT ]
 }
 
 @test "Test 03: tkltest-ui execute [api_type=crawljax] addressbook" {
@@ -68,5 +65,8 @@ setup() {
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
         execute --api-type crawljax
-    [ $status -eq 0 ]
+    # [ $status -eq 0 ]
+
+    # assert that test report is created
+    [ -f ./$ADDRESSBOOK_CRAWLJAX_API_TEST_REPORT ]
 }
