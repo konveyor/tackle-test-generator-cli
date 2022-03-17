@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
+          submodules: 'true'
       - name: Set up JDK 8
         uses: actions/setup-java@v2
         with:
@@ -46,8 +47,8 @@ jobs:
       - name: Create archive release (.tgz and .zip) with all dependencies
         run: |
           cd ..; ls -l
-          tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" ${{ github.event.repository.name }}
-          zip -9 -r ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }} -x "*.git*"
+          tar -zcvf ${{ steps.set_file_name.outputs.file_name }}.tgz --exclude ".git*" --exclude test/test_helper ${{ github.event.repository.name }}
+          zip -9 -r ${{ steps.set_file_name.outputs.file_name }}.zip ${{ github.event.repository.name }} -x "*.git*" -x "${{ github.event.repository.name }}/test/test_helper/*"
           ls -l
       - name: Build Changelog
         id: gen_changelog

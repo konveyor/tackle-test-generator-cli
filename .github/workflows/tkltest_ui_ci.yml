@@ -66,10 +66,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-#    - name: Pull test webapps
-#      run: |
-#        git submodule init
-#        git submodule update
     - name: Install tkltest-ui command
       run: |
         python -m venv venv
