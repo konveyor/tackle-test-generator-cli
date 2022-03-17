@@ -30,7 +30,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'true'
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -64,10 +66,10 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-    - name: Pull test webapps
-      run: |
-        git submodule init
-        git submodule update
+#    - name: Pull test webapps
+#      run: |
+#        git submodule init
+#        git submodule update
     - name: Install tkltest-ui command
       run: |
         python -m venv venv
