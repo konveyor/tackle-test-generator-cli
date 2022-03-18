@@ -43,7 +43,7 @@ jobs:
     - name: Install prerequisites
       run: |
         ant -version
-        sudo apt-get install -y bats libxml2-utils
+        sudo apt-get update && sudo apt-get install -y bats libxml2-utils
         bats --version
         xmllint --version
     - name: Create maven settings.xml
