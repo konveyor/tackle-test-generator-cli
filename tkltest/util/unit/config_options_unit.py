@@ -316,8 +316,8 @@ __options_spec = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
-            'choices': ['gradle', 'ant', 'maven', None],
-            'default_value': None,
+            'choices': ['gradle', 'ant', 'maven', ''],
+            'default_value': '',
             'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
         'app_build_files': {
