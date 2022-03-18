@@ -118,6 +118,7 @@ To see the TackleTest-UI in action on a sample web application, follow these ste
    git submodule init
    git submodule update
    ```
+   Alternatively, you can get the sample web applications from [this repo](https://github.com/sinha108/tkltest-ui-webapps).
 
 2. Deploy one of the sample web applications, `addressbook` or `petclinic`, in Docker:
    ```buildoutcfg
