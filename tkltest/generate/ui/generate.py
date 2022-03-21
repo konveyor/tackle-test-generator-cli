@@ -77,18 +77,6 @@ def process_generate_command(config):
     # cleanup browser instances
     browser_util.cleanup_browser_instances(browser)
 
-
-def __generate_selenium_tests(config, output_crawl_dir):
-    tkltest_status('Creating Selenium API test cases')
-    try:
-        generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
-        test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
-    except Exception as e:
-        tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(e), error=True)
-        browser_util.cleanup_browser_instances(browser)
-        sys.exit(1)
-
-
 def __run_crawljax(config):
     app_name = config['general']['app_name']
     app_url = config['general']['app_url']
