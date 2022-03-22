@@ -8,6 +8,7 @@ verbose = false
 browser = "chrome_headless"
 time_limit = 2
 max_states = 0
+max_explore_action = 1
 add_state_diff_assertions = "none"
 include_iframes = false
 wait_after_event = 1000

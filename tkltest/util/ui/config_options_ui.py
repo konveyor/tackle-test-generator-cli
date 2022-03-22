@@ -183,6 +183,14 @@ __options_spec = {
             'default_value': 0,
             'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
         },
+        'max_explore_action': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': int,
+            'default_value': 1,
+            'help_message': 'maximum number of times to explore a discovered action; default is 1'
+        },
         'include_iframes': {
             'required': False,
             'is_toml_option': True,
