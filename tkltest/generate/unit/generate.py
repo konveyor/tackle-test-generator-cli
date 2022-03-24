@@ -227,6 +227,11 @@ def generate_ctd_amplified_tests(config, output_dir):
         offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False,
         output_dir=output_dir
     )
+    #todo - put in the right place
+    build_util.add_tests_to_maven_user_build_file(config['generate']['app_build_files'][0],
+                                                  build_util.get_build_classpath(config),
+                                                  test_directory,
+                                                  test_dirs)
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))

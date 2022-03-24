@@ -17,9 +17,11 @@ import os
 import subprocess
 import sys
 import pathlib
+import re
 
 from yattag import Doc, indent
 from jinja2 import Environment, FileSystemLoader
+import xml.etree.ElementTree as ElementTree
 
 from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
@@ -285,11 +287,41 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
                      excludes="**/*ESTest_scaffolding.class")
         doc.stag('formatter', type='xml')
 
+def __get_maven_dependencies_tags(classpath_list):
+    classpath_list = classpath_list.split(os.pathsep)
+    dependencies = []
+    dependencies.append({'groupId': 'org.glassfish.main.extras',
+                         'artifactId': 'glassfish-embedded-all',
+                         'version': '3.1.2.2',
+                         'scope': 'test'})
+    for full_path in classpath_list:
+        if full_path.strip() and os.path.isdir(full_path):
+            try:
+                subprocess.run('jar cf ' + os.path.basename(full_path) + '.jar -C ' + full_path + " .", shell=True,
+                               check=True)
+            except subprocess.CalledProcessError as e:
+                tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
+                sys.exit(1)
+            full_path += ".jar"
+        file_name = full_path.rsplit(os.path.sep, 1)[1]
+        file_name = file_name.replace('.jar', '')
+        if 'org.jacoco.agent' in file_name:
+            dependencies.append({'groupId': 'org.jacoco',
+                                 'artifactId': 'org.jacoco.agent',
+                                 'version': constants.JACOCO_MAVEN_VERSION,
+                                 'scope': 'test',
+                                 'classifier': 'runtime'})
+        elif os.path.isfile(full_path):
+            dependencies.append({'groupId': file_name,
+                                 'artifactId': file_name,
+                                 'version': '1.0',
+                                 'scope': 'system',
+                                 'systemPath': full_path})
+    return dependencies
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
                   build_xml_file, output_dir):
-    classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
     test_root_dir = os.path.abspath(test_root_dir)
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
@@ -304,36 +336,11 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
             line('maven.compiler.source', constants.JAVA_VERSION_FOR_MAVEN)
             line('maven.compiler.target', constants.JAVA_VERSION_FOR_MAVEN)
         with tag('dependencies'):
-            with tag('dependency'):
-                line('groupId', 'org.glassfish.main.extras')
-                line('artifactId', 'glassfish-embedded-all')
-                line('version', '3.1.2.2')
-                line('scope', 'test')
-            for full_path in classpath_list:
-                if full_path.strip() and os.path.isdir(full_path):
-                    try:
-                        subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
-                    except subprocess.CalledProcessError as e:
-                        tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
-                        sys.exit(1)
-                    full_path += ".jar"
-                file_name = full_path.rsplit(os.path.sep,1)[1]
-                file_name = file_name.replace('.jar', '')
-                if 'org.jacoco.agent' in file_name:
-                    with tag('dependency'):
-                        line('groupId', 'org.jacoco')
-                        line('artifactId', 'org.jacoco.agent')
-                        line('version', constants.JACOCO_MAVEN_VERSION)
-                        line('scope', 'test')
-                        line('classifier', 'runtime')
-                elif os.path.isfile(full_path):
-                    with tag('dependency'):
-                        line('groupId', file_name)
-                        line('artifactId', file_name)
-                        line('version', '1.0')
-                        line('scope', 'system')
-                        line('systemPath', full_path)
-
+            dependencies = __get_maven_dependencies_tags(classpath_list)
+            for dependency in dependencies:
+                with tag('dependency'):
+                    for element_name, value in dependency.items():
+                        line(element_name, value)
         with tag('build'):
             with tag('resources'):
                 for app_path in monolith_app_paths:
@@ -496,3 +503,42 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
 
     with open(build_gradle_file, 'w') as outfile:
         outfile.write(s)
+
+
+def add_tests_to_maven_user_build_file(user_build_file, classpath_list, test_root_dir, test_dirs):
+    # create a copy of the build file
+    tkltest_app_build_file = os.path.join(os.path.dirname(user_build_file),
+                                          'tkltest_' + os.path.basename(user_build_file))
+
+    # tree and root of original build file
+    with open(user_build_file) as f:
+        xmlstring = f.read()
+    # removing namespace
+    xmlstring = re.sub(' xmlns="[^"]+"', '', xmlstring, count=1)
+    project_root = ElementTree.fromstring(xmlstring)
+    dependencies_element = project_root.find('dependencies')
+    dependencies = __get_maven_dependencies_tags(classpath_list)
+    for dependency in dependencies:
+        dependency_element = ElementTree.Element('dependency')
+        for element_name, value in dependency.items():
+            el = ElementTree.Element(element_name)
+            el.text = value
+            dependency_element.append(el)
+        dependencies_element.append(dependency_element)
+
+    build_element = project_root.find('build')
+    if not build_element:
+        build_element = ElementTree.Element('build')
+        project_root.append(build_element)
+    for test_src_dir in test_dirs:
+        if os.path.basename(test_src_dir) in ['target', 'build']:
+            continue  # skip compilation output directory
+        test_dir_element = ElementTree.Element('testSourceDirectory')
+        test_dir_element.text = os.path.abspath(test_src_dir)
+        build_element.append(test_dir_element)
+
+    ElementTree.indent(project_root, space="\t", level=0)
+    with open(tkltest_app_build_file, 'w') as f:
+        f.write(ElementTree.tostring(project_root, encoding='utf8').decode('utf8'))
+    return tkltest_app_build_file
+

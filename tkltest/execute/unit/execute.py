@@ -354,7 +354,7 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
 
         module_jacoco_exec_file = coverage_util.get_jacoco_exec_file(module_config['general']['build_type'], module_test_root_dir)
         if not os.path.isfile(module_jacoco_exec_file):
-            tkltest_status('Warning: exec_file {} does not exist for module {}'.format(module_jacoco_exec_file, module_config['module_name']))
+            tkltest_status('Warning: exec_file {} does not exist for module {}'.format(module_jacoco_exec_file, module_config['general']['module_name']))
         else:
             jacoco_exec_files.append(module_jacoco_exec_file)
             app_path |= set(module_config['general']['monolith_app_path'])
