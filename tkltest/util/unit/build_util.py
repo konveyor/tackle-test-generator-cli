@@ -505,40 +505,42 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
         outfile.write(s)
 
 
-def add_tests_to_maven_user_build_file(user_build_file, classpath_list, test_root_dir, test_dirs):
-    # create a copy of the build file
-    tkltest_app_build_file = os.path.join(os.path.dirname(user_build_file),
-                                          'tkltest_' + os.path.basename(user_build_file))
+def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpath_list, test_dirs):
+    app_build_file = app_build_files[0]
+    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), 'tkltest_' + os.path.basename(app_build_file))
+    tkltest_status('integrating tests with {}, saving new build file into: {}'.format(app_build_file, tkltest_app_build_file))
+    if app_build_type == 'maven':
+        # tree and root of original build file
+        build_file_tree = ElementTree.parse(app_build_file)
+        project_root = build_file_tree.getroot()
+        namespace = project_root.tag.split('}')[0].strip('{') if project_root.tag.startswith('{') else None
+        namespaces = {'': namespace} if namespace else None
+        if namespace:
+            ElementTree.register_namespace('', namespace)
+        # adding the dependencies
+        dependencies_element = project_root.find('dependencies', namespaces)
+        dependencies = __get_maven_dependencies_tags(classpath_list)
+        for dependency in dependencies:
+            dependency_element = ElementTree.Element('dependency')
+            for element_name, value in dependency.items():
+                el = ElementTree.Element(element_name)
+                el.text = value
+                dependency_element.append(el)
+            dependencies_element.append(dependency_element)
 
-    # tree and root of original build file
-    with open(user_build_file) as f:
-        xmlstring = f.read()
-    # removing namespace
-    xmlstring = re.sub(' xmlns="[^"]+"', '', xmlstring, count=1)
-    project_root = ElementTree.fromstring(xmlstring)
-    dependencies_element = project_root.find('dependencies')
-    dependencies = __get_maven_dependencies_tags(classpath_list)
-    for dependency in dependencies:
-        dependency_element = ElementTree.Element('dependency')
-        for element_name, value in dependency.items():
-            el = ElementTree.Element(element_name)
-            el.text = value
-            dependency_element.append(el)
-        dependencies_element.append(dependency_element)
+        # adding the test directories:
+        build_element = project_root.find('build', namespaces)
+        if not build_element:
+            build_element = ElementTree.Element('build')
+            project_root.append(build_element)
+        for test_src_dir in test_dirs:
+            if os.path.basename(test_src_dir) in ['target', 'build']:
+                continue  # skip compilation output directory
+            test_dir_element = ElementTree.Element('testSourceDirectory')
+            test_dir_element.text = os.path.abspath(test_src_dir)
+            build_element.append(test_dir_element)
 
-    build_element = project_root.find('build')
-    if not build_element:
-        build_element = ElementTree.Element('build')
-        project_root.append(build_element)
-    for test_src_dir in test_dirs:
-        if os.path.basename(test_src_dir) in ['target', 'build']:
-            continue  # skip compilation output directory
-        test_dir_element = ElementTree.Element('testSourceDirectory')
-        test_dir_element.text = os.path.abspath(test_src_dir)
-        build_element.append(test_dir_element)
-
-    ElementTree.indent(project_root, space="\t", level=0)
-    with open(tkltest_app_build_file, 'w') as f:
-        f.write(ElementTree.tostring(project_root, encoding='utf8').decode('utf8'))
-    return tkltest_app_build_file
-
+        ElementTree.indent(project_root, space="\t", level=0)
+        build_file_tree.write(tkltest_app_build_file)
+    else:
+        tkltest_status('Integrating tests into app build file is supported only for maven')

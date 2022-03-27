@@ -227,11 +227,6 @@ def generate_ctd_amplified_tests(config, output_dir):
         offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False,
         output_dir=output_dir
     )
-    #todo - put in the right place
-    build_util.add_tests_to_maven_user_build_file(config['generate']['app_build_files'][0],
-                                                  build_util.get_build_classpath(config),
-                                                  test_directory,
-                                                  test_dirs)
     tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))
@@ -272,6 +267,11 @@ def generate_ctd_amplified_tests(config, output_dir):
                                        ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
+    if config['generate']['integrate_to_app_build_file']:
+        build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
+                                                       config['generate']['app_build_type'],
+                                                       build_util.get_build_classpath(config),
+                                                       test_dirs)
 
 
 def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
