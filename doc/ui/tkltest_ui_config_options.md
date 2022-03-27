@@ -174,7 +174,7 @@ The clickables specification consists of `click` and `dont_click` parts, corresp
 that are specified in the same way---consisting of a set of element-level specifications. An element-level
 specification identifies one or more web elements as follows:
 
-1. `tag_name`: string specifying HTML tag
+1. `tag_name`: string, or a list of strings, specifying HTML tag(s)
 2. optionally, one of `with_attribute`, `with_text`, or `under_xpath`, taking the following structure
     ```buildoutcfg
     with_attribute = { attr_name = "", attr_value = ""}
@@ -193,12 +193,12 @@ To illustrate, here are a few examples of `click` specifications:
 
 # click div elements with id "is_clickable"
 [[click.element]]
-  tag_name = "div"
+  tag_name = ["div"]
   with_attribute = { attr_name = "id", attr_value = "is_clickable"}
 
-# click tag1 elements with text "some text"
+# click tag1 and tag2 elements with text "some text"
 [[click.element]]
-  tag_name = "tag1"
+  tag_name = ["tag1", "tag2"]
   with_text = "some text"
 
 # click div elements that occur under the matching xpath
@@ -211,13 +211,12 @@ To illustrate, here are a few examples of `click` specifications:
 
 ```buildoutcfg
 # do not click any anchor element
-# (do not click spec for all occurrences of a tag is unlikely to be used but is supported)
 [[dont_click.element]]
-  tag_name = "a"
+  tag_name = ["a"]
 
 # do not click input elements with id "Delete records"
 [[dont_click.element]]
-  tag_name = "input"
+  tag_name = ["input"]
   with_attribute = { attr_name = "id", attr_value = "Delete records"}
 
 # do not click button elements with name "Update record..."
@@ -230,10 +229,10 @@ To illustrate, here are a few examples of `click` specifications:
   tag_name = "a"
   with_text = "Upload file"
 
-# do not click anchor elements that occur under the matching xpath
+# do not click div and tag123 elements that occur under the matching xpath
 [[dont_click.element]]
-  tag_name = "a"
-  under_xpath = "//*[@id=\"xyz\"]"
+  tag_name = ["div", "tag123"]
+  under_xpath = "//*[@id=\"primary-links\"]/li"
 ```
 
 It also possible to exclude an entire tree of web elements by using the `under_xpath` specifier with
