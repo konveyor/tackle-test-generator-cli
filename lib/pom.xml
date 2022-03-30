@@ -10,8 +10,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.13.1</junit.version>
-    <evosuite.version>1.0.7</evosuite.version>
-    <randoop.version>4.2.6</randoop.version>
+    <evosuite.version>1.2.0</evosuite.version>
+    <randoop.version>4.3.0</randoop.version>
     <crawljax.version>5.0-frag</crawljax.version>
     <testgencore_unit.version>1.1.0</testgencore_unit.version>
     <testgencore_ui.version>0.0.1</testgencore_ui.version>
@@ -141,6 +141,32 @@
                 https://github.com/randoop/randoop/releases/download/v${randoop.version}/replacecall-${randoop.version}.jar
               </url>
               <outputDirectory>${project.basedir}/download</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>get-evosuite-jar</id>
+            <!--            <phase>process-resources</phase>-->
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>
+                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-${evosuite.version}.jar
+              </url>
+              <outputDirectory>${project.basedir}/lib/download</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>get-evosuite-runtime-jar</id>
+            <!--            <phase>process-resources</phase>-->
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>
+                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-standalone-runtime-${evosuite.version}.jar
+              </url>
+              <outputDirectory>${project.basedir}/lib/download</outputDirectory>
             </configuration>
           </execution>
         </executions>

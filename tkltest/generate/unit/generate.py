@@ -384,6 +384,7 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += " -clpt " + app_classpath_file
     tg_command += " -tg " + test_generator_name
     tg_command += " -tl " + str(time_limit)
+    tg_command += " -jdk " + os.path.split(os.path.split(jdk_path)[0])[0]
 
     if partitions_file:
         tg_command += " -tm"
@@ -466,7 +467,8 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -ts " + bb_seq_file
     te_command += " -od " + test_directory
     if jee_support:
-        te_command += " -jee"
+        tkltest_status('Warning: jee_support is currently disabled; ignoring this option')
+        #te_command += " -jee"
 
     if bad_path:
         te_command += " -bp"
