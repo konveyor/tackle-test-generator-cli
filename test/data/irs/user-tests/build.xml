@@ -52,10 +52,6 @@
 
         <pathelement location="../../../../lib/download/error_prone_annotations-2.3.4.jar" />
 
-        <pathelement location="../../../../lib/download/evosuite-master-1.0.7.jar" />
-
-        <pathelement location="../../../../lib/download/evosuite-standalone-runtime-1.0.7.jar" />
-
         <pathelement location="../../../../lib/download/failureaccess-1.0.1.jar" />
 
         <pathelement location="../../../../lib/download/FastInfoset-1.2.15.jar" />
@@ -120,9 +116,9 @@
 
         <pathelement location="../../../../lib/download/polyglot-2006.jar" />
 
-        <pathelement location="../../../../lib/download/randoop-all-4.2.6.jar" />
+        <pathelement location="../../../../lib/download/randoop-all-4.3.0.jar" />
 
-        <pathelement location="../../../../lib/download/replacecall-4.2.6.jar" />
+        <pathelement location="../../../../lib/download/replacecall-4.3.0.jar" />
 
         <pathelement location="../../../../lib/download/slf4j-api-1.7.5.jar" />
 
