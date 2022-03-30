@@ -505,7 +505,34 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
         outfile.write(s)
 
 
+def __get_xml_element(parent_element, namespaces, name, text='', duplicate=False):
+    '''
+    add an element to an xml tree
+    :param parent_element: the perent to add to
+    :param namespaces: the tree namesapce, need for find()
+    :param name: element name
+    :param text: element text
+    :param duplicate: bool - if an element with the same name exist, do we create another element?
+    :return: the element that was added
+    '''
+    if not duplicate:
+        element = parent_element.find(name, namespaces)
+    if duplicate or not element:
+        element = ElementTree.Element(name)
+        if text:
+            element.text = text
+        parent_element.append(element)
+    return element
+
 def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpath_list, test_dirs):
+    '''
+    Adding the test directory and the dependencies to the user app file
+    :param app_build_files: the app build file
+    :param app_build_type: build type
+    :param classpath_list: list of dependencies
+    :param test_dirs: list of test directories
+    :return:
+    '''
     app_build_file = app_build_files[0]
     tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), 'tkltest_' + os.path.basename(app_build_file))
     tkltest_status('integrating tests with {}, saving new build file into: {}'.format(app_build_file, tkltest_app_build_file))
@@ -518,27 +545,33 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpa
         if namespace:
             ElementTree.register_namespace('', namespace)
         # adding the dependencies
-        dependencies_element = project_root.find('dependencies', namespaces)
+        dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
         dependencies = __get_maven_dependencies_tags(classpath_list)
         for dependency in dependencies:
-            dependency_element = ElementTree.Element('dependency')
+            dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
             for element_name, value in dependency.items():
-                el = ElementTree.Element(element_name)
-                el.text = value
-                dependency_element.append(el)
-            dependencies_element.append(dependency_element)
+                __get_xml_element(dependency_element, namespaces, element_name, value)
 
         # adding the test directories:
-        build_element = project_root.find('build', namespaces)
-        if not build_element:
-            build_element = ElementTree.Element('build')
-            project_root.append(build_element)
-        for test_src_dir in test_dirs:
-            if os.path.basename(test_src_dir) in ['target', 'build']:
-                continue  # skip compilation output directory
-            test_dir_element = ElementTree.Element('testSourceDirectory')
-            test_dir_element.text = os.path.abspath(test_src_dir)
-            build_element.append(test_dir_element)
+        # see http://www.mojohaus.org/build-helper-maven-plugin/usage.html
+        build_element = __get_xml_element(project_root, namespaces, 'build')
+        plugins_element = __get_xml_element(build_element, namespaces, 'plugins')
+        plugin_element = __get_xml_element(plugins_element, namespaces, 'plugin', '', True)
+        __get_xml_element(plugin_element, namespaces, 'groupId', 'org.codehaus.mojo')
+        __get_xml_element(plugin_element, namespaces, 'artifactId', 'build-helper-maven-plugin')
+        __get_xml_element(plugin_element, namespaces, 'version', '3.3.0')
+        executions_element = __get_xml_element(plugin_element, namespaces, 'executions')
+        execution_element = __get_xml_element(executions_element, namespaces, 'execution')
+        __get_xml_element(execution_element, namespaces, 'id', 'add-test-source')
+        __get_xml_element(execution_element, namespaces, 'phase', 'generate-test-sources')
+        __get_xml_element(__get_xml_element(execution_element, namespaces, 'goals',), namespaces, 'goal', 'add-test-source')
+        configuration_element = __get_xml_element(execution_element, namespaces, 'configuration')
+        sources_element = __get_xml_element(configuration_element, namespaces, 'sources')
+
+        abs_test_dirs = [os.path.abspath(test_src_dir) for test_src_dir in test_dirs if os.path.basename(test_src_dir) not in ['target', 'build']]
+        abs_test_dirs = abs_test_dirs
+        for abs_test_dir in abs_test_dirs:
+            __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
 
         ElementTree.indent(project_root, space="\t", level=0)
         build_file_tree.write(tkltest_app_build_file)

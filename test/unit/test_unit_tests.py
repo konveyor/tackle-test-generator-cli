@@ -44,6 +44,7 @@ class UnitTests(unittest.TestCase):
             'config_file': os.path.join('test', 'data', 'windup-sample', 'tkltest_config_web.toml'),
             'build_file_if_requires_build': os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master',
                                                          'pom.xml'),
+            'ctd_tests': os.path.join('test', 'data', 'windup-sample', 'windup-sample-web-ctd-amplified-tests')
         }
     }
 
@@ -229,6 +230,47 @@ class UnitTests(unittest.TestCase):
                          'simple-sample-weblogic-web']
         modules = config_util.get_modules_properties(config)
         self.__assert_modules_properties(modules_names, modules)
+        self.__assert_no_artifact_at_cli([app_name])
+
+    def test_integrate_tests_into_app_build_file(self) -> None:
+        """Test integrating tests into the app build file()"""
+        dir_util.cd_cli_dir()
+        app_name = 'windup-sample-web'
+        test_app = self.maven_test_apps[app_name]
+        config = config_util.load_config(config_file=test_app['config_file'])
+        modules = config_util.get_modules_properties(config)
+        ctd_tests = [test_app['ctd_tests']]
+        #compile the app:
+        build_command = 'mvn clean install -f ' + test_app['build_file_if_requires_build']
+        command_util.run_command(command=build_command, verbose=config['general']['verbose'])
+
+        #resolve the config(to get dependencies):
+        config = config_util.resolve_tkltest_configs(config, 'generate')[0]
+        classpath_list = build_util.get_build_classpath(config)
+        pom_file = os.path.join(dir_util.get_output_dir(app_name, ''), config['generate']['app_build_files'][0])
+
+        # call integrate_tests_into_app_build_file(), check that new pom is created:
+        build_util.integrate_tests_into_app_build_file([pom_file], 'maven', classpath_list, ctd_tests)
+        integrated_pom_file = os.path.join(os.path.dirname(pom_file), 'tkltest_pom.xml')
+        self.assertTrue(os.path.isfile(integrated_pom_file))
+
+        surefire_dir = os.path.join(os.path.dirname(pom_file), 'target', 'surefire-reports')
+        shutil.rmtree(surefire_dir, ignore_errors=True)
+        # run tests the new pom file:
+        run_tests_command = 'mvn -f ' + integrated_pom_file + ' clean test'
+        command_util.run_command(command=run_tests_command, verbose=False)
+
+        # check that there are reports, and no fails:
+        self.assertTrue(os.path.isdir(surefire_dir))
+        result_files = list(Path(surefire_dir).glob('**/*.txt'))
+        self.assertTrue(result_files)
+
+        line_part_ok = 'Failures: 0, Errors: 0, Skipped: 0'
+        for result_file in result_files:
+            with open(result_file) as f:
+                lines = f.readlines()
+                self.assertTrue([line for line in lines if line_part_ok in line])
+        os.remove(integrated_pom_file)
         self.__assert_no_artifact_at_cli([app_name])
 
     def test_getting_modules_gradle(self) -> None:
