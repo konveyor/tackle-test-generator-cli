@@ -157,7 +157,7 @@
               <url>
                 https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-${evosuite.version}.jar
               </url>
-              <outputDirectory>${project.basedir}/lib/download</outputDirectory>
+              <outputDirectory>${project.basedir}/download</outputDirectory>
             </configuration>
           </execution>
           <execution>
@@ -170,7 +170,7 @@
               <url>
                 https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-standalone-runtime-${evosuite.version}.jar
               </url>
-              <outputDirectory>${project.basedir}/lib/download</outputDirectory>
+              <outputDirectory>${project.basedir}/download</outputDirectory>
             </configuration>
           </execution>
         </executions>
