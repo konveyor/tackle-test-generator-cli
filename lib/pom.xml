@@ -88,16 +88,20 @@
       <artifactId>tackle-test-generator-unit</artifactId>
       <version>${testgencore_unit.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.evosuite</groupId>
-      <artifactId>evosuite</artifactId>
-      <version>${evosuite.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.evosuite</groupId>
-      <artifactId>evosuite-standalone-runtime</artifactId>
-      <version>${evosuite.version}</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.evosuite</groupId>-->
+<!--      <artifactId>evosuite</artifactId>-->
+<!--      <version>${evosuite.version}</version>-->
+<!--       <scope>system</scope>-->
+<!--	  <systemPath>${project.basedir}/lib/download/evosuite-${evosuite.version}.jar</systemPath>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.evosuite</groupId>-->
+<!--      <artifactId>evosuite-standalone-runtime</artifactId>-->
+<!--      <version>${evosuite.version}</version>-->
+<!--       <scope>system</scope>-->
+<!--	  <systemPath>${project.basedir}/lib/download/evosuite-standalone-runtime-${evosuite.version}.jar</systemPath>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.konveyor</groupId>
       <artifactId>tackle-test-generator-ui</artifactId>
