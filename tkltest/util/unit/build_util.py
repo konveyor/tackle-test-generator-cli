@@ -17,11 +17,11 @@ import os
 import subprocess
 import sys
 import pathlib
-import re
 
 from yattag import Doc, indent
 from jinja2 import Environment, FileSystemLoader
 import xml.etree.ElementTree as ElementTree
+from xml.dom import minidom
 
 from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
@@ -573,7 +573,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpa
         for abs_test_dir in abs_test_dirs:
             __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
 
-        ElementTree.indent(project_root, space="\t", level=0)
-        build_file_tree.write(tkltest_app_build_file)
+        with open(tkltest_app_build_file, 'w') as f:
+            f.write(minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   "))
     else:
         tkltest_status('Integrating tests into app build file is supported only for maven')

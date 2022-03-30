@@ -1,0 +1,10 @@
+subcommand = "ctd-amplified"
+
+[general]
+app_name = "windup-sample-web"
+
+[generate]
+partitions_file = ""
+target_class_list = []
+
+[generate.ctd_amplified]
