@@ -90,7 +90,7 @@
     </dependency>
     <dependency>
       <groupId>org.evosuite</groupId>
-      <artifactId>evosuite-master</artifactId>
+      <artifactId>evosuite</artifactId>
       <version>${evosuite.version}</version>
     </dependency>
     <dependency>
