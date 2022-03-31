@@ -137,7 +137,7 @@ def __execute_base(args, config):
         offline_inst = config['general']['offline_instrumentation']
     __run_test_cases(create_build=config['execute']['create_build_file'],
                      build_type=config['general']['build_type'],
-                     jdk_path = config['genera;']['java_jdk_home'],
+                     jdk_path = config['general']['java_jdk_home'],
                      ant_build_file=test_root_dir + os.sep + "build.xml",
                      maven_build_file=test_root_dir + os.sep + "pom.xml",
                      gradle_build_file=test_root_dir + os.sep + "build.gradle",
