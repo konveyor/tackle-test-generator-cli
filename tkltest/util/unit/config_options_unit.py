@@ -264,7 +264,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': bool,
             'default_value': False,
-            'help_message': 'add support JEE mocking in generated tests cases'
+            'help_message': 'add support JEE mocking in generated tests cases; currently this option is disabled'
         },
         'no_diff_assertions': {
             'required': False,
