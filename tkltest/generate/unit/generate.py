@@ -384,7 +384,10 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += " -clpt " + app_classpath_file
     tg_command += " -tg " + test_generator_name
     tg_command += " -tl " + str(time_limit)
-    tg_command += " -jdk " + os.path.split(os.path.split(jdk_path)[0])[0]
+    jdk_home = os.path.split(os.path.split(jdk_path)[0])[0]
+    if jdk_home:
+        # add double quotes for the case of spaces in the jdk path
+        tg_command += " -jdk \"" + jdk_home + "\""
 
     if partitions_file:
         tg_command += " -tm"

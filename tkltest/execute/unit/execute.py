@@ -137,6 +137,7 @@ def __execute_base(args, config):
         offline_inst = config['general']['offline_instrumentation']
     __run_test_cases(create_build=config['execute']['create_build_file'],
                      build_type=config['general']['build_type'],
+                     jdk_path = config['genera;']['java_jdk_home'],
                      ant_build_file=test_root_dir + os.sep + "build.xml",
                      maven_build_file=test_root_dir + os.sep + "pom.xml",
                      gradle_build_file=test_root_dir + os.sep + "build.gradle",
@@ -158,7 +159,7 @@ def __execute_base(args, config):
 
 def __run_test_cases(app_name, collect_codecoverage, verbose,
                      create_build, build_type, ant_build_file, maven_build_file, gradle_build_file, build_targets='',
-                     test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[],
+                     test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[], jdk_path='',
                      app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='',
                      env_vars={}, micro=False, output_dir=''):
 
@@ -191,28 +192,37 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
 
     # current limitation in ant script - if code coverage is requested then junit report is generated as well
 
+    env_vars = dict(os.environ.copy())
+    if jdk_path:
+        env_vars['JAVA_HOME'] = jdk_path
+
     try:
         if build_type == 'maven':
             if not build_targets:
                 build_targets = 'clean verify site'
-            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_targets), verbose=verbose)
+            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_targets),
+                                     verbose=verbose, env_vars=env_vars)
         elif build_type == 'gradle':
             if not build_targets:
                 build_targets = 'tklest_task'
             if os.path.basename(gradle_build_file) == "build.gradle":
-                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_targets), verbose=verbose)
+                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_targets),
+                                         verbose=verbose, env_vars=env_vars)
             else:
-                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_targets), verbose=verbose)
+                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_targets),
+                                         verbose=verbose, env_vars=env_vars)
         else:
             if collect_codecoverage:
                 if not build_targets:
                     build_targets = 'merge-coverage-report'
-                command_util.run_command("ant -f {} {}".format(ant_build_file, build_targets), verbose=verbose)
+                command_util.run_command("ant -f {} {}".format(ant_build_file, build_targets),
+                                         verbose=verbose, env_vars=env_vars)
             else:
                 if build_targets:
                     tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(ant_build_file, build_targets), error=True)
                 for partition in partitions:
-                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition), verbose=verbose)
+                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
+                                             verbose=verbose, env_vars=env_vars)
 
         #else:
          #   task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
@@ -322,7 +332,8 @@ def __compare_to_dev_tests_coverage(config, jacoco_raw_date_file = ''):
     coverage_util.generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
                                            exec_file=merged_exec_file,
                                            xml_file=merged_coverage_xml,
-                                           html_dir=merged_html_dir)
+                                           html_dir=merged_html_dir,
+                                           jdk_path=config['general']['java_jdk_home'])
     #printing the html report
     CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_coverage_html, tkltest_html_dir, merged_html_dir, html_compare_dir)
 
@@ -402,7 +413,8 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
                                            exec_file=merged_exec_file,
                                            xml_file=coverage_xml,
                                            html_dir=coverage_html,
-                                           csv_file=coverage_csv)
+                                           csv_file=coverage_csv,
+                                           jdk_path=tkltest_config['general']['java_jdk_home'])
 
     # compare the the dev tests:
     if tkltest_config['dev_tests']['compare_code_coverage']:
