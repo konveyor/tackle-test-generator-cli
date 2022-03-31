@@ -227,9 +227,9 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
             pass
 
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+    env_vars = dict(os.environ.copy())
+    env_vars['JAVA_HOME'] = jdk_path
     if os.path.isfile(ctd_raw_cov_file):
-        env_vars = dict(os.environ.copy())
-        env_vars['JAVA_HOME'] = jdk_path
         try:
             command_util.run_command("java -Xmx"+str(max_memory)+"m -jar {} merge {} {} --destfile {}".
                                  format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
