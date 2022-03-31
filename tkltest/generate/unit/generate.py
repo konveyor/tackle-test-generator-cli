@@ -312,9 +312,9 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "heros-1.2.0.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "httpcore-4.4.6.jar") + os.pathsep
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "httpclient-4.5.13.jar") + os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.5.jar") + os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.5.jar") + os.pathsep
-    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.5.jar")
+    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.6.1.jar") + os.pathsep
+    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.6.jar") + os.pathsep
+    modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.6.jar")
     modeling_command += " org.konveyor.tackle.testgen.model.CTDTestPlanGenerator "
     modeling_command += " -app "+app_name
     if partitions_file:
@@ -374,9 +374,9 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "javaparser-symbol-solver-core-3.16.1.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "guava-29.0-jre.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "failureaccess-1.0.1.jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.5.jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.5.jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.5.jar")
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.6.1.jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.6.jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.6.jar")
     tg_command += " org.konveyor.tackle.testgen.core.TestSequenceInitializer"
     tg_command += " -app " + app_name
     tg_command += " -tp " + ctd_file
@@ -384,7 +384,10 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
     tg_command += " -clpt " + app_classpath_file
     tg_command += " -tg " + test_generator_name
     tg_command += " -tl " + str(time_limit)
-    tg_command += " -jdk " + os.path.split(os.path.split(jdk_path)[0])[0]
+    jdk_home = os.path.split(os.path.split(jdk_path)[0])[0]
+    if jdk_home:
+        # add double quotes for the case of spaces in the jdk path
+        tg_command += " -jdk \"" + jdk_home + "\""
 
     if partitions_file:
         tg_command += " -tm"
@@ -443,9 +446,9 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
                                    "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
         te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "junit-4.13.1.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DIR, "ccmcl.jar") + os.pathsep
-    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.5.jar") + os.pathsep
-    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.5.jar") + os.pathsep
-    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.5.jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.6.1.jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.6.jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.6.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-io-2.6.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "javaparser-core-3.16.1.jar") + os.pathsep

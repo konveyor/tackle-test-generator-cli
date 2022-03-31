@@ -69,6 +69,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
             build_type=build_type,
             report_dir=report_dir,
             class_files=config['general']['monolith_app_path'],
+            jdk_path=config['general']['java_jdk_home'],
             dev_tests=dev_tests
     )
 
@@ -87,7 +88,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir,
-        max_memory=config['general']['max_memory_for_coverage']
+        max_memory=config['general']['max_memory_for_coverage'],
+        jdk_path=config['general']['java_jdk_home']
     )
 
     if test_class_augment_pool:
@@ -104,7 +106,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         class_files=config['general']['monolith_app_path'],
         raw_cov_dir=raw_cov_data_dir,
         report_dir=report_dir,
-        max_memory=config['general']['max_memory_for_coverage']
+        max_memory=config['general']['max_memory_for_coverage'],
+        jdk_path=config['general']['java_jdk_home']
     )
     final_test_method_count = __get_test_method_count(ctd_test_dir)
     final_inst_cov_rate = safe_div(augmented_coverage['instruction_covered'], augmented_coverage['instruction_total'])
@@ -134,7 +137,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
 
 
 def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir, build_file, build_type, report_dir,
-                                                 class_files=None, dev_tests=None):
+                                                 jdk_path, class_files=None, dev_tests=None):
     """Computes base test suite and augment test suite for coverage-based augmentation.
 
     Given the CTD test suite and the evosuite test suite, computes coverage efficiency of both test suites
@@ -147,6 +150,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         build_file (str): Build file to use for running tests
         build_type (str): Type of build file (either ant or maven)
         report_dir (str): Main reports directory, under which coverage report is generated
+        jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
         class_files (str): the class file of the app
         dev_tests (dict): information of user test suite, to add its coverage to the base tests coverage
 
@@ -169,6 +173,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
                                       report_dir=report_dir, test_suite_name='CTD-guided',
                                       raw_cov_data_dir=raw_cov_data_dir,
                                       class_files=class_files,
+                                      jdk_path = jdk_path,
                                       additional_test_suite=dev_tests)
     if not ctd_test_coverage:
         tkltest_status('Error while computing coverage for ctd test suite: {}'.format(ctd_test_dir), error=True)
@@ -212,7 +217,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         test_coverage, test_method_count, inst_cov_efficiency = \
             __compute_coverage_efficiency(test_dir=ctd_test_dir, build_file=build_file, build_type=build_type,
                                       report_dir=report_dir, test_suite_name=os.path.basename(test)[:-5],
-                                      raw_cov_data_dir=raw_cov_data_dir)
+                                      raw_cov_data_dir=raw_cov_data_dir, jdk_path=jdk_path)
         if not test_coverage:
             tkltest_status('Error while computing coverage for test: {}'.format(test), error=True)
             __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
@@ -233,7 +238,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
 
 
 def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, test_suite_name,
-                                  raw_cov_data_dir, class_files=None, additional_test_suite=None):
+                                  raw_cov_data_dir, jdk_path, class_files=None, additional_test_suite=None):
     """Computes and returns coverage efficiency of the given test suite.
 
     Computes coverage efficiency of the given test suite as instruction coverage rate per test method
@@ -248,7 +253,8 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
                                                               raw_cov_data_dir=raw_cov_data_dir,
                                                               raw_cov_data_file_pref=test_suite_name,
                                                               class_files=class_files,
-                                                              additional_test_suite=additional_test_suite)
+                                                              additional_test_suite=additional_test_suite,
+                                                              jdk_path=jdk_path)
     if not test_coverage:
         return None, None, None
     inst_cov_rate = safe_div(test_coverage['instruction_covered'], test_coverage['instruction_total'])
@@ -310,7 +316,7 @@ def __get_test_method_count(test_dir):
 
 
 def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, base_ctd_coverage, class_files,
-                                       raw_cov_dir, report_dir, max_memory):
+                                       raw_cov_dir, report_dir, max_memory, jdk_path):
     """Computes coverage delta for each test class in the augment pool of tests.
 
     Computes for each test class in the test augment pool additional instruction, line, and branch coverage that
@@ -325,6 +331,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
         class_files (list): App classes paths
         raw_cov_dir (str): Directory containing raw coverage data files
         report_dir (str): Main reports directory, under which coverage report is generated
+        max_memory (int): maximal memory to use for merging coverage reports
+        jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
 
     Returns:
         dict: information about tests that provide coverage gain
@@ -362,7 +370,8 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
                                                                               class_files=class_files,
                                                                               base_coverage=base_ctd_coverage,
                                                                               remove_merged_cov_file=True,
-                                                                              max_memory=max_memory)
+                                                                              max_memory=max_memory,
+                                                                              jdk_path=jdk_path)
             #coverage_delta = coverage_util.get_coverage_for_test_suite(
             #    build_file=build_file, build_type=build_type, test_root_dir=ctd_test_dir,
             #    report_dir=report_dir, base_coverage=base_ctd_coverage)
@@ -384,7 +393,7 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
 
 
 def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_coverage, class_files,
-                             raw_cov_dir, report_dir, max_memory):
+                             raw_cov_dir, report_dir, max_memory, jdk_path):
     """Augments CTD test suite with tests that contribute to additional coverage.
 
     Iterates over test classes that contribute to coverage gain, and adds them to the augmented test suite
@@ -399,6 +408,8 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
         class_files (list): App classes paths
         raw_cov_dir (str): Directory containing raw coverage data files
         report_dir (str): Main reports directory, under which coverage report is generated
+        max_memory (int):
+        jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
 
     Returns:
         dict: information about coverage of augmented test suite
@@ -444,7 +455,7 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
                     main_coverage_dir=main_coverage_dir, class_files=class_files,
                     base_coverage=curr_coverage,
                     remove_merged_cov_file=first,
-                    max_memory=max_memory)
+                    max_memory=max_memory, jdk_path=jdk_path)
                 first = False
             except subprocess.CalledProcessError as e:
                 logging.error('Error merging augmented test suite with class {}: {}'.format(test_class, e))

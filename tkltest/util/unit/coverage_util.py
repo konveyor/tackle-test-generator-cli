@@ -27,7 +27,7 @@ from tkltest.execute.unit import execute
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,
                                 raw_cov_data_dir, raw_cov_data_file_pref,
-                                class_files=None, additional_test_suite=None):
+                                jdk_path, class_files=None, additional_test_suite=None):
     """Runs test cases and returns coverage information.
 
     Runs test cases using the given Ant build file, reads coverage information from the Jacoco CSV
@@ -38,6 +38,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
+        jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
         class_files (str): the class file of the app
         additional_test_suite (dict): information of additional test suite, to add its coverage to the tests coverage
     Returns:
@@ -61,6 +62,8 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         pass
 
     jacoco_raw_date_file = ''
+    env_vars = dict(os.environ.copy())
+    env_vars['JAVA_HOME'] = jdk_path
     if has_test_suite:
     # run tests using build file
         if build_type == 'ant':
@@ -70,7 +73,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         else:
             cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
         try:
-            command_util.run_command(cmd, verbose=False)
+            command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
             tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
             return None
@@ -96,7 +99,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         else:  # gradle
             cmd = "gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets)
         try:
-            command_util.run_command(cmd, verbose=False)
+            command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
             tkltest_status('Warning: Error while running dev-written test suite for coverage computing:\n {}\n{}'.format(e, e.stderr))
             # no_failure is still true, we will look for .exec file
@@ -112,7 +115,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                 try:
                     command_util.run_command("java -jar {} merge {} {} --destfile {}".
                                              format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
-                                                    merged_exec_file), verbose=True)
+                                                    merged_exec_file), verbose=True, env_vars=env_vars)
                 except subprocess.CalledProcessError as e:
                     tkltest_status('Warning: Failed to merge coverage data files {} and {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr))
                     no_failure = False
@@ -126,7 +129,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                     jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
                 command_util.run_command("java -jar {} report {} {} --csv {}".
                                          format(jacoco_cli_file, merged_exec_file, jacoco_classfiles_ops,
-                                                merged_csv_file), verbose=True)
+                                                merged_csv_file), verbose=True, env_vars=env_vars)
             except subprocess.CalledProcessError as e:
                 tkltest_status('Warning: Failed to create CSV coverage report {} from {}:\n {}\n{}'.format(merged_csv_file, merged_exec_file, e, e.stderr))
                 no_failure = False
@@ -190,7 +193,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
 
 def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_dir, base_coverage, class_files,
-                       remove_merged_cov_file, max_memory):
+                       remove_merged_cov_file, max_memory, jdk_path):
 
     """Merges two raw coverage data files and returns delta coverage information between respective test suites
 
@@ -205,6 +208,8 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
             main_coverage_dir (str): Main directory in which coverage report is generated
             base_coverage (dict): base coverage to compute coverage gain (delta) against
             remove_merged_cov_file (bool): whether to remove existing merged coverage file
+            max_memory (int): maximal memory to use for merging coverage reports
+            jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
 
         Returns:
             dict: delta instruction, line, branch coverage
@@ -222,11 +227,13 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
             pass
 
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
+    env_vars = dict(os.environ.copy())
+    env_vars['JAVA_HOME'] = jdk_path
     if os.path.isfile(ctd_raw_cov_file):
         try:
             command_util.run_command("java -Xmx"+str(max_memory)+"m -jar {} merge {} {} --destfile {}".
                                  format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
-                                        output_exec_file), verbose=True)
+                                        output_exec_file), verbose=True, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
             # If merging failed we skip current test file and assume it resulted in zero delta coverage
             # The reason to continue is that we may still gain from previous augmenting test files
@@ -255,7 +262,8 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
         jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
     command_util.run_command("java -jar {} report {} {} --csv {} --html {} --xml {}".
                              format(jacoco_cli_file, output_exec_file, jacoco_classfiles_ops,
-                                    coverage_csv_file, main_coverage_dir, coverage_xml_file), verbose=True)
+                                    coverage_csv_file, main_coverage_dir, coverage_xml_file),
+                             verbose=True, env_vars=env_vars)
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0
@@ -380,6 +388,7 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
     dev_coverage_xml = os.path.join(dev_report_dir, dev_test_name + '_coverage.xml') if create_xml else ''
     dev_coverage_html = os.path.join(dev_report_dir, dev_test_name + '-coverage-html') if create_html else ''
     generate_coverage_report(monolith_app_path=config['general']['monolith_app_path'],
+                             jdk_path=config['general']['java_jdk_home'],
                              exec_file=dev_coverage_exec,
                              xml_file=dev_coverage_xml,
                              html_dir=dev_coverage_html,
@@ -387,7 +396,7 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
     return dev_coverage_xml, dev_coverage_html, dev_coverage_csv
 
 
-def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir='', csv_file=''):
+def generate_coverage_report(monolith_app_path, jdk_path, exec_file, xml_file='', html_dir='', csv_file=''):
     """Generates jacoco XML file from raw coverage (.exec) files.
 
      runs the jacoco CLI to generate XML report from the raw coverage file.
@@ -408,8 +417,10 @@ def generate_coverage_report(monolith_app_path, exec_file, xml_file='', html_dir
         jacoco_cmd += ' --html {}'.format(html_dir)
     if csv_file:
         jacoco_cmd += ' --csv {}'.format(csv_file)
+    env_vars = dict(os.environ.copy())
+    env_vars['JAVA_HOME'] = jdk_path
     try:
-        command_util.run_command(jacoco_cmd, verbose=True)
+        command_util.run_command(jacoco_cmd, verbose=True, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error running jacoco cli command {}: {}\n{}'.format(jacoco_cmd, e, e.stderr), error=True)
         sys.exit(1)
