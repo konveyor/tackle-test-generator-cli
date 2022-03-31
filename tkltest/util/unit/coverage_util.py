@@ -62,10 +62,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         pass
 
     jacoco_raw_date_file = ''
+    env_vars = dict(os.environ.copy())
+    env_vars['JAVA_HOME'] = jdk_path
     if has_test_suite:
     # run tests using build file
-        env_vars = dict(os.environ.copy())
-        env_vars['JAVA_HOME'] = jdk_path
         if build_type == 'ant':
             cmd = "ant -f {} merge-coverage-report".format(build_file)
         elif build_type == 'maven':
