@@ -38,7 +38,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         build_type (str): Type of build file (either ant, maven or gradle)
         test_root_dir (str): Root directory of test suite
         report_dir (str): Main reports directory, under which coverage report is generated
-        jdk_path 9str): path to the jdk home to be used for executing the tests and measuring their coverage
+        jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
         class_files (str): the class file of the app
         additional_test_suite (dict): information of additional test suite, to add its coverage to the tests coverage
     Returns:
