@@ -76,8 +76,8 @@ def __conditionally_required(opt_name, config):
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
-        if config['generate']['integrate_to_app_build_file']:
-            return 'required if "integrate_to_app_build_file" is specified'
+        if config['generate']['integrate_into_app_build_file']:
+            return 'required if "integrate_into_app_build_file" is specified'
 
     elif opt_name == 'app_build_files':
         # required if app_build_type is specified
@@ -341,7 +341,7 @@ __options_spec = {
             'relpath_fix_type': 'path',
             'help_message': 'list of paths to app build settings files or property files for the specified app build type'
         },
-        'integrate_to_app_build_file': {
+        'integrate_into_app_build_file': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': False,

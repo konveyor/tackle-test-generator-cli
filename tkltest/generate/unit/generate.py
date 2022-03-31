@@ -267,7 +267,7 @@ def generate_ctd_amplified_tests(config, output_dir):
                                        ctd_test_dir=test_directory, report_dir=reports_dir)
         tkltest_status('Coverage-driven test-suite augmentation and optimization took {} seconds'.
                        format(round(time.time() - start_time, 2)))
-    if config['generate']['integrate_to_app_build_file']:
+    if config['generate']['integrate_into_app_build_file']:
         build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
                                                        config['generate']['app_build_type'],
                                                        build_util.get_build_classpath(config),
