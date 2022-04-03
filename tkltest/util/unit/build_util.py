@@ -61,9 +61,19 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
         ))
 
     # add lib dependencies for tkltest to classpath
+    required_lib_jars = {
+        constants.JACOCO_CLI_JAR_NAME,
+        constants.TKLTEST_UNIT_CORE_JAR,
+        'junit-4.13.1.jar',
+        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-master-' + constants.EVOSUITE_VERSION + '.jar',
+        'randoop-all-' + constants.RANDOOP_VERSION + '.jar'
+    }
+
     class_paths.extend([
         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar'
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
     ])
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
