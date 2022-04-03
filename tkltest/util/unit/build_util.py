@@ -63,12 +63,10 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     # add lib dependencies for tkltest to classpath
     required_lib_jars = {
         constants.JACOCO_CLI_JAR_NAME,
-        constants.TKLTEST_UNIT_CORE_JAR,
+        'org.jacoco.agent-0.8.7.jar',
         'junit-4.13.1.jar',
         'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
         'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
-        'evosuite-master-' + constants.EVOSUITE_VERSION + '.jar',
-        'randoop-all-' + constants.RANDOOP_VERSION + '.jar'
     }
 
     class_paths.extend([
