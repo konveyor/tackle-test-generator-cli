@@ -213,10 +213,11 @@ def generate_ctd_amplified_tests(config, output_dir):
     else:
         reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
+    build_classpath = build_util.get_build_classpath(config)
     ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
         app_name=app_name,
         monolith_app_path=monolith_app_path,
-        app_classpath=build_util.get_build_classpath(config),
+        app_classpath=build_classpath,
         test_root_dir=test_directory,
         test_dirs=test_dirs,
         partitions_file=partitions_file,
@@ -251,7 +252,7 @@ def generate_ctd_amplified_tests(config, output_dir):
             build_util.generate_build_xml(
                 app_name=app_name,
                 monolith_app_path=monolith_app_path,
-                app_classpath=build_util.get_build_classpath(config),
+                app_classpath=build_classpath,
                 test_root_dir=test_directory,
                 test_dirs=test_dirs,
                 partitions_file=partitions_file,
@@ -270,7 +271,7 @@ def generate_ctd_amplified_tests(config, output_dir):
     if config['generate']['integrate_into_app_build_file']:
         build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
                                                        config['generate']['app_build_type'],
-                                                       build_util.get_build_classpath(config),
+                                                       build_classpath,
                                                        test_dirs)
 
 
