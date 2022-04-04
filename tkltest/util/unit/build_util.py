@@ -28,15 +28,15 @@ from tkltest.util.logging_util import tkltest_status
 def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
 
-    Creates and returns build path in the Java CLASSPATH format, consisting of app library dependencies and
-    tkltest cli library dependencies.
+    Creates and returns build path, consisting of app library dependencies and
+    tkltest dependencies required for building and running the generated test cases.
 
     Args:
         config: loaded configuration information
         partition: name of partition (if build is being done for a partition of the refactored app)
 
     Returns:
-        string representing build path in the Java CLASSPATH format
+        string representing build path
     """
     class_paths = []
     classpath_file = config['general']['app_classpath_file']
