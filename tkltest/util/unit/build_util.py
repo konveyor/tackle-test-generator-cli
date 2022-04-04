@@ -295,7 +295,12 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
                      excludes="**/*ESTest_scaffolding.class")
         doc.stag('formatter', type='xml')
 
-def __get_maven_dependencies_tags(classpath_list):
+def __get_maven_dependencies_xml_data(classpath_list):
+    '''
+    create a list of dependencies data to be added to the build.xml file
+    :param classpath_list:
+    :return: list of dicts - dependencies data
+    '''
     classpath_list = classpath_list.split(os.pathsep)
     dependencies = []
     dependencies.append({'groupId': 'org.glassfish.main.extras',
@@ -344,7 +349,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
             line('maven.compiler.source', constants.JAVA_VERSION_FOR_MAVEN)
             line('maven.compiler.target', constants.JAVA_VERSION_FOR_MAVEN)
         with tag('dependencies'):
-            dependencies = __get_maven_dependencies_tags(classpath_list)
+            dependencies = __get_maven_dependencies_xml_data(classpath_list)
             for dependency in dependencies:
                 with tag('dependency'):
                     for element_name, value in dependency.items():
@@ -520,7 +525,7 @@ def __get_xml_element(parent_element, namespaces, name, text='', duplicate=False
     :param namespaces: the tree namesapce, need for find()
     :param name: element name
     :param text: element text
-    :param duplicate: bool - if an element with the same name exist, do we create another element?
+    :param duplicate: bool - create another element, if an element with the same name exist
     :return: the element that was added
     '''
     if not duplicate:
@@ -554,7 +559,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpa
             ElementTree.register_namespace('', namespace)
         # adding the dependencies
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        dependencies = __get_maven_dependencies_tags(classpath_list)
+        dependencies = __get_maven_dependencies_xml_data(classpath_list)
         for dependency in dependencies:
             dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
             for element_name, value in dependency.items():

@@ -78,7 +78,6 @@ def __conditionally_required(opt_name, config):
             return 'required if "monolith_app_path" is not specified'
         if config['generate']['integrate_into_app_build_file']:
             return 'required if "integrate_into_app_build_file" is specified'
-
     elif opt_name == 'app_build_files':
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
