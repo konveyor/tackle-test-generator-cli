@@ -30,15 +30,15 @@ from tkltest.util.logging_util import tkltest_status
 def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
 
-    Creates and returns build path in the Java CLASSPATH format, consisting of app library dependencies and
-    tkltest cli library dependencies.
+    Creates and returns build path, consisting of app library dependencies and
+    tkltest dependencies required for building and running the generated test cases.
 
     Args:
         config: loaded configuration information
         partition: name of partition (if build is being done for a partition of the refactored app)
 
     Returns:
-        string representing build path in the Java CLASSPATH format
+        string representing build path
     """
     class_paths = []
     classpath_file = config['general']['app_classpath_file']
@@ -63,9 +63,17 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
         ))
 
     # add lib dependencies for tkltest to classpath
+    required_lib_jars = {
+        constants.JACOCO_CLI_JAR_NAME,
+        'org.jacoco.agent-0.8.7.jar',
+        'junit-4.13.1.jar',
+        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+    }
+
     class_paths.extend([
         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar'
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
     ])
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
