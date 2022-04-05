@@ -338,7 +338,7 @@ def __compare_to_dev_tests_coverage(config, jacoco_raw_date_file = ''):
     CoverageStatisticsHtmlWriter.create_coverage_html_dir(app_statistics, dev_coverage_html, tkltest_html_dir, merged_html_dir, html_compare_dir)
 
 
-def merge_modules_coverage_reports(tkltest_config, modules_configs):
+def merge_modules_coverage_reports(tkltest_config, modules_configs, failed_modules = []):
     '''
     creating one coverage report, by merging the exec files that was created per for each modules
     :param tkltest_config: the user config
@@ -355,7 +355,10 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs):
     modules_configs_with_exec_file = []
     # first collect exec files and app_paths
     for module_config in modules_configs:
-        module_output_dir = dir_util.get_output_dir(app_name, module_config['general']['module_name'])
+        module_name = module_config['general']['module_name']
+        if module_name in failed_modules:
+            continue
+        module_output_dir = dir_util.get_output_dir(app_name, module_name)
         module_test_root_dir = module_config['general']['test_directory']
         if not module_test_root_dir:
             module_test_root_dir = module_config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX

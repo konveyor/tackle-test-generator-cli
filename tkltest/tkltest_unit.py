@@ -61,7 +61,7 @@ def main():
     tkltest_config = load_configuration(args, 'unit')
 
     configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
-    modules_results = {}
+    failed_modules = []
     for config in configs:
         logging_util.tkltest_status('{} tests for {} {} using config file {}.'.format(
             'Generating' if args.command == 'generate' else 'Executing',
@@ -79,14 +79,19 @@ def main():
             process = Process(target=__process_command, args=(simple_args, config))
             process.start()
             process.join()
-            module_name = config['general']['module_name']
-            modules_results[module_name] = {}
-            modules_results[module_name]['exitcode'] = process.exitcode
+            if process.exitcode:
+                failed_modules.append(config['general']['module_name'])
 
-    if len(configs) > 1:
-        print(modules_results)
+    if failed_modules:
+        if len(failed_modules) == len(configs):
+            logging_util.tkltest_status('Failed to {} tests for all modules, Please see log for details'.format(args.command), error=True)
+            sys.exit(1)
+        else:
+            logging_util.tkltest_status('Warning: Failed to {} tests for the following modules:\n{}'
+                                        '\nPlease see log for details'
+                                        .format(args.command, ', '.join(failed_modules)))
     if args.command == 'execute' and tkltest_config['execute']['combine_modules_coverage_reports']:
-        execute.merge_modules_coverage_reports(tkltest_config, configs)
+        execute.merge_modules_coverage_reports(tkltest_config, configs, failed_modules)
 
 
 
