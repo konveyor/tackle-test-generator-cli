@@ -14,6 +14,8 @@
 import argparse
 import shutil
 from zipfile import ZipFile
+from multiprocessing import Process
+from types import SimpleNamespace
 
 from .execute.unit import execute
 from .generate.unit import generate
@@ -59,6 +61,7 @@ def main():
     tkltest_config = load_configuration(args, 'unit')
 
     configs = config_util.resolve_tkltest_configs(tkltest_config, args.command)
+    modules_results = {}
     for config in configs:
         logging_util.tkltest_status('{} tests for {} {} using config file {}.'.format(
             'Generating' if args.command == 'generate' else 'Executing',
@@ -66,20 +69,40 @@ def main():
             config['general'].get('module_name', config['general']['app_name']),
             config['general'].get('config_file_path', args.config_file.name)))
 
-        unjar_paths = __unjar_path(config)
-        # process generate/execute commands
-        try:
-            if args.command == 'execute':
-                execute.process_execute_command(args, config)
-            elif args.command == 'generate':
-                 generate.process_generate_command(args, config)
-        finally:
-            for path in unjar_paths:
-                if os.path.isdir(path):
-                    shutil.rmtree(path)
+        if len(configs) == 1:
+            __process_command(args, config)
+        else:
+            # we can not deliver a TextIOWrapper as a part of an argument to a process,
+            # so we create a copy of args to and remove config_file from it
+            simple_args = SimpleNamespace(**vars(args))
+            del simple_args.config_file
+            process = Process(target=__process_command, args=(simple_args, config))
+            process.start()
+            process.join()
+            module_name = config['general']['module_name']
+            modules_results[module_name] = {}
+            modules_results[module_name]['exitcode'] = process.exitcode
 
+    if len(configs) > 1:
+        print(modules_results)
     if args.command == 'execute' and tkltest_config['execute']['combine_modules_coverage_reports']:
         execute.merge_modules_coverage_reports(tkltest_config, configs)
+
+
+
+def __process_command(args, config):
+    unjar_paths = __unjar_path(config)
+    # process generate/execute commands
+    try:
+        if args.command == 'execute':
+            execute.process_execute_command(args, config)
+        elif args.command == 'generate':
+            generate.process_generate_command(args, config)
+    finally:
+        for path in unjar_paths:
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+
 
 if __name__ == '__main__':  # pragma: no cover
     main()
