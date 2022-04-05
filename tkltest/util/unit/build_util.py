@@ -538,6 +538,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
     :param test_dirs: list of test directories
     :return:
     '''
+    if not app_build_files:
+        return
     app_build_file = app_build_files[0]
     tkltest_app_build_file = os.path.abspath('tkltest_app_' + os.path.basename(app_build_file))
     if app_build_type == 'maven':
