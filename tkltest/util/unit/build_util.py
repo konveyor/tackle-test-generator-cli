@@ -27,6 +27,21 @@ from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
 
+def __get_required_lib_jars():
+
+    required_lib_jars = {
+        constants.JACOCO_CLI_JAR_NAME,
+        'org.jacoco.agent-0.8.7.jar',
+        'junit-4.13.1.jar',
+        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+    }
+
+    return [
+        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
+    ]
+
 def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
 
@@ -62,19 +77,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
             partition, config['execute']['micro']['partition_paths'][partition]
         ))
 
-    # add lib dependencies for tkltest to classpath
-    required_lib_jars = {
-        constants.JACOCO_CLI_JAR_NAME,
-        'org.jacoco.agent-0.8.7.jar',
-        'junit-4.13.1.jar',
-        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
-        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
-    }
-
-    class_paths.extend([
-        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
-    ])
+    class_paths.extend(__get_required_lib_jars())
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
             class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
@@ -295,46 +298,11 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
                      excludes="**/*ESTest_scaffolding.class")
         doc.stag('formatter', type='xml')
 
-def __get_maven_dependencies_xml_data(classpath_list):
-    '''
-    create a list of dependencies data to be added to the build.xml file
-    :param classpath_list:
-    :return: list of dicts - dependencies data
-    '''
-    classpath_list = classpath_list.split(os.pathsep)
-    dependencies = []
-    dependencies.append({'groupId': 'org.glassfish.main.extras',
-                         'artifactId': 'glassfish-embedded-all',
-                         'version': '3.1.2.2',
-                         'scope': 'test'})
-    for full_path in classpath_list:
-        if full_path.strip() and os.path.isdir(full_path):
-            try:
-                subprocess.run('jar cf ' + os.path.basename(full_path) + '.jar -C ' + full_path + " .", shell=True,
-                               check=True)
-            except subprocess.CalledProcessError as e:
-                tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
-                sys.exit(1)
-            full_path += ".jar"
-        file_name = full_path.rsplit(os.path.sep, 1)[1]
-        file_name = file_name.replace('.jar', '')
-        if 'org.jacoco.agent' in file_name:
-            dependencies.append({'groupId': 'org.jacoco',
-                                 'artifactId': 'org.jacoco.agent',
-                                 'version': constants.JACOCO_MAVEN_VERSION,
-                                 'scope': 'test',
-                                 'classifier': 'runtime'})
-        elif os.path.isfile(full_path):
-            dependencies.append({'groupId': file_name,
-                                 'artifactId': file_name,
-                                 'version': '1.0',
-                                 'scope': 'system',
-                                 'systemPath': full_path})
-    return dependencies
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
                   build_xml_file, output_dir):
+    classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
     test_root_dir = os.path.abspath(test_root_dir)
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
@@ -349,11 +317,36 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
             line('maven.compiler.source', constants.JAVA_VERSION_FOR_MAVEN)
             line('maven.compiler.target', constants.JAVA_VERSION_FOR_MAVEN)
         with tag('dependencies'):
-            dependencies = __get_maven_dependencies_xml_data(classpath_list)
-            for dependency in dependencies:
-                with tag('dependency'):
-                    for element_name, value in dependency.items():
-                        line(element_name, value)
+            with tag('dependency'):
+                line('groupId', 'org.glassfish.main.extras')
+                line('artifactId', 'glassfish-embedded-all')
+                line('version', '3.1.2.2')
+                line('scope', 'test')
+            for full_path in classpath_list:
+                if full_path.strip() and os.path.isdir(full_path):
+                    try:
+                        subprocess.run('jar cf '+os.path.basename(full_path)+'.jar -C '+full_path+" .", shell=True, check=True)
+                    except subprocess.CalledProcessError as e:
+                        tkltest_status('Creating a jar for dependency folder failed: {}\n{}'.format(e, e.stderr), error=True)
+                        sys.exit(1)
+                    full_path += ".jar"
+                file_name = full_path.rsplit(os.path.sep,1)[1]
+                file_name = file_name.replace('.jar', '')
+                if 'org.jacoco.agent' in file_name:
+                    with tag('dependency'):
+                        line('groupId', 'org.jacoco')
+                        line('artifactId', 'org.jacoco.agent')
+                        line('version', constants.JACOCO_MAVEN_VERSION)
+                        line('scope', 'test')
+                        line('classifier', 'runtime')
+                elif os.path.isfile(full_path):
+                    with tag('dependency'):
+                        line('groupId', file_name)
+                        line('artifactId', file_name)
+                        line('version', '1.0')
+                        line('scope', 'system')
+                        line('systemPath', full_path)
+
         with tag('build'):
             with tag('resources'):
                 for app_path in monolith_app_paths:
@@ -537,18 +530,16 @@ def __get_xml_element(parent_element, namespaces, name, text='', duplicate=False
         parent_element.append(element)
     return element
 
-def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpath_list, test_dirs):
+def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_dirs):
     '''
     Adding the test directory and the dependencies to the user app file
     :param app_build_files: the app build file
     :param app_build_type: build type
-    :param classpath_list: list of dependencies
     :param test_dirs: list of test directories
     :return:
     '''
     app_build_file = app_build_files[0]
-    tkltest_app_build_file = os.path.join(os.path.dirname(app_build_file), 'tkltest_' + os.path.basename(app_build_file))
-    tkltest_status('integrating tests with {}, saving new build file into: {}'.format(app_build_file, tkltest_app_build_file))
+    tkltest_app_build_file = os.path.abspath('tkltest_app_' + os.path.basename(app_build_file))
     if app_build_type == 'maven':
         # tree and root of original build file
         build_file_tree = ElementTree.parse(app_build_file)
@@ -559,11 +550,15 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpa
             ElementTree.register_namespace('', namespace)
         # adding the dependencies
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        dependencies = __get_maven_dependencies_xml_data(classpath_list)
-        for dependency in dependencies:
+        dependencies_jars = __get_required_lib_jars()
+        for dependency_jar in dependencies_jars:
             dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
-            for element_name, value in dependency.items():
-                __get_xml_element(dependency_element, namespaces, element_name, value)
+            __get_xml_element(dependency_element, namespaces, 'groupId', os.path.basename(dependency_jar))
+            __get_xml_element(dependency_element, namespaces, 'artifactId', os.path.basename(dependency_jar))
+            __get_xml_element(dependency_element, namespaces, 'version', '1.0')
+            __get_xml_element(dependency_element, namespaces, 'scope', 'system')
+            __get_xml_element(dependency_element, namespaces, 'systemPath', dependency_jar)
+
 
         # adding the test directories:
         # see http://www.mojohaus.org/build-helper-maven-plugin/usage.html
@@ -588,5 +583,6 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, classpa
 
         with open(tkltest_app_build_file, 'w') as f:
             f.write(minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   "))
-    else:
-        tkltest_status('Integrating tests into app build file is supported only for maven')
+
+        # todo  - use this comments for gradle and ant when implemented
+        tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))

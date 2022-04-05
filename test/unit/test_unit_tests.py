@@ -244,15 +244,14 @@ class UnitTests(unittest.TestCase):
         build_command = 'mvn clean install -f ' + test_app['build_file_if_requires_build']
         command_util.run_command(command=build_command, verbose=config['general']['verbose'])
 
-        #resolve the config(to get dependencies):
-        config = config_util.resolve_tkltest_configs(config, 'generate')[0]
-        classpath_list = build_util.get_build_classpath(config)
-        pom_file = os.path.join(dir_util.get_output_dir(app_name, ''), config['generate']['app_build_files'][0])
 
         # call integrate_tests_into_app_build_file(), check that new pom is created:
-        build_util.integrate_tests_into_app_build_file([pom_file], 'maven', classpath_list, ctd_tests)
-        integrated_pom_file = os.path.join(os.path.dirname(pom_file), 'tkltest_pom.xml')
-        self.assertTrue(os.path.isfile(integrated_pom_file))
+        pom_file = config['generate']['app_build_files'][0]
+        build_util.integrate_tests_into_app_build_file([pom_file], 'maven', ctd_tests)
+        integrated_pom_file_name = 'tkltest_app_pom.xml'
+        self.assertTrue(os.path.isfile(integrated_pom_file_name))
+        integrated_pom_file = os.path.join(os.path.dirname(pom_file), integrated_pom_file_name)
+        shutil.move(integrated_pom_file_name, integrated_pom_file)
 
         surefire_dir = os.path.join(os.path.dirname(pom_file), 'target', 'surefire-reports')
         shutil.rmtree(surefire_dir, ignore_errors=True)

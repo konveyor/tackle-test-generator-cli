@@ -76,8 +76,6 @@ def __conditionally_required(opt_name, config):
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
-        if config['generate']['integrate_into_app_build_file']:
-            return 'required if "integrate_into_app_build_file" is specified'
     elif opt_name == 'app_build_files':
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
@@ -339,14 +337,6 @@ __options_spec = {
             'default_value': [],
             'relpath_fix_type': 'path',
             'help_message': 'list of paths to app build settings files or property files for the specified app build type'
-        },
-        'integrate_into_app_build_file': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'integrate the generated test suite into the app build file (saved as tkltest_<app build file>)'
         },
         'bad_path': {
             'required': False,
