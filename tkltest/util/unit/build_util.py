@@ -27,7 +27,7 @@ from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
 
-def __get_required_lib_jars():
+def __get_jars_for_tests_execution():
 
     required_lib_jars = {
         constants.JACOCO_CLI_JAR_NAME,
@@ -77,7 +77,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
             partition, config['execute']['micro']['partition_paths'][partition]
         ))
 
-    class_paths.extend(__get_required_lib_jars())
+    class_paths.extend(__get_jars_for_tests_execution())
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
             class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
@@ -552,7 +552,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
             ElementTree.register_namespace('', namespace)
         # adding the dependencies
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        dependencies_jars = __get_required_lib_jars()
+        dependencies_jars = __get_jars_for_tests_execution()
         for dependency_jar in dependencies_jars:
             dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
             __get_xml_element(dependency_element, namespaces, 'groupId', os.path.basename(dependency_jar))

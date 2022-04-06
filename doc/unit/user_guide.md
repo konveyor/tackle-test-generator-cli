@@ -114,6 +114,8 @@ The specification of the app under test is provided using the following configur
    - For Ant build file, specify `app_build_type`, `app_build_config_file`, and `app_build_target`. `app_build_settings_file` is optional for specifying a property file. For Ant, this feature is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files.
    
    - For Maven build file, specify `app_build_type` and `app_build_config_file`.
+    
+    When specifying an app_build_config_file, the generated test suite will be integrated into this file. the integrated file is saved at the output directory under tkltest_app_< app build file name>.  
 
 ### Selecting the test-generation strategy
 
