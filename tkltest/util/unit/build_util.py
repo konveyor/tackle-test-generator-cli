@@ -20,10 +20,27 @@ import pathlib
 
 from yattag import Doc, indent
 from jinja2 import Environment, FileSystemLoader
+import xml.etree.ElementTree as ElementTree
+from xml.dom import minidom
 
 from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
+
+def __get_jars_for_tests_execution():
+
+    required_lib_jars = {
+        constants.JACOCO_CLI_JAR_NAME,
+        'org.jacoco.agent-0.8.7.jar',
+        'junit-4.13.1.jar',
+        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+    }
+
+    return [
+        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
+    ]
 
 def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
     """Creates and returns build classpath.
@@ -60,19 +77,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
             partition, config['execute']['micro']['partition_paths'][partition]
         ))
 
-    # add lib dependencies for tkltest to classpath
-    required_lib_jars = {
-        constants.JACOCO_CLI_JAR_NAME,
-        'org.jacoco.agent-0.8.7.jar',
-        'junit-4.13.1.jar',
-        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
-        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
-    }
-
-    class_paths.extend([
-        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
-    ])
+    class_paths.extend(__get_jars_for_tests_execution())
 
     if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
             class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
@@ -504,3 +509,82 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
 
     with open(build_gradle_file, 'w') as outfile:
         outfile.write(s)
+
+
+def __get_xml_element(parent_element, namespaces, name, text='', duplicate=False):
+    '''
+    add an element to an xml tree
+    :param parent_element: the perent to add to
+    :param namespaces: the tree namesapce, need for find()
+    :param name: element name
+    :param text: element text
+    :param duplicate: bool - create another element, if an element with the same name exist
+    :return: the element that was added
+    '''
+    if not duplicate:
+        element = parent_element.find(name, namespaces)
+    if duplicate or not element:
+        element = ElementTree.Element(name)
+        if text:
+            element.text = text
+        parent_element.append(element)
+    return element
+
+def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_dirs):
+    '''
+    Adding the test directory and the dependencies to the user app file
+    :param app_build_files: the app build file
+    :param app_build_type: build type
+    :param test_dirs: list of test directories
+    :return:
+    '''
+    if not app_build_files:
+        return
+    app_build_file = app_build_files[0]
+    tkltest_app_build_file = os.path.abspath('tkltest_app_' + os.path.basename(app_build_file))
+    if app_build_type == 'maven':
+        # tree and root of original build file
+        build_file_tree = ElementTree.parse(app_build_file)
+        project_root = build_file_tree.getroot()
+        namespace = project_root.tag.split('}')[0].strip('{') if project_root.tag.startswith('{') else None
+        namespaces = {'': namespace} if namespace else None
+        if namespace:
+            ElementTree.register_namespace('', namespace)
+        # adding the dependencies
+        dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
+        dependencies_jars = __get_jars_for_tests_execution()
+        for dependency_jar in dependencies_jars:
+            dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
+            __get_xml_element(dependency_element, namespaces, 'groupId', os.path.basename(dependency_jar))
+            __get_xml_element(dependency_element, namespaces, 'artifactId', os.path.basename(dependency_jar))
+            __get_xml_element(dependency_element, namespaces, 'version', '1.0')
+            __get_xml_element(dependency_element, namespaces, 'scope', 'system')
+            __get_xml_element(dependency_element, namespaces, 'systemPath', dependency_jar)
+
+
+        # adding the test directories:
+        # see http://www.mojohaus.org/build-helper-maven-plugin/usage.html
+        build_element = __get_xml_element(project_root, namespaces, 'build')
+        plugins_element = __get_xml_element(build_element, namespaces, 'plugins')
+        plugin_element = __get_xml_element(plugins_element, namespaces, 'plugin', '', True)
+        __get_xml_element(plugin_element, namespaces, 'groupId', 'org.codehaus.mojo')
+        __get_xml_element(plugin_element, namespaces, 'artifactId', 'build-helper-maven-plugin')
+        __get_xml_element(plugin_element, namespaces, 'version', '3.3.0')
+        executions_element = __get_xml_element(plugin_element, namespaces, 'executions')
+        execution_element = __get_xml_element(executions_element, namespaces, 'execution')
+        __get_xml_element(execution_element, namespaces, 'id', 'add-test-source')
+        __get_xml_element(execution_element, namespaces, 'phase', 'generate-test-sources')
+        __get_xml_element(__get_xml_element(execution_element, namespaces, 'goals',), namespaces, 'goal', 'add-test-source')
+        configuration_element = __get_xml_element(execution_element, namespaces, 'configuration')
+        sources_element = __get_xml_element(configuration_element, namespaces, 'sources')
+
+        abs_test_dirs = [os.path.abspath(test_src_dir) for test_src_dir in test_dirs if os.path.basename(test_src_dir) not in ['target', 'build']]
+        abs_test_dirs = abs_test_dirs
+        for abs_test_dir in abs_test_dirs:
+            __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
+
+        with open(tkltest_app_build_file, 'w') as f:
+            f.write(minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   "))
+
+        # todo  - use this comments for gradle and ant when implemented
+        tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))

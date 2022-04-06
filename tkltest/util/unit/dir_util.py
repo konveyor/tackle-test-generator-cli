@@ -59,7 +59,7 @@ def cd_app_output_dir(app_name):
 
 def delete_app_output(app_name):
     for filename in os.listdir('.'):
-        if filename.startswith(app_name):
+        if filename.startswith(app_name) or filename.startswith('tkltest'):
             continue
         try:
             if os.path.isfile(filename) or os.path.islink(filename):
