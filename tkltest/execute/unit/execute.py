@@ -354,11 +354,8 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs, failed_modul
     app_path = set()
     modules_configs_with_exec_file = []
     # first collect exec files and app_paths
-    for module_config in modules_configs:
-        module_name = module_config['general']['module_name']
-        if module_name in failed_modules:
-            continue
-        module_output_dir = dir_util.get_output_dir(app_name, module_name)
+    for module_config in [mc for mc in modules_configs if mc['general']['module_name'] not in failed_modules]:
+        module_output_dir = dir_util.get_output_dir(app_name, module_config['general']['module_name'])
         module_test_root_dir = module_config['general']['test_directory']
         if not module_test_root_dir:
             module_test_root_dir = module_config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
