@@ -87,8 +87,8 @@ def main():
             logging_util.tkltest_status('Failed to {} tests for all modules, Please see log for details'.format(args.command), error=True)
             sys.exit(1)
         else:
-            logging_util.tkltest_status('Warning: Failed to {} tests for the following modules:\n{}'
-                                        '\nPlease see log for details'
+            logging_util.tkltest_status('Warning: Failed to {} tests for the following modules: {}.'
+                                        ' Please see log for details'
                                         .format(args.command, ', '.join(failed_modules)))
     if args.command == 'execute' and tkltest_config['execute']['combine_modules_coverage_reports']:
         execute.merge_modules_coverage_reports(tkltest_config, configs, failed_modules)
