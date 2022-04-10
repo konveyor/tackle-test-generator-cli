@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 import pathlib
+import shutil
 
 from yattag import Doc, indent
 from jinja2 import Environment, FileSystemLoader
@@ -542,6 +543,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         return
     app_build_file = app_build_files[0]
     tkltest_app_build_file = os.path.abspath('tkltest_app_' + os.path.basename(app_build_file))
+    dependencies_jars = __get_jars_for_tests_execution()
+    abs_test_dirs = [os.path.abspath(test_src_dir) for test_src_dir in test_dirs if os.path.basename(test_src_dir) not in ['target', 'build']]
     if app_build_type == 'maven':
         # tree and root of original build file
         build_file_tree = ElementTree.parse(app_build_file)
@@ -552,7 +555,6 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
             ElementTree.register_namespace('', namespace)
         # adding the dependencies
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        dependencies_jars = __get_jars_for_tests_execution()
         for dependency_jar in dependencies_jars:
             dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
             __get_xml_element(dependency_element, namespaces, 'groupId', os.path.basename(dependency_jar))
@@ -578,13 +580,24 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         configuration_element = __get_xml_element(execution_element, namespaces, 'configuration')
         sources_element = __get_xml_element(configuration_element, namespaces, 'sources')
 
-        abs_test_dirs = [os.path.abspath(test_src_dir) for test_src_dir in test_dirs if os.path.basename(test_src_dir) not in ['target', 'build']]
-        abs_test_dirs = abs_test_dirs
         for abs_test_dir in abs_test_dirs:
             __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
 
         with open(tkltest_app_build_file, 'w') as f:
             f.write(minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   "))
+        # todo  - use this comments for all types when ant implemented
+        tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))
 
-        # todo  - use this comments for gradle and ant when implemented
+    elif app_build_type == 'gradle':
+        shutil.copy(app_build_file, tkltest_app_build_file)
+        with open(tkltest_app_build_file, 'a') as f:
+            f.write('dependencies {\n')
+            for dependency_jar in dependencies_jars:
+                f.write('    implementation files(\'' + pathlib.PurePath(dependency_jar).as_posix() + '\')\n')
+            f.write('}\n')
+            f.write('sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [\n')
+            for abs_test_dir in abs_test_dirs:
+                f.write('    \'' + pathlib.PurePath(abs_test_dir).as_posix() + '\',\n')
+            f.write(']\n')
+        # todo  - use this comments for all types when ant implemented
         tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))
