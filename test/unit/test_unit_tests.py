@@ -233,8 +233,8 @@ class UnitTests(unittest.TestCase):
         self.__assert_modules_properties(modules_names, modules)
         self.__assert_no_artifact_at_cli([app_name])
 
-    def test_integrate_tests_into_app_build_file(self) -> None:
-        """Test integrating tests into the app build file()"""
+    def test_integrate_tests_into_maven_app_build_file(self) -> None:
+        """Test integrating tests into the maven app build file()"""
         dir_util.cd_cli_dir()
         app_name = 'windup-sample-web'
         test_app = self.maven_test_apps[app_name]
@@ -273,15 +273,15 @@ class UnitTests(unittest.TestCase):
         os.remove(integrated_pom_file)
         self.__assert_no_artifact_at_cli([app_name])
 
-    def test_integrate_gradle_tests_into_app_build_file(self) -> None:
-        """Test integrating tests into the app build file()"""
+    def test_integrate_tests_into_gradle_app_build_file(self) -> None:
+        """Test integrating tests into the gradle app build file()"""
         dir_util.cd_cli_dir()
         app_name = 'splitNjoin'
         test_app = self.gradle_test_apps[app_name]
         config = config_util.load_config(config_file=test_app['config_file'])
         ctd_tests = test_app['ctd_tests']
         app_dir = os.path.dirname(test_app['config_file'])
-        # we use a local copy of the app:
+        # we must override build.gradle, so we use a local copy of the app :
         local_app_dir = os.path.basename(app_dir)
         shutil.rmtree(local_app_dir, ignore_errors=True)
         shutil.copytree(app_dir, local_app_dir)
@@ -317,6 +317,7 @@ class UnitTests(unittest.TestCase):
         self.assertTrue(os.path.isdir(report_dir))
         html_file = os.path.join(report_dir, 'tests', 'test', 'index.html')
         self.assertTrue(os.path.isfile(html_file))
+        # got 100% for each class, and overall:
         with open(html_file) as f:
             success_lines = [l for l in f.readlines() if l.startswith('<td class="success">100%</td>')]
             self.assertTrue(len(success_lines) == 3)
