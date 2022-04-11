@@ -292,7 +292,7 @@ class UnitTests(unittest.TestCase):
         build_util.integrate_tests_into_app_build_file([local_gradle_file], 'gradle', [ctd_tests])
         integrated_gradle_file_name = 'tkltest_app_build.gradle'
         self.assertTrue(os.path.isfile(integrated_gradle_file_name))
-        shutil.move(integrated_gradle_file_name, gradle_file)
+        shutil.move(integrated_gradle_file_name, local_gradle_file)
 
         # delete tests artifacts
         test_class_dir = os.path.join(os.path.dirname(local_gradle_file), 'build', 'classes', 'java', 'test')
