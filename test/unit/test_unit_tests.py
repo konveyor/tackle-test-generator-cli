@@ -300,13 +300,14 @@ class UnitTests(unittest.TestCase):
         shutil.rmtree(test_class_dir, ignore_errors=True)
         shutil.rmtree(report_dir, ignore_errors=True)
 
+        print(local_gradle_file)
         with open(local_gradle_file) as f:
             lines = f.readlines()
             for line in lines:
                 print(line)
 
         # run tests:
-        run_tests_command = 'gradle -b ' + local_gradle_file + ' clean test'
+        run_tests_command = 'gradle -i -b ' + local_gradle_file + ' clean test'
         command_util.run_command(command=run_tests_command, verbose=True)
 
         # check that there are .class files, reports, and no fails:
