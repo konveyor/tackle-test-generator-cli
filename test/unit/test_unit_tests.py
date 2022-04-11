@@ -300,12 +300,6 @@ class UnitTests(unittest.TestCase):
         shutil.rmtree(test_class_dir, ignore_errors=True)
         shutil.rmtree(report_dir, ignore_errors=True)
 
-        print(local_gradle_file)
-        with open(local_gradle_file) as f:
-            lines = f.readlines()
-            for line in lines:
-                print(line)
-
         # run tests:
         run_tests_command = 'gradle -i -b ' + local_gradle_file + ' clean test'
         command_util.run_command(command=run_tests_command, verbose=True)
@@ -323,7 +317,7 @@ class UnitTests(unittest.TestCase):
         self.assertTrue(os.path.isdir(report_dir))
         html_file = os.path.join(report_dir, 'tests', 'test', 'index.html')
         self.assertTrue(os.path.isfile(html_file))
-        # got 100% for each class, and overall:
+        # got 100% for each class + overall -> total 3:
         with open(html_file) as f:
             success_lines = [l for l in f.readlines() if l.startswith('<td class="success">100%</td>')]
             self.assertTrue(len(success_lines) == 3)
