@@ -80,6 +80,7 @@ class UnitTests(unittest.TestCase):
         'splitNjoin': {
             'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
             'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
+            'ctd_tests': os.path.join('test', 'data', 'splitNjoin', 'splitNjoin-ctd-amplified-tests')
         },
     }
 
@@ -270,6 +271,58 @@ class UnitTests(unittest.TestCase):
                 lines = f.readlines()
                 self.assertTrue([line for line in lines if line_part_ok in line])
         os.remove(integrated_pom_file)
+        self.__assert_no_artifact_at_cli([app_name])
+
+    def test_integrate_gradle_tests_into_app_build_file(self) -> None:
+        """Test integrating tests into the app build file()"""
+        dir_util.cd_cli_dir()
+        app_name = 'splitNjoin'
+        test_app = self.gradle_test_apps[app_name]
+        config = config_util.load_config(config_file=test_app['config_file'])
+        ctd_tests = test_app['ctd_tests']
+        app_dir = os.path.dirname(test_app['config_file'])
+        # we use a local copy of the app:
+        local_app_dir = os.path.basename(app_dir)
+        shutil.rmtree(local_app_dir, ignore_errors=True)
+        shutil.copytree(app_dir, local_app_dir)
+
+        # call integrate_tests_into_app_build_file(), check that new pom is created:
+        gradle_file = config['generate']['app_build_files'][0]
+        local_gradle_file = os.path.relpath(gradle_file, os.path.dirname(app_dir))
+        build_util.integrate_tests_into_app_build_file([local_gradle_file], 'gradle', [ctd_tests])
+        integrated_gradle_file_name = 'tkltest_app_build.gradle'
+        self.assertTrue(os.path.isfile(integrated_gradle_file_name))
+        shutil.move(integrated_gradle_file_name, gradle_file)
+
+        # delete tests artifacts
+        test_class_dir = os.path.join(os.path.dirname(local_gradle_file), 'build', 'classes', 'java', 'test')
+        report_dir = os.path.join(os.path.dirname(local_gradle_file), 'build', 'reports')
+        shutil.rmtree(test_class_dir, ignore_errors=True)
+        shutil.rmtree(report_dir, ignore_errors=True)
+
+        # run tests:
+        run_tests_command = 'gradle -b ' + local_gradle_file + ' clean test'
+        command_util.run_command(command=run_tests_command, verbose=False)
+
+        # check that there are .class files, reports, and no fails:
+        self.assertTrue(os.path.isdir(test_class_dir))
+        class_files = list(Path(test_class_dir).glob('**/*.class'))
+        java_files = list(Path(ctd_tests).glob('**/*.java'))
+        self.assertTrue(class_files)
+        self.assertTrue(len(class_files) == len(java_files))
+        class_files_basenames = set([os.path.basename(f).replace('.class', '') for f in class_files])
+        java_files_basenames = set([os.path.basename(f).replace('.java', '') for f in java_files])
+        self.assertTrue(class_files_basenames == java_files_basenames)
+
+        self.assertTrue(os.path.isdir(report_dir))
+        html_file = os.path.join(report_dir, 'tests', 'test', 'index.html')
+        self.assertTrue(os.path.isfile(html_file))
+        with open(html_file) as f:
+            success_lines = [l for l in f.readlines() if l.startswith('<td class="success">100%</td>')]
+            self.assertTrue(len(success_lines) == 3)
+
+        shutil.rmtree(local_app_dir)
+
         self.__assert_no_artifact_at_cli([app_name])
 
     def test_getting_modules_gradle(self) -> None:
