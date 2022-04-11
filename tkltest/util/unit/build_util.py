@@ -34,6 +34,7 @@ def __get_jars_for_tests_execution():
         constants.JACOCO_CLI_JAR_NAME,
         'org.jacoco.agent-0.8.7.jar',
         'junit-4.13.1.jar',
+        'hamcrest-all-1.3.jar',
         'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
         'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
     }
