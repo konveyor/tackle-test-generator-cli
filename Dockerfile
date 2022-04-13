@@ -40,7 +40,8 @@ WORKDIR /app/tackle-test-cli/lib
 RUN cp settings.xml bak.settings.xml
 RUN sed -ie "s|GITHUB_USERNAME|$GITHUB_USERNAME|g" settings.xml
 RUN sed -ie "s|GITHUB_TOKEN|$GITHUB_TOKEN|g" settings.xml
-RUN mvn -s ./settings.xml download:wget@get-randoop-jar download:wget@get-replacecall-jar
+RUN cat settings.xml
+RUN mvn -s ./settings.xml download:wget@get-randoop-jar download:wget@get-replacecall-jar download:wget@get-evosuite-jar download:wget@get-evosuite-runtime-jar
 RUN mvn -s ./settings.xml dependency:copy-dependencies -DoutputDirectory=./download
 RUN mv bak.settings.xml settings.xml
 
