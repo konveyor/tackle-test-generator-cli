@@ -153,7 +153,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
-    os.rename(jacoco_raw_date_file, jacoco_new_file_name)
+    shutil.move(jacoco_raw_date_file, jacoco_new_file_name)
 
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
