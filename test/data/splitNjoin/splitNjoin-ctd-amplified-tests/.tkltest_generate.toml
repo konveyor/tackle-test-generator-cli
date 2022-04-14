@@ -1,0 +1,9 @@
+subcommand = "ctd-amplified"
+
+[general]
+app_name = "splitNjoin"
+
+[generate]
+partitions_file = ""
+target_class_list = []
+
