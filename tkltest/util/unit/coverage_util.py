@@ -61,7 +61,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     except OSError:
         pass
 
-    jacoco_raw_date_file = ''
+    jacoco_raw_data_file = ''
     env_vars = dict(os.environ.copy())
     env_vars['JAVA_HOME'] = jdk_path
     if has_test_suite:
@@ -77,9 +77,9 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         except subprocess.CalledProcessError as e:
             tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
             return None
-        jacoco_raw_date_file = get_jacoco_exec_file(build_type, test_root_dir)
-        if not os.path.exists(jacoco_raw_date_file):
-            tkltest_status('{} was not created by : {}'.format(jacoco_raw_date_file, cmd), error=True)
+        jacoco_raw_data_file = get_jacoco_exec_file(build_type, test_root_dir)
+        if not os.path.exists(jacoco_raw_data_file):
+            tkltest_status('{} was not created by : {}'.format(jacoco_raw_data_file, cmd), error=True)
             return None
 
     if additional_test_suite:
@@ -110,14 +110,14 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         if no_failure:
             jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
             if has_test_suite:
-                merged_exec_file = jacoco_raw_date_file + '_merged_with_' + os.path.basename(additional_exec_file)
+                merged_exec_file = jacoco_raw_data_file + '_merged_with_' + os.path.basename(additional_exec_file)
                 merged_csv_file = coverage_csv_file + '_merged_with_' + os.path.basename(additional_exec_file) + '.csv'
                 try:
                     command_util.run_command("java -jar {} merge {} {} --destfile {}".
-                                             format(jacoco_cli_file, jacoco_raw_date_file, additional_exec_file,
+                                             format(jacoco_cli_file, jacoco_raw_data_file, additional_exec_file,
                                                     merged_exec_file), verbose=True, env_vars=env_vars)
                 except subprocess.CalledProcessError as e:
-                    tkltest_status('Warning: Failed to merge coverage data files {} and {}:\n {}\n{}'.format(jacoco_raw_date_file, additional_exec_file, e, e.stderr))
+                    tkltest_status('Warning: Failed to merge coverage data files {} and {}:\n {}\n{}'.format(jacoco_raw_data_file, additional_exec_file, e, e.stderr))
                     no_failure = False
             else:
                 merged_exec_file = additional_exec_file
@@ -135,11 +135,11 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
                 no_failure = False
 
         if no_failure:
-            jacoco_raw_date_file = merged_exec_file
+            jacoco_raw_data_file = merged_exec_file
             coverage_csv_file = merged_csv_file
         else:
             tkltest_status('Warning: Failed to obtain coverage from dev-written test suite using {}, using only coverage from ctd-amplified test suite {}'.format(additional_build_file, build_file))
-    if not jacoco_raw_date_file:
+    if not jacoco_raw_data_file:
         return {
             'instruction_covered': 0,
             'line_covered': 0,
@@ -153,7 +153,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
 
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
-    os.rename(jacoco_raw_date_file, jacoco_new_file_name)
+    shutil.move(jacoco_raw_data_file, jacoco_new_file_name)
 
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
@@ -428,13 +428,13 @@ def generate_coverage_report(monolith_app_path, jdk_path, exec_file, xml_file=''
 
 def get_jacoco_exec_file(build_type, test_root_dir):
     if build_type == 'ant':
-        jacoco_raw_date_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+        jacoco_raw_data_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
         # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
         if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
-            jacoco_raw_date_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
+            jacoco_raw_data_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
         else:
-            jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
+            jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
-        jacoco_raw_date_file = os.path.join(test_root_dir, "jacoco.exec")
-    return jacoco_raw_date_file
+        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+    return jacoco_raw_data_file
