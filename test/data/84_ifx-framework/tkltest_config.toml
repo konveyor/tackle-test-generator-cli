@@ -8,7 +8,7 @@ name = "TKLTEST_CONFIG_FILE"
 [generate]
     time_limit = 2
     add_assertions = false
-    jee_support = false
+#     jee_support = false
     app_build_type = "ant"
     app_build_files = ["test/data/84_ifx-framework/build.xml"]
     app_build_settings_files = ["test/data/84_ifx-framework/build.properties"]

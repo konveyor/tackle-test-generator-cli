@@ -9,7 +9,6 @@ verbose = false
 time_limit = 10
 
 [generate]
-jee_support = true
 no_diff_assertions = false
 partitions_file = ""
 target_class_list = []

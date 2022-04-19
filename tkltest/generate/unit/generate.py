@@ -164,7 +164,7 @@ def generate_ctd_amplified_tests(config, output_dir):
                      no_diff_assertions=config['generate']['no_diff_assertions'],
                      no_ctd_coverage=config['generate']['ctd_amplified']['no_ctd_coverage'],
                      interaction_level=config['generate']['ctd_amplified']['interaction_level'],
-                     jee_support=config['generate']['jee_support'],
+                     # jee_support=config['generate']['jee_support'],
                      bad_path=config['generate']['bad_path'],
                      num_executions=config['generate']['ctd_amplified']['num_seq_executions'],
                      test_directory=tmp_test_directory, verbose=verbose)
@@ -415,8 +415,9 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
 
 
 def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, bb_seq_file, jdk_path,
-                     no_diff_assertions, no_ctd_coverage, interaction_level, jee_support, bad_path, num_executions,
-                     test_directory, verbose=False):
+                     no_diff_assertions, no_ctd_coverage, interaction_level,
+                     # jee_support,
+                     bad_path, num_executions, test_directory, verbose=False):
     """Generates the final CTD-guided test cases.
 
     Generates extended test sequences for covering the CTD test plan rows that are written as JUnit
@@ -430,7 +431,6 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         bb_seq_file (str): name of JSON file containing building-block test sequences
         jdk_path (str): path to Java VM
         no_diff_assertions (bool): do not add assertions for differential testing to the generated tests
-        jee_support (bool): add support JEE mocking in generated tests cases
         bad_path (bool): whether to enerate bad path tests cases
         num_executions (int): number of executions to perform to determine pass/fail status of generated sequences
         test_directory (str): name of root test directory to write JUnit test classes to
@@ -444,10 +444,10 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -cp \"" + os.path.join(constants.TKLTEST_UNIT_CORE_JAR) + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     te_command += os.path.abspath(app_name+constants.TKL_EVOSUITE_OUTDIR_SUFFIX) + os.pathsep
-    if jee_support:
-        te_command += os.path.join(constants.TKLTEST_LIB_DIR,
-                                   "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
-        te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "junit-4.13.1.jar") + os.pathsep
+    # if jee_support:
+    #     te_command += os.path.join(constants.TKLTEST_LIB_DIR,
+    #                                "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+"-SNAPSHOT.jar") + os.pathsep
+    #     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "junit-4.13.1.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DIR, "ccmcl.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-databind-2.12.6.1.jar") + os.pathsep
     te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-core-2.12.6.jar") + os.pathsep
@@ -472,9 +472,9 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -tp " + ctd_file
     te_command += " -ts " + bb_seq_file
     te_command += " -od " + test_directory
-    if jee_support:
-        tkltest_status('Warning: jee_support is currently disabled; ignoring this option')
-        #te_command += " -jee"
+    # if jee_support:
+    #     tkltest_status('Warning: jee_support is currently disabled; ignoring this option')
+    #     te_command += " -jee"
 
     if bad_path:
         te_command += " -bp"

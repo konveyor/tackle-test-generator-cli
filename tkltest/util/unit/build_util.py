@@ -81,8 +81,8 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 
     class_paths.extend(__get_jars_for_tests_execution())
 
-    if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
-            class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
+    # if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
+    #         class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
     logging.info('classpath: {} '.format(classpath_str))

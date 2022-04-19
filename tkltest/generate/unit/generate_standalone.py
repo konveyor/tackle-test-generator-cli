@@ -282,7 +282,7 @@ def __get_evosuite_flags(config):
     if int(time_limit) > 0:
         flags += " -Dsearch_budget=" + str(time_limit)
     flags += " -Dassertions=" + str(not config['generate']['no_diff_assertions']).lower()
-    flags += " -Djee="+str(config['generate']['jee_support']).lower()
+    # flags += " -Djee="+str(config['generate']['jee_support']).lower()
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':
         output_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX

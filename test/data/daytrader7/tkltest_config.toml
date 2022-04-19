@@ -18,7 +18,7 @@ name = "TKLTEST_CONFIG_FILE"
 [generate]
     time_limit = 2
     add_assertions = false
-    jee_support = true
+#     jee_support = true
     no_diff_assertions = false
 
     # partitions file path. If specified, this option overrides target_class_list option.

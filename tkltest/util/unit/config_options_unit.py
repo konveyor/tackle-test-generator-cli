@@ -258,14 +258,14 @@ __options_spec = {
     'generate': {
         'is_cli_command': True,
         'help_message': 'Generate test cases on the application under test',
-        'jee_support': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': bool,
-            'default_value': False,
-            'help_message': 'add support JEE mocking in generated tests cases; currently this option is disabled'
-        },
+        # 'jee_support': {
+        #     'required': False,
+        #     'is_toml_option': True,
+        #     'is_cli_option': False,
+        #     'type': bool,
+        #     'default_value': False,
+        #     'help_message': 'add support JEE mocking in generated tests cases; currently this option is disabled'
+        # },
         'no_diff_assertions': {
             'required': False,
             'is_toml_option': True,
