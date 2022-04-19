@@ -51,5 +51,5 @@ COPY setup.py ./
 RUN pip install .
 
 # set entrypoint
-COPY entrypoint.sh ./
-ENTRYPOINT ["./entrypoint.sh"]
+COPY entrypoint.sh /app/
+ENTRYPOINT ["/app/entrypoint.sh"]
