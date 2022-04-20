@@ -273,15 +273,20 @@ def __update_config_with_cli_value(config, options_spec, args):
                     config[opt_name] = opt_value
 
 
-def __merge_config(base_config, update_config):
+def __merge_config(base_config, update_config, key_prefix=""):
     """Merge two config specs.
 
     Updates base config with data in update config.
+    Prints warnings about unrecognized configuration flags from update config, and doesn't add them to base config.
     """
     for key, val in update_config.items():
+        full_key = key if key_prefix == "" else key_prefix + '.' + key
+        if key not in base_config:
+            tkltest_status('Warning: Ignoring unrecognized flag from toml file: {}'.format(full_key))
+            continue
         if isinstance(val, dict):
             baseval = base_config.setdefault(key, {})
-            __merge_config(baseval, val)
+            __merge_config(baseval, val, full_key)
         else:
             base_config[key] = val
 
