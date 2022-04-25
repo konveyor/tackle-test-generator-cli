@@ -473,7 +473,6 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     te_command += " -ts " + bb_seq_file
     te_command += " -od " + test_directory
     # if jee_support:
-    #     tkltest_status('Warning: jee_support is currently disabled; ignoring this option')
     #     te_command += " -jee"
 
     if bad_path:
