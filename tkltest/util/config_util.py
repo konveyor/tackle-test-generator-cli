@@ -277,7 +277,7 @@ def __merge_config(base_config, update_config, key_prefix=""):
     """Merge two config specs.
 
     Updates base config with data in update config.
-    Prints warnings about unrecognized configuration flags from update config, and doesn't add them to base config.
+    Prints warnings about unrecognized configuration flags from update_config, still adds them to base_config.
     """
     for key, val in update_config.items():
         full_key = key if key_prefix == "" else key_prefix + '.' + key
