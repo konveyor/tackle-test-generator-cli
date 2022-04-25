@@ -282,8 +282,7 @@ def __merge_config(base_config, update_config, key_prefix=""):
     for key, val in update_config.items():
         full_key = key if key_prefix == "" else key_prefix + '.' + key
         if key not in base_config:
-            tkltest_status('Warning: Ignoring unrecognized flag from toml file: {}'.format(full_key))
-            continue
+            tkltest_status('Warning: Unsupported flag in toml file: {}'.format(full_key))
         if isinstance(val, dict):
             baseval = base_config.setdefault(key, {})
             __merge_config(baseval, val, full_key)

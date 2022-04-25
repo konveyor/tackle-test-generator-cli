@@ -115,8 +115,8 @@ teardown_file() {
 @test "Test 12: CLI generate ctd-amplified invalid spec in toml" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR generate ctd-amplified
     assert_failure 1
-    assert_line --index 1 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 2 --partial "Warning: Ignoring unrecognized flag"
+    assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
     assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
@@ -135,8 +135,8 @@ teardown_file() {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR \
         generate --partitions-file $IRS_PARTITIONS_FILE ctd-amplified
     assert_failure 1
-    assert_line --index 1 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 2 --partial "Warning: Ignoring unrecognized flag"
+    assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
     assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
@@ -150,8 +150,8 @@ teardown_file() {
 @test "Test 15: CLI execute invalid spec in toml" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR execute
     assert_failure 1
-    assert_line --index 1 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 2 --partial "Warning: Ignoring unrecognized flag"
+    assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
     assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
@@ -172,9 +172,9 @@ teardown_file() {
     run tkltest-unit --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR execute
     assert_failure 1
-    assert_line --index 1 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 2 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 3 --partial "Warning: Ignoring unrecognized flag"
+    assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 3 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 4 --partial "Executing tests for app irs using config file"
     assert_line --index 5 --partial "Generate config file not found:"
     assert_line --index 6 --partial "To execute tests in ../$IRS_CTD_AMPLIFIED_TESTDIR, the file created by the generate command must be available"
@@ -184,9 +184,9 @@ teardown_file() {
     run tkltest-unit --config-file $IRS_CONFIG_FILE generate ctd-amplified \
         --base-test-generator randoop
     assert_failure 1
-    assert_line --index 1 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 2 --partial "Warning: Ignoring unrecognized flag"
-    assert_line --index 3 --partial "Warning: Ignoring unrecognized flag"
+    assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
+    assert_line --index 3 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 4 --partial "ERROR: configuration options validation failed:"
     assert_line --index 5 --partial "Violated parameter constraint: For coverage augmentation, base test generator must be \"combined\" or \"evosuite\""
 }
