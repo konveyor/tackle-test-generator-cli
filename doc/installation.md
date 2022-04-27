@@ -14,8 +14,8 @@ requires authentication. To enable authentication, create a [GitHub personal acc
 with the permission `read:packages`. Note that using your GitHub password will not work for downloading some
 of the jar files; a personal access token must be used.
 
-Updatde the script [../lib/download_lib_jars.sh](../lib/download_lib_jars.sh) by replace `GITHUB_USERNAME` with your GitHub username and `GITHUB_TOKEN` with the personal access token that you created. Then, run the script to download all
-library dependencies.
+Update the settings file [../lib/settings.xml](../lib/settings.xml) by replacing `GITHUB_USERNAME` with your GitHub username and `GITHUB_TOKEN` with the personal access token that you created.
+Then, run the `lib/download_lib_jars.sh` script to download all library dependencies.
 
 ```buildoutcfg
 cd lib; ./download_lib_jars.sh
@@ -26,7 +26,7 @@ Windows users should run:
 cd lib; download_lib_jars.sh
 ```
    
-This downloads the Java libraries required by the CLI into the `lib/download` directory.
+This downloads the Java libraries required by the CLI into the `lib/download` directory, including the updated versions of `tackle-test-generator-core` jars.
 
 TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
 
