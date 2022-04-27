@@ -18,7 +18,7 @@ excluded_class_list = []
 time_limit = 10
 app_build_files = []
 app_build_settings_files = []
-app_build_target = ""
+app_build_ant_target = ""
 
 [execute]
 app_packages = ["failing.*"]

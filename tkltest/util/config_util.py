@@ -430,14 +430,14 @@ def __create_modified_build_file_for_dependencies(app_build_file, toy_program_di
 
 def __run_ant_command(modified_build_file_name,
                       app_settings_file,
-                      app_build_target,
+                      app_build_ant_target,
                       output_dir):
     """
     Runs the ant command with the modified copy of the build file.
     Also, removes the modified build file copy after running command.
     :param modified_build_file_name: the modified build file to run Ant with
     :param app_settings_file: settings file for user properties
-    :param app_build_target: Ant target to run
+    :param app_build_ant_target: Ant target to run
     :return: path to the file containing the output
     """
     # create output file or override previous output
@@ -449,7 +449,7 @@ def __run_ant_command(modified_build_file_name,
     run_ant_command = 'ant -f ' + modified_build_file_name
     if app_settings_file:
         run_ant_command += ' -propertyfile ' + os.path.abspath(app_settings_file)
-    run_ant_command += ' ' + app_build_target + ' >> ' + ant_output_filename
+    run_ant_command += ' ' + app_build_ant_target + ' >> ' + ant_output_filename
     logging.info(run_ant_command)
 
     # execute ant command
@@ -678,10 +678,10 @@ def resolve_app_path(tkltest_config):
             tkltest_config['general']['monolith_app_path'] = app_path
 
     elif app_build_type == 'ant':
-        app_build_target = tkltest_config['generate']['app_build_target']
+        app_build_ant_target = tkltest_config['generate']['app_build_ant_target']
         # create a modified build file
         modified_build_file_name, build_base_dir = __create_modified_build_file_for_monolith_app_path(app_build_file)
-        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_ant_target, output_dir)
 
         with open(ant_output_filename, 'r') as output_file:
             lines = output_file.read().splitlines()
@@ -809,7 +809,7 @@ def resolve_classpath(tkltest_config, command):
         os.remove(mvn_classpath_file)
 
     elif app_build_type == 'ant':
-        app_build_target = tkltest_config['generate']['app_build_target']
+        app_build_ant_target = tkltest_config['generate']['app_build_ant_target']
 
         # writing a toy program for compiling when running ant command
         toy_program_dir_path = os.path.abspath(os.path.join(output_dir, 'tkltest_toy_program'))
@@ -823,7 +823,7 @@ def resolve_classpath(tkltest_config, command):
 
         # create a modified build file
         modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
-        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_ant_target, output_dir)
         class_path_order = __parse_ant_output_for_dependencies(ant_output_filename)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)

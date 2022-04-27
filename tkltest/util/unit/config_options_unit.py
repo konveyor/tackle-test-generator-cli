@@ -77,7 +77,7 @@ def __conditionally_required(opt_name, config):
         # required if app_build_type is specified
         if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is specified'
-    elif opt_name == 'app_build_target':
+    elif opt_name == 'app_build_ant_target':
         # required if app_build_type is 'ant'
         if config['generate']['app_build_type'] == 'ant':
             return 'required if "app_build_type" is ant'
@@ -329,7 +329,7 @@ __options_spec = {
             'default_value': False,
             'help_message': 'Generate also bad path tests; assertions will validate that the exception observed during generation is thrown also during execution'
         },
-        'app_build_target': {
+        'app_build_ant_target': {
             'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,

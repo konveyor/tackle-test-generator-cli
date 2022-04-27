@@ -109,7 +109,7 @@ class UnitTests(unittest.TestCase):
 
             # every target is a different test case and is being compared to the standard classpath
             for target_name in ant_test_apps[app_name]['targets_to_test_dependencies']:
-                config['generate']['app_build_target'] = target_name
+                config['generate']['app_build_ant_target'] = target_name
                 config['general']['app_classpath_file'] = ''
                 config_util.resolve_classpath(config, 'generate')
 
@@ -141,7 +141,7 @@ class UnitTests(unittest.TestCase):
             monolith_app_path[0] = os.path.join(constants.TKLTEST_CLI_DIR, monolith_app_path[0])
             # every target is a different test case
             for target_name in ant_test_apps[app_name]['targets_to_test_app_path']:
-                config['generate']['app_build_target'] = target_name
+                config['generate']['app_build_ant_target'] = target_name
                 config['general']['monolith_app_path'] = []
                 config_util.resolve_app_path(config)
 
