@@ -132,8 +132,7 @@ teardown_file() {
 }
 
 @test "Test 14: CLI generate ctd-amplified invalid spec in toml" {
-    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR \
-        generate --partitions-file $IRS_PARTITIONS_FILE ctd-amplified
+    run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR generate ctd-amplified
     assert_failure 1
     assert_line --index 1 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
@@ -142,9 +141,7 @@ teardown_file() {
     assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
     assert_line --index 6 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
     assert_line --index 7 --partial "Missing conditionally required option for \"generate\": app_build_type (required if \"monolith_app_path\" is not specified)"
-    assert_line --index 8 --partial "refactored_app_path_prefix (required if \"partitions_file\" is specified)"
-    assert_line --index 9 --partial "refactored_app_path_suffix (required if \"partitions_file\" is specified)"
-    assert_line --index 10 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
+    assert_line --index 8 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
 @test "Test 15: CLI execute invalid spec in toml" {

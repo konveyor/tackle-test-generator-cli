@@ -33,8 +33,8 @@ no_augment_coverage = true
 no_ctd_coverage = false
 interaction_level = 1
 num_seq_executions = 10
-refactored_app_path_prefix = ""
-refactored_app_path_suffix = []
+# refactored_app_path_prefix = ""
+# refactored_app_path_suffix = []
 ctd_coverage = false
 
 [generate.evosuite]

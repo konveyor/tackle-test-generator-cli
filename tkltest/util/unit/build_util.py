@@ -44,7 +44,8 @@ def __get_jars_for_tests_execution():
         if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
     ]
 
-def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
+
+def get_build_classpath(config, subcommand='ctd-amplified'):
     """Creates and returns build classpath.
 
     Creates and returns build path, consisting of app library dependencies and
@@ -52,7 +53,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 
     Args:
         config: loaded configuration information
-        partition: name of partition (if build is being done for a partition of the refactored app)
+        # partition: name of partition (if build is being done for a partition of the refactored app)
 
     Returns:
         string representing build path
@@ -70,14 +71,14 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
                     class_paths.append(os.path.abspath(line))
 
     # add path for app classes for mono or micro version
-    if partition is not None:
-        if partition not in config['execute']['micro']['partition_paths'].keys():
-            raise Exception('Partition path not specified for partition: {}'.format(partition))
-        for part_path in config['execute']['micro']['partition_paths'][partition]:
-            class_paths.insert(0, os.path.abspath(part_path))
-        logging.debug('Added paths for partition {}: {}'.format(
-            partition, config['execute']['micro']['partition_paths'][partition]
-        ))
+    # if partition is not None:
+    #     if partition not in config['execute']['micro']['partition_paths'].keys():
+    #         raise Exception('Partition path not specified for partition: {}'.format(partition))
+    #     for part_path in config['execute']['micro']['partition_paths'][partition]:
+    #         class_paths.insert(0, os.path.abspath(part_path))
+    #     logging.debug('Added paths for partition {}: {}'.format(
+    #         partition, config['execute']['micro']['partition_paths'][partition]
+    #     ))
 
     class_paths.extend(__get_jars_for_tests_execution())
 
