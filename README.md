@@ -97,7 +97,7 @@ tkltest-ui --help
 
 > Notes on upgrading an installation:
 > - If you download a newer TackleTest release, follow the [command installation instructions](doc/installation.md#installing-the-tackletest-cli) and check the TackleTest version by running the command `tkltest-unit -v` or `tkltest-ui -v`.
-> - To pull in updated [published library dependencies](https://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-core) for the [TackleTest Core](https://github.com/konveyor/tackle-test-generator-core) components, please make sure to delete the corresponding jar files from `lib/download` as well as from your local Maven repository (`~/.m2/repository`) before [running the download script](./doc/installation.md#downloading-java-library-dependencies).
+> - If you upgrade the repo snapshot, please be sure to [rerun the download script](./doc/installation.md#downloading-java-library-dependencies) to pull in the updated [published library dependencies](https://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-core) for the [TackleTest Core](https://github.com/konveyor/tackle-test-generator-core) components.
 
 ## TackleTest CLI in action on sample apps
 
