@@ -2,6 +2,7 @@
 
 1. [Overview](#overview)
 2. [Test Generation](#test-generation)
+    - [Generation Output Artifacts](#generated-artifacts)
 3. [Test Execution](#test-execution)
 4. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
 5. [Configuration Options](tkltest_ui_config_options.md)
@@ -121,17 +122,13 @@ in the main configuration file.
 
 For details on how to specify clickables, see [clickables specification](./tkltest_ui_config_options.md#clickables-specification).
  
-### Generated artifacts      
+## Generated artifacts      
 
 The main artifacts created by the `tkltest-ui generate` command are the two test suites, one using Selenium API
 and the other using Crawljax API. In addition to these, a number of other artifacts are created from the automated
 crawling in the `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##` directory.
 These latter artifacts describe information related to the internal model CrawlJax built, and can be used for 
 advanced debugging or for deep diving into the crawling results from which the test suites are derived.
-The following tree illustrates the created `crawl##` directory structure:
-
-
-<img width="309" alt="image" src="https://user-images.githubusercontent.com/2688521/157508099-e59eea34-028e-4221-b506-f3efb6f2ec31.png">
 
 - The Selenium API tests, the Maven build file, and the TestNG config file appear under directory `selenium-api-tests`.
 
@@ -146,6 +143,10 @@ config file for these tests.
 - The `css/`, `img/`, `js/`, and `lib/` directories contain JavaScript and CSS code and images to support the crawl model visualization.
 
 - The `doms/`, `screenshots/`, and `states/` directories contain information about the states reached (HTML, captured images, etc.)
+
+The following tree illustrates the created `crawl##` directory structure:
+
+<img width="309" alt="image" src="https://user-images.githubusercontent.com/2688521/157508099-e59eea34-028e-4221-b506-f3efb6f2ec31.png">
 
 ## Test Execution
 
