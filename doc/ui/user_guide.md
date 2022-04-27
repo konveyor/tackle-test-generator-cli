@@ -3,8 +3,9 @@
 1. [Overview](#overview)
 2. [Test Generation](#test-generation)
 3. [Test Execution](#test-execution)
-4. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
-5. [Configuration Options](tkltest_ui_config_options.md)
+4. [Output Artifacts](#output-artifacts)
+5. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
+6. [Configuration Options](tkltest_ui_config_options.md)
 
 ## Overview
 
@@ -183,6 +184,20 @@ is created in the folder `crawl##/test-results`. The following image is an illus
 
 Each execution of the Crawljax API test suite generates a new execution report created in a subdirectory under `crawl##/test-results`
 (the subdirectory name is an integer value, starting at `0` and incremented for each execution).
+
+## Output Artifacts
+
+The output artifacts of the `generate` command are as follows:
+
+1. The final TestNG test-suite, located in:
+   - Using Selenium API: `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl<max#>/selenium-api-tests`
+   - Using CrawlJax API: `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl<max#>/` (under `src`)
+2. A `pom.xml` build file to build and execute the test cases, located inside the test-suite folder.
+3. Advanced: the state transition model infered by CrawlJax and additional crawling results and statistics, in `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl<max#>/index.html`     
+   
+The output artifact of the `execute` command is as follows:
+
+1. A surfire report with test execution results, in `tkltest-output-ui-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl<max#>/test-results`
 
 ## Best Practices and Troubleshooting Tips
 
