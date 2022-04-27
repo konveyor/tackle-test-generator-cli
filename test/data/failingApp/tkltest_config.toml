@@ -12,7 +12,7 @@ build_type = "ant"
 [generate]
 # jee_support = false
 no_diff_assertions = false
-partitions_file = ""
+# partitions_file = ""
 target_class_list = []
 excluded_class_list = []
 time_limit = 10

@@ -79,7 +79,7 @@ teardown_file() {
 @test "Test 06: CLI generate command help" {
     run tkltest-unit generate --help
     assert_success
-    assert_output --partial 'usage: tkltest-unit generate [-h] [-nda] [-pf PARTITIONS_FILE]'
+    assert_output --partial 'usage: tkltest-unit generate [-h] [-nda] [-bp]'
 }
 
 @test "Test 07: CLI execute command help" {

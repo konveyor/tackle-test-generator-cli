@@ -538,7 +538,7 @@ class UnitTests(unittest.TestCase):
             app_classpath=build_util.get_build_classpath(config),
             test_root_dir=config['general']['test_directory'],
             test_dirs=[monolithic_dir],
-            partitions_file=None,
+            # partitions_file=None,
             target_class_list=[],
             main_reports_dir=config['general']['reports_path'],
             app_packages=[],  # for coverage-based augmentation
