@@ -38,7 +38,12 @@ The core capability provided by the CLI is automated generation of unit test cas
 `tkltest-unit --help` shows the available commands and options for generating and running test cases.
 
 ```
-usage: tkltest-unit [-h] [-cf CONFIG_FILE] [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}] [-td TEST_DIRECTORY] [-rp REPORTS_PATH] [-vb] [-v] [-offli] [-bt {ant,maven,gradle}] {config,generate,execute} ...
+usage: tkltest-unit [-h] [-cf CONFIG_FILE]
+                    [-l {CRITICAL,ERROR,WARNING,INFO,DEBUG}]
+                    [-td TEST_DIRECTORY] [-rp REPORTS_PATH] [-vb] [-v]
+                    [-offli] [-bt {ant,maven,gradle,}]
+                    [-mam MAXIMAL_MEMORY_FOR_COVERAGE]
+                    {config,generate,execute} ...
 
 Command-line interface for generating and executing Java unit test cases
 
@@ -48,12 +53,12 @@ positional arguments:
     generate            Generate test cases on the application under test
     execute             Execute generated tests on the application version under test
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -cf CONFIG_FILE, --config-file CONFIG_FILE
                         path to TOML file containing configuration options
   -l {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
-                        logging level for printing diagnostic messages
+                        logging level for printing diagnostic messages; options are CRITICAL, ERROR, WARNING, INFO, DEBUG
   -td TEST_DIRECTORY, --test-directory TEST_DIRECTORY
                         name of root test directory containing the generated JUnit test classes
   -rp REPORTS_PATH, --reports-path REPORTS_PATH
@@ -62,9 +67,13 @@ optional arguments:
   -v, --version         print CLI version number
   -offli, --offline-instrumentation
                         perform offline instrumentation of app classes for measuring code coverage (default: app classes are instrumented online)
-  -bt {ant,maven,gradle}, --build-type {ant,maven,gradle}
-                        build file type for compiling and running the tests: ant, maven, or gradle
+  -bt {ant,maven,gradle,}, --build-type {ant,maven,gradle,}
+                        build file type of app_build_files if they are provided; if app_build_files are not provided, this is the build file type for compiling and running the tests
+  -mam MAXIMAL_MEMORY_FOR_COVERAGE, --maximal-memory-for-coverage MAXIMAL_MEMORY_FOR_COVERAGE
+                        maximal heap size (in MB) used for obtaining coverage data
 ```
+
+All the different configuration options of the commands are documented in [TackleTest-Unit documentation of configuration options](tkltest_unit_config_options.md).
 
 In the rest of the guide, we provide detailed description of the test-generation and test-execution capabilities, along with explanation of various configuration options that control the behavior of the CLI and the core test-generation engine.
 
@@ -80,7 +89,8 @@ By default, this sub-command generates diff assertions and adds them to the gene
 To avoid adding assertions, use the `-nda/--no-diff-assertions` option.
 
 ``` 
-usage: tkltest-unit generate [-h] [-nda] [-pf PARTITIONS_FILE] {ctd-amplified,evosuite,randoop} ...
+usage: tkltest-unit generate [-h] [-nda] [-bp]
+                             {ctd-amplified,evosuite,randoop} ...
 
 positional arguments:
   {ctd-amplified,evosuite,randoop}
@@ -88,12 +98,11 @@ positional arguments:
     evosuite            Use EvoSuite for generating a test suite
     randoop             Use Randoop for generating a test suite
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -nda, --no-diff-assertions
                         do not add assertions for differential testing to the generated tests
-  -pf PARTITIONS_FILE, --partitions-file PARTITIONS_FILE
-                        path to file containing specification of partitions
+  -bp, --bad-path       Generate also bad path tests; assertions will validate that the exception observed during generation is thrown also during execution
 ```
 
 To perform test generation, the starting point is creation of the configuration file, containing options and values for configuring the behavior of test generation. This includes specifying the app under test, selecting the test-generation strategy, specifying assertion generation, and specifying time limits for test generation.
@@ -102,21 +111,23 @@ To perform test generation, the starting point is creation of the configuration 
 
 The specification of the app under test is provided using the following configuration parameters:
 
-1. `app_name`: The name of the application being tested. The value provided for `app_name` is used as prefix in the names of files and directories created by the test generator. For example, the directories containing the generated tests and test reports have the prefix `<app_name>-` and the CTD test-plan file has the prefix `<app_name>_`. The app name should thus not contain characters that are invalid in file/directory names.
+1. `app_name`: (in `generate` command options) The name of the application being tested. The value provided for `app_name` is used as prefix in the names of files and directories created by the test generator. For example, the directories containing the generated tests and test reports have the prefix `<app_name>-` and the CTD test-plan file has the prefix `<app_name>_`. The app name should thus not contain characters that are invalid in file/directory names.
 
-2. `monolith_app_path`: A list of absolute or relative paths to directories containing application classes. The specified paths are used as Java `CLASSPATH` for purposes of loading application classes for analysis and test generation.
+2. `app_build_files`: (in `generate` command options) one or more build files for the application. TackleTest will automatically extract the following information from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, and (3) the identity of its modules, in case of a multi-module application. Additional parameters that depend on the build type of the application: (in `generate` command options)
    
-3. `app_classpath_file`. The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../test/data/irs/irsMonoClasspath.txt). 
-
-    Alternatively, you can specify your Gradle, Ant or Maven build file and Tackle-Test will automatically collect the application's library dependencies and create the classpath file.  To do this, use the `generate` command options in the toml file:
+   - For Gradle build file, `app_build_settings_files` is optional for specifying a settings file. For example with Gradle build file, see the [splitNjoin app build specification](../../test/data/splitNjoin/tkltest_config.toml).
    
-   - For Gradle build file, specify `app_build_type` and `app_build_config_file`. `app_build_settings_file` is optional for specifying a settings file. For example with Gradle build file, see the [splitNjoin app build specification](../test/data/splitNjoin/tkltest_config.toml).
-   
-   - For Ant build file, specify `app_build_type`, `app_build_config_file`, and `app_build_target`. `app_build_settings_file` is optional for specifying a property file. For Ant, this feature is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files.
-   
-   - For Maven build file, specify `app_build_type` and `app_build_config_file`.
+   - For Ant build file, `app_build_ant_target` is required. `app_build_settings_files` is optional for specifying a property file. For Ant, the feature of specifying `app_build_files` is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files, and in this case the parameters `monolith_app_path` and `app_classpath_file` should be provided.    
     
-    When specifying `app_build_files`, the generated test suite(s) and their external dependencies will be integrated into them. The integrated build files are saved under the output directory as `tkltest_app_<app-build-file-name>`.  
+3. `build_type`: (in `general` command options) build file type of `app_build_files`, if they are provided.
+
+When specifying `app_build_files`, the generated test suite(s) and their external dependencies will be integrated into them. The integrated build files are saved under the output directory as `tkltest_app_<app-build-file-name>`.
+
+Alternatively, if not specifying `app_build_files` and theirs `build_type`, the following configuration parameters are required:
+
+1. `monolith_app_path`: (in `general` command options) A list of absolute or relative paths to directories containing application classes. The specified paths are used as Java `CLASSPATH` for purposes of loading application classes for analysis and test generation.
+   
+2. `app_classpath_file`: (in `general` command options) The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../../test/data/irs/irsMonoClasspath.txt). 
 
 ### Selecting the test-generation strategy
 
@@ -168,6 +179,7 @@ The time taken in test generation can be controlled via a couple of options:
 
 - `num_seq_executions`: The value specifies the number of executions to perform to determine the pass/fail status of generated sequences. These executions are also used for checking the consistency of recorded object states for creating assertions, so that flaky assertions on non-deterministic values can be avoided. This option applies to CTD-guided test generation only. By default, each sequence is executed 10 times. To lower the cost of test generation, fewer executions can be performed, keeping in mind that fewer executions can result in some flaky tests being generated. 
 
+<!-- This section is hidden because of removed jee support
 ### Support for Java Enterprise Edition (JEE) applications
 
 For a JEE application, unit testing might be more challenging because the application server is not running and not initializing required resources. Queries 
@@ -184,34 +196,24 @@ using EvoSuite classloader and JEE support. If the sequence passes, it is kept a
 
 Note that the current level of JEE support is limited to the types of JEE operations supported by EvoSuite and can still result in low coverage on some classes.
 For more details on EvoSuite's JEE support see [EvoSuite JEE paper](https://www.evosuite.org/wp-content/papercite-data/pdf/ssbse16_jee.pdf). 
+-->
 
 ## Test Execution
 
 The CLI `execute` command automatically creates a build script to compile the test cases, execute them, 
-and create JUnit and (optionally) code coverage reports. Different configuration options exist to control the
-behavior of this command.
+and create JUnit and (optionally) code coverage reports.
 
 ```
 usage: tkltest-unit execute [-h] [-nbf] [-cc] [-tc TEST_CLASS]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -nbf, --no-build-file-creation
                         whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used
   -cc, --code-coverage  generate code coverage report with JaCoCo agent
   -tc TEST_CLASS, --test-class TEST_CLASS
-                        path to a test class file (.java) to compile and run
-
+                        path to a test class file (.java) to compile and run; empty by default, in which case tests for all classes targeted during test generation are executed.
 ```
-
-1. `build_type` - can be either `ant` (default), `maven` or `gradle`. Indicates the type of build script that will be generated.
-2. `code_coverage` - whether to create JaCoCo code coverage reports for the executed test cases. Default is false.
-3. `offline_instrumentation` - whether to use offline instrumentation for the code coverage collection. Default is false, 
-                                meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.
-4. `app_packages` - a list of prefixes of the app under test, to be used by JaCoCo so that it reports coverage of the app 
-                        under test only rather than also third party code.
-5. `test_class` - name of the class to be tested, in case the user wants to execute the tests for a specific class only. 
-Empty by default, in which case tests for all classes targeted during test generation are executed.
 
 When test execution completes, a JUnit report is generated, summarizing all test case results. Optionally, also a JaCoCo code coverage report is generated to present the statement and branch coverage obtained during test case execution. 
 Both reports are illustrated below on the irs example.  

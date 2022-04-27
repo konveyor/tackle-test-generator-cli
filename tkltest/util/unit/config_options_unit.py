@@ -216,7 +216,8 @@ __options_spec = {
             'type': str,
             'choices': ['ant', 'maven',  'gradle', ''],
             'default_value': '',
-            'help_message': 'build file type of app_build_files if they are provided: ant, maven, or gradle'
+            'help_message': 'build file type of app_build_files if they are provided; '
+                            'if app_build_files are not provided, this is the build file type for compiling and running the tests'
         },
         'max_memory_for_coverage': {
             'required': False,
@@ -464,6 +465,8 @@ __options_spec = {
             'type': list,
             'default_value': [],
             'help_message': 'list of app packages; must end with a wildcard'
+                            '(to be used by JaCoCo so that it reports coverage of the app under test only,'
+                            'rather than also third party code)'
         },
         'create_build_file': {
             'required': False,
@@ -493,7 +496,8 @@ __options_spec = {
             'long_name': '--test-class',
             'type': str,
             'default_value': '',
-            'help_message': 'path to a test class file (.java) to compile and run'
+            'help_message': 'path to a test class file (.java) to compile and run; empty by default, '
+                            'in which case tests for all classes targeted during test generation are executed.'
         },
         'combine_modules_coverage_reports': {
             'required': False,
