@@ -119,7 +119,7 @@ The specification of the app under test is provided using the following configur
    
    - For Ant build file, `app_build_ant_target` is required. `app_build_settings_files` is optional for specifying a property file. For Ant, the feature of specifying `app_build_files` is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files, and in this case the parameters `monolith_app_path` and `app_classpath_file` should be provided.    
     
-3. `build_type`: (in `general` command options) build file type of `app_build_files`, if they are provided.
+3. `build_type`: (in `general` command options) build file type for compiling and running the tests. Also build file type of `app_build_files`, if they are provided.
 
 When specifying `app_build_files`, the generated test suite(s) and their external dependencies will be integrated into them. The integrated build files are saved under the output directory as `tkltest_app_<app-build-file-name>`.
 
@@ -214,6 +214,17 @@ options:
   -tc TEST_CLASS, --test-class TEST_CLASS
                         path to a test class file (.java) to compile and run; empty by default, in which case tests for all classes targeted during test generation are executed.
 ```
+
+Configuration parameters relevant to the `execute` command:
+
+1. `build_type`: (in `general` command options) can be either `maven` (default), `ant` or `gradle`. Indicates the type of build file script that will be generated.
+2. `code_coverage`: (in `execute` command options) whether to create JaCoCo code coverage reports for the executed test cases. Default is false.
+3. `offline_instrumentation`: (in `general` command options) whether to use offline instrumentation for the code coverage collection. Default is false, 
+                                meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.
+4. `app_packages`: (in `execute` command options) a list of prefixes of the app under test, to be used by JaCoCo so that it reports coverage of the app 
+                        under test only rather than also third party code.
+5. `test_class`: (in `execute` command options) name of the class to be tested, in case the user wants to execute the tests for a specific class only. 
+Empty by default, in which case tests for all classes targeted during test generation are executed.
 
 When test execution completes, a JUnit report is generated, summarizing all test case results. Optionally, also a JaCoCo code coverage report is generated to present the statement and branch coverage obtained during test case execution. 
 Both reports are illustrated below on the irs example.  
