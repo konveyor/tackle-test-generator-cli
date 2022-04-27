@@ -63,10 +63,7 @@ def __conditionally_required(opt_name, config):
         true if option is required in the context; false otherwise
     """
 
-    if opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
-        if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
-            return 'required if "partitions_file" is specified'
-    elif opt_name in ['app_classpath_file', 'monolith_app_path']:
+    if opt_name in ['app_classpath_file', 'monolith_app_path']:
         # required if app_build_type is not specified
         if config['generate']['app_build_type'] == __options_spec['generate']['app_build_type']['default_value']:
             return 'required if "app_build_type" is not specified'
@@ -84,6 +81,9 @@ def __conditionally_required(opt_name, config):
         # required if app_build_type is 'ant'
         if config['generate']['app_build_type'] == 'ant':
             return 'required if "app_build_type" is ant'
+    # elif opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
+    #     if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
+    #         return 'required if "partitions_file" is specified'
     return ''
 
 
@@ -258,14 +258,6 @@ __options_spec = {
     'generate': {
         'is_cli_command': True,
         'help_message': 'Generate test cases on the application under test',
-        # 'jee_support': {
-        #     'required': False,
-        #     'is_toml_option': True,
-        #     'is_cli_option': False,
-        #     'type': bool,
-        #     'default_value': False,
-        #     'help_message': 'add support JEE mocking in generated tests cases; currently this option is disabled'
-        # },
         'no_diff_assertions': {
             'required': False,
             'is_toml_option': True,
@@ -275,17 +267,6 @@ __options_spec = {
             'type': bool,
             'default_value': False,
             'help_message': 'do not add assertions for differential testing to the generated tests'
-        },
-        'partitions_file': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': True,
-            'short_name': '-pf',
-            'long_name': '--partitions-file',
-            'type': str,
-            'default_value': '',
-            'relpath_fix_type': 'path',
-            'help_message': 'path to file containing specification of partitions'
         },
         'target_class_list': {
             'required': False,
@@ -356,6 +337,25 @@ __options_spec = {
             'default_value': '',
             'help_message': 'Name of the Ant target that is being used to build the app from the build file; required only for apps that use an Ant build file'
         },
+        # 'jee_support': {
+        #     'required': False,
+        #     'is_toml_option': True,
+        #     'is_cli_option': False,
+        #     'type': bool,
+        #     'default_value': False,
+        #     'help_message': 'add support JEE mocking in generated tests cases; currently this option is disabled'
+        # },
+        # 'partitions_file': {
+        #     'required': False,
+        #     'is_toml_option': True,
+        #     'is_cli_option': True,
+        #     'short_name': '-pf',
+        #     'long_name': '--partitions-file',
+        #     'type': str,
+        #     'default_value': '',
+        #     'relpath_fix_type': 'path',
+        #     'help_message': 'path to file containing specification of partitions'
+        # },
 
         # subcommands for the generate command
         'subcommands': {
@@ -409,26 +409,6 @@ __options_spec = {
                     'default_value': 10,
                     'help_message': 'number of executions to perform to determine pass/fail status of generated sequences'
                 },
-                'refactored_app_path_prefix': {
-                    # conditionally required: required if partitions_file is specified
-                    'required': __conditionally_required,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': str,
-                    'default_value': '',
-                    'relpath_fix_type': 'path',
-                    'help_message': 'path prefix to root directory of refactored app version'
-                },
-                'refactored_app_path_suffix': {
-                    # conditionally required: required if partitions_file is specified
-                    'required': __conditionally_required,
-                    'is_toml_option': True,
-                    'is_cli_option': False,
-                    'type': list,
-                    'default_value': [],
-                    'relpath_fix_type': 'path',
-                    'help_message': 'list of paths to refactored app classes'
-                },
                 'reuse_base_tests': {
                     'required': False,
                     'is_toml_option': True,
@@ -439,6 +419,26 @@ __options_spec = {
                     'default_value': False,
                     'help_message': 'reuse existing base test cases'
                 },
+                # 'refactored_app_path_prefix': {
+                #     # conditionally required: required if partitions_file is specified
+                #     'required': __conditionally_required,
+                #     'is_toml_option': True,
+                #     'is_cli_option': False,
+                #     'type': str,
+                #     'default_value': '',
+                #     'relpath_fix_type': 'path',
+                #     'help_message': 'path prefix to root directory of refactored app version'
+                # },
+                # 'refactored_app_path_suffix': {
+                #     # conditionally required: required if partitions_file is specified
+                #     'required': __conditionally_required,
+                #     'is_toml_option': True,
+                #     'is_cli_option': False,
+                #     'type': list,
+                #     'default_value': [],
+                #     'relpath_fix_type': 'path',
+                #     'help_message': 'list of paths to refactored app classes'
+                # },
             },
 
             # "generate evosuite" command options

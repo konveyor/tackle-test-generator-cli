@@ -90,12 +90,12 @@ def generate_ctd_amplified_tests(config, output_dir):
     monolith_app_path = config['general']['monolith_app_path']
     app_classpath_file = config['general']['app_classpath_file']
     verbose = config['general']['verbose']
-    app_prefix = config['generate']['ctd_amplified']['refactored_app_path_prefix']
-    app_suffix = config['generate']['ctd_amplified']['refactored_app_path_suffix']
+    # app_prefix = config['generate']['ctd_amplified']['refactored_app_path_prefix']
+    # app_suffix = config['generate']['ctd_amplified']['refactored_app_path_suffix']
 
-    partitions_file = None
-    if config['generate']['partitions_file']:
-        partitions_file = config['generate']['partitions_file']
+    # partitions_file = None
+    # if config['generate']['partitions_file']:
+    #     partitions_file = config['generate']['partitions_file']
 
     target_class_list = []
     if config['generate']['target_class_list']:
@@ -110,8 +110,11 @@ def generate_ctd_amplified_tests(config, output_dir):
     start_time = time.time()
 
     # generate CTD models and test plans
-    generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
-                                       monolith_app_path, app_classpath_file, app_prefix, app_suffix,
+    generate_CTD_models_and_test_plans(app_name,
+                                       # partitions_file,
+                                       target_class_list, excluded_class_list,
+                                       monolith_app_path, app_classpath_file,
+                                       # app_prefix, app_suffix,
                                        config['generate']['ctd_amplified']['interaction_level'], jdk_path, verbose)
 
     tkltest_status("Computing test plans with CTD took "+str(round(time.time()-start_time,2))+" seconds")
@@ -138,7 +141,9 @@ def generate_ctd_amplified_tests(config, output_dir):
         tkltest_status("Reusing existing basic block test sequences")
     else:
         run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file,
-                          test_generator_name, time_limit, jdk_path, partitions_file, verbose)
+                              test_generator_name, time_limit, jdk_path,
+                              # partitions_file,
+                              verbose)
         tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
             str(round(time.time() - start_time, 2)) + " seconds")
 
@@ -219,7 +224,7 @@ def generate_ctd_amplified_tests(config, output_dir):
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=test_directory,
         test_dirs=test_dirs,
-        partitions_file=partitions_file,
+        # partitions_file=partitions_file,
         target_class_list=target_class_list,
         main_reports_dir=reports_dir,
         app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
@@ -254,7 +259,7 @@ def generate_ctd_amplified_tests(config, output_dir):
                 app_classpath=build_util.get_build_classpath(config),
                 test_root_dir=test_directory,
                 test_dirs=test_dirs,
-                partitions_file=partitions_file,
+                # partitions_file=partitions_file,
                 target_class_list=target_class_list,
                 main_reports_dir=reports_dir,
                 app_packages=config['execute']['app_packages'],  # for coverage-based augmentation
@@ -272,9 +277,11 @@ def generate_ctd_amplified_tests(config, output_dir):
                                                    test_dirs)
 
 
-def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_list, excluded_class_list,
-                                       monolith_app_path, app_classpath_file,
-                                       app_prefix, app_suffix, interaction_level, jdk_path, verbose=False):
+def generate_CTD_models_and_test_plans(app_name,
+                                       # partitions_file,
+                                       target_class_list, excluded_class_list, monolith_app_path, app_classpath_file,
+                                       # app_prefix, app_suffix,
+                                       interaction_level, jdk_path, verbose=False):
     """Generates CTD models and test plans.
 
     Performs the first step in the generation of CTD-guided tests (generation of CTD models and test plans)
@@ -284,14 +291,14 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
 
     Args:
         app_name (str): name of the app
-        partitions_file (str): name of file containing information about app partitions (if the modernization task
+        # partitions_file (str): name of file containing information about app partitions (if the modernization task
             involves partitioning the legacy app)
         target_class_list (list): name of specific classes or packages targeted for test generation
         excluded_class_list (list): names of classes or packages to omit from the set of test targets
         monolith_app_path (list): paths to directories containing classes of the legacy app
         app_classpath_file (str): name of file containing library dependencies of app
-        app_prefix (str): path prefix to root directory of refactored app version
-        app_suffix (list): list of paths to refactored app classes
+        # app_prefix (str): path prefix to root directory of refactored app version
+        # app_suffix (list): list of paths to refactored app classes
         interaction_level (int): CTD interaction level (strength) for test-plan generation
         jdk_path (str): path to Java VM
         verbose (bool): run in verbose mode printing detailed status messages
@@ -320,19 +327,20 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
     modeling_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "jackson-annotations-2.12.6.jar")
     modeling_command += " org.konveyor.tackle.testgen.model.CTDTestPlanGenerator "
     modeling_command += " -app "+app_name
-    if partitions_file:
-        modeling_command += " -pf "+partitions_file
-    elif target_class_list:
+    # if partitions_file:
+    #     modeling_command += " -pf "+partitions_file
+    # elif
+    if target_class_list:
         modeling_command += " -cl " + '::'.join(target_class_list)
 
     if excluded_class_list:
         modeling_command += " -el " + '::'.join(excluded_class_list)
     modeling_command += " -pt " + os.pathsep.join(monolith_app_path)
     modeling_command += " -clpt " + app_classpath_file
-    if app_prefix:
-        modeling_command += " -pp " + app_prefix
-    if app_suffix:
-        modeling_command += " -ps " + os.pathsep.join(app_suffix)
+    # if app_prefix:
+    #     modeling_command += " -pp " + app_prefix
+    # if app_suffix:
+    #     modeling_command += " -ps " + os.pathsep.join(app_suffix)
     modeling_command += " -ic " + str(interaction_level)
 
     logging.info(modeling_command)
@@ -345,7 +353,9 @@ def generate_CTD_models_and_test_plans(app_name, partitions_file, target_class_l
 
 
 def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_file, test_generator_name,
-                          time_limit, jdk_path, partitions_file, verbose=False):
+                          time_limit, jdk_path,
+                          # partitions_file,
+                          verbose=False):
     """Generates building-block test sequences.
 
     Generates building-block tests sequences using evosuite, randoop, or both tools in combination. Performs
@@ -392,8 +402,8 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
         # add double quotes for the case of spaces in the jdk path
         tg_command += " -jdk \"" + jdk_home + "\""
 
-    if partitions_file:
-        tg_command += " -tm"
+    # if partitions_file:
+    #     tg_command += " -tm"
 
     # for verbose option, redirect evosuite and randoop stdout and stderr to files
     if verbose:
@@ -431,6 +441,7 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         bb_seq_file (str): name of JSON file containing building-block test sequences
         jdk_path (str): path to Java VM
         no_diff_assertions (bool): do not add assertions for differential testing to the generated tests
+        # jee_support (bool): add support JEE mocking in generated tests cases
         bad_path (bool): whether to enerate bad path tests cases
         num_executions (int): number of executions to perform to determine pass/fail status of generated sequences
         test_directory (str): name of root test directory to write JUnit test classes to
