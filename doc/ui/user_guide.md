@@ -2,10 +2,10 @@
 
 1. [Overview](#overview)
 2. [Test Generation](#test-generation)
-3. [Generation Output Artifacts](#generated-artifacts)
-4. [Test Execution](#test-execution)
-5. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
-6. [Configuration Options](tkltest_ui_config_options.md)
+    - [Generation Output Artifacts](#generated-artifacts)
+3. [Test Execution](#test-execution)
+4. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
+5. [Configuration Options](tkltest_ui_config_options.md)
 
 ## Overview
 
