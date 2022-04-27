@@ -233,8 +233,8 @@ The output artifacts of the `generate` command are as follows:
     - For `generate ctd-amplified`: `tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests`
     - For `generate evosuite`: `tkltest-output-unit-<app-name>/<app-name>-evosuite-standalone-tests`
     - For `generate randoop`: `tkltest-output-unit-<app-name>/<app-name>-randoop-standalone-tests`
-2. A build file to build and execute the test cases (and only them). The type of the build file will be according to the config option
-    `general.build_type`. The build file will be located inside the test-suite folder. 
+2. A build file to build and execute the test cases (and only them). The type of the build file is determined according to the config option
+    `general.build_type`. The build file is located inside the test-suite folder. 
 3. A copy of the application build file(s), with the generated test cases and their dependencies integrated into them. This 
     build file is to be used in case you want to run the generated test cases as part of your regular app build. This build file(s) 
     is created only if the original application build files are given in the config option `generate.app_build_files`, and only in the case of 
@@ -247,8 +247,8 @@ The output artifacts of the `generate` command are as follows:
     
 The output artifacts of the `execute` command are as follows:
 
-1. A build file to execute the test cases (and only them). The type of the build file will be according to the config option
-    `general.build_type`. The build file will be located inside the folder of the executed test-suite. 
+1. A build file to execute the test cases (and only them). The type of the build file is determined according to the config option
+    `general.build_type`. The build file is located inside the folder of the executed test-suite. 
 2. A junit execution report with the results of the test cases, located in `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports/junit-reports`  
 3. A JaCoCo code coverage report with the code (instruction, line, branch, method) coverage achieved by the test cases, located in `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports/jacoco-reports`
 
