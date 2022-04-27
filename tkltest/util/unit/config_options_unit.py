@@ -64,23 +64,24 @@ def __conditionally_required(opt_name, config):
     """
 
     if opt_name in ['app_classpath_file', 'monolith_app_path']:
-        # required if app_build_type is not specified
-        if config['generate']['app_build_type'] == __options_spec['generate']['app_build_type']['default_value']:
-            return 'required if "app_build_type" is not specified'
-    elif opt_name == 'app_build_type':
+        # required if app_build_files is not specified
+        if config['generate']['app_build_files'] == __options_spec['generate']['app_build_files']['default_value']:
+            return 'required if "app_build_files" is not specified'
+    elif opt_name == 'app_build_files':
         # required if app_classpath_file or monolith_app_path are not specified
         if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
-    elif opt_name == 'app_build_files':
-        # required if app_build_type is specified
-        if config['generate']['app_build_type'] != __options_spec['generate']['app_build_type']['default_value']:
-            return 'required if "app_build_type" is specified'
+    elif opt_name == 'build_type':
+        # required if app_build_files is specified
+        if config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value']:
+            return 'required if "app_build_files" is specified'
     elif opt_name == 'app_build_ant_target':
-        # required if app_build_type is 'ant'
-        if config['generate']['app_build_type'] == 'ant':
-            return 'required if "app_build_type" is ant'
+        # required if app_build_files is specified and build_type is 'ant'
+        if (config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value'] and
+                config['general']['build_type'] == 'ant'):
+            return 'required if "app_build_files" is specified and "build_type" is "ant"'
     # elif opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
     #     if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
     #         return 'required if "partitions_file" is specified'
@@ -141,7 +142,7 @@ __options_spec = {
             'type': list,
             'default_value': [],
             'relpath_fix_type': 'path',
-            'help_message': 'list of paths to application classes.Required only if app_build_files is not given.'
+            'help_message': 'list of paths to application classes. Required only if app_build_files is not given.'
         },
         'java_jdk_home': {
             'required': True,
@@ -207,15 +208,15 @@ __options_spec = {
                             '(default: app classes are instrumented online)'
         },
         'build_type': {
-            'required': False,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': True,
             'short_name': '-bt',
             'long_name': '--build-type',
             'type': str,
-            'choices': ['ant', 'maven',  'gradle'],
-            'default_value': 'ant',
-            'help_message': 'build file type for compiling and running the tests: ant, maven, or gradle'
+            'choices': ['ant', 'maven',  'gradle', ''],
+            'default_value': '',
+            'help_message': 'build file type of app_build_files if they are provided: ant, maven, or gradle'
         },
         'max_memory_for_coverage': {
             'required': False,
@@ -291,15 +292,6 @@ __options_spec = {
             'type': int,
             'default_value': 10,
             'help_message': 'time limit per class (in seconds) for evosuite/randoop test generation'
-        },
-        'app_build_type': {
-            'required': __conditionally_required,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['gradle', 'ant', 'maven', ''],
-            'default_value': '',
-            'help_message': 'build type for collecting app dependencies: ant, maven, or gradle'
         },
         'app_build_files': {
             'required': __conditionally_required,

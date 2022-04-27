@@ -119,9 +119,9 @@ teardown_file() {
     assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
+    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_files\" is not specified)"
     assert_line --index 6 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
-    assert_line --index 7 --partial "Missing conditionally required option for \"generate\": app_build_type (required if \"monolith_app_path\" is not specified)"
+    assert_line --index 7 --partial "Missing conditionally required option for \"generate\": app_build_files (required if \"monolith_app_path\" is not specified)"
     assert_line --index 8 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
@@ -138,9 +138,9 @@ teardown_file() {
     assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
+    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_files\" is not specified)"
     assert_line --index 6 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
-    assert_line --index 7 --partial "Missing conditionally required option for \"generate\": app_build_type (required if \"monolith_app_path\" is not specified)"
+    assert_line --index 7 --partial "Missing conditionally required option for \"generate\": app_build_files (required if \"monolith_app_path\" is not specified)"
     assert_line --index 8 --partial "Value for option \"base_test_generator\" must be one of ['combined', 'evosuite', 'randoop']: combine"
 }
 
@@ -151,7 +151,7 @@ teardown_file() {
     assert_line --index 2 --partial "Warning: Unsupported flag in toml file"
     assert_line --index 3 --partial "ERROR: configuration options validation failed:"
     assert_line --index 4 --partial "Missing required options for \"general\": ['app_name']"
-    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_type\" is not specified)"
+    assert_line --index 5 --partial "Missing conditionally required option for \"general\": monolith_app_path (required if \"app_build_files\" is not specified)"
     assert_line --index 6 --partial "Value for option \"build_type\" must be one of ['ant', 'maven', 'gradle']: cpp"
     assert_line --index 7 --partial "Missing required options for \"execute\": ['app_packages']"
 
@@ -191,12 +191,13 @@ teardown_file() {
 @test "Test 18: CLI generate ctd-amplified invalid build/classpath spec in toml" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR2 generate ctd-amplified
     assert_failure 1
-    assert_output --partial 'app_build_files (required if "app_build_type" is specified)'
+    assert_output --partial 'app_classpath_file (required if "app_build_files" is not specified)'
+    assert_output --partial 'app_build_files (required if "app_classpath_file" is not specified)'
 }
 
 @test "Test 19: CLI generate ctd-amplified invalid build/classpath spec in toml" {
     run tkltest-unit --config-file $IRS_CONFIG_FILE_ERR3 generate ctd-amplified
     assert_failure 1
-    assert_output --partial 'app_classpath_file (required if "app_build_type" is not specified)'
-    assert_output --partial 'app_build_type (required if "app_classpath_file" is not specified)'
+    assert_output --partial 'app_classpath_file (required if "app_build_files" is not specified)'
+    assert_output --partial 'app_build_files (required if "app_classpath_file" is not specified)'
 }

@@ -27,7 +27,7 @@ from tkltest.generate.unit import generate, augment
 class UnitTests(unittest.TestCase):
 
     # dict with apps parameters for test
-    # app_build_type, app_build_files are determined by the toml
+    # build_type, app_build_files are determined by the toml
     maven_test_apps = {
         '14_spark': {
             'standard_classpath': os.path.join('test', 'data', '14_spark', '14_sparkMonoClasspath.txt'),
@@ -102,7 +102,7 @@ class UnitTests(unittest.TestCase):
             dir_util.cd_cli_dir()
 
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
-            config['generate']['app_build_type'] = 'ant'
+            config['general']['build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
             config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             standard_classpath = os.path.abspath(ant_test_apps[app_name]['standard_classpath'])
@@ -131,7 +131,7 @@ class UnitTests(unittest.TestCase):
             failed_assertion_message = 'failed for app = ' + app_name
 
             config = config_util.load_config(config_file=ant_test_apps[app_name]['config_file'])
-            config['generate']['app_build_type'] = 'ant'
+            config['general']['build_type'] = 'ant'
             config['generate']['app_build_settings_files'] = [ant_test_apps[app_name]['property_file']]
             config['generate']['app_build_files'] = [ant_test_apps[app_name]['build_file']]
             monolith_app_path = config['general']['monolith_app_path']
@@ -224,7 +224,7 @@ class UnitTests(unittest.TestCase):
         pom_file2 = os.path.join('test', 'data', 'windup-sample', 'migration-sample-app-master', 'simple-sample-web', 'pom.xml')
         config['generate']['app_build_files'] = [pom_file1, pom_file2]
         config['generate']['app_build_settings_files'] = ['', '']
-        config['generate']['app_build_type'] = 'maven'
+        config['general']['build_type'] = 'maven'
 
         modules_names = ['proprietary-stub',
                          'simple-sample-weblogic-services',
@@ -341,7 +341,7 @@ class UnitTests(unittest.TestCase):
         settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
         config['generate']['app_build_files'] = [build_file1, build_file2]
         config['generate']['app_build_settings_files'] = [settings_file, settings_file]
-        config['generate']['app_build_type'] = 'gradle'
+        config['general']['build_type'] = 'gradle'
 
         modules_names = ['app',
                          'list',
@@ -363,7 +363,7 @@ class UnitTests(unittest.TestCase):
         build_file_list = os.path.join('test', 'data', 'splitNjoin', 'list', 'build.gradle')
         build_file_app = os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
         settings_file = os.path.join('test', 'data', 'splitNjoin', 'settings.gradle')
-        base_config['generate']['app_build_type'] = 'gradle'
+        base_config['general']['build_type'] = 'gradle'
         base_config['general']['test_directory'] = 'SNJ_test_dir'
         base_config['general']['reports_path'] = 'SNJ_report_dir'
 
@@ -475,7 +475,7 @@ class UnitTests(unittest.TestCase):
     def test_getting_dependencies_gradle(self) -> None:
         """Test getting dependencies using gradle build file"""
         # dict with apps parameters for test
-        # app_build_type, app_build_files, app_build_settings_file are determined by the toml
+        # build_type, app_build_files, app_build_settings_file are determined by the toml
         for app_name in self.gradle_test_apps.keys():
             dir_util.cd_cli_dir()
 

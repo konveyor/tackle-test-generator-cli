@@ -6,6 +6,7 @@ test_directory = ""
 reports_path = ""
 verbose = false
 time_limit = 10
+build_type = 'maven'
 
 [generate]
 # jee_support = false
@@ -15,12 +16,10 @@ target_class_list = []
 excluded_class_list = []
 time_limit = 10
 add_assertions = true
-app_build_type = 'maven'
 app_build_files = ["test/data/14_spark/pom.xml"]
 
 [execute]
 app_packages = [ "spark.*",]
-build_type = "ant"
 create_build_file = true
 code_coverage = false
 online_instrumentation = false

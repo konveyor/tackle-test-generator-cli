@@ -84,7 +84,7 @@ def generate_evosuite(config, output_dir):
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, gradle_build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
-                                                   config['generate']['app_build_type'],
+                                                   config['general']['build_type'],
                                                    [evosuite_output_dir])
 
 
@@ -159,7 +159,7 @@ def generate_randoop(config, output_dir):
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, gradle_build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
-                                                   config['generate']['app_build_type'],
+                                                   config['general']['build_type'],
                                                    [randoop_output_dir])
 
 
