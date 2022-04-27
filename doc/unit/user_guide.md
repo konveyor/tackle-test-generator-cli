@@ -3,8 +3,9 @@
 1. [Overview](#overview)
 2. [Test Generation](#test-generation)
 3. [Test Execution](#test-execution)
-4. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
-5. [Configuration Options](tkltest_unit_config_options.md)
+4. [Output Artifacts](#output-artifacts)
+5. [Best Practices and Troubleshooting Tips](#best-practices-and-troubleshooting-tips)
+6. [Configuration Options](tkltest_unit_config_options.md)
 
 ## Overview
 
@@ -222,6 +223,37 @@ JUnit report:
 JaCoCo code coverage report:
 
 ![](./images/jacoco_report.png)    
+
+
+## Output Artifacts
+
+The output artifacts of the `generate` command are as follows:
+
+1. The final JUnit test-suite, located in:
+    - For `generate ctd-amplified`: `tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests`
+    - For `generate evosuite`: `tkltest-output-unit-<app-name>/<app-name>-evosuite-standalone-tests`
+    - For `generate randoop`: `tkltest-output-unit-<app-name>/<app-name>-randoop-standalone-tests`
+2. A build file to build and execute the test cases (and only them). The type of the build file is determined according to the config option
+    `general.build_type`. The build file is located inside the test-suite folder. 
+3. A copy of the application build file(s), with the generated test cases and their dependencies integrated into them. This 
+    build file is to be used in case you want to run the generated test cases as part of your regular app build. This build file(s) 
+    is created only if the original application build files are given in the config option `generate.app_build_files`, and only in the case of 
+    `maven` and `gradle` build types. The copy of the application build file(s) will be located in 
+    `tkltest-output-unit-<app-name>/tkltest_app_<original-app-build-file-name>`. 
+4. For `generate ctd-amplified`: a test plan coverage report, describing for how many and for which rows out of the CTD
+    test plan we were able to generate unit tests. Note that the test plan coverage percentage reported here is *NOT* the 
+    achieved code coverage. The test plan coverage report is located in 
+    `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports/ctd-report`.    
+    
+The output artifacts of the `execute` command are as follows:
+
+1. A build file to execute the test cases (and only them). The type of the build file is determined according to the config option
+    `general.build_type`. The build file is located inside the folder of the executed test-suite. 
+2. A junit execution report with the results of the test cases, located in `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports/junit-reports`  
+3. A JaCoCo code coverage report with the code (instruction, line, branch, method) coverage achieved by the test cases, located in `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports/jacoco-reports`
+
+Note: in case of a multi-module project, all the above artifacts will be generated in the same location, but with the addition of a sub-folder with the module name, 
+        i.e., `tkltest-output-unit-<app-name>/<module-name>`.     
 
 ## Best Practices and Troubleshooting Tips
 

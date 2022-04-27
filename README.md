@@ -54,23 +54,45 @@ the various dependencies (e.g., Python, Java, Maven) need not be installed.
 
 The simplest way is to run the CLI using a [published Docker image](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli). For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry.
 
-After pulling the image, set up the following alias commands for convenience:
+To run TackleTest from docker, the directory containing the TackleTest configuration file for the application under
+test (AUT)---along with the AUT classes and library dependencies, in the case of TackleTest-Unit---has to be mounted
+onto the container. Suppose that the directory containing the AUT configuration file is `/home/user/aut`. To mount this
+directory and run TackleTest with the AUT configuration file, use the following commands (for unit and UI test generation,
+respectively) after pulling the image from the registry:
 
 ```buildoutcfg
-alias tkltest-unit='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit'
+docker run --rm -v /home/user/aut:/app/tackle-test-cli/aut ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit --config-file /app/tackle-test-cli/aut/tkltest_config.toml --verbose generate ctd-mplified'
+```
+
+```buildoutcfg
+docker run --rm -v /home/user/aut:/app/tackle-test-cli/aut ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui --config-file /app/tackle-test-cli/aut/tkltest_config.toml --verbose generate'
+```
+
+Note that, in these commands, the configuration file is specified as an absolute path in the container
+(`/app/tackle-test-cli/aut/tkltest_config.toml`).  You can also specify a relative path, provided that path is
+relative to `/app/tackle-test-cli` in the container.
+
+The results of test generation or execution in the container are available under `/home/user/aut` on the
+host machine.
+
+[//]: # (&#40;This also requires that the classes, the library dependencies, and the configuration file for the app&#41; under test be placed in a directory  under the CLI directory, so that they are available in the container.)
+
+For convenience in using the TackleTest via Docker, you can create a workspace directory for TackleTest (e.g.,
+`/home/user/tkltest-workspace`) and create the following aliases:
+
+```buildoutcfg
+alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit'
 ```
 ```buildoutcfg
-alias tkltest-ui='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui'
+alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui'
 ```
 
-substituting `/path-to-the-cli-directory` with the path to be mounted onto the container---this would be the path
-to the CLI directory or the directory where the app under test would be set up for test generation.
-Also, if you are using an image tagged other than `latest`, substitute the tag for `latest` in the alias command.
+With these aliases set, you can simply use `tkltest-unit` and `tkltest-ui` commands instead of the long `docker run ...` command.
+If you have the TackleTest CLI repo cloned, you could use the CLI repo as the workspace directory.
+If you are using a TackleTest image tagged other than `latest`, remember to substitute `latest` with the specific version tag
+in the docker commands.
 
-The results of test generation or execution in the container are available in `/path-to-the-cli-directory` on the
-host machine. This also requires that the classes, the library dependencies, and the configuration file for the app
-under test be placed in a directory
-under the CLI directory, so that they are available in the container.
+[//]: # (substituting `/path-to-the-cli-directory` with the path to be mounted onto the container---this would be the path to the CLI directory or the directory where the app under test would be set up for test generation.)
 
 >Note: For running `tkltest-unit` via Docker, the option `java_jdk_home` (see [tkltest-unit configuration options](./doc/unit/tkltest_unit_config_options.md)) should be left empty because the environment variable JAVA_HOME is set in the container envrionment. Providing a value for `java_jdk_home` will override the JAVA_HOME setting in the container, resulting in failure.
 
@@ -97,7 +119,7 @@ tkltest-ui --help
 
 > Notes on upgrading an installation:
 > - If you download a newer TackleTest release, follow the [command installation instructions](doc/installation.md#installing-the-tackletest-cli) and check the TackleTest version by running the command `tkltest-unit -v` or `tkltest-ui -v`.
-> - To pull in updated [published library dependencies](https://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-core) for the [TackleTest Core](https://github.com/konveyor/tackle-test-generator-core) components, please make sure to delete the corresponding jar files from `lib/download` as well as from your local Maven repository (`~/.m2/repository`) before [running the download script](./doc/installation.md#downloading-java-library-dependencies).
+> - If you upgrade the repo snapshot, please be sure to [rerun the download script](./doc/installation.md#downloading-java-library-dependencies) to pull in the updated [published library dependencies](https://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-core) for the [TackleTest Core](https://github.com/konveyor/tackle-test-generator-core) components.
 
 ## TackleTest CLI in action on sample apps
 

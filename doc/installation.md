@@ -14,8 +14,8 @@ requires authentication. To enable authentication, create a [GitHub personal acc
 with the permission `read:packages`. Note that using your GitHub password will not work for downloading some
 of the jar files; a personal access token must be used.
 
-Updatde the script [../lib/download_lib_jars.sh](../lib/download_lib_jars.sh) by replace `GITHUB_USERNAME` with your GitHub username and `GITHUB_TOKEN` with the personal access token that you created. Then, run the script to download all
-library dependencies.
+Update the settings file [../lib/settings.xml](../lib/settings.xml) by replacing `GITHUB_USERNAME` with your GitHub username and `GITHUB_TOKEN` with the personal access token that you created.
+Then, run the `lib/download_lib_jars.sh` script to download all library dependencies.
 
 ```buildoutcfg
 cd lib; ./download_lib_jars.sh
@@ -26,7 +26,7 @@ Windows users should run:
 cd lib; download_lib_jars.sh
 ```
    
-This downloads the Java libraries required by the CLI into the `lib/download` directory.
+This downloads the Java libraries required by the CLI into the `lib/download` directory, including the updated versions of `tackle-test-generator-core` jars.
 
 TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
 
@@ -120,27 +120,30 @@ docker-compose run --rm tkltest-cli tkltest-ui --help
 ```
 
 Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run these commands in the CLI
-directory after setting enviroment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the personal access token that you created:
+directory after setting environment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the personal access token that you created:
 
 ```buildoutcfg
 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
 ```
+
+Then, assuming `/home/user/tkltest-workspace` is the host directory to be mounted on to the container, the following
+commands can be used:
 ```buildoutcfg
-docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit --help
-docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-ui --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-unit --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-ui --help
 ```
 
-Note that the CLI directory is mounted onto the container in both cases, so that the results of test generation or
-execution in the container are available in the CLI directory on the host machine. This also requires that the
-classes, the library dependencies, and the configuration file for the app under test be placed in a directory
-under the CLI directory, so that they are available in the container.
+The results of test generation or  execution in the container are available under the `/home/user/tkltest-workspace`
+directory on the host machine.
+For TackleTest-Unit, in addition to the AUT configuration file, the AUT classes and library dependencies must also be placed
+in a directory under `/home/user/tkltest-workspace`, so that they are available in the container.
 
-For convenience in running the CLI via `docker-compose` or `docker`, you can create an alias, such as
+For convenience in running the CLI via `docker` or `docker-compose`, you can create aliases, such as
 one of the following.
 
 For TackleTest-Unit:
 ```buildoutcfg
-alias tkltest-unit='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-unit'
+alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-unit'
 ```
 ```buildoutcfg
 alias tkltest-unit='docker-compose run --rm tkltest-cli tkltest-unit'
@@ -148,8 +151,11 @@ alias tkltest-unit='docker-compose run --rm tkltest-cli tkltest-unit'
 
 For TackleTest-UI:
 ```buildoutcfg
-alias tkltest-ui='docker run --rm -v /path-to-the-cli-directory:/app/tackle-test-cli tkltest-cli tkltest-ui'
+alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-ui'
 ```
 ```buildoutcfg
 alias tkltest-ui='docker-compose run --rm tkltest-cli tkltest-ui'
 ```
+
+Note that for using the CLI via `docker-compose`, `docker-compose.yml` has to be checkout out (it might be better to clone the repo) and
+that [the current directory is mounted onto the container](https://github.com/konveyor/tackle-test-generator-cli/blob/main/docker-compose.yml#L12). 
