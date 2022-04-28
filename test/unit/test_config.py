@@ -22,7 +22,7 @@ from tkltest.util import config_util, config_options, constants
 class ConfigTest(unittest.TestCase):
 
     config_file = os.path.join('test', 'data', 'irs', 'tkltest_config.toml')
-    partitions_file = os.path.join('test', 'data', 'irs', 'refactored', 'PartitionsFile.json')
+    # partitions_file = os.path.join('test', 'data', 'irs', 'refactored', 'PartitionsFile.json')
 
     def test_config_util_init(self) -> None:
         """Test config init"""
@@ -49,7 +49,7 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(config['generate']['no_diff_assertions'])
 
         # add partitions file to args and load config
-        args.partitions_file = self.partitions_file
+        # args.partitions_file = self.partitions_file
         config_util.load_config(args=args)
 
 

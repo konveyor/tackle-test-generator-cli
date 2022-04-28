@@ -148,7 +148,7 @@ def __execute_base(args, config):
                      test_dirs=test_dirs,
                      collect_codecoverage=config['execute']['code_coverage'] or config['dev_tests']['compare_code_coverage'],
                      app_packages=config['execute']['app_packages'],
-                     partitions_file=gen_config['generate']['partitions_file'],
+                     # partitions_file=gen_config['generate']['partitions_file'],
                      target_class_list=gen_config['generate']['target_class_list'],
                      reports_dir=config['general']['reports_path'],
                      offline_inst=offline_inst,
@@ -159,8 +159,9 @@ def __execute_base(args, config):
 
 def __run_test_cases(app_name, collect_codecoverage, verbose,
                      create_build, build_type, ant_build_file, maven_build_file, gradle_build_file, build_targets='',
-                     test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[], jdk_path='',
-                     app_packages=[], partitions_file='', target_class_list=[], reports_dir='', offline_inst='',
+                     test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[], jdk_path='', app_packages=[],
+                     # partitions_file='',
+                     target_class_list=[], reports_dir='', offline_inst='',
                      env_vars={}, micro=False, output_dir=''):
 
     tkltest_status('Compiling and running tests in {}'.format(os.path.abspath(test_root_dir)))
@@ -178,7 +179,7 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
             app_classpath=app_classpath,
             test_root_dir=test_root_dir,
             test_dirs=test_dirs,
-            partitions_file=partitions_file,
+            # partitions_file=partitions_file,
             target_class_list=target_class_list,
             main_reports_dir=main_reports_dir,
             app_packages=app_packages,

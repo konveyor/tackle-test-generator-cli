@@ -4,7 +4,7 @@ name = "TKLTEST_CONFIG_FILE"
 app_name = "irs"
 monolith_app_path = ["test/data/irs/monolith/target/classes"]
 app_classpath_file = ""
+build_type = "gradle"
 
 [generate]
-app_build_type = "gradle"
 app_build_files = []

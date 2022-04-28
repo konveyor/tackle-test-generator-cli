@@ -33,10 +33,10 @@ def generate_evosuite(config, output_dir):
     Args:
         config (dict): loaded and validated config information
     """
-    # partitions file currently not supported for evosuitr
-    if config['generate']['partitions_file']:
-        tkltest_status('-pf/--partitions-file option is currently not supported for evosuite generator')
-        sys.exit(0)
+    # partitions file currently not supported for evosuite
+    # if config['generate']['partitions_file']:
+    #     tkltest_status('-pf/--partitions-file option is currently not supported for evosuite generator')
+    #     sys.exit(0)
 
     app_name = config['general']['app_name']
     classpath = __get_classpath(config)
@@ -75,7 +75,7 @@ def generate_evosuite(config, output_dir):
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=evosuite_output_dir,
         test_dirs=[evosuite_output_dir],
-        partitions_file=config['generate']['partitions_file'],
+        # partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
         main_reports_dir=reports_dir,
         output_dir=output_dir
@@ -84,7 +84,7 @@ def generate_evosuite(config, output_dir):
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, gradle_build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
-                                                   config['generate']['app_build_type'],
+                                                   config['general']['build_type'],
                                                    [evosuite_output_dir])
 
 
@@ -99,9 +99,9 @@ def generate_randoop(config, output_dir):
         config (dict): loaded and validated config information
     """
     # partitions file currently not supported for randoop
-    if config['generate']['partitions_file']:
-        tkltest_status('-pf/--partitions-file option is currently not supported for randoop generator')
-        sys.exit(0)
+    # if config['generate']['partitions_file']:
+    #     tkltest_status('-pf/--partitions-file option is currently not supported for randoop generator')
+    #     sys.exit(0)
 
     monolith_app_path = config['general']['monolith_app_path']
     app_name = config['general']['app_name']
@@ -119,11 +119,12 @@ def generate_randoop(config, output_dir):
         randoop_output_dir = config['general']['test_directory']
 
     randoop_command += " randoop.main.Main gentests --junit-output-dir=" + randoop_output_dir
-    if config['generate']['partitions_file']:
-        randoop_command += " --classlist=" + __generate_class_list_file(__parse_partitions_file(config['generate']['partitions_file']),
-                                                                        config['general']['app_name'],
-                                                                        config['generate']['excluded_class_list'])
-    elif config['generate']['target_class_list']:
+    # if config['generate']['partitions_file']:
+    #     randoop_command += " --classlist=" + __generate_class_list_file(__parse_partitions_file(config['generate']['partitions_file']),
+    #                                                                     config['general']['app_name'],
+    #                                                                     config['generate']['excluded_class_list'])
+    # elif
+    if config['generate']['target_class_list']:
         randoop_command += " --classlist=" + __generate_class_list_file(config['generate']['target_class_list'],
                                                                         config['general']['app_name'],
                                                                         config['generate']['excluded_class_list'])
@@ -149,7 +150,7 @@ def generate_randoop(config, output_dir):
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=randoop_output_dir,
         test_dirs=[randoop_output_dir],
-        partitions_file=config['generate']['partitions_file'],
+        # partitions_file=config['generate']['partitions_file'],
         target_class_list=config['generate']['target_class_list'],
         main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
         output_dir=output_dir
@@ -158,7 +159,7 @@ def generate_randoop(config, output_dir):
     tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, maven_build_file))))
     tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, gradle_build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
-                                                   config['generate']['app_build_type'],
+                                                   config['general']['build_type'],
                                                    [randoop_output_dir])
 
 
@@ -169,9 +170,10 @@ def __arrange_folders_for_evosuite(paths_list,  config):
     for p in paths_list:
         shutil.copytree(p, copy_dir_name)
 
-    if config['generate']['partitions_file']:
-        target_list = [f + ".class" for f in __parse_partitions_file(config['generate']['partitions_file'])]
-    elif config['generate']['target_class_list']:
+    # if config['generate']['partitions_file']:
+    #     target_list = [f + ".class" for f in __parse_partitions_file(config['generate']['partitions_file'])]
+    # elif
+    if config['generate']['target_class_list']:
         target_list = [f.replace(".", os.sep) + ".class" for f in config['generate']['target_class_list']]
     else:
         for cl in config['generate']['excluded_class_list']:
@@ -229,12 +231,12 @@ def __format_string(str):
     return formatted_str
 
 
-def __parse_partitions_file(file):
-    with open(file, "r") as f:
-        partitions_file_dict = json.loads(f.read())
-    flat_list_formatted = list(set(list(map(lambda x: __format_string(x), set([item for elem in [item[1]['Proxy'] for item in partitions_file_dict.items()] for item in elem])))))
-    # return os.pathsep.join(flat_list_formatted)
-    return flat_list_formatted
+# def __parse_partitions_file(file):
+#     with open(file, "r") as f:
+#         partitions_file_dict = json.loads(f.read())
+#     flat_list_formatted = list(set(list(map(lambda x: __format_string(x), set([item for elem in [item[1]['Proxy'] for item in partitions_file_dict.items()] for item in elem])))))
+#     # return os.pathsep.join(flat_list_formatted)
+#     return flat_list_formatted
 
 
 def __generate_class_list_all_app(paths, app_name, excluded_class_list):
@@ -282,7 +284,7 @@ def __get_evosuite_flags(config):
     if int(time_limit) > 0:
         flags += " -Dsearch_budget=" + str(time_limit)
     flags += " -Dassertions=" + str(not config['generate']['no_diff_assertions']).lower()
-    flags += " -Djee="+str(config['generate']['jee_support']).lower()
+    # flags += " -Djee="+str(config['generate']['jee_support']).lower()
     if 'test_directory' not in config['general'].keys() or \
             config['general']['test_directory'] == '':
         output_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX

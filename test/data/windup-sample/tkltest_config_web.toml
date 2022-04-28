@@ -7,21 +7,20 @@ test_directory = ""
 reports_path = ""
 verbose = false
 time_limit = 10
+build_type = 'maven'
 
 [generate]
-jee_support = true
+# jee_support = true
 no_diff_assertions = false
-partitions_file = ""
+# partitions_file = ""
 target_class_list = []
 excluded_class_list = []
 time_limit = 10
 add_assertions = true
-app_build_type = 'maven'
 app_build_files = ["test/data/windup-sample/migration-sample-app-master/simple-sample-web/pom.xml"]
 
 [execute]
 app_packages = [ "com.*",]
-build_type = "maven"
 create_build_file = false
 code_coverage = true
 online_instrumentation = false
@@ -33,8 +32,8 @@ no_augment_coverage = true
 no_ctd_coverage = false
 interaction_level = 1
 num_seq_executions = 10
-refactored_app_path_prefix = ""
-refactored_app_path_suffix = []
+# refactored_app_path_prefix = ""
+# refactored_app_path_suffix = []
 ctd_coverage = false
 
 [generate.evosuite]
