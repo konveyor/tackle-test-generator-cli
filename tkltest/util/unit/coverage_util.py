@@ -80,9 +80,9 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         try:
             command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
-            tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
+            tkltest_status('Warning: Error while running test suite for coverage computing, skipping current test file: {}\n{}'.format(e, e.stderr))
         if not os.path.exists(jacoco_raw_data_file):
-            tkltest_status('{} was not created by : {}'.format(jacoco_raw_data_file, cmd), error=True)
+            tkltest_status('Warning: {} was not created by : {}.\n Skipping current test file'.format(jacoco_raw_data_file, cmd))
             # we allow error when trying to get test suite coverage.
             # will handle it like we do not have test files at all:
             jacoco_raw_data_file = ''
@@ -262,7 +262,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
     elif os.path.isfile(test_raw_cov_file):
         shutil.copy(test_raw_cov_file, output_exec_file)
     else:
-        tkltest_status('Warning: file {} does not exist'.format(test_raw_cov_file))
+        tkltest_status('Warning: coverage data file {} does not exist for test {}, skipping current test file'.format(test_raw_cov_file, test))
         return no_delta_coverage
     # run jacoco cli report command
     if not os.path.isdir(main_coverage_dir):
@@ -279,7 +279,7 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
             coverage_csv_file, main_coverage_dir, coverage_xml_file)
         command_util.run_command(create_report_command, verbose=True, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
-        tkltest_status('Generating coverage report failed, skipping current test file {}: {}\n{}'.format(create_report_command, e, e.stderr),error=True)
+        tkltest_status('Warning: Generating coverage report failed, skipping current test file {}: {}\n{}'.format(create_report_command, e, e.stderr))
         return no_delta_coverage
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
