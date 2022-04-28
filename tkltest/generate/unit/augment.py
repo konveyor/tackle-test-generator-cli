@@ -219,11 +219,8 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
                                       report_dir=report_dir, test_suite_name=os.path.basename(test)[:-5],
                                       raw_cov_data_dir=raw_cov_data_dir, jdk_path=jdk_path)
         if not test_coverage:
-            tkltest_status('Error while computing coverage for test: {}'.format(test), error=True)
-            __initialize_test_directory(ctd_test_dir=ctd_test_dir, source_test_dir=ctd_test_dir_bak)
-            sys.exit(1)
-
-        if test_coverage['instruction_covered'] > 0:
+            tkltest_status('Warning: Error while computing coverage for test, skipping current test file {}'.format(test))
+        elif test_coverage['instruction_covered'] > 0:
             has_coverage = True
         coverage_util.remove_test_class_from_ctd_suite(test_class=test, test_directory=ctd_test_dir)
 
@@ -361,6 +358,9 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
         test_raw_cov_file = os.path.join(raw_cov_dir,
                                          os.path.basename(test_class)[:-5]+constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
 
+        if not os.path.isfile(test_raw_cov_file):
+            tkltest_status('Warning: {} does not exist, skipping current test file {}'.format(test_raw_cov_file, test_class))
+            continue
         # get coverage delta for test class against base CTD coverage
         try:
             coverage_delta, total_coverage = coverage_util.get_delta_coverage(test=test_class,
@@ -447,7 +447,9 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
 
             test_raw_cov_file = os.path.join(raw_cov_dir,
                                         os.path.basename(test_class)[:-5] + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
-
+            if not os.path.isfile(test_raw_cov_file):
+                tkltest_status('Warning: coverage date file {} does not exist, skipping current test file {}'.format(test_raw_cov_file, test_class))
+                continue
             try:
                 coverage_delta, augmented_coverage = coverage_util.get_delta_coverage(
                     test=test_class, test_raw_cov_file=test_raw_cov_file,

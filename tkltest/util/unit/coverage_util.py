@@ -65,7 +65,12 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     env_vars = dict(os.environ.copy())
     env_vars['JAVA_HOME'] = jdk_path
     if has_test_suite:
-    # run tests using build file
+        jacoco_raw_data_file = get_jacoco_exec_file(build_type, test_root_dir)
+        try:
+            os.remove(jacoco_raw_data_file)
+        except OSError:
+            pass
+        # run tests using build file to get the .exec file
         if build_type == 'ant':
             cmd = "ant -f {} merge-coverage-report".format(build_file)
         elif build_type == 'maven':
@@ -75,12 +80,12 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         try:
             command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
-            tkltest_status('Error while running test suite for coverage computing: {}\n{}'.format(e, e.stderr), error=True)
-            return None
-        jacoco_raw_data_file = get_jacoco_exec_file(build_type, test_root_dir)
+            tkltest_status('Warning: Error while running test suite for coverage computing, skipping current test file: {}\n{}'.format(e, e.stderr))
         if not os.path.exists(jacoco_raw_data_file):
-            tkltest_status('{} was not created by : {}'.format(jacoco_raw_data_file, cmd), error=True)
-            return None
+            tkltest_status('Warning: {} was not created by : {}.\n Skipping current test file'.format(jacoco_raw_data_file, cmd))
+            # we allow error when trying to get test suite coverage.
+            # will handle it like we do not have test files at all:
+            jacoco_raw_data_file = ''
 
     if additional_test_suite:
         '''
@@ -226,10 +231,25 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
         except OSError:
             pass
 
+    no_delta_coverage = {
+        'instruction_cov_delta': 0,
+        'line_cov_delta': 0,
+        'branch_cov_delta': 0,
+        'method_cov_delta': 0
+        }, {
+        'instruction_covered': base_coverage['instruction_covered'],
+        'line_covered': base_coverage['line_covered'],
+        'branch_covered': base_coverage['branch_covered'],
+        'method_covered': base_coverage['method_covered'],
+        'instruction_total': base_coverage['instruction_total'],
+        'line_total': base_coverage['line_total'],
+        'branch_total': base_coverage['branch_total'],
+        'method_total': base_coverage['method_total']}
+
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
     env_vars = dict(os.environ.copy())
     env_vars['JAVA_HOME'] = jdk_path
-    if os.path.isfile(ctd_raw_cov_file):
+    if os.path.isfile(ctd_raw_cov_file) and os.path.isfile(test_raw_cov_file):
         try:
             command_util.run_command("java -Xmx"+str(max_memory)+"m -jar {} merge {} {} --destfile {}".
                                  format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
@@ -238,32 +258,29 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
             # If merging failed we skip current test file and assume it resulted in zero delta coverage
             # The reason to continue is that we may still gain from previous augmenting test files
             tkltest_status('Warning: merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr))
-            return {
-                       'instruction_cov_delta': 0,
-                       'line_cov_delta': 0,
-                       'branch_cov_delta': 0,
-                       'method_cov_delta': 0
-                   }, {'instruction_covered': base_coverage['instruction_covered'],
-                       'line_covered': base_coverage['line_covered'],
-                       'branch_covered': base_coverage['branch_covered'],
-                       'method_covered': base_coverage['method_covered'],
-                       'instruction_total': base_coverage['instruction_total'],
-                       'line_total': base_coverage['line_total'],
-                       'branch_total': base_coverage['branch_total'],
-                       'method_total': base_coverage['method_total']}
-    else:
+            return no_delta_coverage
+    elif os.path.isfile(test_raw_cov_file):
         shutil.copy(test_raw_cov_file, output_exec_file)
+    else:
+        tkltest_status('Warning: coverage data file {} does not exist for test {}, skipping current test file'.format(test_raw_cov_file, test))
+        return no_delta_coverage
     # run jacoco cli report command
+    if not os.path.isdir(main_coverage_dir):
+        os.makedirs(main_coverage_dir)
     coverage_csv_file = os.path.join(main_coverage_dir, os.path.basename(test)) + '.csv'
     coverage_xml_file = os.path.join(main_coverage_dir, 'jacoco.xml')
 
     jacoco_classfiles_ops = ''
     for classpath in class_files:
         jacoco_classfiles_ops += '--classfiles {} '.format(classpath)
-    command_util.run_command("java -jar {} report {} {} --csv {} --html {} --xml {}".
-                             format(jacoco_cli_file, output_exec_file, jacoco_classfiles_ops,
-                                    coverage_csv_file, main_coverage_dir, coverage_xml_file),
-                             verbose=True, env_vars=env_vars)
+    try:
+        create_report_command ="java -jar {} report {} {} --csv {} --html {} --xml {}".format(
+            jacoco_cli_file, output_exec_file, jacoco_classfiles_ops,
+            coverage_csv_file, main_coverage_dir, coverage_xml_file)
+        command_util.run_command(create_report_command, verbose=True, env_vars=env_vars)
+    except subprocess.CalledProcessError as e:
+        tkltest_status('Warning: Generating coverage report failed, skipping current test file {}: {}\n{}'.format(create_report_command, e, e.stderr))
+        return no_delta_coverage
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0
