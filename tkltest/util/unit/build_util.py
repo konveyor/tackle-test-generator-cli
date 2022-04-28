@@ -44,7 +44,8 @@ def __get_jars_for_tests_execution():
         if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
     ]
 
-def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
+
+def get_build_classpath(config, subcommand='ctd-amplified'):
     """Creates and returns build classpath.
 
     Creates and returns build path, consisting of app library dependencies and
@@ -52,7 +53,7 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 
     Args:
         config: loaded configuration information
-        partition: name of partition (if build is being done for a partition of the refactored app)
+        # partition: name of partition (if build is being done for a partition of the refactored app)
 
     Returns:
         string representing build path
@@ -70,19 +71,19 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
                     class_paths.append(os.path.abspath(line))
 
     # add path for app classes for mono or micro version
-    if partition is not None:
-        if partition not in config['execute']['micro']['partition_paths'].keys():
-            raise Exception('Partition path not specified for partition: {}'.format(partition))
-        for part_path in config['execute']['micro']['partition_paths'][partition]:
-            class_paths.insert(0, os.path.abspath(part_path))
-        logging.debug('Added paths for partition {}: {}'.format(
-            partition, config['execute']['micro']['partition_paths'][partition]
-        ))
+    # if partition is not None:
+    #     if partition not in config['execute']['micro']['partition_paths'].keys():
+    #         raise Exception('Partition path not specified for partition: {}'.format(partition))
+    #     for part_path in config['execute']['micro']['partition_paths'][partition]:
+    #         class_paths.insert(0, os.path.abspath(part_path))
+    #     logging.debug('Added paths for partition {}: {}'.format(
+    #         partition, config['execute']['micro']['partition_paths'][partition]
+    #     ))
 
     class_paths.extend(__get_jars_for_tests_execution())
 
-    if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
-            class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
+    # if config['generate']['jee_support'] and subcommand == 'ctd-amplified':
+    #         class_paths.insert(0, os.path.abspath(config['general']['app_name']+constants.TKL_EVOSUITE_OUTDIR_SUFFIX))  # for EvoSuite Scaffolding classes
 
     classpath_str = os.pathsep.join(class_paths)
     logging.info('classpath: {} '.format(classpath_str))
@@ -90,8 +91,9 @@ def get_build_classpath(config, subcommand='ctd-amplified', partition=None):
 
 
 def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
-                           partitions_file, target_class_list, main_reports_dir, app_packages='',
-                           collect_codecoverage=False, offline_instrumentation=False, output_dir=''):
+                       # partitions_file,
+                       target_class_list, main_reports_dir, app_packages='',
+                       collect_codecoverage=False, offline_instrumentation=False, output_dir=''):
     """Generates Ant build.xml, Maven pom.xml, and Gradle build.gradle for running tests.
 
     Generates Ant build.xml, aMaven pom.xml and Gradle build.gradle for running generated tests and collecting coverage information.
@@ -102,7 +104,7 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         app_classpath: Java CLASSPATH for building the app under test
         test_root_dir: root directory of test cases
         test_dirs: subdirectories containing test cases under root directory
-        partitions_file: file containing partitions information
+        # partitions_file: file containing partitions information
         target_class_list: list of target classes for testing
         main_reports_dir: root directory for test reports
         app_packages: app packages to be tracked for code coverage
@@ -110,13 +112,14 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         offline_instrumentation whether to perform offline instrumentation of app classes
         output_dir: running directory
     """
-    if partitions_file:
-        with open(app_name + constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX) as ctd_model:
-            ctd_model_data = json.load(ctd_model)
-            class_list = [item[1].keys() for item in ctd_model_data["models_and_test_plans"].items()]
-            class_set = set().union(*class_list)
-            app_reported_packages = list(class_set)
-    elif target_class_list:
+    # if partitions_file:
+    #     with open(app_name + constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX) as ctd_model:
+    #         ctd_model_data = json.load(ctd_model)
+    #         class_list = [item[1].keys() for item in ctd_model_data["models_and_test_plans"].items()]
+    #         class_set = set().union(*class_list)
+    #         app_reported_packages = list(class_set)
+    # elif
+    if target_class_list:
         app_reported_packages = target_class_list
     else:
         app_reported_packages = []

@@ -4,15 +4,15 @@ name = "TKLTEST_CONFIG_FILE"
     app_name = "84_ifx-framework"
     monolith_app_path = ["test/data/84_ifx-framework"]
     java_jdk_home = ""
+    build_type = "ant"
 
 [generate]
     time_limit = 2
     add_assertions = false
-    jee_support = false
-    app_build_type = "ant"
+#     jee_support = false
     app_build_files = ["test/data/84_ifx-framework/build.xml"]
     app_build_settings_files = ["test/data/84_ifx-framework/build.properties"]
-    app_build_target = "compile"
+    app_build_ant_target = "compile"
     target_class_list = ["org.sourceforge.ifx.utils.IFXException"]
 
 [generate.randoop]

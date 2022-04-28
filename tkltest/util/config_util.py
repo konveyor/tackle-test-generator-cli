@@ -430,14 +430,14 @@ def __create_modified_build_file_for_dependencies(app_build_file, toy_program_di
 
 def __run_ant_command(modified_build_file_name,
                       app_settings_file,
-                      app_build_target,
+                      app_build_ant_target,
                       output_dir):
     """
     Runs the ant command with the modified copy of the build file.
     Also, removes the modified build file copy after running command.
     :param modified_build_file_name: the modified build file to run Ant with
     :param app_settings_file: settings file for user properties
-    :param app_build_target: Ant target to run
+    :param app_build_ant_target: Ant target to run
     :return: path to the file containing the output
     """
     # create output file or override previous output
@@ -449,7 +449,7 @@ def __run_ant_command(modified_build_file_name,
     run_ant_command = 'ant -f ' + modified_build_file_name
     if app_settings_file:
         run_ant_command += ' -propertyfile ' + os.path.abspath(app_settings_file)
-    run_ant_command += ' ' + app_build_target + ' >> ' + ant_output_filename
+    run_ant_command += ' ' + app_build_ant_target + ' >> ' + ant_output_filename
     logging.info(run_ant_command)
 
     # execute ant command
@@ -636,7 +636,7 @@ def resolve_app_path(tkltest_config):
     if tkltest_config['general']['monolith_app_path']:
         return
     app_name = tkltest_config['general']['app_name']
-    app_build_type = tkltest_config['generate']['app_build_type']
+    app_build_type = tkltest_config['general']['build_type']
     if len(tkltest_config['generate']['app_build_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
         # it is a rare case, in which the user gives more that one build file, however we obtain only one module
         tkltest_status('resolving app_path supported for only a single app_build_file', error=True)
@@ -678,10 +678,10 @@ def resolve_app_path(tkltest_config):
             tkltest_config['general']['monolith_app_path'] = app_path
 
     elif app_build_type == 'ant':
-        app_build_target = tkltest_config['generate']['app_build_target']
+        app_build_ant_target = tkltest_config['generate']['app_build_ant_target']
         # create a modified build file
         modified_build_file_name, build_base_dir = __create_modified_build_file_for_monolith_app_path(app_build_file)
-        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_ant_target, output_dir)
 
         with open(ant_output_filename, 'r') as output_file:
             lines = output_file.read().splitlines()
@@ -755,7 +755,7 @@ def resolve_classpath(tkltest_config, command):
             tkltest_status('app_classpath_file is missing for execute run\n', error=True)
             sys.exit(1)
 
-    app_build_type = tkltest_config['generate']['app_build_type']
+    app_build_type = tkltest_config['general']['build_type']
     if len(tkltest_config['generate']['app_build_files']) != 1 or len(tkltest_config['generate']['app_build_settings_files']) > 1:
         # it is a rare case, in which the user gives more that one build file, however we obtain only one module
         tkltest_status('resolving classpath supported for only a single app_build_files', error=True)
@@ -809,7 +809,7 @@ def resolve_classpath(tkltest_config, command):
         os.remove(mvn_classpath_file)
 
     elif app_build_type == 'ant':
-        app_build_target = tkltest_config['generate']['app_build_target']
+        app_build_ant_target = tkltest_config['generate']['app_build_ant_target']
 
         # writing a toy program for compiling when running ant command
         toy_program_dir_path = os.path.abspath(os.path.join(output_dir, 'tkltest_toy_program'))
@@ -823,7 +823,7 @@ def resolve_classpath(tkltest_config, command):
 
         # create a modified build file
         modified_build_file_name = __create_modified_build_file_for_dependencies(app_build_file, toy_program_dir_path)
-        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_target, output_dir)
+        ant_output_filename = __run_ant_command(modified_build_file_name, app_settings_file, app_build_ant_target, output_dir)
         class_path_order = __parse_ant_output_for_dependencies(ant_output_filename)
         # removing the toy program
         shutil.rmtree(toy_program_dir_path)
@@ -889,7 +889,7 @@ def resolve_tkltest_configs(tkltest_user_config, command):
     '''
     app_name = tkltest_user_config['general']['app_name']
     tkltest_config_file_suffix = '_generated_tkltest_config.toml'
-    if tkltest_user_config['generate']['app_build_type'] == 'ant' or \
+    if tkltest_user_config['general']['build_type'] == 'ant' or \
             not tkltest_user_config['generate']['app_build_files'] or \
             tkltest_user_config['general']['monolith_app_path']:
         # this is the case in we can not try to get the modules (ant, no user build file), or already have app_path.
@@ -988,7 +988,7 @@ def get_modules_properties(tkltest_user_config):
     '''
 
     app_name = tkltest_user_config['general']['app_name']
-    app_build_type = tkltest_user_config['generate']['app_build_type']
+    app_build_type = tkltest_user_config['general']['build_type']
     app_build_files = tkltest_user_config['generate']['app_build_files']
     app_settings_files = tkltest_user_config['generate']['app_build_settings_files']
 

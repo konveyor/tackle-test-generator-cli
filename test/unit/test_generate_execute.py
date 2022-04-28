@@ -38,7 +38,7 @@ class GenerateExecuteTest(unittest.TestCase):
         'irs': {
             'config_file': os.path.join(test_data_dir, 'irs', 'tkltest_config.toml'),
             'test_directory': '__irs-generated-tests',
-            'partitions_file': os.path.join(test_data_dir, 'irs', 'refactored', 'PartitionsFile.json'),
+            # 'partitions_file': os.path.join(test_data_dir, 'irs', 'refactored', 'PartitionsFile.json'),
             'target_class_list': ["irs.IRS"],
             'excluded_class_list': ["irs.Employer"],
             'basic_blocks': os.path.join(test_data_dir, 'irs', 'basic_blocks'),
@@ -84,7 +84,7 @@ class GenerateExecuteTest(unittest.TestCase):
             # set up config and generate tests
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -116,7 +116,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -143,7 +143,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -168,7 +168,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['interaction_level'] = 2
             config['general']['max_memory_for_coverage'] = 8192
@@ -194,7 +194,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['excluded_class_list'] = app_info['excluded_class_list']
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -221,7 +221,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -247,7 +247,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -274,7 +274,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config['generate']['ctd_amplified']['no_augment_coverage'] = False
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -307,7 +307,7 @@ class GenerateExecuteTest(unittest.TestCase):
                 config['general']['offline_instrumentation'] = tests_option['off_inst']
                 config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
                 config['generate']['ctd_amplified']['reuse_base_tests'] = True
-                config['generate']['partitions_file'] = ''
+                # config['generate']['partitions_file'] = ''
                 config['generate']['target_class_list'] = []
                 config['dev_tests']['use_for_augmentation'] = tests_option['use_dev']
 
@@ -327,7 +327,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -352,7 +352,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -377,7 +377,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='ctd-amplified', config=config)
 
@@ -401,7 +401,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -436,7 +436,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -463,7 +463,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -490,7 +490,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -514,7 +514,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -542,7 +542,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             config['generate']['ctd_amplified']['no_augment_coverage'] = True
@@ -567,7 +567,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -618,7 +618,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['randoop']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -645,7 +645,7 @@ class GenerateExecuteTest(unittest.TestCase):
             config = app_info['config']
             self.__reuse_basic_blocks(app_name, config, app_info['basic_blocks'])
             config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
-            config['generate']['partitions_file'] = app_info['partitions_file']
+            # config['generate']['partitions_file'] = app_info['partitions_file']
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -670,7 +670,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             self.__process_generate(subcommand='randoop', config=config)
 
@@ -690,7 +690,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='randoop', config=config)
 
@@ -710,7 +710,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='randoop', config=config)
@@ -731,7 +731,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='randoop', config=config)
@@ -753,7 +753,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             self.__process_generate(subcommand='evosuite', config=config)
 
@@ -773,7 +773,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             self.__process_generate(subcommand='evosuite', config=config)
 
@@ -794,7 +794,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = app_info['target_class_list']
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='evosuite', config=config)
@@ -815,7 +815,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['partitions_file'] = ''
+            # config['generate']['partitions_file'] = ''
             config['generate']['target_class_list'] = []
             config['generate']['no_diff_assertions'] = True
             self.__process_generate(subcommand='evosuite', config=config)

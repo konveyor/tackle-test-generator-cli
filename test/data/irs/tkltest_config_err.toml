@@ -14,7 +14,7 @@ name = "TKLTEST_CONFIG_FILE"
 # options for "tkltest generate" command
 [generate]
     time_limit = 10
-    jee_support = false
+    # jee_support = false
     no_diff_assertions = true
 
 # options for "tkltest generate randoop" command

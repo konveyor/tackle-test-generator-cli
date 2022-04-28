@@ -19,7 +19,7 @@ and executing them. More detailed description is available in the [CLI user guid
          from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, 
          and (3) the identity of its modules, in case of a multi-module application
   
-   - `app_build_type`: either maven, gradle or ant
+   - `build_type`: either maven, gradle or ant
      
 3. To generate test cases, run the command
    ```
