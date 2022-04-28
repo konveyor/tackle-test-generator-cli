@@ -109,25 +109,25 @@ To perform test generation, the starting point is creation of the configuration 
 
 ### Specifying the app under test
 
-The specification of the app under test is provided using the following configuration parameters:
+The specification of the app under test is provided using the following configuration options:
 
 1. `app_name`: (in `generate` command options) The name of the application being tested. The value provided for `app_name` is used as prefix in the names of files and directories created by the test generator. For example, the directories containing the generated tests and test reports have the prefix `<app_name>-` and the CTD test-plan file has the prefix `<app_name>_`. The app name should thus not contain characters that are invalid in file/directory names.
 
-2. `app_build_files`: (in `generate` command options) one or more build files for the application. TackleTest will automatically extract the following information from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, and (3) the identity of its modules, in case of a multi-module application. Additional parameters that depend on the build type of the application: (in `generate` command options)
+2. `app_build_files`: (in `generate` command options) one or more build files for the application. TackleTest will automatically extract the following information from the provided build files: (1) the paths to the application classes, (2) the external dependencies of the application, and (3) the identity of its modules, in case of a multi-module application. Additional configuration options that depend on the build type of the application: (in `generate` command options)
    
    - For Gradle build file, `app_build_settings_files` is optional for specifying a settings file. For example with Gradle build file, see the [splitNjoin app build specification](../../test/data/splitNjoin/tkltest_config.toml).
    
-   - For Ant build file, `app_build_ant_target` is required. `app_build_settings_files` is optional for specifying a property file. For Ant, the feature of specifying `app_build_files` is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files, and in this case the parameters `monolith_app_path` and `app_classpath_file` should be provided.    
+   - For Ant build file, `app_build_ant_target` is required. `app_build_settings_files` is optional for specifying a property file. For Ant, the feature of specifying `app_build_files` is currently supported only for Java projects that use a single build file and declare dependencies between compilation tasks through the `depends` attribute or `antcall` tasks. There is no current support for declaring dependencies in the compilation process through `ant` tasks in the build file, or using multiple build files, and in this case the configuration options `monolith_app_path` and `app_classpath_file` should be provided.    
     
-3. `build_type`: (in `general` command options) build file type for compiling and running the tests. Also build file type of `app_build_files`, if they are provided.
+3. `build_type`: (in `general` options) build file type for compiling and running the tests. Also build file type of `app_build_files`, if they are provided.
 
 When specifying `app_build_files`, the generated test suite(s) and their external dependencies will be integrated into them. The integrated build files are saved under the output directory as `tkltest_app_<app-build-file-name>`.
 
-Alternatively, if not specifying `app_build_files` and theirs `build_type`, the following configuration parameters are required:
+Alternatively, if not specifying `app_build_files` and theirs `build_type`, the following configuration options are required:
 
-1. `monolith_app_path`: (in `general` command options) A list of absolute or relative paths to directories containing application classes. The specified paths are used as Java `CLASSPATH` for purposes of loading application classes for analysis and test generation.
+1. `monolith_app_path`: (in `general` options) A list of absolute or relative paths to directories containing application classes. The specified paths are used as Java `CLASSPATH` for purposes of loading application classes for analysis and test generation.
    
-2. `app_classpath_file`: (in `general` command options) The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../../test/data/irs/irsMonoClasspath.txt). 
+2. `app_classpath_file`: (in `general` options) The name of a text file containing all library dependencies of the app under test. The file should contain a list of jar files (using relative or absolute paths); for example, see the [irs classpath file](../../test/data/irs/irsMonoClasspath.txt). 
 
 ### Selecting the test-generation strategy
 
@@ -135,7 +135,7 @@ The CLI implements three strategies for test generation: CTD-guided test generat
 
 CTD-guided test generation constructs a CTD model of each public method in the specified application classes, and generates a test plan from the model, where each row in the test plan---specifying a vector of types for the method parameters---becomes a coverage goal for test generation. Applying CTD at the method level, thus, results in a set of test plans that guide test generation. The CTD model for a method consists of a set of types for each formal parameter of the method; these types are subtypes of the declared parameter type and identified statically via type inference. Test generation operates in two steps. First, the test-generation engine runs EvoSuite and/or Randoop to create a set of base test cases from which it mines "building-block" test sequences and adds them to a sequence pool. Next, it iterates over the CTD test plans, and attempts to synthesize a covering test sequence for each row of a test plan by creating objects/values of the types specified in a row, and reusing sequences from the sequence pool.
 
-CTD-guided test generation can be configured using the following parameters:
+CTD-guided test generation can be configured using the following configuration options:
 
 1. `base_test_generator`: The base test generator to use for creating the building-block test sequences: the values can be `evosuite` (EvoSuite only), `randoop` (Randoop only), or `combined` (both Evosuite and Randoop).
 
@@ -215,11 +215,11 @@ options:
                         path to a test class file (.java) to compile and run; empty by default, in which case tests for all classes targeted during test generation are executed.
 ```
 
-Configuration parameters relevant to the `execute` command:
+Configuration options relevant to the `execute` command:
 
-1. `build_type`: (in `general` command options) can be either `maven` (default), `ant` or `gradle`. Indicates the type of build file script that will be generated.
+1. `build_type`: (in `general` options) can be either `maven` (default), `ant` or `gradle`. Indicates the type of build file script that will be generated.
 2. `code_coverage`: (in `execute` command options) whether to create JaCoCo code coverage reports for the executed test cases. Default is false.
-3. `offline_instrumentation`: (in `general` command options) whether to use offline instrumentation for the code coverage collection. Default is false, 
+3. `offline_instrumentation`: (in `general` options) whether to use offline instrumentation for the code coverage collection. Default is false, 
                                 meaning that if code coverage is collected, instrumentation will occur at class load using a Java agent.
 4. `app_packages`: (in `execute` command options) a list of prefixes of the app under test, to be used by JaCoCo so that it reports coverage of the app 
                         under test only rather than also third party code.
