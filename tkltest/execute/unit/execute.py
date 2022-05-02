@@ -168,7 +168,7 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
     else:
         main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
-    # generate build files
+    # generate a build file
     if create_build:
         build_file = build_util.generate_build_xml(
             app_name=app_name,

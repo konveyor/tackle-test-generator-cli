@@ -137,7 +137,7 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
                     app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
                     generated_build_file, output_dir)
 
-        # this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
+        # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
         with open(generated_build_file, 'r') as inp:
             content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
         with open(generated_build_file, 'w') as outp:
