@@ -45,21 +45,11 @@ def process_execute_command(args, config):
 def run_dev_tests(config):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
-    ant_build_file = ''
-    maven_build_file = ''
-    gradle_build_file = ''
-    if build_type == 'ant':
-        ant_build_file = config['dev_tests']['build_file']
-    elif build_type == 'maven':
-        maven_build_file = config['dev_tests']['build_file']
-    else:
-        gradle_build_file = config['dev_tests']['build_file']
+    build_file = config['dev_tests']['build_file']
     __run_test_cases(create_build=False,
                      build_type=build_type,
                      build_targets=build_targets,
-                     ant_build_file=ant_build_file,
-                     maven_build_file=maven_build_file,
-                     gradle_build_file=gradle_build_file,
+                     build_file=build_file,
                      app_name=config['general']['app_name'],
                      collect_codecoverage=True,
                      verbose=config['general']['verbose'],
@@ -135,12 +125,19 @@ def __execute_base(args, config):
         offline_inst = gen_config['general']['offline_instrumentation']
     else:
         offline_inst = config['general']['offline_instrumentation']
+
+    build_type = config['general']['build_type']
+    if build_type == 'ant':
+        build_file = test_root_dir + os.sep + "build.xml"
+    elif build_type == 'maven':
+        build_file = test_root_dir + os.sep + "pom.xml"
+    else:
+        build_file = test_root_dir + os.sep + "build.gradle"
+
     __run_test_cases(create_build=config['execute']['create_build_file'],
-                     build_type=config['general']['build_type'],
-                     jdk_path = config['general']['java_jdk_home'],
-                     ant_build_file=test_root_dir + os.sep + "build.xml",
-                     maven_build_file=test_root_dir + os.sep + "pom.xml",
-                     gradle_build_file=test_root_dir + os.sep + "build.gradle",
+                     build_type=build_type,
+                     jdk_path=config['general']['java_jdk_home'],
+                     build_file=build_file,
                      app_name=config['general']['app_name'],
                      monolith_app_path=config['general']['monolith_app_path'],
                      app_classpath=classpath,
@@ -158,7 +155,7 @@ def __execute_base(args, config):
 
 
 def __run_test_cases(app_name, collect_codecoverage, verbose,
-                     create_build, build_type, ant_build_file, maven_build_file, gradle_build_file, build_targets='',
+                     create_build, build_type, build_file, build_targets='',
                      test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[], jdk_path='', app_packages=[],
                      # partitions_file='',
                      target_class_list=[], reports_dir='', offline_inst='',
@@ -173,8 +170,9 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
 
     # generate build files
     if create_build:
-        ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+        build_file = build_util.generate_build_xml(
             app_name=app_name,
+            build_type=build_type,
             monolith_app_path=monolith_app_path,
             app_classpath=app_classpath,
             test_root_dir=test_root_dir,
@@ -201,42 +199,42 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
         if build_type == 'maven':
             if not build_targets:
                 build_targets = 'clean verify site'
-            command_util.run_command("mvn -f {} {}".format(maven_build_file, build_targets),
+            command_util.run_command("mvn -f {} {}".format(build_file, build_targets),
                                      verbose=verbose, env_vars=env_vars)
         elif build_type == 'gradle':
             if not build_targets:
                 build_targets = 'tklest_task'
-            if os.path.basename(gradle_build_file) == "build.gradle":
-                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(gradle_build_file), build_targets),
+            if os.path.basename(build_file) == "build.gradle":
+                command_util.run_command("gradle --project-dir {} {}".format(os.path.dirname(build_file), build_targets),
                                          verbose=verbose, env_vars=env_vars)
             else:
-                command_util.run_command("gradle -b {} {}".format(gradle_build_file, build_targets),
+                command_util.run_command("gradle -b {} {}".format(build_file, build_targets),
                                          verbose=verbose, env_vars=env_vars)
         else:
             if collect_codecoverage:
                 if not build_targets:
                     build_targets = 'merge-coverage-report'
-                command_util.run_command("ant -f {} {}".format(ant_build_file, build_targets),
+                command_util.run_command("ant -f {} {}".format(build_file, build_targets),
                                          verbose=verbose, env_vars=env_vars)
             else:
                 if build_targets:
-                    tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(ant_build_file, build_targets), error=True)
+                    tkltest_status('Error executing build {}. Can not build target {} when collect_code_coverage is off'.format(build_file, build_targets), error=True)
                 for partition in partitions:
-                    command_util.run_command("ant -f {} {}{}".format(ant_build_file, 'test-reports_', partition),
+                    command_util.run_command("ant -f {} {}{}".format(build_file, 'test-reports_', partition),
                                              verbose=verbose, env_vars=env_vars)
 
-        #else:
-         #   task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
-          #  for partition in partitions:
-                #if not env_vars:
-             #       __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-              #          verbose=verbose)
-                #else:
-                    # env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
-                 #   for env_var in os.environ:
-                  #      env_vars[env_var] = os.environ[env_var]
-                  #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-                   #     verbose=verbose, env_vars=env_vars)
+        # else:
+        #    task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
+        #    for partition in partitions:
+        #         if not env_vars:
+        #            __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+        #                verbose=verbose)
+        #         else:
+        #             env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
+        #            for env_var in os.environ:
+        #                env_vars[env_var] = os.environ[env_var]
+        #            __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+        #                verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
         if not build_targets:

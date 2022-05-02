@@ -39,6 +39,7 @@ def generate_evosuite(config, output_dir):
     #     sys.exit(0)
 
     app_name = config['general']['app_name']
+    build_type = config['general']['build_type']
     classpath = __get_classpath(config)
     tkltest_status('Generating test suite using Evosuite for application: ' + app_name)
     app_copy_folder, target_folder = __arrange_folders_for_evosuite(config['general']['monolith_app_path'], config)
@@ -68,9 +69,10 @@ def generate_evosuite(config, output_dir):
     else:
         reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
-    # generate ant build file
-    ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+    # generate a build file
+    build_file = build_util.generate_build_xml(
         app_name=app_name,
+        build_type=build_type,
         monolith_app_path=config['general']['monolith_app_path'],
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=evosuite_output_dir,
@@ -80,9 +82,7 @@ def generate_evosuite(config, output_dir):
         main_reports_dir=reports_dir,
         output_dir=output_dir
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, ant_build_file))))
-    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, maven_build_file))))
-    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(evosuite_output_dir, gradle_build_file))))
+    tkltest_status('Generated {} build file {}'.format(build_type, os.path.abspath(os.path.join(evosuite_output_dir, build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
                                                    config['general']['build_type'],
                                                    [evosuite_output_dir])
@@ -105,6 +105,7 @@ def generate_randoop(config, output_dir):
 
     monolith_app_path = config['general']['monolith_app_path']
     app_name = config['general']['app_name']
+    build_type = config['general']['build_type']
     time_limit = config['generate']['time_limit']
     tkltest_status('Generating test suite using Randoop for application: ' + app_name)
     classpath = __get_classpath(config)
@@ -143,9 +144,10 @@ def generate_randoop(config, output_dir):
         sys.exit(1)
     tkltest_status('Generated Randoop test suite written to {}'.format(randoop_output_dir))
 
-    # generate ant build file
-    ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+    # generate a build file
+    build_file = build_util.generate_build_xml(
         app_name=app_name,
+        build_type=build_type,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=randoop_output_dir,
@@ -155,9 +157,7 @@ def generate_randoop(config, output_dir):
         main_reports_dir=app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX,
         output_dir=output_dir
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, ant_build_file))))
-    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, maven_build_file))))
-    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(randoop_output_dir, gradle_build_file))))
+    tkltest_status('Generated {} build file {}'.format(build_type, os.path.abspath(os.path.join(randoop_output_dir, build_file))))
     build_util.integrate_tests_into_app_build_file(config['generate']['app_build_files'],
                                                    config['general']['build_type'],
                                                    [randoop_output_dir])
