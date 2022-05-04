@@ -161,7 +161,7 @@ teardown_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 }
 
 @test "Test 13: CLI [build_type=gradle] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
@@ -202,5 +202,5 @@ teardown_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.gradle ]
 }
