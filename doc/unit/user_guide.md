@@ -211,7 +211,7 @@ options:
   -nbf, --no-build-file-creation
                         whether to not create a build file; if set to False (default) a build file (of type set
                         in build_type option) for running the tests with the matching configurations will be
-                        created and used; if set to true, a build file (of type set in build_type option) should
+                        created and used; if set to True, a build file (of type set in build_type option) should
                         already exist and will be used
   -cc, --code-coverage  generate code coverage report with JaCoCo agent
   -tc TEST_CLASS, --test-class TEST_CLASS
