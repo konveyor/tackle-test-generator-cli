@@ -151,7 +151,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
 
     # execute ctd-amplified tests
     print('\n*** ctd-amplified combined execute --- {} ***'.format(short_app_name))
-    tkltest_config['execute']['create_build_file'] = True
+    tkltest_config['execute']['no_create_build_file'] = False
     if not skip_exec:
         __run_execute(config=tkltest_config, verbose=verbose)
 
@@ -163,7 +163,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     else:
         shutil.copy(gen_config_file, evosuite_testdir)
         tkltest_config['general']['test_directory'] = os.path.basename(evosuite_testdir) if first_time else os.path.abspath(evosuite_testdir)
-        tkltest_config['execute']['create_build_file'] = False
+        tkltest_config['execute']['no_create_build_file'] = True
         build_util.generate_build_xml(short_app_name, tkltest_config['general']['monolith_app_path'], build_util.get_build_classpath(tkltest_config),
                                       evosuite_testdir, [evosuite_testdir], None, [],
                                       os.path.join(tkltest_outdir, short_app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX),
@@ -180,7 +180,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
     else:
         shutil.copy(gen_config_file, randoop_testdir)
         tkltest_config['general']['test_directory'] = os.path.basename(randoop_testdir) if first_time else os.path.abspath(randoop_testdir)
-        tkltest_config['execute']['create_build_file'] = False
+        tkltest_config['execute']['no_create_build_file'] = True
         build_util.generate_build_xml(short_app_name, tkltest_config['general']['monolith_app_path'], build_util.get_build_classpath(tkltest_config),
                                       randoop_testdir, [randoop_testdir], None, [],
                                       os.path.join(tkltest_outdir, short_app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX),
@@ -211,7 +211,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
         # generate and execute standalone evosuite tests
         evosuite_standalone_testdir = f'{tkltest_outdir}/{short_app_name}-evosuite-standalone-tests'
         tkltest_config['general']['test_directory'] = os.path.basename(evosuite_standalone_testdir) if first_time else os.path.abspath(evosuite_standalone_testdir)
-        tkltest_config['execute']['create_build_file'] = False
+        tkltest_config['execute']['no_create_build_file'] = True
         __run_generate(config=tkltest_config, subcommand='evosuite', verbose=verbose)
         shutil.copy(gen_config_file, evosuite_standalone_testdir)
         build_util.generate_build_xml(short_app_name, tkltest_config['general']['monolith_app_path'],
@@ -226,7 +226,7 @@ def __run_trial(short_app_name, app, tkltest_config, outdir, force, skip_exec, g
         # generate and execute standalone randoop tests
         randoop_standalone_testdir = f'{tkltest_outdir}/{short_app_name}-randoop-standalone-tests'
         tkltest_config['general']['test_directory'] = os.path.basename(randoop_standalone_testdir) if first_time else os.path.abspath(randoop_standalone_testdir)
-        tkltest_config['execute']['create_build_file'] = False
+        tkltest_config['execute']['no_create_build_file'] = True
         tkltest_config['generate']['randoop']['no_error_revealing_tests'] = True
         __run_generate(config=tkltest_config, subcommand='randoop', verbose=verbose)
         shutil.copy(gen_config_file, randoop_standalone_testdir)
@@ -312,7 +312,7 @@ def __run_combined_test_suite(app_name, combined_testdir, gen_config_file, confi
     ]
     shutil.copy(gen_config_file, combined_testdir)
     config['general']['test_directory'] = os.path.basename(combined_testdir) if first_time else os.path.abspath(combined_testdir)
-    config['execute']['create_build_file'] = False
+    config['execute']['no_create_build_file'] = True
     build_util.generate_build_xml(app_name, config['general']['monolith_app_path'], build_util.get_build_classpath(config), combined_testdir,
                                   test_dirs, None, [], os.path.join(tkltest_outdir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX),
                                   config['execute']['app_packages'], True, True)

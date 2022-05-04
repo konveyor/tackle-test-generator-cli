@@ -90,16 +90,17 @@ def get_build_classpath(config, subcommand='ctd-amplified'):
     return classpath_str
 
 
-def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir, test_dirs,
+def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, test_root_dir, test_dirs,
                        # partitions_file,
                        target_class_list, main_reports_dir, app_packages='',
                        collect_codecoverage=False, offline_instrumentation=False, output_dir=''):
-    """Generates Ant build.xml, Maven pom.xml, and Gradle build.gradle for running tests.
+    """Generates Ant build.xml, Maven pom.xml, or Gradle build.gradle for running tests.
 
-    Generates Ant build.xml, aMaven pom.xml and Gradle build.gradle for running generated tests and collecting coverage information.
+    Generates a build file depending on the build_type, for running generated tests and collecting coverage information.
 
     Args:
         app_name: name of the app under test
+        build_type: build type of the app, type of build file to generate (ant, maven or gradle)
         monolith_app_path: paths to classes for the app under test
         app_classpath: Java CLASSPATH for building the app under test
         test_root_dir: root directory of test cases
@@ -125,31 +126,35 @@ def generate_build_xml(app_name, monolith_app_path, app_classpath, test_root_dir
         app_reported_packages = []
 
     # set the build xml file name and content based on the build file
-    ant_build_xml_file = test_root_dir + os.sep + 'build.xml'
     # if micro:
     #     build_xml_file += 'micro.xml'
     # else:
     #     build_xml_file += 'mono.xml'
 
-    __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                ant_build_xml_file, output_dir)
+    if build_type == 'ant':
+        generated_build_file = test_root_dir + os.sep + 'build.xml'
+        __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                    app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
+                    generated_build_file, output_dir)
 
-    # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
-    with open(ant_build_xml_file, 'r') as inp:
-        content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
-    with open(ant_build_xml_file, 'w') as outp:
-        outp.write(content)
+        # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
+        with open(generated_build_file, 'r') as inp:
+            content = inp.read().replace("xmlnsjacoco", "xmlns:jacoco")
+        with open(generated_build_file, 'w') as outp:
+            outp.write(content)
 
-    maven_build_xml_file = test_root_dir + os.sep + 'pom.xml'
-    __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, app_reported_packages, offline_instrumentation, main_reports_dir, maven_build_xml_file,output_dir)
+    elif build_type == 'maven':
+        generated_build_file = test_root_dir + os.sep + 'pom.xml'
+        __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                      app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
+                      generated_build_file, output_dir)
 
-    gradle_build_file = test_root_dir + os.sep + 'build.gradle'
-    __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, main_reports_dir, gradle_build_file, output_dir)
+    else:
+        generated_build_file = test_root_dir + os.sep + 'build.gradle'
+        __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
+                       app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir)
 
-    return ant_build_xml_file, maven_build_xml_file, gradle_build_file
+    return generated_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,

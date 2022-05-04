@@ -57,7 +57,6 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 }
 
 @test "Test 02: CLI execute irs" {
@@ -210,7 +209,6 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_RANDOOP_TESTDIR/build.xml ]
-    [ -f $IRS_RANDOOP_TESTDIR/pom.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
@@ -235,7 +233,6 @@ setup_file() {
 
     # assert build file is generated
     [ -f $IRS_EVOSUITE_TESTDIR/build.xml ]
-    [ -f $IRS_EVOSUITE_TESTDIR/pom.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
@@ -268,7 +265,6 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
 
     # execute generated tests

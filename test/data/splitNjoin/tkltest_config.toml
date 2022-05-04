@@ -21,7 +21,7 @@ app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
 
 [execute]
 app_packages = ['splitNjoin.*']
-create_build_file = true
+no_create_build_file = false
 code_coverage = true
 online_instrumentation = false
 test_class = ""

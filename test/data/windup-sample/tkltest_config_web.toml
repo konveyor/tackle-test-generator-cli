@@ -21,7 +21,7 @@ app_build_files = ["test/data/windup-sample/migration-sample-app-master/simple-s
 
 [execute]
 app_packages = [ "com.*",]
-create_build_file = false
+no_create_build_file = false
 code_coverage = true
 online_instrumentation = false
 test_class = ""

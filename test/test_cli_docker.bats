@@ -119,10 +119,8 @@ teardown_file() {
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 
-    # assert build files are generated
+    # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.gradle ]
 }
 
 @test "Test 12: CLI [build_type=maven] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
@@ -162,10 +160,8 @@ teardown_file() {
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 
-    # assert build files are generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.gradle ]
 }
 
 @test "Test 13: CLI [build_type=gradle] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
@@ -205,8 +201,6 @@ teardown_file() {
     echo "# test_count=$test_count" >&3
     [ $test_count -gt 0 ]
 
-    # assert build files are generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
+    # assert build file is generated
     [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.gradle ]
 }

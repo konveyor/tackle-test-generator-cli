@@ -87,6 +87,7 @@ def generate_ctd_amplified_tests(config, output_dir):
 
     # get relevant configuration options for test generation
     app_name = config['general']['app_name']
+    build_type = config['general']['build_type']
     monolith_app_path = config['general']['monolith_app_path']
     app_classpath_file = config['general']['app_classpath_file']
     verbose = config['general']['verbose']
@@ -207,7 +208,8 @@ def generate_ctd_amplified_tests(config, output_dir):
     # we create this directory, so it will be at the build files, and will be later used for augmentation
     if not os.path.isdir(os.path.join(test_directory, 'monolithic')):
         os.mkdir(os.path.join(test_directory, 'monolithic'))
-    # generate ant build file
+
+    # generate a build file
     test_dirs = [
         os.path.join(test_directory, dir) for dir in os.listdir(test_directory)
         if os.path.isdir(os.path.join(test_directory, dir)) and not dir.startswith('.')
@@ -218,8 +220,9 @@ def generate_ctd_amplified_tests(config, output_dir):
     else:
         reports_dir = app_name+constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
-    ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+    build_file = build_util.generate_build_xml(
         app_name=app_name,
+        build_type=build_type,
         monolith_app_path=monolith_app_path,
         app_classpath=build_util.get_build_classpath(config),
         test_root_dir=test_directory,
@@ -232,21 +235,12 @@ def generate_ctd_amplified_tests(config, output_dir):
         offline_instrumentation=True if not config['generate']['ctd_amplified']['no_augment_coverage'] else False,
         output_dir=output_dir
     )
-    tkltest_status('Generated Ant build file {}'.format(os.path.abspath(os.path.join(test_directory, ant_build_file))))
-    tkltest_status('Generated Maven build file {}'.format(os.path.abspath(os.path.join(test_directory, maven_build_file))))
-    tkltest_status('Generated Gradle build file {}'.format(os.path.abspath(os.path.join(test_directory, gradle_build_file))))
+    tkltest_status('Generated {} build file {}'.format(build_type, os.path.abspath(os.path.join(test_directory, build_file))))
 
     # augment CTD-guided tests with coverage-increasing base tests
     if not config['generate']['ctd_amplified']['no_augment_coverage']:
         config['general']['offline_instrumentation'] = True
-        build_type = config['general']['build_type']
         start_time = time.time()
-        if build_type == 'ant':
-            build_file = ant_build_file
-        elif build_type == 'maven':
-            build_file = maven_build_file
-        else:
-            build_file = gradle_build_file
         has_coverage = augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
                                    ctd_test_dir=test_directory, report_dir=reports_dir)
         if not has_coverage:
@@ -255,6 +249,7 @@ def generate_ctd_amplified_tests(config, output_dir):
             tkltest_status('Re-running Coverage-driven test-suite augmentation with online instrumentation')
             build_util.generate_build_xml(
                 app_name=app_name,
+                build_type=build_type,
                 monolith_app_path=monolith_app_path,
                 app_classpath=build_util.get_build_classpath(config),
                 test_root_dir=test_directory,

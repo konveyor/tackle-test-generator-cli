@@ -532,8 +532,9 @@ class UnitTests(unittest.TestCase):
         shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
         os.makedirs(config['general']['test_directory'])
         monolithic_dir = os.path.join(config['general']['test_directory'], 'monolithic')
-        ant_build_file, maven_build_file, gradle_build_file = build_util.generate_build_xml(
+        build_file = build_util.generate_build_xml(
             app_name=app_name,
+            build_type='gradle',
             monolith_app_path=config['general']['monolith_app_path'],
             app_classpath=build_util.get_build_classpath(config),
             test_root_dir=config['general']['test_directory'],
@@ -553,7 +554,7 @@ class UnitTests(unittest.TestCase):
             shutil.rmtree(monolithic_dir, ignore_errors=True)
             os.makedirs(monolithic_dir)
             shutil.rmtree(config['general']['reports_path'], ignore_errors=True)
-            augment.augment_with_code_coverage(config, gradle_build_file,
+            augment.augment_with_code_coverage(config, build_file,
                                                config['general']['build_type'],
                                                config['general']['test_directory'],
                                                config['general']['reports_path'])

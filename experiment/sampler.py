@@ -126,7 +126,7 @@ def __execute_samples(config, build_xml_from, sampled_testdir, app_conf, conf_di
     print('\n*** {} execute ***'.format(sampled_testdir))
     config['general']['test_directory'] = os.path.abspath(sampled_testdir)
     config['general']['reports_path'] = os.path.join(conf_dir, app_conf + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
-    config['execute']['create_build_file'] = False
+    config['execute']['no_create_build_file'] = True
     build_xml = os.path.join(sampled_testdir, 'build.xml')
     if build_xml_from:
         build_xml_orig = os.path.join(build_xml_from, 'build.xml')
