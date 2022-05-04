@@ -472,7 +472,10 @@ __options_spec = {
             'long_name': '--no-build-file-creation',
             'type': bool,
             'default_value': False,
-            'help_message': 'whether to not create a build file; if set to True, a build file (of type set in build_type option) should already exist and will be used (default: False)'
+            'help_message': 'whether to not create a build file; if set to False (default) a build file (of type set'
+                            'in build_type option) for running the tests with the matching configurations will be'
+                            'created and used; if set to True, a build file (of type set in build_type option) should'
+                            'already exist and will be used'
         },
         'code_coverage': {
             'required': False,

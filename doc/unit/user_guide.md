@@ -209,10 +209,15 @@ usage: tkltest-unit execute [-h] [-nbf] [-cc] [-tc TEST_CLASS]
 options:
   -h, --help            show this help message and exit
   -nbf, --no-build-file-creation
-                        whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used
+                        whether to not create a build file; if set to False (default) a build file (of type set
+                        in build_type option) for running the tests with the matching configurations will be
+                        created and used; if set to true, a build file (of type set in build_type option) should
+                        already exist and will be used
   -cc, --code-coverage  generate code coverage report with JaCoCo agent
   -tc TEST_CLASS, --test-class TEST_CLASS
-                        path to a test class file (.java) to compile and run; empty by default, in which case tests for all classes targeted during test generation are executed.
+                        path to a test class file (.java) to compile and run; empty by default, in which case tests
+                        for all classes targeted during test generation are executed.
+
 ```
 
 Configuration options relevant to the `execute` command:
@@ -225,6 +230,7 @@ Configuration options relevant to the `execute` command:
                         under test only rather than also third party code.
 5. `test_class`: (in `execute` command options) name of the class to be tested, in case the user wants to execute the tests for a specific class only. 
 Empty by default, in which case tests for all classes targeted during test generation are executed.
+6. `no_create_build_file`: (in `execute` command options) whether to not create a build file for running the tests. Default value of the configuration option is False, and in this case a build file (of type set in build_type option) for running the tests with the matching configurations will be created and used. If set to True, a build file (of type set in build_type option) should already exist and will be used.
 
 When test execution completes, a JUnit report is generated, summarizing all test case results. Optionally, also a JaCoCo code coverage report is generated to present the statement and branch coverage obtained during test case execution. 
 Both reports are illustrated below on the irs example.  

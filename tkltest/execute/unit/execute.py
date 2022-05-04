@@ -46,7 +46,7 @@ def run_dev_tests(config):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     build_file = config['dev_tests']['build_file']
-    __run_test_cases(no_create_build=False,
+    __run_test_cases(no_create_build=True,
                      build_type=build_type,
                      build_targets=build_targets,
                      build_file=build_file,
