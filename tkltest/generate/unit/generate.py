@@ -242,7 +242,7 @@ def generate_ctd_amplified_tests(config, output_dir):
         config['general']['offline_instrumentation'] = True
         start_time = time.time()
         has_coverage = augment_with_code_coverage(config=config, build_file=build_file, build_type=build_type,
-                                                  ctd_test_dir=test_directory, report_dir=reports_dir)
+                                   ctd_test_dir=test_directory, report_dir=reports_dir)
         if not has_coverage:
             # try augmentation again with online instrumentation.
             # Build files have fixed names hence no need to update the name.

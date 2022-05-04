@@ -223,18 +223,18 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
                     command_util.run_command("ant -f {} {}{}".format(build_file, 'test-reports_', partition),
                                              verbose=verbose, env_vars=env_vars)
 
-        # else:
-        #    task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
-        #    for partition in partitions:
-        #         if not env_vars:
-        #            __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-        #                verbose=verbose)
-        #         else:
-        #             env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
-        #            for env_var in os.environ:
-        #                env_vars[env_var] = os.environ[env_var]
-        #            __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
-        #                verbose=verbose, env_vars=env_vars)
+        #else:
+         #   task_prefix = 'coverage-reports_' if collect_codecoverage else 'test-reports_' if gen_junit_report else 'execute-tests_'
+          #  for partition in partitions:
+                #if not env_vars:
+             #       __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+              #          verbose=verbose)
+                #else:
+                    # env_vars = env_vars | os.environ # this syntax is valid in python 3.9+
+                 #   for env_var in os.environ:
+                  #      env_vars[env_var] = os.environ[env_var]
+                  #  __run_command("ant -f {} {}{}".format(ant_build_file, task_prefix, partition),
+                   #     verbose=verbose, env_vars=env_vars)
     except subprocess.CalledProcessError as e:
         tkltest_status('Error executing junit {}: {}\n{}'.format(build_type, e, e.stderr), error=True)
         if not build_targets:
