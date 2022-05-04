@@ -8,6 +8,7 @@ name = "TKLTEST_CONFIG_FILE"
     # test_directory = "irs-ctd-amplified-tests"
     # JDK home directory
     java_jdk_home = ""
+    build_type = "maven"
 
 # options for "tkltest generate" command
 [generate]
