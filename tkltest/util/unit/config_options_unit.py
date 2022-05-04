@@ -464,15 +464,15 @@ __options_spec = {
                             '(to be used by JaCoCo so that it reports coverage of the app under test only,'
                             'rather than also third party code)'
         },
-        'create_build_file': {
+        'no_create_build_file': {
             'required': False,
             'is_toml_option': True,
             'is_cli_option': True,
             'short_name': '-nbf',
             'long_name': '--no-build-file-creation',
             'type': bool,
-            'default_value': True,
-            'help_message': 'whether to generate build files; if set to false, a build file (of type set in build_type option) should already exist and will be used'
+            'default_value': False,
+            'help_message': 'whether to not create a build file; if set to True, a build file (of type set in build_type option) should already exist and will be used (default: False)'
         },
         'code_coverage': {
             'required': False,

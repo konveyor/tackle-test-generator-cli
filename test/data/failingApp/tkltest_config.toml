@@ -22,7 +22,7 @@ app_build_ant_target = ""
 
 [execute]
 app_packages = ["failing.*"]
-create_build_file = true
+no_create_build_file = false
 code_coverage = true
 test_class = ""
 

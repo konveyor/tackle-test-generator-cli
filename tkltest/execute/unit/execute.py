@@ -46,7 +46,7 @@ def run_dev_tests(config):
     build_type = config['dev_tests']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
     build_file = config['dev_tests']['build_file']
-    __run_test_cases(create_build=False,
+    __run_test_cases(no_create_build=False,
                      build_type=build_type,
                      build_targets=build_targets,
                      build_file=build_file,
@@ -134,7 +134,7 @@ def __execute_base(args, config):
     else:
         build_file = test_root_dir + os.sep + "build.gradle"
 
-    __run_test_cases(create_build=config['execute']['create_build_file'],
+    __run_test_cases(no_create_build=config['execute']['no_create_build_file'],
                      build_type=build_type,
                      jdk_path=config['general']['java_jdk_home'],
                      build_file=build_file,
@@ -155,7 +155,7 @@ def __execute_base(args, config):
 
 
 def __run_test_cases(app_name, collect_codecoverage, verbose,
-                     create_build, build_type, build_file, build_targets='',
+                     no_create_build, build_type, build_file, build_targets='',
                      test_root_dir='', monolith_app_path='', app_classpath='', test_dirs=[], jdk_path='', app_packages=[],
                      # partitions_file='',
                      target_class_list=[], reports_dir='', offline_inst='',
@@ -169,7 +169,7 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
         main_reports_dir = app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX
 
     # generate a build file
-    if create_build:
+    if not no_create_build:
         build_file = build_util.generate_build_xml(
             app_name=app_name,
             build_type=build_type,

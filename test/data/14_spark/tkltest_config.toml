@@ -20,7 +20,7 @@ app_build_files = ["test/data/14_spark/pom.xml"]
 
 [execute]
 app_packages = [ "spark.*",]
-create_build_file = true
+no_create_build_file = false
 code_coverage = false
 online_instrumentation = false
 test_class = ""
