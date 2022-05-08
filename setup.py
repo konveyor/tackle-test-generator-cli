@@ -32,7 +32,7 @@ setup(
     },
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: EPL-2.0',
+        'License :: OSI Approved :: APL-2.0',
         'Operating System :: OS Independent'
     ]
 )
