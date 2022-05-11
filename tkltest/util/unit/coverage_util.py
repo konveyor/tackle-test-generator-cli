@@ -89,6 +89,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
             # we allow error when trying to get test suite coverage.
             # will handle it like we do not have test files at all:
             jacoco_raw_data_file = ''
+        elif not os.path.exists(coverage_csv_file):
+            tkltest_status('Warning: {} was not created by : {}.\n Skipping current test file'.format(coverage_csv_file, cmd))
+            # if csv file was not created, we will not use the jacoco file
+            jacoco_raw_data_file = ''
 
     if additional_test_suite:
         '''
