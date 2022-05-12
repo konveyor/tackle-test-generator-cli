@@ -80,7 +80,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
         tkltest_status('Failed to collect coverage for tests in the augmentation test pool, no tests are added.')
         return False
 
-    tkltest_status('Collecting coverage gain for each of {} tests in the augmentation test pool'.format(
+    tkltest_status('Collecting coverage gain for each of {} test files in the augmentation test pool'.format(
         len(test_class_augment_pool)))
 
     # initialize map for test classes that provide coverage gain
@@ -206,6 +206,12 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         for dir, files in coverage_util.get_test_classes(evosuite_test_dir).items()
         for file in files if '_scaffolding' not in file
     ]
+
+    if len(augmentation_test_pool) == 0:
+        tkltest_status('Warning: no EvoSuite tests found for augmentation')
+    else:
+        tkltest_status('Computing individual coverage for each of {} test files in the augmentation test pool'
+                   .format(len(augmentation_test_pool)))
 
     counter = 1
     has_coverage = False
