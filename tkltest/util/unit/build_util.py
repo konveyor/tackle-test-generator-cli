@@ -433,6 +433,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                         line('artifactId', 'maven-surefire-plugin')
                         line('version', constants.MAVEN_SURFIRE_VERSION)
                         with tag('configuration'):
+                            line('testFailureIgnore', 'true')
                             line('reportsDirectory', junit_output_dir + '/raw')
                             with tag('systemPropertyVariables'):
                                 line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
