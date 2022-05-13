@@ -393,7 +393,11 @@ def __compute_tests_with_coverage_gain(test_class_augment_pool, ctd_test_dir, ba
             else:
                 logging.info('No coverage gain from test class {}'.format(test_class))
         except subprocess.CalledProcessError as e:
-            logging.error('Error running augmented test suite with class {}: {}'.format(test_class, e))
+            logging.error('Warning: error occurred while merging augmented test suite with class {}: {}'.format(test_class, e))
+
+        if not coverage_delta and not total_coverage:
+            tkltest_status('Terminating augmentation due to memory exhaustion')
+            return tests_with_coverage_gain, total_inst_cov_gain, total_branch_cov_gain
 
         # remove test class from test suite
         #coverage_util.remove_test_class_from_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
@@ -469,7 +473,12 @@ def __augment_ctd_test_suite(tests_with_coverage_gain, ctd_test_dir, base_ctd_co
                     max_memory=max_memory, jdk_path=jdk_path)
                 first = False
             except subprocess.CalledProcessError as e:
-                logging.error('Error merging augmented test suite with class {}: {}'.format(test_class, e))
+                logging.error('Warning: error occurred while merging augmented test suite with class {}: {}'.format(test_class, e))
+
+            if not coverage_delta and not augmented_coverage:
+                tkltest_status('Terminating augmentation due to memory exhaustion')
+                coverage_util.remove_test_class_from_ctd_suite(test_class=test_class, test_directory=ctd_test_dir)
+                return curr_coverage, added_test_classes
 
             if coverage_delta['instruction_cov_delta'] > 0 or coverage_delta['branch_cov_delta'] > 0:
                 curr_coverage = augmented_coverage
