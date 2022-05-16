@@ -46,9 +46,9 @@ def process_execute_command(args, config):
 
 
 def run_dev_tests(config):
-    build_type = config['dev_tests']['build_type']
+    build_type = config['general']['build_type']
     build_targets = ' '.join(config['dev_tests']['build_targets'])
-    build_file = config['dev_tests']['build_file']
+    build_file = config['generate']['app_build_files'][0]
     __run_test_cases(no_create_build=True,
                      build_type=build_type,
                      build_targets=build_targets,
@@ -297,7 +297,7 @@ def __compare_to_dev_tests_coverage(config, jacoco_raw_date_file = ''):
     os.mkdir(compare_report_dir)
 
     # calling get_dev_test_coverage() to create a xml file and html dir:
-    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_test_name = os.path.basename(os.path.dirname(config['generate']['app_build_files'][0]))
     dev_coverage_exec = config['dev_tests']['coverage_exec_file']
     dev_coverage_xml, dev_coverage_html, dev_coverage_csv = coverage_util.get_dev_test_coverage(
         config=config,
