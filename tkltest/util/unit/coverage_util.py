@@ -89,6 +89,10 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
             # we allow error when trying to get test suite coverage.
             # will handle it like we do not have test files at all:
             jacoco_raw_data_file = ''
+        elif not os.path.exists(coverage_csv_file):
+            tkltest_status('Warning: {} was not created by : {}.\n Skipping current test file'.format(coverage_csv_file, cmd))
+            # if csv file was not created, we will not use the jacoco file
+            jacoco_raw_data_file = ''
 
     if additional_test_suite:
         '''
@@ -256,10 +260,10 @@ def get_delta_coverage(test, test_raw_cov_file, ctd_raw_cov_file, main_coverage_
                                  format(jacoco_cli_file, test_raw_cov_file, ctd_raw_cov_file,
                                         output_exec_file), verbose=True, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
-            # If merging failed we skip current test file and assume it resulted in zero delta coverage
-            # The reason to continue is that we may still gain from previous augmenting test files
-            tkltest_status('Warning: merging of jacoco output failed, skipping current test file: {}\n{}'.format(e, e.stderr))
-            return no_delta_coverage
+            # If merging failed we stop augmentation because subsequent merging will most probably also fail due
+            # to same memory issues
+            tkltest_status('Warning: merging of jacoco output failed for test file: {}\n{}'.format(e, e.stderr))
+            return {},{}
     elif os.path.isfile(test_raw_cov_file):
         shutil.copy(test_raw_cov_file, output_exec_file)
     else:

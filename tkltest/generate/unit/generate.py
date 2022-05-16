@@ -180,7 +180,7 @@ def generate_ctd_amplified_tests(config, output_dir):
 
     if os.path.exists(test_directory):
         shutil.rmtree(test_directory)
-    os.rename(tmp_test_directory, test_directory)
+    shutil.move(tmp_test_directory, test_directory)
 
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
