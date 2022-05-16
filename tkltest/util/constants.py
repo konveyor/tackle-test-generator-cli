@@ -145,7 +145,8 @@ JACOCO_MERGED_DATA_FOR_AUGMENTATION = 'ctd-guided-augmented.exec'
 
 # Name of Jacoco CLI jar
 
-JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
+JACOCO_CLI_NAME = 'org.jacoco.cli'
+JACOCO_CLI_JAR_NAME = JACOCO_CLI_NAME + '-' + JACOCO_MAVEN_VERSION + '-nodeps.jar'
 
 ####### tkltest-ui constants #######
 
