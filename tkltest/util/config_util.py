@@ -154,10 +154,12 @@ def __validate_config(config, test_level, command=None, subcommand=None):
     message and exits.
 
     """
-    # get general options spec and options spec for the given command and subcommand
-    options_spec = {
-        'general': config_options.get_options_spec('general', test_level=test_level)
-    }
+    general_scopes = ['general']
+    if test_level == 'unit':
+        general_scopes.append('dev_tests')
+
+    # get general and dev_tests options spec and options spec for the given command and subcommand
+    options_spec = {scope: config_options.get_options_spec(scope, test_level=test_level) for scope in general_scopes}
     if command is not None:
         options_spec[command] = config_options.get_options_spec(command, test_level=test_level)
     if subcommand is not None:
@@ -170,7 +172,7 @@ def __validate_config(config, test_level, command=None, subcommand=None):
             'missing_conditionally_required_params': {},
             'invalid_enum_values': {},
             'param_constraint_violation': []
-        } for scope in ['general', command, subcommand] if scope is not None
+        } for scope in general_scopes + [command, subcommand] if scope is not None
     }
 
     for scope in options_spec.keys():

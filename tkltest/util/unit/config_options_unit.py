@@ -52,6 +52,20 @@ def get_options_spec(command=None, subcommand=None, load_format=True):
     return spec
 
 
+def __is_using_dev_tests(config):
+    """
+    Checks if developers' tests are used.
+    This happens when compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified.
+    Args:
+        config: the loaded configuration information.
+    Returns:
+        True is dev_tests are used in generation or execution.
+    """
+    return config['dev_tests']['compare_code_coverage'] or \
+           config['dev_tests']['use_for_augmentation'] or \
+           config['dev_tests']['coverage_threshold'] != __options_spec['dev_tests']['coverage_threshold']['default_value']
+
+
 def __conditionally_required(opt_name, config):
     """Checker for conditionally required options.
 
@@ -81,6 +95,14 @@ def __conditionally_required(opt_name, config):
         if (config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value'] and
                 config['general']['build_type'] == 'ant'):
             return 'required if "app_build_files" is specified and "build_type" is "ant"'
+    elif opt_name == 'coverage_exec_file':
+        # required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified
+        if __is_using_dev_tests(config):
+            return 'required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified'
+    elif opt_name == 'build_targets':
+        # required if build_type is ant and (compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified)
+        if config['general']['build_type'] == 'ant' and __is_using_dev_tests(config):
+            return 'required if build_type is ant, and if compare_code_coverage or use_for_augmentation are True or if coverage_threshold is specified'
     # elif opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
     #     if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
     #         return 'required if "partitions_file" is specified'
@@ -515,34 +537,19 @@ __options_spec = {
     'dev_tests': {
         'is_cli_command': False,
         'help_message': 'information about developer-written test suite',
-        'build_type': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['ant', 'maven', 'gradle'],
-            'default_value': 'ant',
-            'help_message': 'build type for compiling and running the developer-written test suite: ant, maven, or gradle'
-        },
-        'build_file': {
-            'required': True,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'relpath_fix_type': 'path',
-            'help_message': 'path to build file for compiling and running the developer-written test suite'
-        },
         'build_targets': {
-            'required': True,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': list,
             'default_value': [],
-            'help_message': 'list of build targets for compiling and running the developer-written test suite'
+            'help_message': 'list of build targets for compiling and running the developer-written test suite. '
+                            'If build_type is maven or gradle and build_targets is not specified, then "mvn test" or '
+                            '"gradle clean test" will be used. '
+                            'If build_type is ant, then build_targets is required.'
         },
         'coverage_exec_file': {
-            'required': False,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
