@@ -19,7 +19,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+// import io.github.bonigarcia.wdm.WebDriverManager;
 
 import java.time.Duration;
 
@@ -47,7 +47,7 @@ public class GeneratedTests {
 	public void oneTimeSetUp() {
 {% if browser == 'chrome' or browser == 'chrome_headless' %}
         // create chrome driver instance and set options
-        WebDriverManager.chromedriver().setup();
+//        WebDriverManager.chromedriver().setup();
         ChromeOptions chromeOptions = new ChromeOptions();
     {% if browser == 'chrome_headless' %}
     	chromeOptions.addArguments("--headless");
