@@ -156,17 +156,17 @@ TKLTEST_UI_OUTPUT_DIR_PREFIX = 'tkltest-output-ui-'
 TKLTEST_UI_LIB_DOWNLOAD_DIR = os.path.join('lib', 'download')
 
 # version of ui testgen core
-TKLTEST_UI_CORE_VERSION = '0.0.1'
+TKLTEST_UI_CORE_VERSION = 'main-SNAPSHOT-jar-with-dependencies'
 TKLTEST_UI_CORE_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR,
                                    'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION))
 # crawljax version and jar
-CRAWLJAX_VERSION = '5.0-frag'
-CRAWLJAX_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'crawljax-examples-{}.jar'.format(CRAWLJAX_VERSION))
+# CRAWLJAX_VERSION = '5.0-frag'
+# CRAWLJAX_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'crawljax-examples-{}.jar'.format(CRAWLJAX_VERSION))
 
 # library jars
-ANTLR_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'antlr4-runtime-4.7.2.jar')
-COMMONS_CLI_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'commons-cli-1.4.jar')
-TOML_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'tomlj-1.0.0.jar')
+# ANTLR_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'antlr4-runtime-4.7.2.jar')
+# COMMONS_CLI_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'commons-cli-1.4.jar')
+# TOML_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR, 'tomlj-1.0.0.jar')
 
 # generated test class
 CRAWLJAX_API_TEST_FILE = os.path.join('src', 'test', 'java', 'generated', 'GeneratedTests.java')

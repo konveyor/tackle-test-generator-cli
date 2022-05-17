@@ -12,21 +12,26 @@
     <junit.version>4.13.1</junit.version>
     <evosuite.version>1.2.0</evosuite.version>
     <randoop.version>4.3.0</randoop.version>
-    <crawljax.version>5.0-frag</crawljax.version>
-    <testgencore_unit.version>1.1.0</testgencore_unit.version>
-    <testgencore_ui.version>0.0.1</testgencore_ui.version>
+<!--    <crawljax.version>5.0-frag</crawljax.version>-->
+<!--    <testgencore_unit.version>1.1.0</testgencore_unit.version>-->
+<!--    <testgencore_ui.version>0.0.1</testgencore_ui.version>-->
+    <tackletest_core.version>artifact-test-SNAPSHOT</tackletest_core.version>
   </properties>
 
   <repositories>
+<!--    <repository>-->
+<!--      <id>github</id>-->
+<!--      <name>GitHub Konveyor-Tackle Test Generator Maven Packages</name>-->
+<!--      <url>https://maven.pkg.github.com/konveyor/tackle-test-generator-core</url>-->
+<!--    </repository>-->
+<!--    <repository>-->
+<!--      <id>github-sinha108</id>-->
+<!--      <name>Test Generator Maven Packages</name>-->
+<!--      <url>https://maven.pkg.github.com/sinha108/maven-packages</url>-->
+<!--    </repository>-->
     <repository>
-      <id>github</id>
-      <name>GitHub Konveyor-Tackle Test Generator Maven Packages</name>
-      <url>https://maven.pkg.github.com/konveyor/tackle-test-generator-core</url>
-    </repository>
-    <repository>
-      <id>github-sinha108</id>
-      <name>Test Generator Maven Packages</name>
-      <url>https://maven.pkg.github.com/sinha108/maven-packages</url>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
 
@@ -83,11 +88,16 @@
       <artifactId>javaparser-symbol-solver-core</artifactId>
       <version>3.16.1</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.konveyor</groupId>-->
+<!--      <artifactId>tackle-test-generator-unit</artifactId>-->
+<!--      <version>${testgencore_unit.version}</version>-->
+<!--    </dependency>-->
     <dependency>
-      <groupId>org.konveyor</groupId>
-      <artifactId>tackle-test-generator-unit</artifactId>
-      <version>${testgencore_unit.version}</version>
-    </dependency>
+	    <groupId>com.github.konveyor.tackle-test-generator-core</groupId>
+	    <artifactId>tackle-test-generator-unit</artifactId>
+	    <version>${tackletest_core.version}</version>
+	</dependency>
 <!--    <dependency>-->
 <!--      <groupId>org.evosuite</groupId>-->
 <!--      <artifactId>evosuite</artifactId>-->
@@ -102,16 +112,16 @@
 <!--       <scope>system</scope>-->
 <!--	  <systemPath>${project.basedir}/lib/download/evosuite-standalone-runtime-${evosuite.version}.jar</systemPath>-->
 <!--    </dependency>-->
-    <dependency>
-      <groupId>org.konveyor</groupId>
-      <artifactId>tackle-test-generator-ui</artifactId>
-      <version>${testgencore_ui.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.crawljax</groupId>
-      <artifactId>crawljax-examples</artifactId>
-      <version>${crawljax.version}</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.konveyor</groupId>-->
+<!--      <artifactId>tackle-test-generator-ui</artifactId>-->
+<!--      <version>${testgencore_ui.version}</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.crawljax</groupId>-->
+<!--      <artifactId>crawljax-examples</artifactId>-->
+<!--      <version>${crawljax.version}</version>-->
+<!--    </dependency>-->
   </dependencies>
 
   <build>
