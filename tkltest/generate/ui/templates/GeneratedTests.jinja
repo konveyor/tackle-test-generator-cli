@@ -103,10 +103,10 @@ public class GeneratedTests {
      * @param eventType event type: click or enter
      * @param frameId ID of frame to switch focus to before event dispatch
      * @return
-     * @throws ElementNotVisibleException
+     * @throws ElementNotInteractableException
      * @throws InterruptedException
      */
-    private boolean fireEvent(WebElement webElement, String eventType, String frameId) throws ElementNotVisibleException, InterruptedException {
+    private boolean fireEvent(WebElement webElement, String eventType, String frameId) throws ElementNotInteractableException, InterruptedException {
         if (webElement == null) {
             return false;
         }
@@ -118,7 +118,7 @@ public class GeneratedTests {
                 try {
                     webElement.click();
                     break;
-                } catch (ElementNotVisibleException enve) {
+                } catch (ElementNotInteractableException enve) {
                     throw enve;
                 } catch (WebDriverException wde) {
                     return false;
@@ -127,7 +127,7 @@ public class GeneratedTests {
                 try {
                     webElement.sendKeys(Keys.RETURN);
                     break;
-                } catch (ElementNotVisibleException enve) {
+                } catch (ElementNotInteractableException enve) {
                     throw enve;
                 } catch (WebDriverException wde) {
                     return false;
