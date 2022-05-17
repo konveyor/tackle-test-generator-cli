@@ -92,7 +92,7 @@ ERROR_PATTERNS_FILE = 'errorPatterns.json'
 RANDOOP_VERSION = "4.3.0"
 
 # evosuite used version
-EVOSUITE_VERSION = "1.2.0"
+EVOSUITE_VERSION = "v1.2.0"
 
 # soot used version
 SOOT_VERSION = "4.1.0"

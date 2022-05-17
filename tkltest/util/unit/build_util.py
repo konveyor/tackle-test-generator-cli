@@ -33,8 +33,8 @@ required_lib_jars = {
     #(is_for_user, groupId, artifactId, version, classifier)
     (True, 'junit', 'junit', '4.13.1', ''),
     (True, 'org.hamcrest', 'hamcrest-all', '1.3', ''),
-    (True, 'com.github.evosuite', 'evosuite-standalone-runtime', constants.EVOSUITE_VERSION, ''), # todo
-    (True, 'com.github.evosuite', 'evosuite', constants.EVOSUITE_VERSION, ''),
+    (True, 'com.github.evosuite.evosuite', 'evosuite-standalone-runtime', constants.EVOSUITE_VERSION, ''), # todo
+    (True, 'com.github.evosuite.evosuite', 'evosuite-master', constants.EVOSUITE_VERSION, ''),
     (False, 'org.jacoco', 'org.jacoco.cli', constants.JACOCO_MAVEN_VERSION, 'nodeps'),
     (False, 'org.jacoco', 'org.jacoco.agent', constants.JACOCO_MAVEN_VERSION, ''),
 }
@@ -615,7 +615,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
     elif app_build_type == 'gradle':
         shutil.copy(app_build_file, tkltest_app_build_file)
         with open(tkltest_app_build_file, 'a') as f:
-            f.write('repositories{\n maven {url \'https://jitpack.io\'}\n}\n')
+            f.write('\nrepositories{\n maven {url \'https://jitpack.io\'}\n}\n')
 
             f.write('dependencies {\n')
             for is_for_user, groupId, artifactId, version, classifier in required_lib_jars:
@@ -623,9 +623,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
                 if classifier:
                     dependency += ':' + classifier
                 if is_for_user:
-                    f.write('    implementation \'' + dependency + '\')\n')
-            for dependency_jar in dependencies_jars:
-                f.write('    implementation files(\'' + pathlib.PurePath(dependency_jar).as_posix() + '\')\n')
+                    f.write('    implementation \'' + dependency + '\'\n')
             f.write('}\n')
             f.write('sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [\n')
             for abs_test_dir in abs_test_dirs:
