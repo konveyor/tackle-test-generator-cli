@@ -92,7 +92,7 @@ ERROR_PATTERNS_FILE = 'errorPatterns.json'
 RANDOOP_VERSION = "4.3.0"
 
 # evosuite used version
-EVOSUITE_VERSION = "v1.2.0"
+EVOSUITE_VERSION = "1.2.0"
 
 # soot used version
 SOOT_VERSION = "4.1.0"
@@ -145,8 +145,7 @@ JACOCO_MERGED_DATA_FOR_AUGMENTATION = 'ctd-guided-augmented.exec'
 
 # Name of Jacoco CLI jar
 
-JACOCO_CLI_NAME = 'org.jacoco.cli'
-JACOCO_CLI_JAR_NAME = JACOCO_CLI_NAME + '-' + JACOCO_MAVEN_VERSION + '-nodeps.jar'
+JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
 
 ####### tkltest-ui constants #######
 

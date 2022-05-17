@@ -30,19 +30,33 @@ from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
 required_lib_jars = {
-    #(is_for_user, groupId, artifactId, version, classifier)
+    #(needed_for_user_build, groupId, artifactId, version, classifier)
+    # todo - fix EVOSUITE_VERSION at constants
     (True, 'junit', 'junit', '4.13.1', ''),
     (True, 'org.hamcrest', 'hamcrest-all', '1.3', ''),
-    (True, 'com.github.evosuite.evosuite', 'evosuite-standalone-runtime', constants.EVOSUITE_VERSION, ''), # todo
-    (True, 'com.github.evosuite.evosuite', 'evosuite-master', constants.EVOSUITE_VERSION, ''),
+    (True, 'com.github.evosuite.evosuite', 'evosuite-standalone-runtime', 'v' + constants.EVOSUITE_VERSION, ''),
+    (True, 'com.github.evosuite.evosuite', 'evosuite-master', 'v' + constants.EVOSUITE_VERSION, ''),
     (False, 'org.jacoco', 'org.jacoco.cli', constants.JACOCO_MAVEN_VERSION, 'nodeps'),
     (False, 'org.jacoco', 'org.jacoco.agent', constants.JACOCO_MAVEN_VERSION, ''),
 }
 
-
 def __get_jars_for_tests_execution():
+    # todo: use the following code after Saurabh merge
+    required_lib_jars = {
+        constants.JACOCO_CLI_JAR_NAME,
+        'org.jacoco.agent-0.8.7.jar',
+        'junit-4.13.1.jar',
+        'hamcrest-all-1.3.jar',
+        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+    }
+    return [
+        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
+    ]
+    # todo: use the following code after Saurabh merge
     required_lib_jars_names = [artifactId + '-' + version + ('-' + classifier if classifier else '') + '.jar'
-                               for is_for_user, groupId, artifactId, version, classifier in required_lib_jars]
+                               for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars]
     return [
         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
         if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars_names
@@ -575,8 +589,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
 
         # adding the dependencies
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        for is_for_user, groupId, artifactId, version, classifier in required_lib_jars:
-            if is_for_user:
+        for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
+            if needed_for_user_build:
                 dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
                 __get_xml_element(dependency_element, namespaces, 'groupId', groupId)
                 __get_xml_element(dependency_element, namespaces, 'artifactId', artifactId)
@@ -618,11 +632,11 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
             f.write('\nrepositories{\n maven {url \'https://jitpack.io\'}\n}\n')
 
             f.write('dependencies {\n')
-            for is_for_user, groupId, artifactId, version, classifier in required_lib_jars:
-                dependency = ':'.join([groupId, artifactId, version])
-                if classifier:
-                    dependency += ':' + classifier
-                if is_for_user:
+            for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
+                if needed_for_user_build:
+                    dependency = ':'.join([groupId, artifactId, version])
+                    if classifier:
+                        dependency += ':' + classifier
                     f.write('    implementation \'' + dependency + '\'\n')
             f.write('}\n')
             f.write('sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [\n')
