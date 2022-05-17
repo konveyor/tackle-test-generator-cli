@@ -30,8 +30,12 @@ from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
 required_lib_jars = {
-    #(needed_for_user_build, groupId, artifactId, version, classifier)
-    # todo - fix EVOSUITE_VERSION at constants
+    ###
+    # this is a list of dependencies that are needed for both the testing build file, and the user build file
+    # each dependency is represented as:
+    # (is_needed_for_user_build, groupId, artifactId, version, classifier)
+    ###
+    # todo - fix EVOSUITE_VERSION at constants, and in the following list
     (True, 'junit', 'junit', '4.13.1', ''),
     (True, 'org.hamcrest', 'hamcrest-all', '1.3', ''),
     (True, 'com.github.evosuite.evosuite', 'evosuite-standalone-runtime', 'v' + constants.EVOSUITE_VERSION, ''),
@@ -41,7 +45,7 @@ required_lib_jars = {
 }
 
 def __get_jars_for_tests_execution():
-    # todo: use the following code after Saurabh merge
+    # todo: remove this code after Saurabh merge
     required_lib_jars = {
         constants.JACOCO_CLI_JAR_NAME,
         'org.jacoco.agent-0.8.7.jar',
@@ -582,12 +586,13 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         if namespace:
             ElementTree.register_namespace('', namespace)
 
+        # adding jitpack repository:
         repositories_element = __get_xml_element(project_root, namespaces, 'repositories')
         repository_element = __get_xml_element(repositories_element, namespaces, 'repository', '', True)
         __get_xml_element(repository_element, namespaces, 'id', 'jitpack.io')
         __get_xml_element(repository_element, namespaces, 'url', 'https://jitpack.io')
 
-        # adding the dependencies
+        # adding the dependencies:
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
         for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
             if needed_for_user_build:
@@ -619,18 +624,19 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         for abs_test_dir in abs_test_dirs:
             __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
 
+        # writing the new file, removing empty lines
+        lines = minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   ").split('\n')
         with open(tkltest_app_build_file, 'w') as f:
-            lines = minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   ").split('\n')
-            lines = [line for line in lines if line.strip()]
-            f.write('\n'.join(lines))
+            f.write('\n'.join([line for line in lines if line.strip()]))
         # todo  - use this comments for all types when ant implemented
         tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))
 
     elif app_build_type == 'gradle':
         shutil.copy(app_build_file, tkltest_app_build_file)
         with open(tkltest_app_build_file, 'a') as f:
+            # adding jitpack repository:
             f.write('\nrepositories{\n maven {url \'https://jitpack.io\'}\n}\n')
-
+            # adding the dependencies:
             f.write('dependencies {\n')
             for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
                 if needed_for_user_build:
