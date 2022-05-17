@@ -30,7 +30,7 @@ TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'lib')
 TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 
 # version of unit testgen core
-TKLTEST_UNIT_CORE_VERSION = '1.1.0'
+TKLTEST_UNIT_CORE_VERSION = 'artifact-test-0251622373-1'
 TKLTEST_UNIT_CORE_JAR = os.path.join(TKLTEST_LIB_DOWNLOAD_DIR,
                                      'tackle-test-generator-unit-{}.jar'.format(TKLTEST_UNIT_CORE_VERSION))
 
