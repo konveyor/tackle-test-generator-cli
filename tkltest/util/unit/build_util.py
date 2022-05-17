@@ -31,11 +31,11 @@ from tkltest.util.logging_util import tkltest_status
 
 required_lib_jars = {
     ###
-    # this is a list of dependencies that are needed for both the testing build file, and the user build file
+    # this is a list of dependencies that are needed for both the testing build file, and the app build file
     # each dependency is represented as:
-    # (is_needed_for_user_build, groupId, artifactId, version, classifier)
+    # (is_needed_for_app_build_file, groupId, artifactId, version, classifier)
     ###
-    # todo - fix EVOSUITE_VERSION at constants, and in the following list
+    # todo - once we will move to jitpack.io, fix EVOSUITE_VERSION at constants, and in the following list
     (True, 'junit', 'junit', '4.13.1', ''),
     (True, 'org.hamcrest', 'hamcrest-all', '1.3', ''),
     (True, 'com.github.evosuite.evosuite', 'evosuite-standalone-runtime', 'v' + constants.EVOSUITE_VERSION, ''),
@@ -45,7 +45,6 @@ required_lib_jars = {
 }
 
 def __get_jars_for_tests_execution():
-    # todo: remove this code after Saurabh merge
     required_lib_jars = {
         constants.JACOCO_CLI_JAR_NAME,
         'org.jacoco.agent-0.8.7.jar',
@@ -58,14 +57,16 @@ def __get_jars_for_tests_execution():
         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
         if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
     ]
-    # todo: use the following code after Saurabh merge
-    required_lib_jars_names = [artifactId + '-' + version + ('-' + classifier if classifier else '') + '.jar'
-                               for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars]
-    return [
-        os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars_names
-    ]
 
+# todo - the following code should be the new implementation of __get_jars_for_tests_execution(), once we will move to jitpack.io
+#def __get_jars_for_tests_execution():
+    # required_lib_jars_names = [artifactId + '-' + version + ('-' + classifier if classifier else '') + '.jar'
+    #                            for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars]
+    # return [
+    #     os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
+    #     if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars_names
+    # ]
+    #
 
 def get_build_classpath(config, subcommand='ctd-amplified'):
     """Creates and returns build classpath.
@@ -594,8 +595,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
 
         # adding the dependencies:
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
-            if needed_for_user_build:
+        for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars:
+            if needed_for_app_build_file:
                 dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
                 __get_xml_element(dependency_element, namespaces, 'groupId', groupId)
                 __get_xml_element(dependency_element, namespaces, 'artifactId', artifactId)
@@ -638,8 +639,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
             f.write('\nrepositories{\n maven {url \'https://jitpack.io\'}\n}\n')
             # adding the dependencies:
             f.write('dependencies {\n')
-            for needed_for_user_build, groupId, artifactId, version, classifier in required_lib_jars:
-                if needed_for_user_build:
+            for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars:
+                if needed_for_app_build_file:
                     dependency = ':'.join([groupId, artifactId, version])
                     if classifier:
                         dependency += ':' + classifier
