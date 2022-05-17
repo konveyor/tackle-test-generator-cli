@@ -38,7 +38,7 @@ def __get_jars_for_tests_execution():
         'junit-4.13.1.jar',
         'hamcrest-all-1.3.jar',
         'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
-        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
+        'evosuite-master-' + constants.EVOSUITE_VERSION + '.jar',
     }
 
     return [

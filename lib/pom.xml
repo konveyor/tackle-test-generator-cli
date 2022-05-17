@@ -10,12 +10,13 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.13.1</junit.version>
-    <evosuite.version>1.2.0</evosuite.version>
-    <randoop.version>4.3.0</randoop.version>
+    <evosuite.version>v1.2.0</evosuite.version>
+    <randoop.version>v4.3.0</randoop.version>
+    <randoop.replacecall.version>4.3.0</randoop.replacecall.version>
+    <tackletest_core.version>artifact-test-SNAPSHOT</tackletest_core.version>
 <!--    <crawljax.version>5.0-frag</crawljax.version>-->
 <!--    <testgencore_unit.version>1.1.0</testgencore_unit.version>-->
 <!--    <testgencore_ui.version>0.0.1</testgencore_ui.version>-->
-    <tackletest_core.version>artifact-test-SNAPSHOT</tackletest_core.version>
   </properties>
 
   <repositories>
@@ -122,6 +123,21 @@
 <!--      <artifactId>crawljax-examples</artifactId>-->
 <!--      <version>${crawljax.version}</version>-->
 <!--    </dependency>-->
+    <dependency>
+      <groupId>com.github.EvoSuite.evosuite</groupId>
+      <artifactId>evosuite-master</artifactId>
+      <version>${evosuite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.EvoSuite.evosuite</groupId>
+      <artifactId>evosuite-standalone-runtime</artifactId>
+      <version>${evosuite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.randoop</groupId>
+      <artifactId>randoop</artifactId>
+      <version>${randoop.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -131,19 +147,19 @@
         <artifactId>download-maven-plugin</artifactId>
         <version>1.6.3</version>
         <executions>
-          <execution>
-            <id>get-randoop-jar</id>
-            <!--            <phase>process-resources</phase>-->
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>
-                https://github.com/randoop/randoop/releases/download/v${randoop.version}/randoop-all-${randoop.version}.jar
-              </url>
-              <outputDirectory>${project.basedir}/download</outputDirectory>
-            </configuration>
-          </execution>
+<!--          <execution>-->
+<!--            <id>get-randoop-jar</id>-->
+<!--            &lt;!&ndash;            <phase>process-resources</phase>&ndash;&gt;-->
+<!--            <goals>-->
+<!--              <goal>wget</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <url>-->
+<!--                https://github.com/randoop/randoop/releases/download/v${randoop.version}/randoop-all-${randoop.version}.jar-->
+<!--              </url>-->
+<!--              <outputDirectory>${project.basedir}/download</outputDirectory>-->
+<!--            </configuration>-->
+<!--          </execution>-->
           <execution>
             <id>get-replacecall-jar</id>
             <!--            <phase>process-resources</phase>-->
@@ -152,37 +168,37 @@
             </goals>
             <configuration>
               <url>
-                https://github.com/randoop/randoop/releases/download/v${randoop.version}/replacecall-${randoop.version}.jar
+                https://github.com/randoop/randoop/releases/download/${randoop.version}/replacecall-${randoop.replacecall.version}.jar
               </url>
               <outputDirectory>${project.basedir}/download</outputDirectory>
             </configuration>
           </execution>
-          <execution>
-            <id>get-evosuite-jar</id>
-            <!--            <phase>process-resources</phase>-->
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>
-                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-${evosuite.version}.jar
-              </url>
-              <outputDirectory>${project.basedir}/download</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>get-evosuite-runtime-jar</id>
-            <!--            <phase>process-resources</phase>-->
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>
-                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-standalone-runtime-${evosuite.version}.jar
-              </url>
-              <outputDirectory>${project.basedir}/download</outputDirectory>
-            </configuration>
-          </execution>
+<!--          <execution>-->
+<!--            <id>get-evosuite-jar</id>-->
+<!--            &lt;!&ndash;            <phase>process-resources</phase>&ndash;&gt;-->
+<!--            <goals>-->
+<!--              <goal>wget</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <url>-->
+<!--                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-${evosuite.version}.jar-->
+<!--              </url>-->
+<!--              <outputDirectory>${project.basedir}/download</outputDirectory>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <id>get-evosuite-runtime-jar</id>-->
+<!--            &lt;!&ndash;            <phase>process-resources</phase>&ndash;&gt;-->
+<!--            <goals>-->
+<!--              <goal>wget</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <url>-->
+<!--                https://github.com/EvoSuite/evosuite/releases/download/v${evosuite.version}/evosuite-standalone-runtime-${evosuite.version}.jar-->
+<!--              </url>-->
+<!--              <outputDirectory>${project.basedir}/download</outputDirectory>-->
+<!--            </configuration>-->
+<!--          </execution>-->
         </executions>
       </plugin>
     </plugins>
