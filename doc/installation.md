@@ -9,13 +9,8 @@
 
 ## Downloading Java library Dependencies
 
-To run TackleTest CLI from a locally built Docker image or a local installation, a few jar files need to be downloaded from Maven repositories hosted on GitHub, which
-requires authentication. To enable authentication, create a [GitHub personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token),
-with the permission `read:packages`. Note that using your GitHub password will not work for downloading some
-of the jar files; a personal access token must be used.
-
-Update the settings file [../lib/settings.xml](../lib/settings.xml) by replacing `GITHUB_USERNAME` with your GitHub username and `GITHUB_TOKEN` with the personal access token that you created.
-Then, run the `lib/download_lib_jars.sh` script to download all library dependencies.
+To run TackleTest CLI from a locally built Docker image or a local installation, a few jar files need to be downloaded
+from Maven repositories. This can be done by running the script `lib/download_lib_jars.sh`
 
 ```buildoutcfg
 cd lib; ./download_lib_jars.sh
@@ -119,11 +114,10 @@ docker-compose run --rm tkltest-cli tkltest-unit --help
 docker-compose run --rm tkltest-cli tkltest-ui --help
 ```
 
-Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run these commands in the CLI
-directory after setting environment variables `GITHUB_USERNAME` to your GitHub username and `GITHUB_TOKEN` to the personal access token that you created:
+Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run these commands in the CLI:
 
 ```buildoutcfg
-docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg GITHUB_USERNAME=$GITHUB_USERNAME --tag tkltest-cli .
+docker build --tag tkltest-cli .
 ```
 
 Then, assuming `/home/user/tkltest-workspace` is the host directory to be mounted on to the container, the following

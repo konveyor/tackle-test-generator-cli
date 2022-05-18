@@ -21,21 +21,10 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - name: Create maven settings.xml
-        uses: s4u/maven-settings-action@v2.4.0
-        with:
-          servers: '[
-            {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
-            {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
-          ]'
       - name: Download Java libraries
         run: |
           cd lib
-          cp settings.xml bak.settings.xml
-          sed -ie "s|GITHUB_USERNAME|$GITHUB_ACTOR|g" settings.xml
-          sed -ie "s|GITHUB_TOKEN|${{ secrets.TKLTEST_PKGS_PAT }}|g" settings.xml
           ./download_lib_jars.sh
-          mv bak.settings.xml settings.xml
           cd ..; ls lib/*
       - name: Get release tag
         id: get_release_tag
