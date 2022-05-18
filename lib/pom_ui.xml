@@ -10,8 +10,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.13.1</junit.version>
-<!--    <crawljax.version>frag-SNAPSHOT</crawljax.version>-->
-    <tackletest_core.version>artifact-test-SNAPSHOT</tackletest_core.version>
+    <tackletest_core.version>main-SNAPSHOT</tackletest_core.version>
   </properties>
 
   <repositories>
@@ -27,21 +26,6 @@
 	    <artifactId>tackle-test-generator-ui</artifactId>
 	    <version>${tackletest_core.version}</version>
 	</dependency>
-<!--    <dependency>-->
-<!--      <groupId>com.github.crawljax.crawljax</groupId>-->
-<!--      <artifactId>crawljax-core</artifactId>-->
-<!--      <version>${crawljax.version}</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>com.github.crawljax.crawljax</groupId>-->
-<!--      <artifactId>crawloverview-plugin</artifactId>-->
-<!--      <version>${crawljax.version}</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>com.github.crawljax.crawljax</groupId>-->
-<!--      <artifactId>testcasegenerator</artifactId>-->
-<!--      <version>${crawljax.version}</version>-->
-<!--    </dependency>-->
   </dependencies>
 
   <build>

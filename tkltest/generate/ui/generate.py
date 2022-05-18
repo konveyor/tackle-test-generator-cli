@@ -94,8 +94,7 @@ def __run_crawljax(config):
 
     # create java command for running crawljax runner
     uitestgen_command = 'java -Xmx2048m -cp '
-    uitestgen_command += TKLTEST_UI_CORE_JAR #+ os.pathsep + CRAWLJAX_JAR
-    # uitestgen_command += os.pathsep + COMMONS_CLI_JAR + os.pathsep + TOML_JAR + os.pathsep + ANTLR_JAR
+    uitestgen_command += TKLTEST_UI_CORE_JAR
     uitestgen_command += ' org.konveyor.tackletest.ui.crawljax.CrawljaxRunner -cf {}'.format(config_file_name)
 
     # if verbose option specified, redirect crawljax log to file
