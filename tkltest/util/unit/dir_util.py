@@ -42,8 +42,8 @@ def get_output_dir(app_name, module_name):
     # (currently, at the core, the locations of these jars are hard coded)
     if not os.path.isdir(os.path.join(output_dir, "lib")):
         os.makedirs(os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "replacecall-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
-    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "replacecall-"+RANDOOP_REPLACECALL_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
+    shutil.copy(os.path.join(TKLTEST_LIB_DOWNLOAD_DIR, "randoop-"+RANDOOP_VERSION+".jar"), os.path.join(output_dir, "lib", "download"))
     # end of todo
     return output_dir
 

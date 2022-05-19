@@ -14,12 +14,8 @@
     <properties>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <testng.version>6.14.3</testng.version>
-        <selenium-java.version>4.0.0</selenium-java.version>
-{% if browser == 'chrome' or browser == 'chrome_headless' %}
-        <selenium-chrome-driver.version>4.0.0</selenium-chrome-driver.version>
-{% elif browser == 'firefox' or browser == 'firefox_headless' %}
-        <selenium-firefox-driver.version>4.0.0</selenium-firefox-driver.version>
-{% endif %}
+        <selenium.version>4.1.4</selenium.version>
+        <wdm.version>5.1.1</wdm.version>
     </properties>
 
 	<build>
@@ -53,7 +49,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>${selenium-java.version}</version>
+            <version>${selenium.version}</version>
         </dependency>
 
 {% if browser == 'chrome' or browser == 'chrome_headless' %}
@@ -61,24 +57,24 @@
 		<dependency>
     		<groupId>org.seleniumhq.selenium</groupId>
     		<artifactId>selenium-chrome-driver</artifactId>
-    		<version>${selenium-chrome-driver.version}</version>
+            <version>${selenium.version}</version>
 		</dependency>
 {% elif browser == 'firefox' or browser == 'firefox_headless' %}
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-firefox-driver -->
 		<dependency>
     		<groupId>org.seleniumhq.selenium</groupId>
     		<artifactId>selenium-firefox-driver</artifactId>
-    		<version>${selenium-firefox-driver.version}</version>
+            <version>${selenium.version}</version>
 		</dependency>
 {% endif %}
 
 		<!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
-		<dependency>
+<!--		<dependency>
     		<groupId>io.github.bonigarcia</groupId>
     		<artifactId>webdrivermanager</artifactId>
-    		<version>5.1.0</version>
+           	<version>${wdm.version}</version>
 		</dependency>
-
+-->
 		<!-- TEST-NG -->
 		<dependency>
 			<groupId>org.testng</groupId>

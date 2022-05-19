@@ -52,7 +52,7 @@ def process_execute_command(config):
         api_type, app_name, app_url, browser
     ))
     try:
-        command_util.run_command("mvn test", verbose=config['general']['verbose'])
+        command_util.run_command("mvn test --no-transfer-progress", verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
         tkltest_status('Error executing tests: {}\n{}'.format(e, e.stderr), error=True)
         os.chdir(cur_dir)
