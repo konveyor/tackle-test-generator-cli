@@ -70,3 +70,60 @@ setup() {
     # assert that test report is created
     [ -f ./$ADDRESSBOOK_CRAWLJAX_API_TEST_REPORT ]
 }
+
+@test "Test 04: tkltest-ui generate [nonfrag_mode] addressbook" {
+    # remove output directory
+    rm -rf $ADDRESSBOOK_OUTPUT_DIR
+
+    # generate test cases for addressbook app
+    run tkltest-ui --verbose --log-level INFO \
+        --config-file $ADDRESSBOOK_CONFIG_FILE_NONFRAG \
+        --test-directory $ADDRESSBOOK_OUTPUT_DIR \
+        generate
+    [ $status -eq 0 ]
+
+    # assert that the crawl directory is created
+    [ -d ./$ADDRESSBOOK_CRAWL_DIR ]
+
+    # assert that pom.xml and test class for crawljax API tests are generated
+    [ -f ./$ADDRESSBOOK_CRAWL_DIR/pom.xml ]
+    [ -f ./$ADDRESSBOOK_CRAWLJAX_API_TEST_FILE ]
+
+    # assert over number of generated crawljax API tests
+    test_count=`grep @Test $ADDRESSBOOK_CRAWLJAX_API_TEST_FILE | wc -l`
+    echo "# crawljax_api_test_count=$test_count" >&3
+    [ $test_count -gt 0 ]
+
+        # assert that pom.xml and test class for selenium API tests are generated
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_DIR/pom.xml ]
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_FILE ]
+
+    # assert over number of generated selenium API tests
+    test_count=`grep @Test $ADDRESSBOOK_SELENIUM_API_TEST_FILE | wc -l`
+    echo "# selenium_api_test_count=$test_count" >&3
+    [ $test_count -gt 0 ]
+}
+
+@test "Test 05: tkltest-ui execute [nonfrag_mode][api_type=selenium] addressbook" {
+    # execute test cases for addressbook app
+    run tkltest-ui --verbose \
+        --config-file $ADDRESSBOOK_CONFIG_FILE_NONFRAG \
+        --test-directory $ADDRESSBOOK_OUTPUT_DIR \
+        execute
+    # [ $status -eq 0 ]
+
+    # assert that test report is created
+    [ -f ./$ADDRESSBOOK_SELENIUM_API_TEST_REPORT ]
+}
+
+@test "Test 06: tkltest-ui execute [nonfrag_mode][api_type=crawljax] addressbook" {
+    # execute test cases for addressbook app
+    run tkltest-ui --verbose \
+        --config-file $ADDRESSBOOK_CONFIG_FILE_NONFRAG \
+        --test-directory $ADDRESSBOOK_OUTPUT_DIR \
+        execute --api-type crawljax
+    # [ $status -eq 0 ]
+
+    # assert that test report is created
+    [ -f ./$ADDRESSBOOK_CRAWLJAX_API_TEST_REPORT ]
+}
