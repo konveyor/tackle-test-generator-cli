@@ -75,7 +75,7 @@ setup() {
 
 @test "Test 04: tkltest-ui generate [nonfrag_mode] petclinic" {
     # remove output directory
-    rm -r $PETCLINIC_OUTPUT_DIR
+    rm -rf $PETCLINIC_OUTPUT_DIR
 
     # generate test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
@@ -109,7 +109,7 @@ setup() {
 @test "Test 05: tkltest-ui execute [nonfrag_mode][api_type=selenium] petclinic" {
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
-        --config-file $PETCLINIC_CONFIG_FILE \
+        --config-file $PETCLINIC_CONFIG_FILE_NONFRAG \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute
     # [ $status -eq 0 ]
@@ -121,7 +121,7 @@ setup() {
 @test "Test 06: tkltest-ui execute [nonfrag_mode][api_type=crawljax] petclinic" {
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
-        --config-file $PETCLINIC_CONFIG_FILE \
+        --config-file $PETCLINIC_CONFIG_FILE_NONFRAG \
         --test-directory $PETCLINIC_OUTPUT_DIR \
         execute --api-type crawljax
     # [ $status -eq 0 ]
