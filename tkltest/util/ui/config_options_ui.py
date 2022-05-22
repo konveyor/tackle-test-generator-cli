@@ -346,7 +346,7 @@ __options_spec_internal = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': float,
-            'default_value': 0,
+            'default_value': 0.0,
             'help_message': 'Threshold value for determining similar/duplicate states for the RTED algorithm'
         }
 

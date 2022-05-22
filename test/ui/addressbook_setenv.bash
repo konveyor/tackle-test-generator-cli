@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 ADDRESSBOOK_CONFIG_FILE=./test/ui/data/addressbook/tkltest_ui_config.toml
+ADDRESSBOOK_CONFIG_FILE_NONFRAG=./test/ui/data/addressbook/tkltest_ui_config_nonfrag.toml
 ADDRESSBOOK_OUTPUT_DIR=./__tkltest-output-ui-addressbook
 ADDRESSBOOK_CRAWL_DIR=$ADDRESSBOOK_OUTPUT_DIR/localhost/crawl0
 ADDRESSBOOK_CRAWLJAX_API_TEST_FILE=$ADDRESSBOOK_CRAWL_DIR/src/test/java/generated/GeneratedTests.java
