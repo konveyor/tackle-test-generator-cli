@@ -16,4 +16,4 @@ org/apache/httpcomponents/httpcore/4.4.13/httpcore-4.4.13.jar
 commons-logging/commons-logging/1.2/commons-logging-1.2.jar
 commons-codec/commons-codec/1.11/commons-codec-1.11.jar
 org/freemarker/freemarker/2.3.19/freemarker-2.3.19.jar
-com/google/code/gson/gson/2.2.4/gson-2.2.4.jar
+com/google/code/gson/gson/2.8.9/gson-2.8.9.jar

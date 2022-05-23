@@ -47,18 +47,9 @@ jobs:
         sudo npm install -g bats
         bats --version
         chromedriver --version
-    - name: Create maven settings.xml
-      uses: s4u/maven-settings-action@v2.4.0
-      with:
-        servers: '[
-          {"id": "github", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"},
-          {"id": "github-sinha108", "username": "$GITHUB_ACTOR", "password": "${{ secrets.TKLTEST_PKGS_PAT }}"}
-        ]'
     - name: Download Java libraries
       run: |
         cd lib
-        sed -ie "s|GITHUB_USERNAME|$GITHUB_ACTOR|g" settings.xml
-        sed -ie "s|GITHUB_TOKEN|${{ secrets.TKLTEST_PKGS_PAT }}|g" settings.xml
         ./download_lib_jars.sh
         cd ..; ls lib/*
     - name: Install Python dependencies
@@ -91,20 +82,11 @@ jobs:
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_addressbook.bats
     - name: Run tkltest-ui help/config tests using docker-compose
-      env:
-        GITHUB_USERNAME: $GITHUB_ACTOR
-        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
       run: |
         bats test/ui/test_cli_docker.bats
     - name: Run tkltest-ui generate/execute tests using docker-compose - petclinic
-      env:
-        GITHUB_USERNAME: $GITHUB_ACTOR
-        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
       run: |
         bats test/ui/test_cli_docker_petclinic.bats
     - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
-      env:
-        GITHUB_USERNAME: $GITHUB_ACTOR
-        GITHUB_TOKEN: ${{ secrets.TKLTEST_PKGS_PAT }}
       run: |
         bats test/ui/test_cli_docker_addressbook.bats

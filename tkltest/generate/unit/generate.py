@@ -373,11 +373,9 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
 
     # build the java command to be executed
     tg_command = "\""+jdk_path+"\" -Xmx2048m -cp " + os.path.join(constants.TKLTEST_UNIT_CORE_JAR)+os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-standalone-runtime-"
-                               +constants.EVOSUITE_VERSION+".jar") + os.pathsep
-    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-"
-                               +constants.EVOSUITE_VERSION+".jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-standalone-runtime-"+constants.EVOSUITE_VERSION+".jar") + os.pathsep
+    tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "evosuite-master-"+constants.EVOSUITE_VERSION+".jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-cli-1.4.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "soot-4.1.0.jar") + os.pathsep
     tg_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "commons-io-2.6.jar") + os.pathsep
@@ -448,10 +446,10 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
     tkltest_status('Extending sequences to reach coverage goals and generating junit tests')
 
     te_command = "\"" + jdk_path + "\""
-    te_command += " -Xmx2048m -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+\
-                  ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_VERSION+".jar"
+    te_command += " -Xmx2048m -Xbootclasspath/a:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_REPLACECALL_VERSION+\
+                  ".jar -javaagent:"+constants.TKLTEST_LIB_DOWNLOAD_DIR+os.sep+"replacecall-"+constants.RANDOOP_REPLACECALL_VERSION+".jar"
     te_command += " -cp \"" + os.path.join(constants.TKLTEST_UNIT_CORE_JAR) + os.pathsep
-    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-all-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
+    te_command += os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, "randoop-"+constants.RANDOOP_VERSION+".jar") + os.pathsep
     te_command += os.path.abspath(app_name+constants.TKL_EVOSUITE_OUTDIR_SUFFIX) + os.pathsep
     # if jee_support:
     #     te_command += os.path.join(constants.TKLTEST_LIB_DIR,

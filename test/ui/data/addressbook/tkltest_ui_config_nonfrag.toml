@@ -1,0 +1,31 @@
+[general]
+app_name = "addressbook"
+app_url = "http://localhost:3000/addressbook/"
+test_directory = ""
+verbose = false
+
+[generate]
+browser = "chrome_headless"
+time_limit = 2
+max_states = 0
+max_explore_action = 1
+include_iframes = true
+wait_after_event = 1000
+wait_after_reload = 1000
+clickables_spec_file = ""
+form_data_spec_file = "./test/ui/data/addressbook/tkltest_ui_formdata_config.toml"
+click_once = true
+click_randomly = true
+max_depth = 3
+crawl_hidden_anchors = false
+click_default_elements = true
+form_fill_mode = "random"
+form_fill_order = "normal"
+browser_pixel_density = 2
+rted_similarity_threshold = 0.0
+
+[execute]
+
+[config.init]
+
+[config.list]

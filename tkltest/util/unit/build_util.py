@@ -29,21 +29,40 @@ from xml.dom import minidom
 from tkltest.util import constants
 from tkltest.util.logging_util import tkltest_status
 
+required_lib_jars = {
+    ###
+    # this is a list of dependencies that are needed for both the testing build file, and the app build file
+    # each dependency is represented as:
+    # (is_needed_for_app_build_file, groupId, artifactId, version, classifier)
+    ###
+    (True, 'junit', 'junit', '4.13.1', ''),
+    (True, 'org.hamcrest', 'hamcrest-all', '1.3', ''),
+    (True, 'com.github.EvoSuite.evosuite', 'evosuite-standalone-runtime', constants.EVOSUITE_VERSION, ''),
+    (True, 'com.github.EvoSuite.evosuite', 'evosuite-master', constants.EVOSUITE_VERSION, ''),
+    (False, 'org.jacoco', 'org.jacoco.cli', constants.JACOCO_MAVEN_VERSION, 'nodeps'),
+    (False, 'org.jacoco', 'org.jacoco.agent', constants.JACOCO_MAVEN_VERSION, ''),
+}
+
+# def __get_jars_for_tests_execution():
+#     required_lib_jars = {
+#         constants.JACOCO_CLI_JAR_NAME,
+#         'org.jacoco.agent-0.8.7.jar',
+#         'junit-4.13.1.jar',
+#         'hamcrest-all-1.3.jar',
+#         'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
+#         'evosuite-master-' + constants.EVOSUITE_VERSION + '.jar',
+#     }
+#     return [
+#         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
+#         if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
+#     ]
 
 def __get_jars_for_tests_execution():
-
-    required_lib_jars = {
-        constants.JACOCO_CLI_JAR_NAME,
-        'org.jacoco.agent-0.8.7.jar',
-        'junit-4.13.1.jar',
-        'hamcrest-all-1.3.jar',
-        'evosuite-standalone-runtime-' + constants.EVOSUITE_VERSION + '.jar',
-        'evosuite-' + constants.EVOSUITE_VERSION + '.jar',
-    }
-
+    required_lib_jars_names = [artifactId + '-' + version + ('-' + classifier if classifier else '') + '.jar'
+                               for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars]
     return [
         os.path.join(os.path.abspath(dp), f) for dp, dn, filenames in os.walk(constants.TKLTEST_LIB_DIR) for f in filenames
-        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars
+        if os.path.splitext(f)[1] == '.jar' and f in required_lib_jars_names
     ]
 
 
@@ -565,15 +584,24 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         namespaces = {'': namespace} if namespace else None
         if namespace:
             ElementTree.register_namespace('', namespace)
-        # adding the dependencies
+
+        # adding jitpack repository:
+        repositories_element = __get_xml_element(project_root, namespaces, 'repositories')
+        repository_element = __get_xml_element(repositories_element, namespaces, 'repository', '', True)
+        __get_xml_element(repository_element, namespaces, 'id', 'jitpack.io')
+        __get_xml_element(repository_element, namespaces, 'url', 'https://jitpack.io')
+
+        # adding the dependencies:
         dependencies_element = __get_xml_element(project_root, namespaces, 'dependencies')
-        for dependency_jar in dependencies_jars:
-            dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
-            __get_xml_element(dependency_element, namespaces, 'groupId', os.path.basename(dependency_jar))
-            __get_xml_element(dependency_element, namespaces, 'artifactId', os.path.basename(dependency_jar))
-            __get_xml_element(dependency_element, namespaces, 'version', '1.0')
-            __get_xml_element(dependency_element, namespaces, 'scope', 'system')
-            __get_xml_element(dependency_element, namespaces, 'systemPath', dependency_jar)
+        for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars:
+            if needed_for_app_build_file:
+                dependency_element = __get_xml_element(dependencies_element, namespaces, 'dependency', '', True)
+                __get_xml_element(dependency_element, namespaces, 'groupId', groupId)
+                __get_xml_element(dependency_element, namespaces, 'artifactId', artifactId)
+                __get_xml_element(dependency_element, namespaces, 'version', version)
+                if classifier:
+                    __get_xml_element(dependency_element, namespaces, 'classifier', classifier)
+                __get_xml_element(dependency_element, namespaces, 'scope', 'test')
 
 
         # adding the test directories:
@@ -595,17 +623,26 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         for abs_test_dir in abs_test_dirs:
             __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
 
+        # writing the new file, removing empty lines
+        lines = minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   ").split('\n')
         with open(tkltest_app_build_file, 'w') as f:
-            f.write(minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   "))
+            f.write('\n'.join([line for line in lines if line.strip()]))
         # todo  - use this comments for all types when ant implemented
         tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))
 
     elif app_build_type == 'gradle':
         shutil.copy(app_build_file, tkltest_app_build_file)
         with open(tkltest_app_build_file, 'a') as f:
+            # adding jitpack repository:
+            f.write('\nrepositories{\n maven {url \'https://jitpack.io\'}\n}\n')
+            # adding the dependencies:
             f.write('dependencies {\n')
-            for dependency_jar in dependencies_jars:
-                f.write('    implementation files(\'' + pathlib.PurePath(dependency_jar).as_posix() + '\')\n')
+            for needed_for_app_build_file, groupId, artifactId, version, classifier in required_lib_jars:
+                if needed_for_app_build_file:
+                    dependency = ':'.join([groupId, artifactId, version])
+                    if classifier:
+                        dependency += ':' + classifier
+                    f.write('    implementation \'' + dependency + '\'\n')
             f.write('}\n')
             f.write('sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [\n')
             for abs_test_dir in abs_test_dirs:
