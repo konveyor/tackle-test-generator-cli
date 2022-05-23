@@ -102,12 +102,13 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         '''
         no_failure = True
         additional_build_targets = ' '.join(additional_test_suite['build_targets'])
+        additional_build_file = additional_test_suite['build_file']
         if build_type == 'ant':
-            cmd = "ant -f {} {}".format(build_file, additional_build_targets)
+            cmd = "ant -f {} {}".format(additional_build_file, additional_build_targets)
         elif build_type == 'maven':
-            cmd = "mvn -f {} {}".format(build_file, additional_build_targets)
+            cmd = "mvn -f {} {}".format(additional_build_file, additional_build_targets)
         else:  # gradle
-            cmd = "gradle --project-dir {} {}".format(os.path.dirname(build_file), additional_build_targets)
+            cmd = "gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets)
         try:
             command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:

@@ -91,10 +91,13 @@ def __conditionally_required(opt_name, config):
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
     elif opt_name == 'app_build_ant_target':
-        # required if app_build_files is specified and build_type is 'ant'
+        # required if app_build_files is specified, and build_type is 'ant', and if app_classpath_file or monolith_app_path are not specified
         if (config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value'] and
                 config['general']['build_type'] == 'ant'):
-            return 'required if "app_build_files" is specified and "build_type" is "ant"'
+            if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
+                return 'required if "app_build_files" is specified, and "build_type" is "ant", and "app_classpath_file" is not specified'
+            if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
+                return 'required if "app_build_files" is specified, and "build_type" is "ant", and "monolith_app_path" is not specified'
     elif opt_name == 'coverage_exec_file':
         # required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified
         if __is_using_dev_tests(config):
@@ -541,7 +544,7 @@ __options_spec = {
             'default_value': ['test'],
             'help_message': 'list of build targets for running the developer-written test suite and generating Jacoco '
                             'coverage .exec file. If build_targets is not specified, then ["test"] will be used '
-                            '(resulting for example in the commands "mvn test" or "gradle test", which usually '
+                            '(resulting for example in the commands "mvn test" or "gradle test", which commonly '
                             'are used to generate Jacoco coverage .exec file). '
         },
         'coverage_exec_file': {
