@@ -52,5 +52,4 @@ name = "TKLTEST_CONFIG_FILE"
 [dev_tests]
     build_targets =  ['coverage-reports_user-tests']
     coverage_exec_file = 'test/data/irs/user-tests/jacoco.exec'
-    compare_code_coverage = true
 
