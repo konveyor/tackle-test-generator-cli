@@ -154,12 +154,13 @@ JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
 TKLTEST_UI_OUTPUT_DIR_PREFIX = 'tkltest-output-ui-'
 
 # UI lib download dir
-TKLTEST_UI_LIB_DOWNLOAD_DIR = os.path.join('lib', 'download')
+# TKLTEST_UI_LIB_DOWNLOAD_DIR = os.path.join('lib', 'download')
 
 # version of ui testgen core
 TKLTEST_UI_CORE_VERSION = 'main-SNAPSHOT-jar-with-dependencies'
-TKLTEST_UI_CORE_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR,
-                                   'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION))
+# TKLTEST_UI_CORE_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR,
+#                                    'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION))
+TKLTEST_UI_CORE_JAR = 'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION)
 
 # generated test class
 CRAWLJAX_API_TEST_FILE = os.path.join('src', 'test', 'java', 'generated', 'GeneratedTests.java')

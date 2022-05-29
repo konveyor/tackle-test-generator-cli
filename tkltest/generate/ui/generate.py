@@ -19,19 +19,19 @@ import os.path
 import re
 import subprocess
 import sys
-import urllib.parse
-from tqdm import trange
 import time
+import urllib.parse
+from importlib import resources
 from threading import Thread
 
-import glob
 import toml
+from tqdm import trange
 
-from tkltest.util.logging_util import tkltest_status
+from tkltest.generate.ui import generate_selenium
 from tkltest.util import command_util
 from tkltest.util.constants import *
+from tkltest.util.logging_util import tkltest_status
 from tkltest.util.ui import dir_util, browser_util
-from tkltest.generate.ui import generate_selenium
 
 
 def process_generate_command(config):
@@ -94,7 +94,9 @@ def __run_crawljax(config):
 
     # create java command for running crawljax runner
     uitestgen_command = 'java -Xmx2048m -cp '
-    uitestgen_command += TKLTEST_UI_CORE_JAR
+    # uitestgen_command += TKLTEST_UI_CORE_JAR
+    with resources.path('lib', TKLTEST_UI_CORE_JAR) as core_ui_jar:
+        uitestgen_command += str(core_ui_jar)
     uitestgen_command += ' org.konveyor.tackletest.ui.crawljax.CrawljaxRunner -cf {}'.format(config_file_name)
 
     # if verbose option specified, redirect crawljax log to file
