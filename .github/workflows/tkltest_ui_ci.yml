@@ -65,6 +65,7 @@ jobs:
         source venv/bin/activate
         pip install .
         which tkltest-ui
+        ls venv/lib/python3.8/site-packages/*
     - name: Run tkltest-ui help/config tests
       run: |
         source venv/bin/activate
