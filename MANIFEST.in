@@ -1,0 +1,2 @@
+include tkltest/generate/ui/templates/*.jinja
+include lib/*.jar
