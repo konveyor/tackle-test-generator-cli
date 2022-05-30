@@ -29,9 +29,9 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 # install java lib dependencies
 WORKDIR /app/tackle-test-cli
-COPY lib/*.jar ./lib/
-COPY lib/*.xml ./lib/
-COPY lib/download_lib_jars.sh ./lib/
+COPY lib/*.* ./lib/
+#COPY lib/*.xml ./lib/
+#COPY lib/download_lib_jars.sh ./lib/
 WORKDIR /app/tackle-test-cli/lib
 RUN ./download_lib_jars.sh
 
