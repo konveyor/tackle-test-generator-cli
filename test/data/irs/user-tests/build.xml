@@ -2,7 +2,7 @@
 
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 
-        <classpath path="../../../../lib/download/org.jacoco.ant-0.8.7-nodeps.jar" />
+        <classpath path="../../../../lib/org.jacoco.ant-0.8.7-nodeps.jar" />
 
     </taskdef>
 
@@ -24,113 +24,113 @@
 
         <pathelement location="../../../../lib/acts_3.2.jar" />
 
-        <pathelement location="../../../../lib/download/args4j-2.0.28.jar" />
+        <pathelement location="../../../../lib/args4j-2.0.28.jar" />
 
-        <pathelement location="../../../../lib/download/asm-7.1.jar" />
+        <pathelement location="../../../../lib/asm-7.1.jar" />
 
-        <pathelement location="../../../../lib/download/asm-analysis-7.1.jar" />
+        <pathelement location="../../../../lib/asm-analysis-7.1.jar" />
 
-        <pathelement location="../../../../lib/download/asm-commons-7.1.jar" />
+        <pathelement location="../../../../lib/asm-commons-7.1.jar" />
 
-        <pathelement location="../../../../lib/download/asm-tree-7.1.jar" />
+        <pathelement location="../../../../lib/asm-tree-7.1.jar" />
 
-        <pathelement location="../../../../lib/download/asm-util-7.1.jar" />
+        <pathelement location="../../../../lib/asm-util-7.1.jar" />
 
-        <pathelement location="../../../../lib/download/axml-2.0.0.jar" />
+        <pathelement location="../../../../lib/axml-2.0.0.jar" />
 
-        <pathelement location="../../../../lib/download/checker-qual-2.11.1.jar" />
+        <pathelement location="../../../../lib/checker-qual-2.11.1.jar" />
 
-        <pathelement location="../../../../lib/download/commons-cli-1.4.jar" />
+        <pathelement location="../../../../lib/commons-cli-1.4.jar" />
 
-        <pathelement location="../../../../lib/download/commons-codec-1.11.jar" />
+        <pathelement location="../../../../lib/commons-codec-1.11.jar" />
 
-        <pathelement location="../../../../lib/download/commons-io-2.6.jar" />
+        <pathelement location="../../../../lib/commons-io-2.6.jar" />
 
-        <pathelement location="../../../../lib/download/commons-logging-1.2.jar" />
+        <pathelement location="../../../../lib/commons-logging-1.2.jar" />
 
-        <pathelement location="../../../../lib/download/dexlib2-2.4.0.jar" />
+        <pathelement location="../../../../lib/dexlib2-2.4.0.jar" />
 
-        <pathelement location="../../../../lib/download/error_prone_annotations-2.3.4.jar" />
+        <pathelement location="../../../../lib/error_prone_annotations-2.3.4.jar" />
 
-        <pathelement location="../../../../lib/download/failureaccess-1.0.1.jar" />
+        <pathelement location="../../../../lib/failureaccess-1.0.1.jar" />
 
-        <pathelement location="../../../../lib/download/FastInfoset-1.2.15.jar" />
+        <pathelement location="../../../../lib/FastInfoset-1.2.15.jar" />
 
-        <pathelement location="../../../../lib/download/functionaljava-4.2.jar" />
+        <pathelement location="../../../../lib/functionaljava-4.2.jar" />
 
-        <pathelement location="../../../../lib/download/guava-29.0-jre.jar" />
+        <pathelement location="../../../../lib/guava-29.0-jre.jar" />
 
-        <pathelement location="../../../../lib/download/hamcrest-all-1.3.jar" />
+        <pathelement location="../../../../lib/hamcrest-all-1.3.jar" />
 
-        <pathelement location="../../../../lib/download/hamcrest-core-1.3.jar" />
+        <pathelement location="../../../../lib/hamcrest-core-1.3.jar" />
 
-        <pathelement location="../../../../lib/download/heros-1.2.0.jar" />
+        <pathelement location="../../../../lib/heros-1.2.0.jar" />
 
-        <pathelement location="../../../../lib/download/httpclient-4.5.13.jar" />
+        <pathelement location="../../../../lib/httpclient-4.5.13.jar" />
 
-        <pathelement location="../../../../lib/download/httpcore-4.4.6.jar" />
+        <pathelement location="../../../../lib/httpcore-4.4.6.jar" />
 
-        <pathelement location="../../../../lib/download/istack-commons-runtime-3.0.7.jar" />
+        <pathelement location="../../../../lib/istack-commons-runtime-3.0.7.jar" />
 
-        <pathelement location="../../../../lib/download/j2objc-annotations-1.3.jar" />
+        <pathelement location="../../../../lib/j2objc-annotations-1.3.jar" />
 
-        <pathelement location="../../../../lib/download/jackson-annotations-2.12.5.jar" />
+        <pathelement location="../../../../lib/jackson-annotations-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/download/jackson-core-2.12.5.jar" />
+        <pathelement location="../../../../lib/jackson-core-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/download/jackson-databind-2.12.5.jar" />
+        <pathelement location="../../../../lib/jackson-databind-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/download/jasmin-3.0.2.jar" />
+        <pathelement location="../../../../lib/jasmin-3.0.2.jar" />
 
-        <pathelement location="../../../../lib/download/javaparser-core-3.16.1.jar" />
+        <pathelement location="../../../../lib/javaparser-core-3.16.1.jar" />
 
-        <pathelement location="../../../../lib/download/javaparser-symbol-solver-core-3.16.1.jar" />
+        <pathelement location="../../../../lib/javaparser-symbol-solver-core-3.16.1.jar" />
 
-        <pathelement location="../../../../lib/download/javassist-3.27.0-GA.jar" />
+        <pathelement location="../../../../lib/javassist-3.27.0-GA.jar" />
 
-        <pathelement location="../../../../lib/download/javax.activation-api-1.2.0.jar" />
+        <pathelement location="../../../../lib/javax.activation-api-1.2.0.jar" />
 
-        <pathelement location="../../../../lib/download/javax.annotation-api-1.3.2.jar" />
+        <pathelement location="../../../../lib/javax.annotation-api-1.3.2.jar" />
 
-        <pathelement location="../../../../lib/download/java_cup-0.9.2.jar" />
+        <pathelement location="../../../../lib/java_cup-0.9.2.jar" />
 
-        <pathelement location="../../../../lib/download/jaxb-api-2.4.0-b180725.0427.jar" />
+        <pathelement location="../../../../lib/jaxb-api-2.4.0-b180725.0427.jar" />
 
-        <pathelement location="../../../../lib/download/jaxb-runtime-2.4.0-b180830.0438.jar" />
+        <pathelement location="../../../../lib/jaxb-runtime-2.4.0-b180830.0438.jar" />
 
-        <pathelement location="../../../../lib/download/jsr305-1.3.9.jar" />
+        <pathelement location="../../../../lib/jsr305-1.3.9.jar" />
 
-        <pathelement location="../../../../lib/download/junit-4.13.1.jar" />
+        <pathelement location="../../../../lib/junit-4.13.1.jar" />
 
-        <pathelement location="../../../../lib/download/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+        <pathelement location="../../../../lib/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
 
-        <pathelement location="../../../../lib/download/org.jacoco.agent-0.8.7.jar" />
+        <pathelement location="../../../../lib/org.jacoco.agent-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/download/org.jacoco.ant-0.8.7-nodeps.jar" />
+        <pathelement location="../../../../lib/org.jacoco.ant-0.8.7-nodeps.jar" />
 
-        <pathelement location="../../../../lib/download/org.jacoco.cli-0.8.7-nodeps.jar" />
+        <pathelement location="../../../../lib/org.jacoco.cli-0.8.7-nodeps.jar" />
 
-        <pathelement location="../../../../lib/download/org.jacoco.core-0.8.7.jar" />
+        <pathelement location="../../../../lib/org.jacoco.core-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/download/org.jacoco.report-0.8.7.jar" />
+        <pathelement location="../../../../lib/org.jacoco.report-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/download/polyglot-2006.jar" />
+        <pathelement location="../../../../lib/polyglot-2006.jar" />
 
-        <pathelement location="../../../../lib/download/randoop-all-4.3.0.jar" />
+        <pathelement location="../../../../lib/randoop-all-4.3.0.jar" />
 
-        <pathelement location="../../../../lib/download/replacecall-4.3.0.jar" />
+        <pathelement location="../../../../lib/replacecall-4.3.0.jar" />
 
-        <pathelement location="../../../../lib/download/slf4j-api-1.7.5.jar" />
+        <pathelement location="../../../../lib/slf4j-api-1.7.5.jar" />
 
-        <pathelement location="../../../../lib/download/soot-4.1.0.jar" />
+        <pathelement location="../../../../lib/soot-4.1.0.jar" />
 
-        <pathelement location="../../../../lib/download/stax-ex-1.8.jar" />
+        <pathelement location="../../../../lib/stax-ex-1.8.jar" />
 
-        <pathelement location="../../../../lib/download/tackle-test-generator-core-1.0.0-SNAPSHOT.jar" />
+        <pathelement location="../../../../lib/tackle-test-generator-core-1.0.0-SNAPSHOT.jar" />
 
-        <pathelement location="../../../../lib/download/txw2-2.4.0-b180830.0438.jar" />
+        <pathelement location="../../../../lib/txw2-2.4.0-b180830.0438.jar" />
 
-        <pathelement location="../../../../lib/download/xmlpull-1.1.3.4d_b4_min.jar" />
+        <pathelement location="../../../../lib/xmlpull-1.1.3.4d_b4_min.jar" />
 
         <pathelement location="instrumented-classes" />
 
@@ -188,11 +188,11 @@
 
                     <path refid="classpath" />
 
-                    <pathelement location="../../../../lib/download/hamcrest-all-1.3.jar" />
+                    <pathelement location="../../../../lib/hamcrest-all-1.3.jar" />
 
-                    <pathelement location="../../../../lib/download/hamcrest-core-1.3.jar" />
+                    <pathelement location="../../../../lib/hamcrest-core-1.3.jar" />
 
-                    <pathelement location="../../../../lib/download/junit-4.13.1.jar" />
+                    <pathelement location="../../../../lib/junit-4.13.1.jar" />
 
                     <pathelement location="test_files" />
 
