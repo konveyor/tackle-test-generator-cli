@@ -22,7 +22,7 @@ import pathlib
 import shutil
 
 from yattag import Doc, indent
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, PackageLoader
 import xml.etree.ElementTree as ElementTree
 from xml.dom import minidom
 
@@ -512,8 +512,9 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     coverage_csv_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.csv')).as_posix()
 
     #here we refer to build_template.gradle, it is a file from the tkltest code. ugly, but works:
-    env = Environment(loader=FileSystemLoader(os.path.join(constants.TKLTEST_CLI_DIR, 'tkltest', 'util', 'unit')))
-    template = env.get_template('build_template.gradle')
+    # env = Environment(loader=FileSystemLoader(os.path.join(constants.TKLTEST_CLI_DIR, 'tkltest', 'util', 'unit')))
+    env = Environment(loader=PackageLoader('tkltest.util.unit'))
+    template = env.get_template('build_gradle.jinja')
 
     test_dependsOn = ''
     app_classes_for_tests = monolith_app_paths
