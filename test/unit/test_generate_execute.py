@@ -904,9 +904,8 @@ class GenerateExecuteTest(unittest.TestCase):
             generated_test_directory = config['general']['test_directory']
             shutil.rmtree(generated_test_directory, ignore_errors=True)
             shutil.copytree(pre_generated_test, generated_test_directory)
-            if config['general']['build_type'] == 'ant':
-                config['dev_tests']['build_targets'] = ['merge-coverage-report']
-                config['dev_tests']['coverage_exec_file'] = os.path.join(user_tests, 'merged_jacoco.exec')
+            config['dev_tests']['build_targets'] = ['merge-coverage-report']
+            config['dev_tests']['coverage_exec_file'] = os.path.join(user_tests, 'merged_jacoco.exec')
 
             if os.path.isfile(config['dev_tests']['coverage_exec_file']):
                 os.remove(config['dev_tests']['coverage_exec_file'])

@@ -291,7 +291,8 @@ class UnitTests(unittest.TestCase):
         shutil.copytree(app_dir, local_app_dir)
 
         # call integrate_tests_into_app_build_file(), check that new .gradle is created:
-        local_gradle_file = test_app['build_file_without_tests']
+        gradle_file = test_app['build_file_without_tests']
+        local_gradle_file = os.path.relpath(gradle_file, os.path.dirname(app_dir))
         build_util.integrate_tests_into_app_build_file([local_gradle_file], 'gradle', [ctd_tests])
         integrated_gradle_file_name = 'tkltest_app_' + os.path.basename(local_gradle_file)
         self.assertTrue(os.path.isfile(integrated_gradle_file_name))
