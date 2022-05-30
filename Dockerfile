@@ -39,6 +39,7 @@ RUN ./download_lib_jars.sh
 WORKDIR /app/tackle-test-cli
 COPY tkltest ./tkltest
 COPY setup.py ./
+COPY MANIFEST.in ./
 RUN pip install .
 
 # set entrypoint
