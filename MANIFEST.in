@@ -1,3 +1,4 @@
 include tkltest/generate/ui/templates/*.jinja
 include tkltest/util/unit/templates/*.jinja
 include lib/*.jar
+include lib/*.gif
