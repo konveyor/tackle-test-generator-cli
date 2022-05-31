@@ -28,9 +28,6 @@ setup(
         ]
     },
     include_package_data=True,
-    # package_data={
-    #     'tkltest/generate/ui/templates': ['tkltest/generate/ui/templates/*.jinja']
-    # },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: APL-2.0',

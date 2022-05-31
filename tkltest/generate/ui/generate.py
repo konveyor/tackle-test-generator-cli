@@ -94,7 +94,6 @@ def __run_crawljax(config):
 
     # create java command for running crawljax runner
     uitestgen_command = 'java -Xmx2048m -cp '
-    # uitestgen_command += TKLTEST_UI_CORE_JAR
     with resources.path('lib', TKLTEST_UI_CORE_JAR) as core_ui_jar:
         uitestgen_command += str(core_ui_jar)
     uitestgen_command += ' org.konveyor.tackletest.ui.crawljax.CrawljaxRunner -cf {}'.format(config_file_name)
@@ -161,3 +160,23 @@ def __get_generated_test_count(test_class_file):
     with open(test_class_file, 'r') as f:
         teststr = f.read()
     return len(re.findall('@Test', teststr))
+
+if __name__ == '__main__':  # pragma: no cover
+    app_config = {
+        'general': {
+            'log-level': 'WARNING',
+            'app_name': 'petclinic',
+            'app_url': 'http://localhost:8080',
+            # 'app_name': 'addressbook',
+            # 'app_url': 'http://localhost:3000/addressbook/',
+            'test_directory': '',
+            'verbose': False
+        },
+        'generate': {
+            'browser': 'chrome_headless',
+            'wait_after_event': 500,
+            'wait_after_reload': 500,
+            'time_limit': 2
+        }
+    }
+    process_generate_command(app_config)

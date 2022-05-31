@@ -54,8 +54,7 @@ class CoverageStatisticsHtmlWriter:
         # shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'goldbar.gif',
         #                 html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
         with resources.path('lib', 'goldbar.gif') as iconfile:
-            shutil.copyfile(iconfile,
-                            html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
+            shutil.copyfile(iconfile, html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
 
         for package_statistic in app_statistics.children:
             os.mkdir(html_compare_dir + os.sep + package_statistic.get_pretty_name())
