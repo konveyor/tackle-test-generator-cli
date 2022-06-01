@@ -85,11 +85,13 @@ def __conditionally_required(opt_name, config):
         if config['generate']['app_build_files'] == __options_spec['generate']['app_build_files']['default_value']:
             return 'required if "app_build_files" is not specified'
     elif opt_name == 'app_build_files':
-        # required if app_classpath_file or monolith_app_path are not specified
+        # required if app_classpath_file or monolith_app_path are not specified, or dev_tests are used
         if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
+        if __is_using_dev_tests(config):
+            return 'required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified'
     elif opt_name == 'app_build_ant_target':
         # required if app_build_files is specified, and build_type is 'ant', and if app_classpath_file or monolith_app_path are not specified
         if (config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value'] and

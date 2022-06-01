@@ -154,11 +154,12 @@ def __validate_config(config, test_level, command=None, subcommand=None):
     message and exits.
 
     """
+    # get general and dev_tests options spec (options that are always checked)
     general_scopes = ['general']
     if test_level == 'unit':
         general_scopes.append('dev_tests')
 
-    # get general and dev_tests options spec and options spec for the given command and subcommand
+    # get options spec for the given command and subcommand
     options_spec = {scope: config_options.get_options_spec(scope, test_level=test_level) for scope in general_scopes}
     if command is not None:
         options_spec[command] = config_options.get_options_spec(command, test_level=test_level)

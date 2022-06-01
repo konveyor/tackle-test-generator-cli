@@ -16,7 +16,7 @@ no_diff_assertions = false
 target_class_list = []
 excluded_class_list = []
 time_limit = 10
-app_build_files = ["test/data/splitNjoin/app/tkltest_app_build.gradle"]
+app_build_files = ["test/data/splitNjoin/app/build.gradle"]
 app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
 
 [execute]

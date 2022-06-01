@@ -84,7 +84,7 @@ class UnitTests(unittest.TestCase):
             'standard_classpath': os.path.join('test', 'data', 'splitNjoin', 'splitNjoinMonoClasspath.txt'),
             'config_file': os.path.join('test', 'data', 'splitNjoin', 'tkltest_config.toml'),
             'ctd_tests': os.path.join('test', 'data', 'splitNjoin', 'splitNjoin-ctd-amplified-tests'),
-            'build_file_without_tests': os.path.join('test', 'data', 'splitNjoin', 'app', 'build.gradle')
+            'build_file_without_tests': os.path.join('test', 'data', 'splitNjoin', 'app', 'build_without_tests.gradle')
         },
     }
 
@@ -293,6 +293,9 @@ class UnitTests(unittest.TestCase):
         # call integrate_tests_into_app_build_file(), check that new .gradle is created:
         gradle_file = test_app['build_file_without_tests']
         local_gradle_file = os.path.relpath(gradle_file, os.path.dirname(app_dir))
+        local_gradle_new_filename = os.path.join(os.path.dirname(local_gradle_file), 'build.gradle')
+        shutil.move(local_gradle_file, local_gradle_new_filename)
+        local_gradle_file = local_gradle_new_filename
         build_util.integrate_tests_into_app_build_file([local_gradle_file], 'gradle', [ctd_tests])
         integrated_gradle_file_name = 'tkltest_app_' + os.path.basename(local_gradle_file)
         self.assertTrue(os.path.isfile(integrated_gradle_file_name))

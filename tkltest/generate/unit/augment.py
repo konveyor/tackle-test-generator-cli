@@ -20,6 +20,7 @@ import re
 import shutil
 import subprocess
 import sys
+import copy
 
 from tkltest.util import constants
 from tkltest.util.unit import coverage_util
@@ -57,7 +58,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     """
 
     if config['dev_tests']['use_for_augmentation']:
-        dev_tests = config['dev_tests']
+        dev_tests = copy.copy(config['dev_tests'])
         dev_tests['build_file'] = config['generate']['app_build_files'][0]
     else:
         dev_tests = None
