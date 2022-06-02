@@ -103,10 +103,9 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         no_failure = True
         additional_build_targets = ' '.join(additional_test_suite['build_targets'])
         additional_build_file = additional_test_suite['build_file']
-        dev_build_type = additional_test_suite['build_type']
-        if dev_build_type == 'ant':
+        if build_type == 'ant':
             cmd = "ant -f {} {}".format(additional_build_file, additional_build_targets)
-        elif dev_build_type == 'maven':
+        elif build_type == 'maven':
             cmd = "mvn -f {} {}".format(additional_build_file, additional_build_targets)
         else:  # gradle
             cmd = "gradle --project-dir {} {}".format(os.path.dirname(additional_build_file), additional_build_targets)
@@ -407,7 +406,7 @@ def get_dev_test_coverage(config, output_dir, create_csv=False, create_xml=False
         shutil.rmtree(dev_report_dir)
     os.makedirs(dev_report_dir)
     # calling generate_coverage_report() to create the csv file:
-    dev_test_name = os.path.basename(os.path.dirname(config['dev_tests']['build_file']))
+    dev_test_name = os.path.basename(os.path.dirname(config['generate']['app_build_files'][0]))
     dev_coverage_csv = os.path.join(dev_report_dir, dev_test_name + '_coverage.csv') if create_csv else ''
     dev_coverage_xml = os.path.join(dev_report_dir, dev_test_name + '_coverage.xml') if create_xml else ''
     dev_coverage_html = os.path.join(dev_report_dir, dev_test_name + '-coverage-html') if create_html else ''

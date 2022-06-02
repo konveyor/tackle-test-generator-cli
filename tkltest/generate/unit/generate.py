@@ -579,7 +579,7 @@ def exclude_classes_covered_by_dev_test(config, output_dir):
     first running the user test suite and the jacoco cli to get the coverage of the developer test suite
     than add to the excluded_class_list all the classes that already covered
     '''
-    if not config['dev_tests']['build_file']:
+    if not config['generate']['app_build_files']:
         return
     if config['dev_tests']['coverage_threshold'] >= 100:
         return

@@ -7,7 +7,7 @@ test_directory = ""
 reports_path = ""
 verbose = false
 offline_instrumentation = false
-build_type = "ant"
+build_type = "gradle"
 
 [generate]
 # jee_support = false
@@ -16,7 +16,7 @@ no_diff_assertions = false
 target_class_list = []
 excluded_class_list = []
 time_limit = 10
-app_build_files = []
+app_build_files = ["test/data/failingApp/user-tests/build.gradle"]
 app_build_settings_files = []
 app_build_ant_target = ""
 
@@ -50,8 +50,6 @@ no_error_revealing_tests = false
 
 
 [dev_tests]
-    build_type = "gradle"
-    build_file = "test/data/failingApp/user-tests/build.gradle"
     build_targets =  ["clean", "test"]
     coverage_exec_file = "test/data/failingApp/user-tests/jacoco/jacoco.exec"
 #    compare_code_coverage = true

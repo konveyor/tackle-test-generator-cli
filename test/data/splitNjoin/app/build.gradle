@@ -1,13 +1,20 @@
 
 plugins {
-    id 'java'
     id 'application'
+    id 'java'
+    id 'jacoco'
 }
 repositories {
     mavenCentral()
 }
 
+configurations {
+    jacocoInstrumentation
+}
 dependencies {
+
+jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.7', classifier: 'nodeps'
+
     implementation 'org.apache.commons:commons-text:1.7'
     implementation 'org.apache.commons:commons-lang3:3.6'
     implementation project(':list')
@@ -18,3 +25,51 @@ application {
     mainClass = 'splitNjoin.app.App'
 }
 
+
+repositories{
+ maven {url 'https://jitpack.io'}
+}
+dependencies {
+    implementation 'junit:junit:4.13.1'
+    implementation 'org.hamcrest:hamcrest-all:1.3'
+    implementation 'com.github.EvoSuite.evosuite:evosuite-standalone-runtime:v1.2.0'
+    implementation 'com.github.EvoSuite.evosuite:evosuite-master:v1.2.0'
+}
+sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [
+    '../user-tests/test_files',
+]
+
+test {
+//with offline instrumentation, the test also depend on the instrument class:
+  reports {
+    html.destination = file('../user-tests/junit-reports')
+    junitXml.destination = file('../user-tests/junit-reports')
+  }
+  jacoco{
+    destinationFile = file('../user-tests/jacoco/jacoco.exec')
+  }
+}
+
+task cleanCoverageReportDir(){
+    delete '../user-tests/jacoco_report'
+}
+
+jacoco{
+    reportsDirectory = file('../user-tests/jacoco_report')
+}
+
+jacocoTestReport {
+    dependsOn cleanCoverageReportDir, test
+    afterEvaluate {
+        classDirectories.setFrom(
+        
+            fileTree(dir:'../app/build/classes/java/main' , include: '/**/*.class' ),
+            fileTree(dir:'../utilities/build/classes/java/main' , include: '/**/*.class' ),
+            fileTree(dir:'../list/build/classes/java/main' , include: '/**/*.class' ),
+        )
+    }
+}
+
+task tklest_task(){
+    dependsOn clean, test
+}

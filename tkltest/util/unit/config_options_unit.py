@@ -52,6 +52,20 @@ def get_options_spec(command=None, subcommand=None, load_format=True):
     return spec
 
 
+def __is_using_dev_tests(config):
+    """
+    Checks if developers' tests are used.
+    This happens when compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified.
+    Args:
+        config: the loaded configuration information.
+    Returns:
+        True is dev_tests are used in generation or execution.
+    """
+    return config['dev_tests']['compare_code_coverage'] or \
+           config['dev_tests']['use_for_augmentation'] or \
+           config['dev_tests']['coverage_threshold'] != __options_spec['dev_tests']['coverage_threshold']['default_value']
+
+
 def __conditionally_required(opt_name, config):
     """Checker for conditionally required options.
 
@@ -71,16 +85,25 @@ def __conditionally_required(opt_name, config):
         if config['generate']['app_build_files'] == __options_spec['generate']['app_build_files']['default_value']:
             return 'required if "app_build_files" is not specified'
     elif opt_name == 'app_build_files':
-        # required if app_classpath_file or monolith_app_path are not specified
+        # required if app_classpath_file or monolith_app_path are not specified, or dev_tests are used
         if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
             return 'required if "app_classpath_file" is not specified'
         if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
             return 'required if "monolith_app_path" is not specified'
+        if __is_using_dev_tests(config):
+            return 'required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified'
     elif opt_name == 'app_build_ant_target':
-        # required if app_build_files is specified and build_type is 'ant'
+        # required if app_build_files is specified, and build_type is 'ant', and if app_classpath_file or monolith_app_path are not specified
         if (config['generate']['app_build_files'] != __options_spec['generate']['app_build_files']['default_value'] and
                 config['general']['build_type'] == 'ant'):
-            return 'required if "app_build_files" is specified and "build_type" is "ant"'
+            if config['general']['app_classpath_file'] == __options_spec['general']['app_classpath_file']['default_value']:
+                return 'required if "app_build_files" is specified, and "build_type" is "ant", and "app_classpath_file" is not specified'
+            if config['general']['monolith_app_path'] == __options_spec['general']['monolith_app_path']['default_value']:
+                return 'required if "app_build_files" is specified, and "build_type" is "ant", and "monolith_app_path" is not specified'
+    elif opt_name == 'coverage_exec_file':
+        # required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified
+        if __is_using_dev_tests(config):
+            return 'required if compare_code_coverage or use_for_augmentation are True, or if coverage_threshold is specified'
     # elif opt_name in ['refactored_app_path_prefix', 'refactored_app_path_suffix']:  # pragma: no branch
     #     if config['generate']['partitions_file'] != __options_spec['generate']['partitions_file']['default_value']:
     #         return 'required if "partitions_file" is specified'
@@ -475,9 +498,9 @@ __options_spec = {
             'long_name': '--no-build-file-creation',
             'type': bool,
             'default_value': False,
-            'help_message': 'whether to not create a build file; if set to False (default) a build file (of type set'
-                            'in build_type option) for running the tests with the matching configurations will be'
-                            'created and used; if set to True, a build file (of type set in build_type option) should'
+            'help_message': 'whether to not create a build file; if set to False (default) a build file (of type set '
+                            'in build_type option) for running the tests with the matching configurations will be '
+                            'created and used; if set to True, a build file (of type set in build_type option) should '
                             'already exist and will be used'
         },
         'code_coverage': {
@@ -515,40 +538,26 @@ __options_spec = {
     'dev_tests': {
         'is_cli_command': False,
         'help_message': 'information about developer-written test suite',
-        'build_type': {
-            'required': False,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'choices': ['ant', 'maven', 'gradle'],
-            'default_value': 'ant',
-            'help_message': 'build type for compiling and running the developer-written test suite: ant, maven, or gradle'
-        },
-        'build_file': {
-            'required': True,
-            'is_toml_option': True,
-            'is_cli_option': False,
-            'type': str,
-            'default_value': '',
-            'relpath_fix_type': 'path',
-            'help_message': 'path to build file for compiling and running the developer-written test suite'
-        },
         'build_targets': {
-            'required': True,
+            'required': False,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': list,
-            'default_value': [],
-            'help_message': 'list of build targets for compiling and running the developer-written test suite'
+            'default_value': ['test'],
+            'help_message': 'list of build targets for running the developer-written test suite and generating Jacoco '
+                            'coverage .exec file. If build_targets is not specified, then ["test"] will be used '
+                            '(resulting for example in the commands "mvn test" or "gradle test", which commonly '
+                            'are used to generate Jacoco coverage .exec file). '
         },
         'coverage_exec_file': {
-            'required': False,
+            'required': __conditionally_required,
             'is_toml_option': True,
             'is_cli_option': False,
             'type': str,
             'default_value': '',
             'relpath_fix_type': 'path',
-            'help_message': 'the path to the Jacoco coverage .exec file, generated by the developer-written build file'
+            'help_message': 'the path where the Jacoco coverage .exec file is generated by the developer-written '
+                            'build file.'
         },
         'compare_code_coverage': {
             'required': False,

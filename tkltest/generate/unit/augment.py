@@ -20,6 +20,7 @@ import re
 import shutil
 import subprocess
 import sys
+import copy
 
 from tkltest.util import constants
 from tkltest.util.unit import coverage_util
@@ -47,7 +48,7 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     Args:
         config (dict): loaded and validated config information
         build_file (str): Build file to use for running tests
-        build_type (str): Type of build file (either ant or maven)
+        build_type (str): Type of build file (either ant, maven or gradle)
         ctd_test_dir (str): Root directory for CTD tests
         report_dir (str): Main reports directory, under which coverage report is generated
 
@@ -57,7 +58,8 @@ def augment_with_code_coverage(config, build_file, build_type, ctd_test_dir, rep
     """
 
     if config['dev_tests']['use_for_augmentation']:
-        dev_tests = config['dev_tests']
+        dev_tests = copy.copy(config['dev_tests'])
+        dev_tests['build_file'] = config['generate']['app_build_files'][0]
     else:
         dev_tests = None
     tkltest_status('Performing coverage-driven test-suite augmentation and optimization')
@@ -151,7 +153,7 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
         ctd_test_dir (str): Root directory for CTD tests
         evosuite_test_dir (str): Root directory for evosuite tests
         build_file (str): Build file to use for running tests
-        build_type (str): Type of build file (either ant or maven)
+        build_type (str): Type of build file (either ant, maven or gradle)
         report_dir (str): Main reports directory, under which coverage report is generated
         jdk_path (str): path to the jdk home to be used for executing the tests and measuring their coverage
         class_files (str): the class file of the app
