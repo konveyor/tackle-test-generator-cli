@@ -42,8 +42,6 @@ no_error_revealing_tests = false
 
 
 [dev_tests]
-    build_type = "gradle"
-    build_file = "test/data/splitNjoin/user-tests/build.gradle"
     build_targets =  ["clean", "test"]
     coverage_exec_file = "test/data/splitNjoin/user-tests/jacoco/jacoco.exec"
     compare_code_coverage = false

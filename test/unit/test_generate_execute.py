@@ -897,30 +897,23 @@ class GenerateExecuteTest(unittest.TestCase):
             pre_generated_test = os.path.join(self.test_data_dir, app_name, app_name + '-ctd-amplified-tests')
             user_tests = os.path.join(self.test_data_dir, app_name, 'user-tests')
             # execute tests
-            for build_type in ['ant', 'gradle', 'maven']:
+            config = copy.deepcopy(app_info['config'])
+            config['execute']['code_coverage'] = True
+            config['dev_tests']['compare_code_coverage'] = True
+            shutil.rmtree(main_report_dir, ignore_errors=True)
+            generated_test_directory = config['general']['test_directory']
+            shutil.rmtree(generated_test_directory, ignore_errors=True)
+            shutil.copytree(pre_generated_test, generated_test_directory)
+            config['dev_tests']['build_targets'] = ['merge-coverage-report']
+            config['dev_tests']['coverage_exec_file'] = os.path.join(user_tests, 'merged_jacoco.exec')
 
-                config = copy.deepcopy(app_info['config'])
-                config['execute']['code_coverage'] = True
-                config['dev_tests']['compare_code_coverage'] = True
-                shutil.rmtree(main_report_dir, ignore_errors=True)
-                generated_test_directory = config['general']['test_directory']
-                shutil.rmtree(generated_test_directory, ignore_errors=True)
-                shutil.copytree(pre_generated_test, generated_test_directory)
-                config['general']['build_type'] = build_type
-                if build_type == 'gradle':
-                    config['dev_tests']['build_type'] = 'ant'
-                    config['dev_tests']['build_file'] = os.path.join(user_tests, 'build.xml')
-                    config['dev_tests']['build_targets'] = ['merge-coverage-report']
-                    config['dev_tests']['coverage_exec_file'] = os.path.join(user_tests, 'merged_jacoco.exec')
+            if os.path.isfile(config['dev_tests']['coverage_exec_file']):
+                os.remove(config['dev_tests']['coverage_exec_file'])
+            self.__process_execute(config=config)
 
-                if os.path.isfile(config['dev_tests']['coverage_exec_file']):
-                    os.remove(config['dev_tests']['coverage_exec_file'])
-                self.__process_execute(config=config)
-
-                # assert that expected execute resources are created
-                self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
-                shutil.rmtree(generated_test_directory, ignore_errors=True)
-
+            # assert that expected execute resources are created
+            self.__assert_execute_resources(app_name=app_name, compare_coverage=True)
+            shutil.rmtree(generated_test_directory, ignore_errors=True)
 
     def __assert_generate_resources(self, app_name, generate_subcmd, is_bad_path=False, module_name=''):
         dir_util.cd_output_dir(app_name, module_name)

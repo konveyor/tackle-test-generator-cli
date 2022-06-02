@@ -18,7 +18,7 @@ name = "TKLTEST_CONFIG_FILE"
     # jee_support = false
     # partitions file path. If specified, this option overrides target_class_list option.
     # partitions_file = "test/data/irs/refactored/PartitionsFile.json"
-
+    app_build_files = ['test/data/irs/monolith/for_tests_build.xml']
     # list of target classes for test generation. If unspecified, targets all application classes
     target_class_list = []
 	#excluded_class_list = ["irs.Employer"]
@@ -50,8 +50,6 @@ name = "TKLTEST_CONFIG_FILE"
 
 
 [dev_tests]
-    build_type = "gradle"
-    build_file = "test/data/irs/user-tests/build.gradle"
-    build_targets =  ["clean", "test"]
-    coverage_exec_file = "test/data/irs/user-tests/jacoco/jacoco.exec"
+    build_targets =  ['coverage-reports_user-tests']
+    coverage_exec_file = 'test/data/irs/user-tests/jacoco.exec'
 
