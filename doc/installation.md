@@ -123,12 +123,12 @@ docker build --tag tkltest-cli .
 Then, assuming `/home/user/tkltest-workspace` is the host directory to be mounted on to the container, the following
 commands can be used:
 ```buildoutcfg
-docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-unit --help
-docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-ui --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-unit --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-ui --help
 ```
 
 The results of test generation or  execution in the container are available under the `/home/user/tkltest-workspace`
-directory on the host machine.
+directory on the host machine (`/app/tackle-test-cli` in the container).
 For TackleTest-Unit, in addition to the AUT configuration file, the AUT classes and library dependencies must also be placed
 in a directory under `/home/user/tkltest-workspace`, so that they are available in the container.
 
@@ -137,7 +137,7 @@ one of the following.
 
 For TackleTest-Unit:
 ```buildoutcfg
-alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-unit'
+alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-unit'
 ```
 ```buildoutcfg
 alias tkltest-unit='docker-compose run --rm tkltest-cli tkltest-unit'
@@ -145,7 +145,7 @@ alias tkltest-unit='docker-compose run --rm tkltest-cli tkltest-unit'
 
 For TackleTest-UI:
 ```buildoutcfg
-alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace tkltest-cli tkltest-ui'
+alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-ui'
 ```
 ```buildoutcfg
 alias tkltest-ui='docker-compose run --rm tkltest-cli tkltest-ui'
