@@ -2,7 +2,7 @@
 
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 
-        <classpath path="../../../../lib/org.jacoco.ant-0.8.7-nodeps.jar" />
+        <classpath path="../../../../tkltest-lib/org.jacoco.ant-0.8.7-nodeps.jar" />
 
     </taskdef>
 
@@ -22,115 +22,115 @@
 
         <pathelement location="../libresteasy-jaxrs-3.0.8.Final.jar" />
 
-        <pathelement location="../../../../lib/acts_3.2.jar" />
+        <pathelement location="../../../../tkltest-lib/acts_3.2.jar" />
 
-        <pathelement location="../../../../lib/args4j-2.0.28.jar" />
+        <pathelement location="../../../../tkltest-lib/args4j-2.0.28.jar" />
 
-        <pathelement location="../../../../lib/asm-7.1.jar" />
+        <pathelement location="../../../../tkltest-lib/asm-7.1.jar" />
 
-        <pathelement location="../../../../lib/asm-analysis-7.1.jar" />
+        <pathelement location="../../../../tkltest-lib/asm-analysis-7.1.jar" />
 
-        <pathelement location="../../../../lib/asm-commons-7.1.jar" />
+        <pathelement location="../../../../tkltest-lib/asm-commons-7.1.jar" />
 
-        <pathelement location="../../../../lib/asm-tree-7.1.jar" />
+        <pathelement location="../../../../tkltest-lib/asm-tree-7.1.jar" />
 
-        <pathelement location="../../../../lib/asm-util-7.1.jar" />
+        <pathelement location="../../../../tkltest-lib/asm-util-7.1.jar" />
 
-        <pathelement location="../../../../lib/axml-2.0.0.jar" />
+        <pathelement location="../../../../tkltest-lib/axml-2.0.0.jar" />
 
-        <pathelement location="../../../../lib/checker-qual-2.11.1.jar" />
+        <pathelement location="../../../../tkltest-lib/checker-qual-2.11.1.jar" />
 
-        <pathelement location="../../../../lib/commons-cli-1.4.jar" />
+        <pathelement location="../../../../tkltest-lib/commons-cli-1.4.jar" />
 
-        <pathelement location="../../../../lib/commons-codec-1.11.jar" />
+        <pathelement location="../../../../tkltest-lib/commons-codec-1.11.jar" />
 
-        <pathelement location="../../../../lib/commons-io-2.6.jar" />
+        <pathelement location="../../../../tkltest-lib/commons-io-2.6.jar" />
 
-        <pathelement location="../../../../lib/commons-logging-1.2.jar" />
+        <pathelement location="../../../../tkltest-lib/commons-logging-1.2.jar" />
 
-        <pathelement location="../../../../lib/dexlib2-2.4.0.jar" />
+        <pathelement location="../../../../tkltest-lib/dexlib2-2.4.0.jar" />
 
-        <pathelement location="../../../../lib/error_prone_annotations-2.3.4.jar" />
+        <pathelement location="../../../../tkltest-lib/error_prone_annotations-2.3.4.jar" />
 
-        <pathelement location="../../../../lib/failureaccess-1.0.1.jar" />
+        <pathelement location="../../../../tkltest-lib/failureaccess-1.0.1.jar" />
 
-        <pathelement location="../../../../lib/FastInfoset-1.2.15.jar" />
+        <pathelement location="../../../../tkltest-lib/FastInfoset-1.2.15.jar" />
 
-        <pathelement location="../../../../lib/functionaljava-4.2.jar" />
+        <pathelement location="../../../../tkltest-lib/functionaljava-4.2.jar" />
 
-        <pathelement location="../../../../lib/guava-29.0-jre.jar" />
+        <pathelement location="../../../../tkltest-lib/guava-29.0-jre.jar" />
 
-        <pathelement location="../../../../lib/hamcrest-all-1.3.jar" />
+        <pathelement location="../../../../tkltest-lib/hamcrest-all-1.3.jar" />
 
-        <pathelement location="../../../../lib/hamcrest-core-1.3.jar" />
+        <pathelement location="../../../../tkltest-lib/hamcrest-core-1.3.jar" />
 
-        <pathelement location="../../../../lib/heros-1.2.0.jar" />
+        <pathelement location="../../../../tkltest-lib/heros-1.2.0.jar" />
 
-        <pathelement location="../../../../lib/httpclient-4.5.13.jar" />
+        <pathelement location="../../../../tkltest-lib/httpclient-4.5.13.jar" />
 
-        <pathelement location="../../../../lib/httpcore-4.4.6.jar" />
+        <pathelement location="../../../../tkltest-lib/httpcore-4.4.6.jar" />
 
-        <pathelement location="../../../../lib/istack-commons-runtime-3.0.7.jar" />
+        <pathelement location="../../../../tkltest-lib/istack-commons-runtime-3.0.7.jar" />
 
-        <pathelement location="../../../../lib/j2objc-annotations-1.3.jar" />
+        <pathelement location="../../../../tkltest-lib/j2objc-annotations-1.3.jar" />
 
-        <pathelement location="../../../../lib/jackson-annotations-2.12.5.jar" />
+        <pathelement location="../../../../tkltest-lib/jackson-annotations-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/jackson-core-2.12.5.jar" />
+        <pathelement location="../../../../tkltest-lib/jackson-core-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/jackson-databind-2.12.5.jar" />
+        <pathelement location="../../../../tkltest-lib/jackson-databind-2.12.5.jar" />
 
-        <pathelement location="../../../../lib/jasmin-3.0.2.jar" />
+        <pathelement location="../../../../tkltest-lib/jasmin-3.0.2.jar" />
 
-        <pathelement location="../../../../lib/javaparser-core-3.16.1.jar" />
+        <pathelement location="../../../../tkltest-lib/javaparser-core-3.16.1.jar" />
 
-        <pathelement location="../../../../lib/javaparser-symbol-solver-core-3.16.1.jar" />
+        <pathelement location="../../../../tkltest-lib/javaparser-symbol-solver-core-3.16.1.jar" />
 
-        <pathelement location="../../../../lib/javassist-3.27.0-GA.jar" />
+        <pathelement location="../../../../tkltest-lib/javassist-3.27.0-GA.jar" />
 
-        <pathelement location="../../../../lib/javax.activation-api-1.2.0.jar" />
+        <pathelement location="../../../../tkltest-lib/javax.activation-api-1.2.0.jar" />
 
-        <pathelement location="../../../../lib/javax.annotation-api-1.3.2.jar" />
+        <pathelement location="../../../../tkltest-lib/javax.annotation-api-1.3.2.jar" />
 
-        <pathelement location="../../../../lib/java_cup-0.9.2.jar" />
+        <pathelement location="../../../../tkltest-lib/java_cup-0.9.2.jar" />
 
-        <pathelement location="../../../../lib/jaxb-api-2.4.0-b180725.0427.jar" />
+        <pathelement location="../../../../tkltest-lib/jaxb-api-2.4.0-b180725.0427.jar" />
 
-        <pathelement location="../../../../lib/jaxb-runtime-2.4.0-b180830.0438.jar" />
+        <pathelement location="../../../../tkltest-lib/jaxb-runtime-2.4.0-b180830.0438.jar" />
 
-        <pathelement location="../../../../lib/jsr305-1.3.9.jar" />
+        <pathelement location="../../../../tkltest-lib/jsr305-1.3.9.jar" />
 
-        <pathelement location="../../../../lib/junit-4.13.1.jar" />
+        <pathelement location="../../../../tkltest-lib/junit-4.13.1.jar" />
 
-        <pathelement location="../../../../lib/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+        <pathelement location="../../../../tkltest-lib/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
 
-        <pathelement location="../../../../lib/org.jacoco.agent-0.8.7.jar" />
+        <pathelement location="../../../../tkltest-lib/org.jacoco.agent-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/org.jacoco.ant-0.8.7-nodeps.jar" />
+        <pathelement location="../../../../tkltest-lib/org.jacoco.ant-0.8.7-nodeps.jar" />
 
-        <pathelement location="../../../../lib/org.jacoco.cli-0.8.7-nodeps.jar" />
+        <pathelement location="../../../../tkltest-lib/org.jacoco.cli-0.8.7-nodeps.jar" />
 
-        <pathelement location="../../../../lib/org.jacoco.core-0.8.7.jar" />
+        <pathelement location="../../../../tkltest-lib/org.jacoco.core-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/org.jacoco.report-0.8.7.jar" />
+        <pathelement location="../../../../tkltest-lib/org.jacoco.report-0.8.7.jar" />
 
-        <pathelement location="../../../../lib/polyglot-2006.jar" />
+        <pathelement location="../../../../tkltest-lib/polyglot-2006.jar" />
 
-        <pathelement location="../../../../lib/randoop-all-4.3.0.jar" />
+        <pathelement location="../../../../tkltest-lib/randoop-all-4.3.0.jar" />
 
-        <pathelement location="../../../../lib/replacecall-4.3.0.jar" />
+        <pathelement location="../../../../tkltest-lib/replacecall-4.3.0.jar" />
 
-        <pathelement location="../../../../lib/slf4j-api-1.7.5.jar" />
+        <pathelement location="../../../../tkltest-lib/slf4j-api-1.7.5.jar" />
 
-        <pathelement location="../../../../lib/soot-4.1.0.jar" />
+        <pathelement location="../../../../tkltest-lib/soot-4.1.0.jar" />
 
-        <pathelement location="../../../../lib/stax-ex-1.8.jar" />
+        <pathelement location="../../../../tkltest-lib/stax-ex-1.8.jar" />
 
-        <pathelement location="../../../../lib/tackle-test-generator-core-1.0.0-SNAPSHOT.jar" />
+        <pathelement location="../../../../tkltest-lib/tackle-test-generator-core-1.0.0-SNAPSHOT.jar" />
 
-        <pathelement location="../../../../lib/txw2-2.4.0-b180830.0438.jar" />
+        <pathelement location="../../../../tkltest-lib/txw2-2.4.0-b180830.0438.jar" />
 
-        <pathelement location="../../../../lib/xmlpull-1.1.3.4d_b4_min.jar" />
+        <pathelement location="../../../../tkltest-lib/xmlpull-1.1.3.4d_b4_min.jar" />
 
         <pathelement location="instrumented-classes" />
 
@@ -188,11 +188,11 @@
 
                     <path refid="classpath" />
 
-                    <pathelement location="../../../../lib/hamcrest-all-1.3.jar" />
+                    <pathelement location="../../../../tkltest-lib/hamcrest-all-1.3.jar" />
 
-                    <pathelement location="../../../../lib/hamcrest-core-1.3.jar" />
+                    <pathelement location="../../../../tkltest-lib/hamcrest-core-1.3.jar" />
 
-                    <pathelement location="../../../../lib/junit-4.13.1.jar" />
+                    <pathelement location="../../../../tkltest-lib/junit-4.13.1.jar" />
 
                     <pathelement location="test_files" />
 
