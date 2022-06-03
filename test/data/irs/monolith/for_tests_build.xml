@@ -9,7 +9,7 @@
   <property name="source.java"             value="src/main/java"/>
   <property name="test.java"               value="src/test/java"/>
 
-  <property name="lib.dir"                 value="../tkltest-lib/"/>
+  <property name="lib.dir"                 value="../lib/"/>
 
   <!-- The dependency libraries -->
   <path id="source.lib">
