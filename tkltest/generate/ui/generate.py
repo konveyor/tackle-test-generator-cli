@@ -94,7 +94,7 @@ def __run_crawljax(config):
 
     # create java command for running crawljax runner
     uitestgen_command = 'java -Xmx2048m -cp '
-    with resources.path('lib', TKLTEST_UI_CORE_JAR) as core_ui_jar:
+    with resources.path('tkltest-lib', TKLTEST_UI_CORE_JAR) as core_ui_jar:
         uitestgen_command += str(core_ui_jar)
     uitestgen_command += ' org.konveyor.tackletest.ui.crawljax.CrawljaxRunner -cf {}'.format(config_file_name)
 

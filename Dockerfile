@@ -29,10 +29,8 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 # install java lib dependencies
 WORKDIR /app/tackle-test-cli
-COPY lib/*.* ./lib/
-#COPY lib/*.xml ./lib/
-#COPY lib/download_lib_jars.sh ./lib/
-WORKDIR /app/tackle-test-cli/lib
+COPY tkltest-lib/*.* ./tkltest-lib/
+WORKDIR /app/tackle-test-cli/tkltest-lib
 RUN ./download_lib_jars.sh
 
 # copy cli code and install tkltest command

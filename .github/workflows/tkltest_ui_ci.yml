@@ -49,9 +49,9 @@ jobs:
         chromedriver --version
     - name: Download Java libraries
       run: |
-        cd lib
+        cd tkltest-lib
         ./download_lib_jars.sh
-        cd ..; ls lib/*
+        cd ..; ls tkltest-lib/*
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip

@@ -10,20 +10,20 @@
 ## Downloading Java library Dependencies
 
 To run TackleTest CLI from a locally built Docker image or a local installation, a few jar files need to be downloaded
-from Maven repositories. This can be done by running the script `lib/download_lib_jars.sh`
+from Maven repositories. This can be done by running the script `tkltest-lib/download_lib_jars.sh`
 
 ```buildoutcfg
-cd lib; ./download_lib_jars.sh
+cd tkltest-lib; ./download_lib_jars.sh
 ```
 Windows users should run:
     
 ```buildoutcfg
-cd lib; download_lib_jars.sh
+cd tkltest-lib; download_lib_jars.sh
 ```
    
-This downloads the Java libraries required by the CLI into the `lib/download` directory, including the updated versions of `tackle-test-generator-core` jars.
+This downloads the Java libraries required by the CLI into the `tkltest-lib/` directory, including the updated versions of `tackle-test-generator-core` jars.
 
-TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `lib` directory).
+TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST Automated Combinatorial Testing for Software](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software) tool, which is packaged with the CLI (in the `tkltest-lib` directory).
 
 ## Installing Prerequisites
 
