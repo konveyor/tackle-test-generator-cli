@@ -8,19 +8,19 @@
 
     <path id="classpath">
 
-        <pathelement location="../libcommons-logging-1.1.2.jar" />
+        <pathelement location="../lib/libcommons-logging-1.1.2.jar" />
 
-        <pathelement location="../libjavax.annotation-api-1.3.2.jar" />
+        <pathelement location="../lib/libjavax.annotation-api-1.3.2.jar" />
 
-        <pathelement location="../libjavax.json-api-1.0.jar" />
+        <pathelement location="../lib/libjavax.json-api-1.0.jar" />
 
-        <pathelement location="../libjavax.servlet-api-3.1.0.jar" />
+        <pathelement location="../lib/libjavax.servlet-api-3.1.0.jar" />
 
-        <pathelement location="../libjavax.ws.rs-api-2.0.jar" />
+        <pathelement location="../lib/libjavax.ws.rs-api-2.0.jar" />
 
-        <pathelement location="../libresteasy-client-3.0.8.Final.jar" />
+        <pathelement location="../lib/libresteasy-client-3.0.8.Final.jar" />
 
-        <pathelement location="../libresteasy-jaxrs-3.0.8.Final.jar" />
+        <pathelement location="../lib/libresteasy-jaxrs-3.0.8.Final.jar" />
 
         <pathelement location="../../../../tkltest-lib/acts_3.2.jar" />
 
