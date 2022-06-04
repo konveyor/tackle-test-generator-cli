@@ -27,9 +27,7 @@ setup(
             "tkltest-ui = tkltest.tkltest_ui:main"
         ]
     },
-    package_data={
-        'tkltest/generate/ui/templates': ['tkltest/generate/ui/templates/*.jinja']
-    },
+    include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: APL-2.0',

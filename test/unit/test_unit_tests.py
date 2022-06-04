@@ -591,7 +591,7 @@ class UnitTests(unittest.TestCase):
             lines_generated = file.read().splitlines()
         lines_generated = [PurePath(line).as_posix() for line in lines_generated]
 
-        self.assertTrue(len(lines_generated) == len(lines_standard), message)
+        self.assertEqual(len(lines_generated), len(lines_standard), message)
 
         for i, jar_path in enumerate(lines_generated):
             extended_message = message + " , path = " + jar_path

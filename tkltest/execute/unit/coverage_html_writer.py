@@ -16,6 +16,7 @@
 
 import os
 from bs4 import BeautifulSoup
+from importlib import resources
 import shutil
 from tkltest.util import constants
 
@@ -46,10 +47,14 @@ class CoverageStatisticsHtmlWriter:
             shutil.rmtree(html_compare_dir)
         os.mkdir(html_compare_dir)
         shutil.copytree(html1_dir + os.sep + 'jacoco-resources', html_compare_dir + os.sep + 'jacoco-resources')
-        shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'bluebar.gif',
-                        html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
-        shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'goldbar.gif',
-                        html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
+        # shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'bluebar.gif',
+        #                 html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
+        with resources.path('tkltest-lib', 'bluebar.gif') as iconfile:
+            shutil.copyfile(iconfile, html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'bluebar.gif')
+        # shutil.copyfile(constants.TKLTEST_LIB_DIR + os.sep + 'goldbar.gif',
+        #                 html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
+        with resources.path('tkltest-lib', 'goldbar.gif') as iconfile:
+            shutil.copyfile(iconfile, html_compare_dir + os.sep + 'jacoco-resources' + os.sep + 'goldbar.gif')
 
         for package_statistic in app_statistics.children:
             os.mkdir(html_compare_dir + os.sep + package_statistic.get_pretty_name())

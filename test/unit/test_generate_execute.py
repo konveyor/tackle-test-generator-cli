@@ -889,7 +889,7 @@ class GenerateExecuteTest(unittest.TestCase):
             self.__assert_execute_resources(app_name=app_name, compare_coverage=True, has_junit_report=False)
 
     def test_execute_ctdamplified_compare_coverage(self) -> None:
-        """execute": comparing coverage reports"""
+        """Test "execute": comparing coverage reports"""
         for app_name in self.test_list1:
             app_info = self.test_apps[app_name]
 

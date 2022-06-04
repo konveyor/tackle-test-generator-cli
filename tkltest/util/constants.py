@@ -15,6 +15,7 @@
 # ***************************************************************************
 
 import os
+from importlib import resources
 
 # name of default config file
 TKLTEST_DEFAULT_CONFIG_FILE='tkltest_config.toml'
@@ -26,8 +27,11 @@ TKLTEST_UNIT_OUTPUT_DIR_PREFIX = 'tkltest-output-unit-'
 
 # cli lib download dir
 TKLTEST_CLI_DIR = os.getcwd()
-TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'lib')
-TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
+# TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'tkltest-lib')
+with resources.path('tkltest-lib', '') as libpath:
+    TKLTEST_LIB_DIR = str(libpath)
+# TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
+TKLTEST_LIB_DOWNLOAD_DIR = TKLTEST_LIB_DIR
 
 # version of unit testgen core
 TKLTEST_UNIT_CORE_VERSION = 'main-SNAPSHOT'
@@ -153,13 +157,9 @@ JACOCO_CLI_JAR_NAME = 'org.jacoco.cli-0.8.7-nodeps.jar'
 # output directory for generated UI tests
 TKLTEST_UI_OUTPUT_DIR_PREFIX = 'tkltest-output-ui-'
 
-# UI lib download dir
-TKLTEST_UI_LIB_DOWNLOAD_DIR = os.path.join('lib', 'download')
-
 # version of ui testgen core
 TKLTEST_UI_CORE_VERSION = 'main-SNAPSHOT-jar-with-dependencies'
-TKLTEST_UI_CORE_JAR = os.path.join(TKLTEST_UI_LIB_DOWNLOAD_DIR,
-                                   'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION))
+TKLTEST_UI_CORE_JAR = 'tackle-test-generator-ui-{}.jar'.format(TKLTEST_UI_CORE_VERSION)
 
 # generated test class
 CRAWLJAX_API_TEST_FILE = os.path.join('src', 'test', 'java', 'generated', 'GeneratedTests.java')

@@ -115,7 +115,7 @@
               <url>
                 https://github.com/randoop/randoop/releases/download/${randoop.version}/replacecall-${randoop.replacecall.version}.jar
               </url>
-              <outputDirectory>${project.basedir}/download</outputDirectory>
+              <outputDirectory>${project.basedir}</outputDirectory>
             </configuration>
           </execution>
         </executions>

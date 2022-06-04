@@ -61,19 +61,19 @@ directory and run TackleTest with the AUT configuration file, use the following 
 respectively) after pulling the image from the registry:
 
 ```buildoutcfg
-docker run --rm -v /home/user/aut:/app/tackle-test-cli/aut ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit --config-file /app/tackle-test-cli/aut/tkltest_config.toml --verbose generate ctd-mplified'
+docker run --rm -v /home/user/aut:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit --config-file /app/tackle-test-cli/tkltest_config.toml --verbose generate ctd-mplified'
 ```
 
 ```buildoutcfg
-docker run --rm -v /home/user/aut:/app/tackle-test-cli/aut ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui --config-file /app/tackle-test-cli/aut/tkltest_config.toml --verbose generate'
+docker run --rm -v /home/user/aut:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui --config-file /app/tackle-test-cli/tkltest_config.toml --verbose generate'
 ```
 
 Note that, in these commands, the configuration file is specified as an absolute path in the container
-(`/app/tackle-test-cli/aut/tkltest_config.toml`).  You can also specify a relative path, provided that path is
+(`/app/tackle-test-cli/tkltest_config.toml`).  You can also specify a relative path, provided that path is
 relative to `/app/tackle-test-cli` in the container.
 
 The results of test generation or execution in the container are available under `/home/user/aut` on the
-host machine.
+host machine (`/app/tackle-test-cli` in the container).
 
 [//]: # (&#40;This also requires that the classes, the library dependencies, and the configuration file for the app&#41; under test be placed in a directory  under the CLI directory, so that they are available in the container.)
 
@@ -81,10 +81,10 @@ For convenience in using the TackleTest via Docker, you can create a workspace d
 `/home/user/tkltest-workspace`) and create the following aliases:
 
 ```buildoutcfg
-alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit'
+alias tkltest-unit='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit'
 ```
 ```buildoutcfg
-alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli/tkltest-workspace ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui'
+alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-ui'
 ```
 
 With these aliases set, you can simply use `tkltest-unit` and `tkltest-ui` commands instead of the long `docker run ...` command.
