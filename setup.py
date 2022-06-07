@@ -19,7 +19,8 @@ setup(
         'bs4==0.0.1',
         'kaitaistruct==0.9',
         'psutil==5.9.0',
-        'tqdm==4.62.3'
+        'tqdm==4.62.3',
+        'nltk==3.6.1',
     ],
     entry_points={
         "console_scripts": [

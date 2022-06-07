@@ -24,6 +24,8 @@ import os.path
 
 from tkltest.util import constants, logging_util
 
+from .heuristic_labels import HeuristicLabel
+
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
 _CRAWL_PATHS_FILE = 'CrawlPaths.json'
@@ -87,6 +89,13 @@ def generate_selenium_api_tests(config, crawl_dir):
 
     # iterate over crawl paths and construct context for each test method
     method_name_count = {}
+
+    # get heuristic labels for each eventable based on its ranked attributes
+    heuristic_label = HeuristicLabel(crawl_paths_file, 'ranked_attributes.json')
+
+    # heuristic labels stored in a dictionary of eventable id to eventable ranked attribute dictionary
+    heuristic_label_dict = heuristic_label.get_labels()
+
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
         method_name = __create_method_name_for_path(crawl_path)
@@ -103,7 +112,7 @@ def generate_selenium_api_tests(config, crawl_dir):
             'eventables': []
         }
         for eventable in crawl_path:
-            method_context['eventables'].append(__get_context_for_eventable(eventable))
+            method_context['eventables'].append(__get_context_for_eventable(eventable, heuristic_label_dict))
         jinja_context['test_methods'].append(method_context)
 
     # render template to generate source code for test class
@@ -133,7 +142,7 @@ def __create_method_name_for_path(path):
     return 'test_path_{}'.format('_'.join(eventable_ids))
 
 
-def __get_context_for_eventable(eventable):
+def __get_context_for_eventable(eventable, heuristic_label_dict):
     """Creates jinja context for an eventable.
 
     Creates and returns jinja context for the given eventable for rendering the test class code template.
@@ -143,7 +152,8 @@ def __get_context_for_eventable(eventable):
         'by_method': __get_by_method_for_eventable(eventable['identification']),
         'related_frame': eventable['relatedFrame'],
         'form_inputs': [],
-        'comment': json.dumps(eventable['element'])
+        # 'comment': json.dumps(eventable['element'])
+        'comment': heuristic_label_dict[eventable['id']]
     }
     for form_input in eventable['relatedFormInputs']:
         context['form_inputs'].append({
