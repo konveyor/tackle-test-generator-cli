@@ -1,6 +1,5 @@
 import json
 import nltk
-nltk.download('words')
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import string
