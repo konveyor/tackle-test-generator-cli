@@ -28,7 +28,7 @@ TKLTEST_UNIT_OUTPUT_DIR_PREFIX = 'tkltest-output-unit-'
 # cli lib download dir
 TKLTEST_CLI_DIR = os.getcwd()
 # TKLTEST_LIB_DIR = os.path.join(TKLTEST_CLI_DIR, 'tkltest-lib')
-with resources.path('tkltest-lib', '') as libpath:
+with resources.files('tkltest-lib') as libpath:
     TKLTEST_LIB_DIR = str(libpath)
 # TKLTEST_LIB_DOWNLOAD_DIR = os.path.join(TKLTEST_LIB_DIR, 'download')
 TKLTEST_LIB_DOWNLOAD_DIR = TKLTEST_LIB_DIR
