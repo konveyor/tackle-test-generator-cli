@@ -181,7 +181,7 @@ def generate_ctd_amplified_tests(config, output_dir):
     if os.path.exists(test_directory):
         shutil.rmtree(test_directory)
     shutil.move(tmp_test_directory, test_directory)
-
+    tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
 
@@ -515,7 +515,6 @@ def extend_sequences(app_name, monolith_app_path, app_classpath_file, ctd_file, 
         tkltest_status('Extender process has not terminated despite its completion, forcibly terminating it\n')
         proc.kill()
 
-    tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
 
 def extender_timeout(command, coverage_file_name, verbose):
     global proc, thread_error
