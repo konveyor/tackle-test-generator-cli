@@ -29,7 +29,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 ### Prerequisites for TackleTest-Unit
 
-1. Install Python 3.8
+1. Install Python 3.9
 
 2. Install a JDK (versions 8-11 are supported). The JDK home directory has to be specified as a configuration option;
    see [tkltest-unit Configuration Options](unit/tkltest_unit_config_options.md) for details on
@@ -55,7 +55,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 ### Prerequisites for TackleTest-UI
 
-1. Install Python 3.8
+1. Install Python 3.9
 
 2. Install JDK 8
 
