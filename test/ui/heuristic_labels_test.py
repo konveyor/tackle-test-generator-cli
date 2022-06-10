@@ -8,7 +8,15 @@ class HeuristicLabelTest(unittest.TestCase):
     helper_file_dir = os.path.join('test', 'ui', 'helper_files')
 
     def test_heuristic_labels(self):
+        ''' Test the get_label function of the HeuristicLabel class by testing on example labels
 
+                Parameters:
+                            None
+
+                Returns:
+                            Assertion that labels are correctly produced for a few addressbook and petclinic DOM fragments'''
+
+        # Refer to eventable['element'] DOM fragments of addressbook and petclinic stored in the helper_files directory
         with open(os.path.join(self.helper_file_dir, 'ids_addressbook.json')) as file1:
             ids_addressbook = json.load(file1)
         with open(os.path.join(self.helper_file_dir, 'ids_petclinic.json')) as file2:
@@ -26,6 +34,8 @@ class HeuristicLabelTest(unittest.TestCase):
             {2: 'veterinarian', 3: 'brand', 4: 'add new', 9: 'save vet', 10: 'specialty', 11: 'owner', 12: 'pet type',
              13: 'specialty', 14: 'edit', 15: 'edit', 16: 'brand', 22: 'vet', 23: 'back'}]
         ids = [ids_addressbook, ids_petclinic]
+
+        # check for all DOM fragments in these two files, that labels are produced correctly
         for file_num, eventable_elements in enumerate([eventables_addressbook, eventables_petclinic]):
             id_index = 0
             for eventable_element in eventable_elements:
@@ -33,8 +43,8 @@ class HeuristicLabelTest(unittest.TestCase):
                 id_index += 1
 
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
 
 
 

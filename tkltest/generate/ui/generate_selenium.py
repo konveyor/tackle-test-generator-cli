@@ -96,10 +96,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
-    # heuristic_label = HeuristicLabel('ranked_attributes.json')
-
-    # heuristic labels stored in a dictionary of eventable id to eventable ranked attribute dictionary
-    # heuristic_label_dict = heuristic_label.get_labels()
+    # to store eventable id : eventable label
     heuristic_label_dict = dict()
 
     for path_num, crawl_path in enumerate(crawl_paths):
