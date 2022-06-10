@@ -47,6 +47,8 @@ class HeuristicLabel:
 
         logging.info('Getting highest ranked attribute for this eventable')
 
+        label = ''
+
         for ranked_attr in self.ranked_attributes:
             if ranked_attr in curr_eventable_attributes and curr_eventable_attributes[ranked_attr] != '':
                 label = curr_eventable_attributes[ranked_attr]
