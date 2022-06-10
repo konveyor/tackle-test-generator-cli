@@ -73,7 +73,7 @@ def process_generate_command(config):
         tkltest_status('Generated {} Selenium API test cases; written to test class file "{}"'
                        .format(test_count, test_class_file))
     except Exception as e:
-        tkltest_status('Execption occurred while creating Selenium API tests: {}'.format(str(e)), error=True)
+        tkltest_status('Exception occurred while creating Selenium API tests: {}'.format(str(e)), error=True)
         browser_util.cleanup_browser_instances(browser)
         sys.exit(1)
 

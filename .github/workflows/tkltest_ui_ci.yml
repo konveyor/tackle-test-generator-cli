@@ -65,6 +65,10 @@ jobs:
         source venv/bin/activate
         pip install .
         which tkltest-ui
+    - name: Run labeling unit tests
+      run: |
+        source venv/bin/activate
+        nosetests test/ui/heuristic_labels_test.py
     - name: Run tkltest-ui help/config tests
       run: |
         source venv/bin/activate

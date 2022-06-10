@@ -1,5 +1,17 @@
 import tkltest
 from setuptools import setup, find_packages
+from setuptools.command.install import install
+
+
+class TkltestInstall(install):
+    """Install and download nltk data"""
+    def run(self):
+        install.run(self)
+        import nltk
+        nltk.download('stopwords')
+        nltk.download('wordnet')
+        nltk.download('words')
+
 
 setup(
     name='tkltest',
@@ -19,8 +31,11 @@ setup(
         'bs4==0.0.1',
         'kaitaistruct==0.9',
         'psutil==5.9.0',
-        'tqdm==4.62.3'
+        'tqdm==4.62.3',
+        'nltk==3.6.1',
     ],
+    setup_requires=['nltk'],
+    cmdclass={'install': TkltestInstall},
     entry_points={
         "console_scripts": [
             "tkltest-unit = tkltest.tkltest_unit:main",
