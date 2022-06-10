@@ -11,6 +11,7 @@ class TkltestInstall(install):
         nltk.download('stopwords')
         nltk.download('wordnet')
         nltk.download('words')
+        nltk.download('omw-1.4')
 
 
 setup(
@@ -32,9 +33,9 @@ setup(
         'kaitaistruct==0.9',
         'psutil==5.9.0',
         'tqdm==4.62.3',
-        'nltk==3.6.1',
+        'nltk==3.6.6',
     ],
-    setup_requires=['nltk'],
+    setup_requires=['nltk==3.6.6'],
     cmdclass={'install': TkltestInstall},
     entry_points={
         "console_scripts": [
