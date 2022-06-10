@@ -9,13 +9,13 @@ import logging
 class HeuristicLabel:
 
     def __init__(self, rankings_file_path):
-        ''' initialize with the ranked attribute order to use while calculating the label
+        """ initialize with the ranked attribute order to use while calculating the label
 
         Parameters:
                     rankings_file_path (str): A string path to the ranked_attributes.json file
 
         Returns:
-                    Nothing, creates a ranked_attributes list and rankings_set set to find the labels'''
+                    Nothing, creates a ranked_attributes list and rankings_set set to find the labels"""
 
         with open(rankings_file_path) as f:
             self.ranked_attributes = json.load(f)
@@ -24,13 +24,13 @@ class HeuristicLabel:
         self.rankings_set = set(self.ranked_attributes)
 
     def get_label(self, eventable):
-        ''' get heuristic labels by selecting the highest ranked attribute which this eventable has
+        """ get heuristic labels by selecting the highest ranked attribute which this eventable has
 
         Parameters:
                     eventable (str): A json string path of the element field of the clickable
 
         Returns:
-                    label (str): The label for this clickable '''
+                    label (str): The label for this clickable """
 
         curr_eventable_attributes = dict()  # dictionary of ranked attributes for this eventable
         for attr in eventable:
@@ -57,13 +57,13 @@ class HeuristicLabel:
 
 
     def preprocess(self, s):
-        ''' preprocess value of ranked attributes of eventables
+        """ preprocess value of ranked attributes of eventables
 
         Parameters:
                     s (str): A string word or phrase to be preprocessed
 
         Returns:
-                    s (str): The preprocessed version of this input string '''
+                    s (str): The preprocessed version of this input string """
 
         html_stop_words = ["a", "abbr", "acronym", "address", "area", "b", "base", "bdo", "big", "blockquote", "body",
                            "br",
@@ -99,13 +99,13 @@ class HeuristicLabel:
         return s
 
     def tokenize(self, s: str):
-        ''' tokenize input string to remove uppercase, camel case, snake case, etc. eg. TableSortTrigger -> table sort trigger
+        """ tokenize input string to remove uppercase, camel case, snake case, etc. eg. TableSortTrigger -> table sort trigger
 
         Parameters:
                     s (str): A string word or phrase to be tokenized
 
         Returns:
-                    s (str): The tokenized version of this input string '''
+                    s (str): The tokenized version of this input string """
 
         result = ""
         buffer = ""

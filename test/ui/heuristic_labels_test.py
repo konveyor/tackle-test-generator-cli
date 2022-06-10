@@ -8,13 +8,13 @@ class HeuristicLabelTest(unittest.TestCase):
     helper_file_dir = os.path.join('test', 'ui', 'helper_files')
 
     def test_heuristic_labels(self):
-        ''' Test the get_label function of the HeuristicLabel class by testing on example labels
+        """ Test the get_label function of the HeuristicLabel class by testing on example labels
 
                 Parameters:
                             None
 
                 Returns:
-                            Assertion that labels are correctly produced for a few addressbook and petclinic DOM fragments'''
+                            Assertion that labels are correctly produced for a few addressbook and petclinic DOM fragments """
 
         # Refer to eventable['element'] DOM fragments of addressbook and petclinic stored in the helper_files directory
         with open(os.path.join(self.helper_file_dir, 'ids_addressbook.json')) as file1:
