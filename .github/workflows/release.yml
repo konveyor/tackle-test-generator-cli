@@ -23,9 +23,9 @@ jobs:
           distribution: 'adopt'
       - name: Download Java libraries
         run: |
-          cd lib
+          cd tkltest-lib
           ./download_lib_jars.sh
-          cd ..; ls lib/*
+          cd ..; ls tkltest-lib/*
       - name: Get release tag
         id: get_release_tag
         run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
