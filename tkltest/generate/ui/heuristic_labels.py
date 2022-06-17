@@ -50,8 +50,14 @@ class HeuristicLabel:
         # set of ranked attributes, to search efficiently
         self.rankings_set = set(self.ranked_attributes)
 
+<<<<<<< HEAD
     ########################################## NLP preprocessing ########################################################
+=======
 
+>>>>>>> c8d129578c6d219b7e64b2997082f0a835b114ff
+
+    ########################################## NLP preprocessing ########################################################
+    
     def preprocess(self, s):
         """
         Preprocess value of ranked attributes of eventables-  tokenize, remove stop words, lemmatize and remove non-English words
@@ -66,6 +72,7 @@ class HeuristicLabel:
         # print('preprocessed: ',s)
         return s
 
+    
     def tokenize(self, s: str):
         """
         Tokenize input string to remove uppercase, camel case, snake case, etc. eg. TableSortTrigger -> table sort trigger
@@ -218,6 +225,114 @@ class HeuristicLabel:
 
         return element_label
 
+<<<<<<< HEAD
+=======
+    def remove_stop_words(self, s):
+        s = list(s.split(' '))
+        s = [word for word in s if word not in set(stopwords.words('english'))]
+        s = [word for word in s if word not in set(self.html_stop_words)]
+        return ' '.join(s)
+
+
+    def lemmatize(self, s):
+        s = list(s.split(' '))
+        lemmatizer = WordNetLemmatizer()
+        s = [lemmatizer.lemmatize(word) for word in s]
+        s = ' '.join(s)
+        return s
+
+
+    def remove_non_english_words(self, s):
+        s = (word for word in nltk.wordpunct_tokenize(s) if word in set(nltk.corpus.words.words()))
+        s = ' '.join(s)
+        return s
+
+
+
+    ########################################## Compute Labels ########################################################
+
+
+    def get_label(self, eventable):
+        """
+        Get the label for an eventable element, either based on element or its context (in the case of no relevant element attributes)
+        
+        Parameters:
+            eventable (dict): A json dict of the element field of the eventable
+            
+        Returns:
+            label (str): The label for this eventable based on either the element or its context dom """
+        
+        heuristic_label = self.get_element_label(eventable['element'])
+
+        if heuristic_label.strip() == '':
+            context_dom = self.get_context_dom(eventable['source']['dom'],
+                                                            eventable['identification']['value'].lower())
+            context_label = self.get_context_label(context_dom)
+            heuristic_label = context_label
+        heuristic_label = heuristic_label.strip()
+        tokenized_label = list(self.tokenize(heuristic_label).split(' '))
+        pos_tags = nltk.pos_tag(tokenized_label)
+        contains_verb = False
+        # print(pos_tags)
+        for pos_tag in pos_tags:
+            # print(pos_tag)
+            if pos_tag[0] != '' and pos_tag[1] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+                contains_verb = True
+                break
+        if not contains_verb:
+            heuristic_label = eventable['eventType'] + ' ' + heuristic_label
+        return heuristic_label
+
+
+    def get_element_label(self, eventable):
+        """ get heuristic labels by selecting the highest ranked attribute which this eventable has
+
+        Parameters:
+                    eventable (dict): A json dict of the element field of the eventable
+
+        Returns:
+                    element_label (str): The label for this eventable based on the element itself"""
+
+        element_label = ''
+        for attr in self.ranked_attributes:
+            if attr == 'text':
+                element_label = self.process_attribute_value(eventable[attr])
+            elif 'attributes' in eventable and attr in eventable['attributes']:
+                if attr == 'href':
+                    # special case for "href" attribute because its value
+                    # is usually longer and more complicated than other
+                    # attributes
+                    href = eventable['attributes']['href']
+                    tokenized_href = self.process_attribute_value(href.strip().split("?")[-1])
+                    kw_model = KeyBERT()
+                    keywords = kw_model.extract_keywords(tokenized_href, keyphrase_ngram_range=(1, 2),
+                                                         stop_words='english', use_mmr=True,
+                                                         diversity=0.7)
+                    if keywords:
+                        element_label = keywords[0][0]
+                    else:
+                        element_label = href.strip().split("/")[-1].split(".")[0]
+                        element_label = self.process_attribute_value(element_label)
+                else:
+                    element_label = self.process_attribute_value(eventable['attributes'][attr])
+            if element_label != '':
+                break
+
+        if element_label == '':
+            preprocessed_eventable = self.remove_non_english_words(
+                self.lemmatize(self.tokenize(self.preprocess_eventable_element_details(eventable))))
+            kw_model = KeyBERT()
+            keywords = kw_model.extract_keywords(preprocessed_eventable, keyphrase_ngram_range=(1, 2), stop_words='english',
+                                                 use_mmr=True, diversity=0.7)
+            if keywords:
+                element_label = keywords[0][0]
+
+        logging.info('Got highest ranked attribute for this eventable')
+
+        return element_label
+
+
+>>>>>>> c8d129578c6d219b7e64b2997082f0a835b114ff
     def get_context_label(self, context_dom: str):
         """
         Get label for a context DOM
@@ -250,6 +365,10 @@ class HeuristicLabel:
         label = self.process_attribute_value(label)
         return label.strip()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c8d129578c6d219b7e64b2997082f0a835b114ff
     def find_element(self, state_dom: str, eventable_element_xpath: str, return_format: str = 'dom'):
         """
         Locates the eventable element in the web page
@@ -276,6 +395,10 @@ class HeuristicLabel:
             logging.debug(e)
             return None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c8d129578c6d219b7e64b2997082f0a835b114ff
     def get_context_dom(self, state_dom: str, eventable_element_xpath: str):
         """
         Gets context dom of the eventable element by finding the oldest parent of the eventable element without another child
@@ -319,9 +442,129 @@ class HeuristicLabel:
             iterations += 1
         return etree.tostring(curr_dom).decode('UTF-8')
 
+<<<<<<< HEAD
     def contains_more_than_one_eventable(self, dom):
         """
         Checks whether the DOM has more than one eventable
+=======
+
+    def contains_more_than_one_eventable(self, dom):
+        """
+        Checks whether the DOM has more than one eventable
+
+        Parameters:
+            dom (str): string DOM
+
+        Returns:
+            Boolean (True if the DOM contains more than one eventable, False otherwise)
+        """
+
+        xpath_res = dom.xpath("//*[self::a or self::input[@type='submit'] or self::button]")
+        logging.debug(f"xpath result: {xpath_res}")
+        logging.debug(f"length: {len(xpath_res)}")
+        if len(xpath_res) > 1:
+            return True
+        return False
+
+
+    def preprocess_eventable_element_details(self, eventable_element_details):
+        """
+        Preprocesses eventable['element'] to return a string
+        
+        Parameters:
+            eventable_element_details (dict): a dictionary of eventable['element'] 
+
+        Returns:
+            preprocessed_eventable_details (str): preprocessed version of the input
+        """
+        text = ''
+        for value in eventable_element_details.values():
+            if type(value) == dict:
+                text = text + json.dumps(list(value.values())) + " "
+            elif type(value) == str:
+                text = text + value + " "
+        logging.debug(f"text: {text}")
+        preprocessed_eventable_details = self.preprocess(text)
+        return preprocessed_eventable_details
+
+    def process_attribute_value(self, text):
+        # TODO: check how this is different from normal preprocessing
+        """
+        Process a string attribute value of an eventable
+
+        Parameters:
+            text (str): an attribute of an eventable to be processed
+
+        Returns:
+            preprocessed_attr (str): the preprocessed attribute value
+        """
+        preprocessed_attr = ''
+        dictionary = enchant.Dict("en_US")
+        punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+        text = self.preprocess(text)
+        english = False
+        if text:
+            for button_text_word in text.split(" "):
+                if button_text_word in punc:
+                    continue
+                if not dictionary.check(button_text_word.lower()):
+                    english = False
+                    break
+                english = True
+            if english:
+                preprocessed_attr = text
+        logging.debug(f"text: {text}, isEnglish: {english}, element label: {preprocessed_attr}")
+        return preprocessed_attr.strip()
+ 
+
+    def parse_dom_to_dict(self, dom: str):
+        """
+        Parses input string dom to a dict using the xmltodict library
+        
+        Parameters:
+            dom (str): input string DOM
+
+        Returns:
+            context_dom_dict (dict): dictionary of the parsed DOM
+        """
+        context_dom_str = r"<html>" + dom + r"</html>"
+        context_dom_dict = xd.parse(context_dom_str)
+        # print(f"context dom dict: {context_dom_dict}")
+        return context_dom_dict
+
+
+    def dict_value_to_str(self, context_dom_input):
+        """
+        Converts dict context dom to string 
+        
+        Parameters:
+            context_dom_input (dict):  dict of context dom
+
+        Returns:
+            parsed string of this dom
+        """
+        if type(context_dom_input) == dict or type(context_dom_input) == collections.OrderedDict:
+            res = ""
+            for value in context_dom_input.values():
+                res += self.dict_value_to_str(value)
+            return res
+        elif type(context_dom_input) == str:
+            return context_dom_input
+        elif type(context_dom_input) == list:
+            res = ""
+            for context_dom_item in context_dom_input:
+                res += self.dict_value_to_str(context_dom_item)
+            return res
+        elif type(context_dom_input) == tuple:
+            if len(context_dom_input) == 2:
+                return context_dom_input[1]
+            else:
+                return " ".join(context_dom_input)
+        else:
+            logging.debug(f"missed {type(context_dom_input)}")
+            return ""
+
+>>>>>>> c8d129578c6d219b7e64b2997082f0a835b114ff
 
         Parameters:
             dom (str): string DOM
