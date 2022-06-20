@@ -38,7 +38,7 @@ class HeuristicLabelTest(unittest.TestCase):
         for file_num, crawl_paths in enumerate([crawl_paths_addressbook, crawl_paths_petclinic]):
             for crawl_path in crawl_paths:
                 for eventable in crawl_path:
-                    print('\n\n\n', eventable['element'])
+                    # print('\n\n\n', eventable['element'])
                     assert (heuristic_label.get_label(eventable) == correct_labels[file_num][eventable['id']])
 
 
