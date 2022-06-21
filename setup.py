@@ -9,6 +9,7 @@ class TkltestInstall(install):
         install.run(self)
         import nltk
         nltk.download('stopwords')
+        nltk.download('averaged_perceptron_tagger')
         nltk.download('wordnet')
         nltk.download('words')
         nltk.download('omw-1.4')
@@ -34,6 +35,10 @@ setup(
         'psutil==5.9.0',
         'tqdm==4.62.3',
         'nltk==3.6.6',
+        'pyenchant==3.2.2',
+        'lxml==4.6.3',
+        'xmltodict==0.12.0',
+        'keybert==0.4.0'
     ],
     setup_requires=['nltk==3.6.6'],
     cmdclass={'install': TkltestInstall},

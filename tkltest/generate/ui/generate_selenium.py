@@ -116,7 +116,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         }
         for eventable in crawl_path:
             if eventable['id'] not in heuristic_label_dict:
-                heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable['element'])
+                heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
             label = heuristic_label_dict[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
         jinja_context['test_methods'].append(method_context)
