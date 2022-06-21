@@ -23,7 +23,7 @@ class HeuristicLabelTest(unittest.TestCase):
         with open(os.path.join(self.helper_file_dir, 'crawl_paths_petclinic_small.json')) as file2:
             crawl_paths_petclinic = json.load(file2)
 
-        with resources.path('tkltest.generate.ui', 'ranked_attributes_short.json') as attr_file:
+        with resources.path('test.ui.helper_files', 'ranked_attributes_short.json') as attr_file:
             heuristic_label = HeuristicLabel(str(attr_file))
 
         correct_labels = [
