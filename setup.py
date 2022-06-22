@@ -38,7 +38,8 @@ setup(
         'pyenchant==3.2.2',
         'lxml==4.6.3',
         'xmltodict==0.12.0',
-        'keybert==0.4.0'
+        'keybert==0.4.0',
+        'flair==0.11.3'
     ],
     setup_requires=['nltk==3.6.6'],
     cmdclass={'install': TkltestInstall},

@@ -153,20 +153,23 @@ def __get_context_for_eventable(eventable, label):
 
     Creates and returns jinja context for the given eventable for rendering the test class code template.
     """
+    logging.info('label in get context for eventable: ',label,' LABEL END')
+
     context = {
         'event_type': eventable['eventType'],
         'by_method': __get_by_method_for_eventable(eventable['identification']),
         'related_frame': eventable['relatedFrame'],
         'form_inputs': [],
         # 'comment': json.dumps(eventable['element'])
-        'comment': label
+        'comment': label[0]
     }
-    for form_input in eventable['relatedFormInputs']:
+    for i, form_input in enumerate(eventable['relatedFormInputs']):
         context['form_inputs'].append({
             'type': form_input['type'],
             'by_method': __get_by_method_for_eventable(form_input['identification']),
             'value': form_input['inputValues'][0]['value'],
-            'checked': "true" if form_input['inputValues'][0]['checked'] is True else "false"
+            'checked': "true" if form_input['inputValues'][0]['checked'] is True else "false",
+            'comment': label[1][i]
         })
     return context
 

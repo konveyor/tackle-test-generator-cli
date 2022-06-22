@@ -10,6 +10,10 @@ import xmltodict as xd
 from io import StringIO
 import collections
 from keybert import KeyBERT
+from importlib import resources
+from flair.data import Sentence
+from flair.models import SequenceTagger
+
 
 
 class HeuristicLabel:
@@ -49,6 +53,12 @@ class HeuristicLabel:
 
         # set of ranked attributes, to search efficiently
         self.rankings_set = set(self.ranked_attributes)
+
+        with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
+            with open(attr_file) as f:
+                self.ranked_attributes_form_fields = json.load(f)
+
+        print(self.ranked_attributes_form_fields)
 
     ########################################## NLP preprocessing ########################################################
 
@@ -157,18 +167,65 @@ class HeuristicLabel:
             context_label = self.get_context_label(context_dom)
             heuristic_label = context_label
         heuristic_label = heuristic_label.strip()
-        tokenized_label = list(self.tokenize(heuristic_label).split(' '))
-        pos_tags = nltk.pos_tag(tokenized_label)
+
+        # load tagger
+        tagger = SequenceTagger.load("flair/pos-english")
+        heuristic_label_flair = Sentence(heuristic_label)
+        tagger.predict(heuristic_label_flair)
         contains_verb = False
-        # print(pos_tags)
-        for pos_tag in pos_tags:
-            # print(pos_tag)
-            if pos_tag[0] != '' and pos_tag[1] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+        heuristic_label_pos = dict()
+        for token in heuristic_label_flair.tokens:
+            heuristic_label_pos[token.text] = token.labels[0].value
+
+        for word in heuristic_label_pos:
+            if heuristic_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
                 contains_verb = True
                 break
         if not contains_verb:
             heuristic_label = eventable['eventType'] + ' ' + heuristic_label
-        return heuristic_label
+
+        form_field_labels = []
+        for form_input in eventable['relatedFormInputs']:
+            form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification']['value'].lower(), 'str')
+            form_field_label = self.get_form_field_label(form_field_dom).strip()
+
+            form_field_label_flair = Sentence(form_field_label)
+            tagger.predict(form_field_label_flair)
+            contains_verb = False
+            form_field_label_pos = dict()
+            for token in form_field_label_flair.tokens:
+                form_field_label_pos[token.text] = token.labels[0].value
+            for word in form_field_label_pos:
+                if form_field_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+                    contains_verb = True
+                    break
+            if len(form_field_label_pos) > 0 and not contains_verb:
+                form_field_label = 'enter' + ' ' + form_field_label
+
+            if form_field_label == '':
+                form_field_label = 'Enter data into form field'
+            form_field_labels.append(form_field_label)
+        return [heuristic_label, form_field_labels]
+
+    def get_form_field_label(self, form_field_dom:str):
+        if not form_field_dom:
+            return ''
+
+        attributes = dict()
+        form_field_dom = self.parse_dom_to_dict(form_field_dom)
+
+        for k1 in form_field_dom.keys():
+            for k2 in form_field_dom[k1].keys():
+                for k3 in form_field_dom[k1][k2].keys():
+                    attributes[k3[1:]] = form_field_dom[k1][k2][k3]
+
+        form_field_label = ''
+        for attr in self.ranked_attributes_form_fields:
+            if attr in attributes:
+                form_field_label = (self.lemmatize(self.tokenize(attributes[attr])))
+                break
+        return form_field_label
+
 
     def get_element_label(self, eventable):
         """ get heuristic labels by selecting the highest ranked attribute which this eventable has
@@ -230,7 +287,9 @@ class HeuristicLabel:
         """
 
         preprocessed_context_dom = self.dict_value_to_str(self.parse_dom_to_dict(context_dom))
+        # print('\n\n\n\n Preprocessed dom: ', preprocessed_context_dom)
         preprocessed_context_dom = self.preprocess(preprocessed_context_dom)
+        # print('\n\n\n\n Preprocessed dom: ',preprocessed_context_dom)
         kw_model = KeyBERT()
         keywords = kw_model.extract_keywords(preprocessed_context_dom, keyphrase_ngram_range=(1, 2),
                                              stop_words=self.html_stop_words,
@@ -435,9 +494,9 @@ class HeuristicLabel:
 
 # for class testing
 if __name__ == "__main__":
-    heuristic_label = HeuristicLabel('ranked_attributes.json')
-    file1 = json.load(open('CrawlPaths_addr.json'))
-    file2 = json.load(open('CrawlPaths_petclinic.json'))
+    heuristic_label = HeuristicLabel('ranked_attributes_short.json')
+    file1 = json.load(open('crawl_paths_addressbook_small.json'))
+    file2 = json.load(open('crawl_paths_petclinic_small.json'))
     labels = []
     for file in [file1, file2]:
         curr_labels = dict()
