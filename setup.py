@@ -34,7 +34,7 @@ setup(
         'kaitaistruct==0.9',
         'psutil==5.9.0',
         'tqdm==4.62.3',
-        'nltk==3.6.6',
+        'nltk>=3.6.6',
         'pyenchant==3.2.2',
         'lxml==4.6.5',
         'xmltodict==0.12.0',
