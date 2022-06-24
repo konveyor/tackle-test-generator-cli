@@ -26,6 +26,7 @@ class HeuristicLabelTest(unittest.TestCase):
         with resources.path('test.ui.helper_files', 'ranked_attributes_short.json') as attr_file:
             heuristic_label = HeuristicLabel(str(attr_file))
 
+
         correct_labels = [{2: ['click post login', ['enter user', 'enter password']], 3: ['click birthday',
                                                                                           ['search for any text',
                                                                                            'enter checkbox',
@@ -55,6 +56,7 @@ class HeuristicLabelTest(unittest.TestCase):
                     assert (eventable_label == correct_labels[file_num][eventable['id']][0])
                     for i, form_field_label in enumerate(form_field_labels):
                         assert (form_field_label == correct_labels[file_num][eventable['id']][1][i])
+
 
 
 if __name__ == '__main__':

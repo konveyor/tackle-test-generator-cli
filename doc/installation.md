@@ -73,7 +73,7 @@ installation isolated and avoid version conflicts), run the commands:
 ```buildoutcfg
 python3 -m venv venv
 source venv/bin/activate
-pip install .
+pip install --editable .
 ```
 
 Windows users should run:
@@ -81,24 +81,23 @@ Windows users should run:
 ```buildoutcfg
 python3 -m venv venv
 venv\Scripts\activate.bat
-pip install .
+pip install --editable .
 ```
 
 If you prefer to install the command globally, run the command
 
 ```buildoutcfg
-pip install .
+pip install --editable .
 ```
 
-After installation, TacklteTest commands `tkltest-unit` and `tkltest-ui` will be available for use. Try them out:
+After installation, TackleTest commands `tkltest-unit` and `tkltest-ui` will be available for use. Try them out:
 
 ```buildoutcfg
 tkltest-unit --help
 tkltest-ui --help
 ```
 
-> Note: To install the CLI for development, set the editable mode: `pip install --editable`.
-You can then continue to develop it and make changes and simply run the command without having to package
+> Note: The editable mode (`pip install --editable`) allows to continue development and make changes and simply run the command without having to package
 and re-install it.
 
 ## Building the Docker image and running the CLI via docker or docker-compose

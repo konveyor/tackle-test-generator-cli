@@ -10,6 +10,7 @@ import xmltodict as xd
 from io import StringIO
 import collections
 from keybert import KeyBERT
+
 from importlib import resources
 from flair.data import Sentence
 from flair.models import SequenceTagger
@@ -54,6 +55,7 @@ class HeuristicLabel:
 
         # set of ranked attributes, to search efficiently
         self.rankings_set = set(self.ranked_attributes)
+
 
         with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
             with open(attr_file) as f:
@@ -180,6 +182,8 @@ class HeuristicLabel:
 
         for word in heuristic_label_pos:
             if heuristic_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+
+
                 contains_verb = True
                 break
         if not contains_verb:
@@ -278,6 +282,8 @@ class HeuristicLabel:
         logging.info('Got highest ranked attribute for this eventable')
 
         return element_label
+
+
 
     def get_context_label(self, context_dom: str):
         """
@@ -496,6 +502,7 @@ class HeuristicLabel:
             return ""
 
 
+
 # for class testing and performance analysis
 if __name__ == "__main__":
     heuristic_label = HeuristicLabel('ranked_attributes.json')
@@ -543,5 +550,3 @@ if __name__ == "__main__":
 
 
     eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table.csv')
-
-
