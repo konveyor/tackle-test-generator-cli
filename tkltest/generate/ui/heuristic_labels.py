@@ -215,6 +215,16 @@ class HeuristicLabel:
         return [heuristic_label, form_field_labels]
 
     def get_form_field_label(self, form_field_dom:str):
+        """
+        Get the label for a form field element
+
+        Parameters:
+            form_field_dom (str): the dom of the form field element
+
+        Returns:
+            form_field_label (str): the label for the form field element
+
+        """
         if not form_field_dom:
             return ''
 
@@ -505,6 +515,8 @@ class HeuristicLabel:
 
 # for class testing and performance analysis
 if __name__ == "__main__":
+    # save analysis outputs in tkltest/generate/ui/analysis_outputs
+
     heuristic_label = HeuristicLabel('ranked_attributes.json')
 
     file = json.load(open('crawl_paths_addressbook_small.json'))
@@ -542,11 +554,11 @@ if __name__ == "__main__":
                'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
                'Percentage of Labels computed for clickables': clickable_percentage,
                'Percentage of labels computed for form fields': form_field_percentage}
+
     output_file = open('analysis_outputs/label_analysis_results.json', 'w')
     output_file.write(json.dumps(results))
 
     output_file = open('analysis_outputs/labels_computed.json', 'w')
     output_file.write(json.dumps(curr_labels))
-
 
     eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table.csv')

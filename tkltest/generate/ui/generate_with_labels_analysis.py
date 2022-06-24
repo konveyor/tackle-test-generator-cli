@@ -35,7 +35,10 @@ _CRAWL_PATHS_FILE = 'crawl_paths_tmf.json'
 
 
 def generate_selenium_api_tests(config, crawl_dir):
-    """Generates test cases that use the Selenium API.
+    """
+    Modified generate_selenium.py to directly take in a crawl paths file
+
+    Generates test cases that use the Selenium API
 
     Processes crawl path information created by crawljax to generate test cases that use the Selenium API
     for performing actions on the app web UI. Removes crawljax-generated artifacts that are not required
@@ -97,7 +100,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
-    # to store eventable id : eventable label
+    # to store analysis outputs
     heuristic_label_dict = dict()
     total_clickables = 0
     total_form_field_elements = 0
@@ -197,7 +200,6 @@ def __get_context_for_eventable(eventable, label):
 
     Creates and returns jinja context for the given eventable for rendering the test class code template.
     """
-    logging.info('label in get context for eventable: ',label,' LABEL END')
 
     context = {
         'event_type': eventable['eventType'],

@@ -52,7 +52,7 @@ class HeuristicLabelTest(unittest.TestCase):
         for file_num, crawl_paths in enumerate([crawl_paths_addressbook, crawl_paths_petclinic]):
             for crawl_path in crawl_paths:
                 for eventable in crawl_path:
-                    [eventable_label, form_field_labels]  = heuristic_label.get_label(eventable)
+                    [eventable_label, form_field_labels] = heuristic_label.get_label(eventable)
                     assert (eventable_label == correct_labels[file_num][eventable['id']][0])
                     for i, form_field_label in enumerate(form_field_labels):
                         assert (form_field_label == correct_labels[file_num][eventable['id']][1][i])
