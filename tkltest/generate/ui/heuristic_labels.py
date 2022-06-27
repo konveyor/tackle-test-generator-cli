@@ -15,6 +15,7 @@ from importlib import resources
 from flair.data import Sentence
 from flair.models import SequenceTagger
 import pandas as pd
+import os
 
 
 
@@ -554,6 +555,10 @@ if __name__ == "__main__":
                'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
                'Percentage of Labels computed for clickables': clickable_percentage,
                'Percentage of labels computed for form fields': form_field_percentage}
+
+    analysis_outputs_path = os.path.join(os.curdir, 'analysis_outputs')
+    if not (os.path.exists(analysis_outputs_path)):
+        os.makedirs(analysis_outputs_path)
 
     output_file = open('analysis_outputs/label_analysis_results.json', 'w')
     output_file.write(json.dumps(results))
