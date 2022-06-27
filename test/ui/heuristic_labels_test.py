@@ -26,20 +26,37 @@ class HeuristicLabelTest(unittest.TestCase):
         with resources.path('test.ui.helper_files', 'ranked_attributes_short.json') as attr_file:
             heuristic_label = HeuristicLabel(str(attr_file))
 
-        correct_labels = [
-            {2: 'click post login', 3: 'click birthday', 4: 'click export', 5: 'click group', 6: 'click view',
-             7: 'click note', 9: 'click import', 11: 'click note', 12: 'click view', 13: 'click edit', 14: 'click next',
-             16: 'add', 17: 'click note', 21: 'click note', 22: 'click trigger sort', 23: 'click sort telephone',
-             24: 'click trigger sort', 25: 'click sort trigger', 26: 'click sort mail'},
-            {2: 'click veterinarian true', 3: 'owner add', 4: 'add', 9: 'click vet default', 10: 'click specialty',
-             11: 'click owner true', 12: 'click type active', 13: 'click specialty', 14: 'click default delete',
-             15: 'click default delete', 16: 'owner add', 22: 'click vet', 23: 'save vet'}]
+
+        correct_labels = [{2: ['click post login', ['enter user', 'enter password']], 3: ['click birthday',
+                                                                                          ['search for any text',
+                                                                                           'enter checkbox',
+                                                                                           'enter group',
+                                                                                           'enter to group']],
+                           4: ['click export',
+                               ['search for any text', 'enter checkbox', 'enter group', 'enter to group']],
+                           5: ['click group', []], 6: ['click view',
+                                                       ['search for any text', 'enter checkbox', 'enter group',
+                                                        'enter to group']], 7: ['click note', []], 9: ['click import',
+                                                                                                       [
+                                                                                                           'search for any text',
+                                                                                                           'enter checkbox',
+                                                                                                           'enter group',
+                                                                                                           'enter to group']],
+                           11: ['click note', []],
+                           12: ['click view',
+                                ['search for any text', 'enter checkbox', 'enter group', 'enter to group']]},
+                          {2: ['click veterinarian true', []], 3: ['owner add', []]}]
+
         # check for all DOM fragments in these two files, that labels are produced correctly
+
         for file_num, crawl_paths in enumerate([crawl_paths_addressbook, crawl_paths_petclinic]):
             for crawl_path in crawl_paths:
                 for eventable in crawl_path:
-                    # print('\n\n\n', eventable['element'])
-                    assert (heuristic_label.get_label(eventable) == correct_labels[file_num][eventable['id']])
+                    [eventable_label, form_field_labels] = heuristic_label.get_label(eventable)
+                    assert (eventable_label == correct_labels[file_num][eventable['id']][0])
+                    for i, form_field_label in enumerate(form_field_labels):
+                        assert (form_field_label == correct_labels[file_num][eventable['id']][1][i])
+
 
 
 if __name__ == '__main__':

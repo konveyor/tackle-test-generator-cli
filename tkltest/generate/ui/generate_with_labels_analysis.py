@@ -24,20 +24,26 @@ import os.path
 
 from tkltest.util import constants, logging_util
 
-from .heuristic_labels import HeuristicLabel
+from heuristic_labels import HeuristicLabel
 
 from importlib import resources
+import pandas as pd
 
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
-_CRAWL_PATHS_FILE = 'CrawlPaths.json'
+_CRAWL_PATHS_FILE = 'crawl_paths_addressbook_small.json'
 
 
 def generate_selenium_api_tests(config, crawl_dir):
-    """Generates test cases that use the Selenium API.
+    """
+    Modified generate_selenium.py to directly take in a crawl paths file
+
+    Generates test cases that use the Selenium API
+
     Processes crawl path information created by crawljax to generate test cases that use the Selenium API
     for performing actions on the app web UI. Removes crawljax-generated artifacts that are not required
     for Selenium API test cases.
+
     Args:
         config (dict): Configuration information for test generation
         crawl_dir (dict): Root crawl directory created by Crawljax for the current test-generation run
@@ -94,8 +100,13 @@ def generate_selenium_api_tests(config, crawl_dir):
     with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
-    # to store eventable id : eventable label
+    # to store analysis outputs
     heuristic_label_dict = dict()
+    total_clickables = 0
+    total_form_field_elements = 0
+    empty_clickable_labels = 0
+    empty_form_field_labels = 0
+    eventable_dom_label_table = []
 
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
@@ -113,10 +124,53 @@ def generate_selenium_api_tests(config, crawl_dir):
             'eventables': []
         }
         for eventable in crawl_path:
+            heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
+            eventable_dom_label_table.append([eventable['id'],
+                                              eventable['element'],
+                                              heuristic_label.find_element(eventable['source']['dom'],
+                                                                           eventable['identification']['value'].lower(),
+                                                                           'str'),
+                                              heuristic_label.get_context_dom(eventable['source']['dom'],
+                                                                              eventable['identification'][
+                                                                                  'value'].lower()),
+                                              heuristic_label_dict[eventable['id']][0]])
+            total_clickables += 1
+            total_form_field_elements += len(heuristic_label_dict[eventable['id']][1])
+            if heuristic_label_dict[eventable['id']][0] == '':
+                empty_clickable_labels += 1
+            for form_field_label in heuristic_label_dict[eventable['id']][1]:
+                if form_field_label == 'Enter data into form field':
+                    empty_form_field_labels += 1
             if eventable['id'] not in heuristic_label_dict:
                 heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
             label = heuristic_label_dict[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
+        eventable_dom_label_table = pd.DataFrame(eventable_dom_label_table,
+                                                 columns=['id', 'eventable[element]', 'curr_dom', 'context_dom',
+                                                          'label'])
+        clickable_percentage = 'N/A'
+        if total_clickables > 0:
+            clickable_percentage = (1 - empty_clickable_labels / total_clickables) * 100
+        form_field_percentage = 'N/A'
+        if total_form_field_elements > 0:
+            form_field_percentage = (1 - empty_form_field_labels / total_form_field_elements) * 100
+        results = {'Number of Clickables': total_clickables, 'Number of Form Field Elements': total_form_field_elements,
+                   'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
+                   'Percentage of Labels computed for clickables': clickable_percentage,
+                   'Percentage of labels computed for form fields': form_field_percentage}
+
+        analysis_outputs_path = os.path.join(os.curdir, 'analysis_outputs')
+        if not (os.path.exists(analysis_outputs_path)):
+            os.makedirs(analysis_outputs_path)
+
+        output_file = open('analysis_outputs/label_analysis_results.json', 'w')
+        output_file.write(json.dumps(results))
+
+        output_file = open('analysis_outputs/labels_computed.json', 'w')
+        output_file.write(json.dumps(heuristic_label_dict))
+
+        eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table.csv')
+
         jinja_context['test_methods'].append(method_context)
 
     # render template to generate source code for test class
@@ -132,7 +186,9 @@ def generate_selenium_api_tests(config, crawl_dir):
 
 def __create_method_name_for_path(path):
     """Creates method name from crawl/test path.
+
     Creates test method name for the given path by concatenating IDs of the states in the path.
+
     Args:
         path (str): crawl/test path to create test method name for
     Returns:
@@ -146,8 +202,10 @@ def __create_method_name_for_path(path):
 
 def __get_context_for_eventable(eventable, label):
     """Creates jinja context for an eventable.
+
     Creates and returns jinja context for the given eventable for rendering the test class code template.
     """
+
     context = {
         'event_type': eventable['eventType'],
         'by_method': __get_by_method_for_eventable(eventable['identification']),
@@ -169,8 +227,10 @@ def __get_context_for_eventable(eventable, label):
 
 def __get_by_method_for_eventable(elem_identification):
     """Computes Selenium's By method to use for the given web element identification info.
+
     Computes Selenium's By method to be used for locating the web element with the given identification
     information. Maps identification's "how" value to one of the Selenium API methods.
+
     Args:
         elem_identification (dict): identification information for a web element
     Returns:
@@ -193,6 +253,7 @@ def __get_by_method_for_eventable(elem_identification):
 
 def __write_generated_code(pom_xml, test_class_code, crawl_dir):
     """Writes generated pom and test class code to files.
+
     Writes pom and test class to files under selenium API test root dir. Copies testng.xml from the crawl
     root dir to the selenium API test root dir
     """
@@ -208,11 +269,12 @@ def __write_generated_code(pom_xml, test_class_code, crawl_dir):
     logging.info('Wrote test class to {}'.format(selenium_api_test_class_dir))
 
     # copy testng xml from crawl root dir to test root dir
-    shutil.copy(os.path.join(crawl_dir, 'testng.xml'), selenium_api_test_root)
+    # shutil.copy(os.path.join(crawl_dir, 'testng.xml'), selenium_api_test_root)
 
 
 def __clean_up_crawl_artifacts(crawl_dir):
     """Cleans up crawl artifacts.
+
     Deletes crawl artifacts related to crawljax API test cases. Retains the crawl model and related visualization
     artifacts.
     """
@@ -226,13 +288,13 @@ def __clean_up_crawl_artifacts(crawl_dir):
     # #     os.remove(file)
 
     # delete all json files except the crawl paths files and files required for running crawljax API tests
-    files_to_keep = [
-        os.path.join(crawl_dir, file)
-        for file in [_CRAWL_PATHS_FILE, 'config.json', 'crawlPathsInfo.json', 'result.json']
-    ]
-    for file in glob.glob(os.path.join(crawl_dir, '*.json')):
-        if file not in files_to_keep:
-            os.remove(file)
+    # files_to_keep = [
+    #     os.path.join(crawl_dir, file)
+    #     for file in [_CRAWL_PATHS_FILE, 'config.json', 'crawlPathsInfo.json', 'result.json']
+    # ]
+    # for file in glob.glob(os.path.join(crawl_dir, '*.json')):
+    #     if file not in files_to_keep:
+    #         os.remove(file)
 
     # remove run scripts
     for file in glob.glob(os.path.join(crawl_dir, 'run.*')):
@@ -240,14 +302,15 @@ def __clean_up_crawl_artifacts(crawl_dir):
 
 
 if __name__ == '__main__':  # pragma: no cover
+    # generate_selenium_api_tests()
     logging_util.init_logging('generate_selenium.log', 'INFO')
     app_config = {
         'general': {
             'log-level': 'WARNING',
             # 'app_name': 'petclinic',
             # 'app_url': 'http://localhost:8080'
-            'app_name': 'addressbook',
-            'app_url': 'http://localhost:3000/addressbook/'
+            'app_name': 'TMF',
+            'app_url': 'xxx'
         },
         'generate': {
             'browser': 'chrome_headless',
@@ -255,6 +318,6 @@ if __name__ == '__main__':  # pragma: no cover
             'wait_after_reload': 500
         }
     }
-    app_crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl1'
+    app_crawl_dir = ''
     # app_crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_3mins/localhost/crawl0'
     generate_selenium_api_tests(app_config, app_crawl_dir)

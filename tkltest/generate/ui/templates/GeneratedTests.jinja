@@ -197,10 +197,12 @@ public class GeneratedTests {
     {% for eventable in method.eventables %}
 
         {% for form_input in eventable.form_inputs %}
+        // {{form_input.comment}}
         {# element = driver.findElement({{form_input.by_method}}); #}
         element = this.webDriverWait.until(ExpectedConditions.presenceOfElementLocated({{form_input.by_method}}));
         this.handleFormField(element, "{{form_input.type}}", "{{form_input.value}}", {{form_input.checked}});
         {% endfor %}
+
         // {{eventable.comment}}
         {# element = driver.findElement({{eventable.by_method}}); #}
         element = this.webDriverWait.until(ExpectedConditions.elementToBeClickable({{eventable.by_method}}));
