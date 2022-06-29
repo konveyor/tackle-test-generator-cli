@@ -31,7 +31,7 @@ import pandas as pd
 
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
-_CRAWL_PATHS_FILE = 'crawl_paths_addressbook_small.json'
+_CRAWL_PATHS_FILE = 'crawl_paths_tmf.json'
 
 
 def generate_selenium_api_tests(config, crawl_dir):
@@ -49,7 +49,8 @@ def generate_selenium_api_tests(config, crawl_dir):
         crawl_dir (dict): Root crawl directory created by Crawljax for the current test-generation run
     """
     logging.info('Creating Selenium API tests from paths in {}'.format(os.path.join(crawl_dir, _CRAWL_PATHS_FILE)))
-    app_name = config['general']['app_name']
+    # app_name = config['general']['app_name']
+    app_name = _CRAWL_PATHS_FILE[12:-5]
     app_url = config['general']['app_url']
     browser = config['generate']['browser']
 
@@ -63,6 +64,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         lstrip_blocks=True,
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
     )
+    print("environment =",jinja_env.loader.list_templates())
     logging.info('Jinja environment created')
 
     # load pom template, render it, and write to pom.xml file
@@ -94,7 +96,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     }
 
     # iterate over crawl paths and construct context for each test method
-    method_name_count = {}
+    method_eventables_path_count = {}
 
     # get heuristic labels for each eventable based on its ranked attributes
     with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
@@ -107,21 +109,25 @@ def generate_selenium_api_tests(config, crawl_dir):
     empty_clickable_labels = 0
     empty_form_field_labels = 0
     eventable_dom_label_table = []
+    form_field_dom_label_table = []
+
+    heuristic_label.get_element_and_method_labels(crawl_paths)
 
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
-        method_name = __create_method_name_for_path(crawl_path)
-        logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_name))
-        if method_name in method_name_count:
-            method_name_count[method_name] = method_name_count[method_name] + 1
-            method_name = '{}_dup{}'.format(method_name, method_name_count[method_name])
-            logging.info('Creating duplicate test method: {}'.format(method_name))
+        method_eventables_path = __create_method_name_for_path(crawl_path)
+        logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_eventables_path))
+        if method_eventables_path in method_eventables_path_count:
+            method_eventables_path_count[method_eventables_path] = method_eventables_path_count[method_eventables_path] + 1
+            method_eventables_path = '{}_dup{}'.format(method_eventables_path, method_eventables_path_count[method_eventables_path])
+            logging.info('Creating duplicate test method: {}'.format(method_eventables_path))
         else:
-            method_name_count[method_name] = 0
+            method_eventables_path_count[method_eventables_path] = 0
         method_context = {
+            'comment': heuristic_label.method_labels[method_eventables_path[10:]],
             'priority': path_num,
-            'name': method_name,
-            'eventables': []
+            'name': method_eventables_path,
+            'eventables': [],
         }
         for eventable in crawl_path:
             heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
@@ -138,16 +144,33 @@ def generate_selenium_api_tests(config, crawl_dir):
             total_form_field_elements += len(heuristic_label_dict[eventable['id']][1])
             if heuristic_label_dict[eventable['id']][0] == '':
                 empty_clickable_labels += 1
-            for form_field_label in heuristic_label_dict[eventable['id']][1]:
+            i = 0
+            for form_input in eventable['relatedFormInputs']:
+                form_field_dom = heuristic_label.find_element(eventable['source']['dom'],
+                                                form_input['identification']['value'].lower(), 'str')
+                form_field_label = heuristic_label_dict[eventable['id']][1][i]
+                form_field_dom_label_table.append([form_field_dom, form_field_label])
                 if form_field_label == 'Enter data into form field':
                     empty_form_field_labels += 1
+                i += 1
+
+            # for form_field_label in heuristic_label_dict[eventable['id']][1]:
+            #     if form_field_label == 'Enter data into form field':
+            #         empty_form_field_labels += 1
+
             if eventable['id'] not in heuristic_label_dict:
                 heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
             label = heuristic_label_dict[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
+            # method_name.append(heuristic_label_dict[eventable['id']][0].replace(' ', '_'))
+        # method_context['name'] = '__'.join(method_eventables_path)
+        eventable_id_path = '_'.join([
+            str(eventable['id']) for eventable in crawl_path
+        ])
         eventable_dom_label_table = pd.DataFrame(eventable_dom_label_table,
                                                  columns=['id', 'eventable[element]', 'curr_dom', 'context_dom',
                                                           'label'])
+        form_field_dom_label_table = pd.DataFrame(form_field_dom_label_table, columns=['form_field_dom','label'])
         clickable_percentage = 'N/A'
         if total_clickables > 0:
             clickable_percentage = (1 - empty_clickable_labels / total_clickables) * 100
@@ -163,13 +186,14 @@ def generate_selenium_api_tests(config, crawl_dir):
         if not (os.path.exists(analysis_outputs_path)):
             os.makedirs(analysis_outputs_path)
 
-        output_file = open('analysis_outputs/label_analysis_results.json', 'w')
+        output_file = open('analysis_outputs/label_analysis_results_' + app_name + '.json', 'w')
         output_file.write(json.dumps(results))
 
-        output_file = open('analysis_outputs/labels_computed.json', 'w')
+        output_file = open('analysis_outputs/labels_computed_' + app_name + '.json', 'w')
         output_file.write(json.dumps(heuristic_label_dict))
 
-        eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table.csv')
+        eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_' + app_name + '.csv')
+        form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_' + app_name + '.csv')
 
         jinja_context['test_methods'].append(method_context)
 
@@ -178,10 +202,11 @@ def generate_selenium_api_tests(config, crawl_dir):
     logging.info('Generated test class')
 
     # write pom and test class to files
-    __write_generated_code(pom_xml=pom_xml, test_class_code=testclass_code, crawl_dir=crawl_dir)
+    __write_generated_code(pom_xml=pom_xml, test_class_code=testclass_code, crawl_dir=crawl_dir, app_name=app_name)
 
     # clean up crawl folder
     __clean_up_crawl_artifacts(crawl_dir)
+
 
 
 def __create_method_name_for_path(path):
@@ -251,7 +276,7 @@ def __get_by_method_for_eventable(elem_identification):
     return web_element
 
 
-def __write_generated_code(pom_xml, test_class_code, crawl_dir):
+def __write_generated_code(pom_xml, test_class_code, crawl_dir, app_name):
     """Writes generated pom and test class code to files.
 
     Writes pom and test class to files under selenium API test root dir. Copies testng.xml from the crawl
@@ -264,7 +289,7 @@ def __write_generated_code(pom_xml, test_class_code, crawl_dir):
     with open(os.path.join(selenium_api_test_root, _POM_FILE), 'w') as f:
         f.write(pom_xml)
     logging.info('Wrote {} to {}'.format(_POM_FILE, os.path.join(crawl_dir, constants.SELENIUM_API_TEST_ROOT)))
-    with open(os.path.join(crawl_dir, constants.SELENIUM_API_TEST_FILE), 'w') as f:
+    with open(os.path.join(crawl_dir, constants.SELENIUM_API_TEST_FILE[:-5] + '_' + app_name + '.java'), 'w') as f:
         f.write(test_class_code)
     logging.info('Wrote test class to {}'.format(selenium_api_test_class_dir))
 

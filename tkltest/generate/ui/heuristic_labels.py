@@ -10,7 +10,6 @@ import xmltodict as xd
 from io import StringIO
 import collections
 from keybert import KeyBERT
-
 from importlib import resources
 from flair.data import Sentence
 from flair.models import SequenceTagger
@@ -56,6 +55,8 @@ class HeuristicLabel:
 
         # set of ranked attributes, to search efficiently
         self.rankings_set = set(self.ranked_attributes)
+        self.eventable_counts = dict()
+        self.eventable_labels = dict()
 
 
         with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
@@ -152,6 +153,76 @@ class HeuristicLabel:
 
     ########################################## Compute Labels ########################################################
 
+    def get_element_and_method_labels(self, crawl_paths):
+        """
+        Get element level and method level labels
+
+        Parameters:
+            crawl_paths (list): list of crawl paths, output by CrawlJax
+
+        Returns:
+            None (stores element and method level labels in self.eventable_labels and self.method_labels
+
+        """
+        for crawl_path in crawl_paths:
+            for eventable in crawl_path:
+                self.get_label(eventable)
+        self.get_label_counts(crawl_paths)
+        self.method_labels = dict()
+        for crawl_path in crawl_paths:
+            eventable_id_path = '_'.join([
+                str(eventable['id']) for eventable in crawl_path
+            ])
+            method_label = self.get_method_label(crawl_path)
+            self.method_labels[eventable_id_path] = method_label
+
+
+    def get_label_counts(self, crawl_paths):
+        """
+        Calculates frequency of occurrence of each clickable label
+
+        Parameters:
+            crawl_paths (list): list of crawl paths
+
+        Returns:
+            None (stores label frequencies in self.label_counts)
+
+        """
+        self.label_counts = dict()
+        for crawl_path in crawl_paths:
+            for eventable in crawl_path:
+                eventable_label = self.eventable_labels[eventable['id']][0]
+                if eventable_label not in self.label_counts:
+                    self.label_counts[eventable_label] = 0
+                self.label_counts[eventable_label] += 1
+
+
+    def get_method_label(self, crawl_path):
+        """
+        Calculates method level label
+
+        Parameters:
+            crawl_path (list): a single crawl path, depicting a single output test method
+
+        Returns:
+            method_label (str): label for the method
+
+        """
+        curr_eventable_labels = [
+            self.eventable_labels[eventable['id']][0] for eventable in crawl_path
+        ]
+
+        sorted_eventable_labels = sorted(curr_eventable_labels, key=lambda ele: self.label_counts[ele])
+        method_label = []
+        for eventable_label in sorted_eventable_labels:
+            if eventable_label in method_label:
+                continue
+            method_label.append(eventable_label)
+            if self.label_counts[eventable_label] == 1:
+                break  # unique
+        return ', '.join(method_label)
+
+
     def get_label(self, eventable):
         """
         Get the label for an eventable element, either based on element or its context (in the case of no relevant element attributes)
@@ -162,6 +233,8 @@ class HeuristicLabel:
         Returns:
             label (str): The label for this eventable based on either the element or its context dom """
 
+        if eventable['id'] in self.eventable_labels:
+            return self.eventable_labels[eventable['id']]
 
         heuristic_label = self.get_element_label(eventable['element'])
 
@@ -183,8 +256,6 @@ class HeuristicLabel:
 
         for word in heuristic_label_pos:
             if heuristic_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
-
-
                 contains_verb = True
                 break
         if not contains_verb:
@@ -193,6 +264,7 @@ class HeuristicLabel:
         form_field_labels = []
         for form_input in eventable['relatedFormInputs']:
             form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification']['value'].lower(), 'str')
+            # print('Form field dom:\n',form_field_dom)
 
             form_field_label = self.get_form_field_label(form_field_dom).strip()
 
@@ -213,7 +285,10 @@ class HeuristicLabel:
                 form_field_label = 'Enter data into form field'
             form_field_labels.append(form_field_label)
 
+        self.eventable_labels[eventable['id']] = [heuristic_label, form_field_labels]
+
         return [heuristic_label, form_field_labels]
+
 
     def get_form_field_label(self, form_field_dom:str):
         """
@@ -295,7 +370,6 @@ class HeuristicLabel:
         return element_label
 
 
-
     def get_context_label(self, context_dom: str):
         """
         Get label for a context DOM
@@ -330,6 +404,7 @@ class HeuristicLabel:
         label = self.process_attribute_value(label)
         return label.strip()
 
+
     def find_element(self, state_dom: str, eventable_element_xpath: str, return_format: str = 'dom'):
         """
         Locates the eventable element in the web page
@@ -356,6 +431,7 @@ class HeuristicLabel:
             logging.debug(e)
             return None
 
+
     def get_context_dom(self, state_dom: str, eventable_element_xpath: str):
         """
         Gets context dom of the eventable element by finding the oldest parent of the eventable element without another child
@@ -370,10 +446,8 @@ class HeuristicLabel:
 
         curr_dom = self.find_element(state_dom, eventable_element_xpath)
 
-        # TODO: ask about space
-
         if curr_dom is None:
-            return " "
+            return ""
         # stop when we find more than one eventable element
         # at most find the fourth parent
         iterations = 0
@@ -399,6 +473,7 @@ class HeuristicLabel:
             iterations += 1
         return etree.tostring(curr_dom).decode('UTF-8')
 
+
     def contains_more_than_one_eventable(self, dom):
         """
         Checks whether the DOM has more than one eventable
@@ -416,6 +491,7 @@ class HeuristicLabel:
         if len(xpath_res) > 1:
             return True
         return False
+
 
     def preprocess_eventable_element_details(self, eventable_element_details):
         """
@@ -436,6 +512,7 @@ class HeuristicLabel:
         logging.debug(f"text: {text}")
         preprocessed_eventable_details = self.preprocess(text)
         return preprocessed_eventable_details
+
 
     def process_attribute_value(self, text):
         # TODO: check how this is different from normal preprocessing
@@ -466,6 +543,7 @@ class HeuristicLabel:
         logging.debug(f"text: {text}, isEnglish: {english}, element label: {preprocessed_attr}")
         return preprocessed_attr.strip()
 
+
     def parse_dom_to_dict(self, dom: str):
         """
         Parses input string dom to a dict using the xmltodict library
@@ -480,6 +558,7 @@ class HeuristicLabel:
         context_dom_dict = xd.parse(context_dom_str)
         # print(f"context dom dict: {context_dom_dict}")
         return context_dom_dict
+
 
     def dict_value_to_str(self, context_dom_input):
         """
