@@ -10,6 +10,7 @@ import xmltodict as xd
 from io import StringIO
 import collections
 from keybert import KeyBERT
+
 from importlib import resources
 from flair.data import Sentence
 from flair.models import SequenceTagger
@@ -57,6 +58,12 @@ class HeuristicLabel:
         self.rankings_set = set(self.ranked_attributes)
         self.eventable_counts = dict()
         self.eventable_labels = dict()
+
+
+        with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
+            with open(attr_file) as f:
+                self.ranked_attributes_form_fields = json.load(f)
+
 
 
         with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
@@ -233,8 +240,10 @@ class HeuristicLabel:
         Returns:
             label (str): The label for this eventable based on either the element or its context dom """
 
+
         if eventable['id'] in self.eventable_labels:
             return self.eventable_labels[eventable['id']]
+
 
         heuristic_label = self.get_element_label(eventable['element'])
 
@@ -264,7 +273,7 @@ class HeuristicLabel:
         form_field_labels = []
         for form_input in eventable['relatedFormInputs']:
             form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification']['value'].lower(), 'str')
-            # print('Form field dom:\n',form_field_dom)
+
 
             form_field_label = self.get_form_field_label(form_field_dom).strip()
 
@@ -288,6 +297,7 @@ class HeuristicLabel:
         self.eventable_labels[eventable['id']] = [heuristic_label, form_field_labels]
 
         return [heuristic_label, form_field_labels]
+
 
 
     def get_form_field_label(self, form_field_dom:str):
@@ -368,6 +378,7 @@ class HeuristicLabel:
         logging.info('Got highest ranked attribute for this eventable')
 
         return element_label
+
 
 
     def get_context_label(self, context_dom: str):
