@@ -10,10 +10,8 @@ class HeuristicLabelTest(unittest.TestCase):
 
     def test_heuristic_labels(self):
         """ Test the get_label function of the HeuristicLabel class by testing on example labels
-
                 Parameters:
                             None
-
                 Returns:
                             Assertion that labels are correctly produced for a few addressbook and petclinic DOM fragments """
 
@@ -23,8 +21,6 @@ class HeuristicLabelTest(unittest.TestCase):
         with open(os.path.join(self.helper_file_dir, 'crawl_paths_petclinic_small.json')) as file2:
             crawl_paths_petclinic = json.load(file2)
 
-        with resources.path('test.ui.helper_files', 'ranked_attributes_short.json') as attr_file:
-            heuristic_label = HeuristicLabel(str(attr_file))
 
 
         correct_labels = [{2: ['click post login', ['enter user', 'enter password']], 3: ['click birthday',
@@ -50,20 +46,22 @@ class HeuristicLabelTest(unittest.TestCase):
         # check for all DOM fragments in these two files, that labels are produced correctly
 
         for file_num, crawl_paths in enumerate([crawl_paths_addressbook, crawl_paths_petclinic]):
+            with resources.path('test.ui.helper_files', 'ranked_attributes_short.json') as attr_file:
+                heuristic_label = HeuristicLabel(str(attr_file))
+            heuristic_label.get_element_and_method_labels(crawl_paths)
             for crawl_path in crawl_paths:
                 for eventable in crawl_path:
                     [eventable_label, form_field_labels] = heuristic_label.get_label(eventable)
+                    print('\n\n\n',[eventable_label, form_field_labels])
+                    print('correct label:')
+                    print(correct_labels[file_num][eventable['id']][0])
+                    print(correct_labels[file_num][eventable['id']][1])
                     assert (eventable_label == correct_labels[file_num][eventable['id']][0])
                     for i, form_field_label in enumerate(form_field_labels):
                         assert (form_field_label == correct_labels[file_num][eventable['id']][1][i])
+                    # assert (heuristic_label.method_labels[])
 
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
-
-
-
