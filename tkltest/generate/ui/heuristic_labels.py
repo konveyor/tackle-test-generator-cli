@@ -340,7 +340,9 @@ class HeuristicLabel:
                 form_field_label = 'enter data into form field'
                 form_field_labels.append(form_field_label)
                 continue
-            form_field_label = form_field_dom.get('value')
+            form_field_label = form_field_dom.get('aria-label')
+            if not form_field_label:
+                form_field_label = form_field_dom.get('value')
             if not form_field_dom.get('id'):
                 # label must be previous sibling
                 previous_sibling = form_field_dom.getprevious()
