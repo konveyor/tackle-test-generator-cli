@@ -102,6 +102,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         # for each path create a jinja context for the test method to be generated
         method_name = __create_method_name_for_path(crawl_path)
         logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_name))
+        method_path = method_name[10:] # first 10 characters are 'test_path_'
         if method_name in method_name_count:
             method_name_count[method_name] = method_name_count[method_name] + 1
             method_name = '{}_dup{}'.format(method_name, method_name_count[method_name])
@@ -109,7 +110,7 @@ def generate_selenium_api_tests(config, crawl_dir):
         else:
             method_name_count[method_name] = 0
         method_context = {
-            'comment': heuristic_label.method_labels[method_name[10:]], # first 10 characters are 'test_path_'
+            'comment': heuristic_label.method_labels[method_path],
             'priority': path_num,
             'name': method_name,
             'eventables': []

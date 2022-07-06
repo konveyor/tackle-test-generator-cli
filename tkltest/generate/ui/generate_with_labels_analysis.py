@@ -138,7 +138,7 @@ def generate_selenium_api_tests(config, crawl_dir):
 
         }
         for eventable in crawl_path:
-            heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
+
             eventable_dom_label_table.append([eventable['id'],
                                               eventable['element'],
                                               heuristic_label.find_element(eventable['source']['dom'],
@@ -147,65 +147,60 @@ def generate_selenium_api_tests(config, crawl_dir):
                                               heuristic_label.get_context_dom(eventable['source']['dom'],
                                                                               eventable['identification'][
                                                                                   'value'].lower()),
-                                              heuristic_label_dict[eventable['id']][0]])
+                                              heuristic_label.eventable_labels[eventable['id']][0]])
             total_clickables += 1
-            total_form_field_elements += len(heuristic_label_dict[eventable['id']][1])
-            if heuristic_label_dict[eventable['id']][0] == '':
+            total_form_field_elements += len(heuristic_label.eventable_labels[eventable['id']][1])
+            if heuristic_label.eventable_labels[eventable['id']][0] == '':
                 empty_clickable_labels += 1
 
             i = 0
             for form_input in eventable['relatedFormInputs']:
                 form_field_dom = heuristic_label.find_element(eventable['source']['dom'],
                                                 form_input['identification']['value'].lower(), 'str')
-                form_field_label = heuristic_label_dict[eventable['id']][1][i]
-                form_field_dom_label_table.append([form_field_dom, form_field_label])
-                if form_field_label == 'Enter data into form field':
+                form_field_extended_dom = heuristic_label.get_form_field_extended_dom(eventable['source']['dom'],
+                                                form_input['identification']['value'].lower(), 'str')
+                form_field_label = heuristic_label.eventable_labels[eventable['id']][1][i]
+
+                form_field_dom_label_table.append([form_field_dom, form_field_extended_dom, form_field_label])
+
+                if form_field_label in ['enter data into form field', 'select element']:
                     empty_form_field_labels += 1
                 i += 1
 
-
-            if eventable['id'] not in heuristic_label_dict:
-                heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
-            label = heuristic_label_dict[eventable['id']]
+            label = heuristic_label.eventable_labels[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
-
-            # method_name.append(heuristic_label_dict[eventable['id']][0].replace(' ', '_'))
-        # method_context['name'] = '__'.join(method_eventables_path)
-        eventable_id_path = '_'.join([
-            str(eventable['id']) for eventable in crawl_path
-        ])
-        eventable_dom_label_table = pd.DataFrame(eventable_dom_label_table,
-                                                 columns=['id', 'eventable[element]', 'curr_dom', 'context_dom',
-                                                          'label'])
-        form_field_dom_label_table = pd.DataFrame(form_field_dom_label_table, columns=['form_field_dom','label'])
-
-        clickable_percentage = 'N/A'
-        if total_clickables > 0:
-            clickable_percentage = (1 - empty_clickable_labels / total_clickables) * 100
-        form_field_percentage = 'N/A'
-        if total_form_field_elements > 0:
-            form_field_percentage = (1 - empty_form_field_labels / total_form_field_elements) * 100
-        results = {'Number of Clickables': total_clickables, 'Number of Form Field Elements': total_form_field_elements,
-                   'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
-                   'Percentage of Labels computed for clickables': clickable_percentage,
-                   'Percentage of labels computed for form fields': form_field_percentage}
-
-        analysis_outputs_path = os.path.join(os.curdir, 'analysis_outputs')
-        if not (os.path.exists(analysis_outputs_path)):
-            os.makedirs(analysis_outputs_path)
-
-
-        output_file = open('analysis_outputs/label_analysis_results_' + app_name + '.json', 'w')
-        output_file.write(json.dumps(results))
-
-        output_file = open('analysis_outputs/labels_computed_' + app_name + '.json', 'w')
-        output_file.write(json.dumps(heuristic_label_dict))
-
-        eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_' + app_name + '.csv')
-        form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_' + app_name + '.csv')
-
-
         jinja_context['test_methods'].append(method_context)
+
+    eventable_dom_label_table = pd.DataFrame(eventable_dom_label_table,
+                                             columns=['id', 'eventable[element]', 'curr_dom', 'context_dom',
+                                                      'label'])
+    form_field_dom_label_table = pd.DataFrame(form_field_dom_label_table, columns=['form_field_dom','form_field_extended_dom', 'label'])
+
+    clickable_percentage = 'N/A'
+    if total_clickables > 0:
+        clickable_percentage = (1 - empty_clickable_labels / total_clickables) * 100
+    form_field_percentage = 'N/A'
+    if total_form_field_elements > 0:
+        form_field_percentage = (1 - empty_form_field_labels / total_form_field_elements) * 100
+    results = {'Number of Clickables': total_clickables, 'Number of Form Field Elements': total_form_field_elements,
+               'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
+               'Percentage of Labels computed for clickables': clickable_percentage,
+               'Percentage of labels computed for form fields': form_field_percentage}
+
+    analysis_outputs_path = os.path.join(os.curdir, 'analysis_outputs')
+    if not (os.path.exists(analysis_outputs_path)):
+        os.makedirs(analysis_outputs_path)
+
+
+    output_file = open('analysis_outputs/label_analysis_results_' + app_name + '.json', 'w')
+    output_file.write(json.dumps(results))
+
+    output_file = open('analysis_outputs/labels_computed_' + app_name + '.json', 'w')
+    output_file.write(json.dumps(heuristic_label_dict))
+
+    eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_' + app_name + '.csv')
+    form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_' + app_name + '.csv')
+
 
     # render template to generate source code for test class
     testclass_code = testclass_template.render(jinja_context)

@@ -21,27 +21,25 @@ class HeuristicLabelTest(unittest.TestCase):
         with open(os.path.join(self.helper_file_dir, 'crawl_paths_petclinic_small.json')) as file2:
             crawl_paths_petclinic = json.load(file2)
 
-
-
         correct_labels = [{2: ['click post login', ['enter user', 'enter password']], 3: ['click birthday',
                                                                                           ['search for any text',
-                                                                                           'enter checkbox',
+                                                                                           'select checkbox',
                                                                                            'enter group',
                                                                                            'enter to group']],
                            4: ['click export',
-                               ['search for any text', 'enter checkbox', 'enter group', 'enter to group']],
+                               ['search for any text', 'select checkbox', 'enter group', 'enter to group']],
                            5: ['click group', []], 6: ['click view',
-                                                       ['search for any text', 'enter checkbox', 'enter group',
-                                                        'enter to group']], 7: ['click note', []], 9: ['click import',
-                                                                                                       [
-                                                                                                           'search for any text',
-                                                                                                           'enter checkbox',
-                                                                                                           'enter group',
-                                                                                                           'enter to group']],
-                           11: ['click note', []],
+                                                       ['search for any text', 'select checkbox', 'enter group',
+                                                        'enter to group']], 7: ['click note', []], 9: ['click import', [
+                'search for any text', 'select checkbox', 'enter group', 'enter to group']], 11: ['click note', []],
                            12: ['click view',
-                                ['search for any text', 'enter checkbox', 'enter group', 'enter to group']]},
+                                ['search for any text', 'select checkbox', 'enter group', 'enter to group']]},
                           {2: ['click veterinarian true', []], 3: ['owner add', []]}]
+
+        correct_method_labels = [
+            {'2_3': 'click post login', '4_5': 'click export', '6_7': 'click view, click note', '9_11': 'click import',
+             '12': 'click view'},
+            {'2_3': 'click veterinarian true'}]
 
         # check for all DOM fragments in these two files, that labels are produced correctly
 
@@ -51,15 +49,14 @@ class HeuristicLabelTest(unittest.TestCase):
             heuristic_label.get_element_and_method_labels(crawl_paths)
             for crawl_path in crawl_paths:
                 for eventable in crawl_path:
-                    [eventable_label, form_field_labels] = heuristic_label.get_label(eventable)
-                    print('\n\n\n',[eventable_label, form_field_labels])
-                    print('correct label:')
-                    print(correct_labels[file_num][eventable['id']][0])
-                    print(correct_labels[file_num][eventable['id']][1])
+                    [eventable_label, form_field_labels] = heuristic_label.eventable_labels[eventable['id']]
                     assert (eventable_label == correct_labels[file_num][eventable['id']][0])
                     for i, form_field_label in enumerate(form_field_labels):
                         assert (form_field_label == correct_labels[file_num][eventable['id']][1][i])
-                    # assert (heuristic_label.method_labels[])
+                    eventable_id_path = '_'.join([
+                        str(eventable['id']) for eventable in crawl_path
+                    ])
+                    assert (heuristic_label.method_labels[eventable_id_path] == correct_method_labels[file_num][eventable_id_path])
 
 
 
