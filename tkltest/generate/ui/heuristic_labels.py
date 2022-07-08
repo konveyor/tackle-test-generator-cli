@@ -172,7 +172,6 @@ class HeuristicLabel:
             None (stores element and method level labels in self.eventable_labels and self.method_labels
 
         """
-
         # to store eventable and method labels
         self.eventable_labels = dict()
         self.method_labels = dict()
@@ -237,12 +236,11 @@ class HeuristicLabel:
         method_label = []
 
         # calculate method label based on sorted eventable labels in this path
-        for eventable_label in sorted_eventable_labels:
-            if eventable_label in method_label:
-                continue
-            method_label.append(eventable_label)
-            if self.label_counts[eventable_label] == 1:
-                break  # unique eventable only occurs in this path, enough for method label
+        if self.label_counts[sorted_eventable_labels[0]] == 1:
+            method_label.append(sorted_eventable_labels[0]) # clickable only occurs in this crawlpath, unique label
+        else:
+            for label in curr_eventable_labels:
+                method_label.append(label) # use all clickables in crawlpath for the label
 
         return ', '.join(method_label)
 
@@ -252,40 +250,50 @@ class HeuristicLabel:
         Get the label for an eventable element, either based on element or its context (in the case of no relevant element attributes)
 
         Parameters:
-            eventable (dict): A json dict of the element field of the eventable
+            eventable (dict): A json dict of the eventable
 
         Returns:
             label (str): The label for this eventable based on either the element or its context dom """
 
+        # get title of the source web page
+        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text
 
         if eventable['id'] in self.eventable_labels:
             return self.eventable_labels[eventable['id']]
 
-        heuristic_label = self.get_element_label(eventable['element'])
+        element_dom = self.find_element(eventable['source']['dom'], eventable['identification']['value'].lower())
 
-        if heuristic_label.strip() == '':
-            context_dom = self.get_context_dom(eventable['source']['dom'],
-                                               eventable['identification']['value'].lower())
-            heuristic_label = self.get_context_label(context_dom)
+        heuristic_label = ''
+        if element_dom is not None:
+            # check if this element dom has text
+            heuristic_label = element_dom.text
 
-        heuristic_label = heuristic_label.strip()
+        if not heuristic_label or heuristic_label == '':
+            heuristic_label = self.get_element_label(eventable['element'])
 
+            if heuristic_label.strip() == '':
+                context_dom = self.get_context_dom(eventable['source']['dom'],
+                                                   eventable['identification']['value'].lower())
+                heuristic_label = self.get_context_label(context_dom)
+
+        heuristic_label = heuristic_label.strip().lower()
         # load tagger
-        tagger = SequenceTagger.load("flair/pos-english")
-        heuristic_label_flair = Sentence(heuristic_label)
-        tagger.predict(heuristic_label_flair)
+        # tagger = SequenceTagger.load("flair/pos-english")
+        # heuristic_label_flair = Sentence(heuristic_label)
+        # tagger.predict(heuristic_label_flair)
         contains_verb = False
-        heuristic_label_pos = dict()
-        for token in heuristic_label_flair.tokens:
-            heuristic_label_pos[token.text] = token.labels[0].value
+        # heuristic_label_pos = dict()
+        # for token in heuristic_label_flair.tokens:
+        #     heuristic_label_pos[token.text] = token.labels[0].value
+        #
+        # for word in heuristic_label_pos:
+        #     if heuristic_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+        #         contains_verb = True
+        #         break
 
-        for word in heuristic_label_pos:
-            if heuristic_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
-                contains_verb = True
-                break
-
-        if not contains_verb:
-            heuristic_label = eventable['eventType'] + ' ' + heuristic_label
+        # heuristic_label = 'On page ' + title + ' '
+        heuristic_label = 'On page "' + title + '", ' + eventable['eventType'] + ' "' + heuristic_label + '"'
+        # print(heuristic_label)
 
         form_field_labels = self.get_form_field_labels(eventable)
 
@@ -310,12 +318,12 @@ class HeuristicLabel:
         form_field_dom = self.find_element(source_dom, form_field_xpath)
         if form_field_dom is None:
             return None
-        i = 0
+
         while form_field_dom.getparent():
             form_field_dom = form_field_dom.getparent()
-            if i == 2 or form_field_dom.get('label') is not None or form_field_dom.get('aria-label') is not None:
+            if form_field_dom.get('label') is not None or form_field_dom.get('aria-label') is not None or self.contains_more_than_one_eventable(form_field_dom):
                 break
-            i += 1
+
         if return_format == 'str':
             return etree.tostring(form_field_dom).decode('UTF-8')
         return form_field_dom
@@ -332,70 +340,103 @@ class HeuristicLabel:
             form_field_labels (list): a list of labels corresponding to all the form fields for this eventable
 
         """
+        # get title text for the source dom
+        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text
+
         form_field_labels = []
         for form_input in eventable['relatedFormInputs']:
+
             form_field_dom_str = self.find_element(eventable['source']['dom'], form_input['identification']['value'].lower(), 'str')
+
             form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification']['value'].lower())
+
             if form_field_dom is None:
-                form_field_label = 'enter data into form field'
+                form_field_label = 'On page "' + title + '", enter data into form field'
                 form_field_labels.append(form_field_label)
                 continue
-            form_field_label = form_field_dom.get('aria-label')
-            if not form_field_label:
-                form_field_label = form_field_dom.get('value')
-            if not form_field_dom.get('id'):
-                # label must be previous sibling
-                previous_sibling = form_field_dom.getprevious()
-                if previous_sibling is not None:
-                    form_field_label = previous_sibling.text
-            else:
-                form_field_id = form_field_dom.get('id')
-                for sibling in form_field_dom.itersiblings(preceding=True):
-                    if sibling.get('for') == form_field_id:
-                        form_field_label = sibling.text
+
+            # check if form field dom has any text
+            form_field_label = form_field_dom.text
+
+            # if no text found in form field dom, try to get the label sibling of this dom
+            if not form_field_label or form_field_label == '':
+
+                # if no id, only previous sibling of the form field dom can be its label
+                if not form_field_dom.get('id'):
+                    previous_sibling = form_field_dom.getprevious()
+                    if previous_sibling is not None:
+                        form_field_label = previous_sibling.text
+
+                # if id, search for the preceding sibling which has this id
+                else:
+                    form_field_id = form_field_dom.get('id')
+                    for sibling in form_field_dom.itersiblings(preceding=True):
+                        if sibling.get('for') == form_field_id:
+                            form_field_label = sibling.text
+                            break
+
+            # if no label elements found, check for a few useful attributes
+            if not form_field_label or form_field_label == '':
+                for attr in ['aria-label', 'value', 'placeholder']:
+                    form_field_label = form_field_dom.get(attr)
+                    if form_field_label is not None:
                         break
+
+            # if still no label has been generated, check in the extended dom of the form field for a label or aria-label
             if not form_field_label or form_field_label == '':
                 form_field_extended_dom = self.get_form_field_extended_dom(eventable['source']['dom'], form_input['identification']['value'].lower())
                 if form_field_extended_dom is not None:
                     form_field_label = form_field_extended_dom.get('label')
                     if not form_field_label:
                         form_field_label = form_field_extended_dom.get('aria-label')
+
+            # if no label has been generated so far, check directly with the ranked attributes for form fields
             if not form_field_label or form_field_label == '':
                 form_field_label = self.get_form_field_label_by_attribute(form_field_dom_str)
 
+            # get type of the form field
             form_field_type = form_field_dom.get('type')
-            tagger = SequenceTagger.load("flair/pos-english")
-            form_field_label_flair = Sentence(form_field_label)
-            tagger.predict(form_field_label_flair)
-            contains_verb = False
-            form_field_label_pos = dict()
-            for token in form_field_label_flair.tokens:
-                form_field_label_pos[token.text] = token.labels[0].value
-            for word in form_field_label_pos:
-                if form_field_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
-                    contains_verb = True
-                    break
-            if len(form_field_label_pos) > 0 and not contains_verb:
-                if form_field_type in ['checkbox', 'file', 'radio']:
-                    form_field_label = 'select ' + form_field_label
-                else:
-                    form_field_label = 'enter ' + form_field_label
 
-            form_field_label = form_field_label.lower()
+            # tagger = SequenceTagger.load("flair/pos-english")
+            # form_field_label_flair = Sentence(form_field_label)
+            # tagger.predict(form_field_label_flair)
+            # contains_verb = False
+            # form_field_label_pos = dict()
+            # for token in form_field_label_flair.tokens:
+            #     form_field_label_pos[token.text] = token.labels[0].value
+            # for word in form_field_label_pos:
+            #     if form_field_label_pos[word] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+            #         contains_verb = True
+            #         break
+            # if len(form_field_label_pos) > 0 and not contains_verb:
+            #     if form_field_type in ['checkbox', 'file', 'radio']:
+            #         form_field_label = 'select ' + form_field_label
+            #     else:
+            #         form_field_label = 'enter ' + form_field_label
+
+            form_field_label = form_field_label.strip().lower()
+
+            # remove punctuation
             punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
             for chr in form_field_label:
                 if chr in punc:
                     form_field_label = form_field_label.replace(chr,'')
 
-            if form_field_label == '':
+            # get final label based on form field type
+            if form_field_label != '':
                 if form_field_type in ['checkbox', 'file', 'radio']:
-                    form_field_label = 'select '+ form_field_type
+                    form_field_label = 'On page "' + title + '", select ' + form_field_label
                 else:
-                    form_field_label = 'enter data into form field'
+                    form_field_label = 'On page "' + title + '", enter ' + form_field_label
+
+            else:
+                if form_field_type in ['checkbox', 'file', 'radio']:
+                    form_field_label = 'On page "' + title + '", ' + 'select ' + form_field_type
+                else:
+                    form_field_label = 'On page "' + title + '", enter data into form field'
 
             form_field_labels.append(form_field_label)
 
-        # print(form_field_labels)
         return form_field_labels
 
 
@@ -440,6 +481,7 @@ class HeuristicLabel:
                     element_label (str): The label for this eventable based on the element itself"""
 
         element_label = ''
+
         for attr in self.ranked_attributes:
 
             if attr == 'text' and attr in eventable:
@@ -595,11 +637,14 @@ class HeuristicLabel:
         Returns:
             Boolean (True if the DOM contains more than one eventable, False otherwise)
         """
-
-        xpath_res = dom.xpath("//*[self::a or self::input[@type='submit'] or self::button]")
+        xpath_res = dom.xpath("//*[self::input[@type='submit']]")
+        # print(etree.tostring(dom).decode('UTF-8'))
+        # xpath_res = dom.xpath("//*[self::a or self::input[@type='submit'] or self::button]")
+        # print(len(xpath_res))
         logging.debug(f"xpath result: {xpath_res}")
         logging.debug(f"length: {len(xpath_res)}")
         if len(xpath_res) > 1:
+            # print('contains more than 1')
             return True
         return False
 

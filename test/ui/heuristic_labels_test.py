@@ -21,25 +21,44 @@ class HeuristicLabelTest(unittest.TestCase):
         with open(os.path.join(self.helper_file_dir, 'crawl_paths_petclinic_small.json')) as file2:
             crawl_paths_petclinic = json.load(file2)
 
-        correct_labels = [{2: ['click post login', ['enter user', 'enter password']], 3: ['click birthday',
-                                                                                          ['search for any text',
-                                                                                           'select checkbox',
-                                                                                           'enter group',
-                                                                                           'enter to group']],
-                           4: ['click export',
-                               ['search for any text', 'select checkbox', 'enter group', 'enter to group']],
-                           5: ['click group', []], 6: ['click view',
-                                                       ['search for any text', 'select checkbox', 'enter group',
-                                                        'enter to group']], 7: ['click note', []], 9: ['click import', [
-                'search for any text', 'select checkbox', 'enter group', 'enter to group']], 11: ['click note', []],
-                           12: ['click view',
-                                ['search for any text', 'select checkbox', 'enter group', 'enter to group']]},
-                          {2: ['click veterinarian true', []], 3: ['owner add', []]}]
+        correct_labels = [{2: ['On page "Address book", click "post login"',
+                               ['On page "Address book", enter user', 'On page "Address book", enter password']],
+                           3: ['On page "Address book", click "next birthdays"',
+                               ['On page "Address book", enter search for any text',
+                                'On page "Address book", select checkbox',
+                                'On page "Address book", enter data into form field',
+                                'On page "Address book", enter to group']],
+                           4: ['On page "Address book", click "export"',
+                               ['On page "Address book", enter search for any text',
+                                'On page "Address book", select checkbox',
+                                'On page "Address book", enter data into form field',
+                                'On page "Address book", enter to group']],
+                           5: ['On page "Address book ([none])", click "groups"', []],
+                           6: ['On page "Address book", click "print all"',
+                               ['On page "Address book", enter search for any text',
+                                'On page "Address book", select checkbox',
+                                'On page "Address book", enter data into form field',
+                                'On page "Address book", enter to group']],
+                           7: ['On page "Address book (cEyhmIaV)", click "v8.0.0 - r475"', []],
+                           9: ['On page "Address book", click "import"',
+                               ['On page "Address book", enter search for any text',
+                                'On page "Address book", select checkbox',
+                                'On page "Address book", enter data into form field',
+                                'On page "Address book", enter to group']],
+                           11: ['On page "Address book ([none])", click "v8.0.0 - r475"', []],
+                           12: ['On page "Address book", click "print phones"',
+                                ['On page "Address book", enter search for any text',
+                                 'On page "Address book", select checkbox',
+                                 'On page "Address book", enter data into form field',
+                                 'On page "Address book", enter to group']]},
+                          {2: ['On page "SpringPetclinicAngular", click "veterinarians"', []],
+                           3: ['On page "SpringPetclinicAngular", click "vet add"', []]}]
 
         correct_method_labels = [
-            {'2_3': 'click post login', '4_5': 'click export', '6_7': 'click view, click note', '9_11': 'click import',
-             '12': 'click view'},
-            {'2_3': 'click veterinarian true'}]
+            {'2_3': 'On page "Address book", click "post login"', '4_5': 'On page "Address book", click "export"',
+             '6_7': 'On page "Address book", click "print all"', '9_11': 'On page "Address book", click "import"',
+             '12': 'On page "Address book", click "print phones"'},
+            {'2_3': 'On page "SpringPetclinicAngular", click "veterinarians"'}]
 
         # check for all DOM fragments in these two files, that labels are produced correctly
 
