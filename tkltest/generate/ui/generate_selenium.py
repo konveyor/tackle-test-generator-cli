@@ -24,7 +24,7 @@ import os.path
 
 from tkltest.util import constants, logging_util
 
-from .heuristic_labels import HeuristicLabel
+from tkltest.generate.ui.heuristic_labels import HeuristicLabel
 
 from importlib import resources
 
@@ -94,13 +94,15 @@ def generate_selenium_api_tests(config, crawl_dir):
     with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
-    # to store eventable id : eventable label
-    heuristic_label_dict = dict()
+    # # to store eventable id : eventable label
+    # heuristic_label_dict = dict()
+    heuristic_label.get_element_and_method_labels(crawl_paths)
 
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
         method_name = __create_method_name_for_path(crawl_path)
         logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_name))
+        method_path = method_name[10:] # first 10 characters are 'test_path_'
         if method_name in method_name_count:
             method_name_count[method_name] = method_name_count[method_name] + 1
             method_name = '{}_dup{}'.format(method_name, method_name_count[method_name])
@@ -108,14 +110,13 @@ def generate_selenium_api_tests(config, crawl_dir):
         else:
             method_name_count[method_name] = 0
         method_context = {
+            'comment': heuristic_label.method_labels[method_path],
             'priority': path_num,
             'name': method_name,
             'eventables': []
         }
         for eventable in crawl_path:
-            if eventable['id'] not in heuristic_label_dict:
-                heuristic_label_dict[eventable['id']] = heuristic_label.get_label(eventable)
-            label = heuristic_label_dict[eventable['id']]
+            label = heuristic_label.eventable_labels[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
         jinja_context['test_methods'].append(method_context)
 
