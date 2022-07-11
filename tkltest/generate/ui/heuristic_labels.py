@@ -755,7 +755,7 @@ class HeuristicLabel:
 if __name__ == "__main__":
     # save analysis outputs in tkltest/generate/ui/analysis_outputs
 
-    file = json.load(open('crawl_paths_tmf_small.json'))
+    file = json.load(open('crawl_paths_petclinic_small.json'))
     curr_labels = dict()
     method_labels = dict()
     total_clickables = 0

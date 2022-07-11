@@ -24,7 +24,7 @@ import os.path
 
 from tkltest.util import constants, logging_util
 
-from .heuristic_labels import HeuristicLabel
+from tkltest.generate.ui.heuristic_labels import HeuristicLabel
 
 from importlib import resources
 
