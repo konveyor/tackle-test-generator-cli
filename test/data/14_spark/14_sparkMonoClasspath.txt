@@ -4,7 +4,7 @@ org/eclipse/jetty/jetty-server/11.0.10/jetty-server-11.0.10.jar
 org/eclipse/jetty/toolchain/jetty-jakarta-servlet-api/5.0.2/jetty-jakarta-servlet-api-5.0.2.jar
 org/eclipse/jetty/jetty-http/11.0.10/jetty-http-11.0.10.jar
 org/eclipse/jetty/jetty-util/11.0.10/jetty-util-11.0.10.jar
-org/eclipse/jetty/jetty-io/11.0.10/jetty-io-11.0.7.jar
+org/eclipse/jetty/jetty-io/11.0.10/jetty-io-11.0.10.jar
 org/eclipse/jetty/jetty-webapp/11.0.10/jetty-webapp-11.0.10.jar
 org/eclipse/jetty/jetty-servlet/11.0.10/jetty-servlet-11.0.10.jar
 org/eclipse/jetty/jetty-security/11.0.10/jetty-security-11.0.10.jar
