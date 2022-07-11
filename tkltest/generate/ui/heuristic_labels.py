@@ -256,7 +256,7 @@ class HeuristicLabel:
             label (str): The label for this eventable based on either the element or its context dom """
 
         # get title of the source web page
-        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text
+        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text.strip()
 
         if eventable['id'] in self.eventable_labels:
             return self.eventable_labels[eventable['id']]
@@ -341,7 +341,7 @@ class HeuristicLabel:
 
         """
         # get title text for the source dom
-        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text
+        title = self.find_element(eventable['source']['dom'], '/html[1]/head[1]/title[1]').text.strip()
 
         form_field_labels = []
         for form_input in eventable['relatedFormInputs']:
@@ -425,19 +425,21 @@ class HeuristicLabel:
             # get final label based on form field type
             if form_field_label != '':
                 if form_field_type in ['checkbox', 'file', 'radio']:
-                    form_field_label = 'On page "' + title + '", select ' + form_field_label
+                    form_field_label = 'On page "' + title + '", select "' + form_field_label + '"'
                 else:
-                    form_field_label = 'On page "' + title + '", enter ' + form_field_label
+                    form_field_label = 'On page "' + title + '", enter "' + form_field_label + '"'
 
             else:
+
                 if form_field_type in ['checkbox', 'file', 'radio']:
-                    form_field_label = 'On page "' + title + '", ' + 'select ' + form_field_type
+                    form_field_label = 'On page "' + title + '", ' + 'select "' + form_field_type + '"'
                 else:
                     form_field_label = 'On page "' + title + '", enter data into form field'
 
             form_field_labels.append(form_field_label)
 
         return form_field_labels
+
 
 
     def get_form_field_label_by_attribute(self, form_field_dom:str):
@@ -753,7 +755,7 @@ class HeuristicLabel:
 if __name__ == "__main__":
     # save analysis outputs in tkltest/generate/ui/analysis_outputs
 
-    file = json.load(open('crawl_paths_petclinic_small.json'))
+    file = json.load(open('crawl_paths_tmf_small.json'))
     curr_labels = dict()
     method_labels = dict()
     total_clickables = 0

@@ -32,7 +32,7 @@ import pandas as pd
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
 
-_CRAWL_PATHS_FILE = 'crawl_paths_tmf.json'
+_CRAWL_PATHS_FILE = 'crawl_paths_tmf_small.json'
 
 
 
