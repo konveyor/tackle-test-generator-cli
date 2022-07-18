@@ -27,7 +27,7 @@ from generate_selenium import __create_method_name_for_path, __get_context_for_e
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
 
-_CRAWL_PATHS_FILE = 'crawl_paths_tmf.json'
+_CRAWL_PATHS_FILE = 'crawl_paths_mdh.json'
 
 
 
@@ -92,7 +92,7 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
         heuristic_label = HeuristicLabel(str(attr_file))
 
     # to store analysis outputs
-    heuristic_label_dict = dict()
+
     total_clickables = 0
     total_form_field_elements = 0
     empty_clickable_labels = 0
@@ -133,8 +133,6 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
                                               heuristic_label.eventable_labels[eventable['id']][0]])
             total_clickables += 1
             total_form_field_elements += len(heuristic_label.eventable_labels[eventable['id']][1])
-            if heuristic_label.eventable_labels[eventable['id']][0] == '':
-                empty_clickable_labels += 1
 
             i = 0
             for form_input in eventable['relatedFormInputs']:
@@ -145,9 +143,6 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
                 form_field_label = heuristic_label.eventable_labels[eventable['id']][1][i]
 
                 form_field_dom_label_table.append([form_field_dom, form_field_extended_dom, form_field_label])
-
-                if form_field_label in ['enter data into form field', 'select element']:
-                    empty_form_field_labels += 1
                 i += 1
 
             label = heuristic_label.eventable_labels[eventable['id']]
@@ -161,12 +156,12 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
 
     clickable_percentage = 'N/A'
     if total_clickables > 0:
-        clickable_percentage = (1 - empty_clickable_labels / total_clickables) * 100
+        clickable_percentage = (1 - heuristic_label.empty_eventable_labels / len(heuristic_label.eventable_labels)) * 100
     form_field_percentage = 'N/A'
     if total_form_field_elements > 0:
-        form_field_percentage = (1 - empty_form_field_labels / total_form_field_elements) * 100
-    results = {'Number of Clickables': total_clickables, 'Number of Form Field Elements': total_form_field_elements,
-               'Empty Clickable Labels': empty_clickable_labels, 'Empty Form Field Labels': empty_form_field_labels,
+        form_field_percentage = (1 - heuristic_label.empty_form_field_labels / total_form_field_elements) * 100
+    results = {'Number of Clickables': len(heuristic_label.eventable_labels), 'Number of Form Field Elements': total_form_field_elements,
+               'Empty Clickable Labels': heuristic_label.empty_eventable_labels, 'Empty Form Field Labels': heuristic_label.empty_form_field_labels,
                'Percentage of Labels computed for clickables': clickable_percentage,
                'Percentage of labels computed for form fields': form_field_percentage}
 
@@ -174,12 +169,8 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
     if not (os.path.exists(analysis_outputs_path)):
         os.makedirs(analysis_outputs_path)
 
-
     output_file = open('analysis_outputs/label_analysis_results_' + app_name + '.json', 'w')
     output_file.write(json.dumps(results))
-
-    output_file = open('analysis_outputs/labels_computed_' + app_name + '.json', 'w')
-    output_file.write(json.dumps(heuristic_label_dict))
 
     eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_' + app_name + '.csv')
     form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_' + app_name + '.csv')

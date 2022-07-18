@@ -65,6 +65,9 @@ class HeuristicLabel:
             with open(attr_file) as f:
                 self.ranked_attributes_form_fields = json.load(f)
 
+        self.empty_eventable_labels = 0
+        self.empty_form_field_labels = 0
+
 
 
     ########################################## NLP preprocessing ########################################################
@@ -250,13 +253,13 @@ class HeuristicLabel:
         Returns:
             label (str): The label for this eventable based on either the element or its context dom """
 
+        if eventable['id'] in self.eventable_labels:
+            return self.eventable_labels[eventable['id']]
+
         # get title of the source web page
         tree = html.fromstring(eventable['source']['dom'])
         title_element = tree.xpath('/html[1]/head[1]/title[1]')
         title = title_element[0].text.strip()
-
-        if eventable['id'] in self.eventable_labels:
-            return self.eventable_labels[eventable['id']]
 
         element_dom = self.find_element(eventable['source']['dom'], eventable['identification'])
 
@@ -276,6 +279,8 @@ class HeuristicLabel:
                 heuristic_label = self.get_context_label(context_dom)
 
         heuristic_label = heuristic_label.strip().lower()
+        if heuristic_label == '':
+            self.empty_eventable_labels += 1
 
         # add title and verb to label
         heuristic_label = 'On page "' + title + '", ' + eventable['eventType'] + ' "' + heuristic_label + '"'
@@ -344,6 +349,8 @@ class HeuristicLabel:
 
             # form field dom not found
             if form_field_dom is None:
+                # if no dom found, not possible to calculate the label
+                self.empty_form_field_labels += 1
                 form_field_label = 'On page "' + title + '", enter data into form field'
                 form_field_labels.append(form_field_label)
                 continue
@@ -415,6 +422,7 @@ class HeuristicLabel:
 
                 # empty form field label
                 else:
+                    self.empty_form_field_labels += 1
                     if form_field_type in ['checkbox', 'file', 'radio']:
                         form_field_label = 'On page "' + title + '", ' + 'select "' + form_field_type + '"'
                     else:
