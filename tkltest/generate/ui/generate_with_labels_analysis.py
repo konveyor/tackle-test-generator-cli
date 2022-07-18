@@ -105,18 +105,19 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
 
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
-        method_eventables_path = __create_method_name_for_path(crawl_path)
-        logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_eventables_path))
+        method_name = __create_method_name_for_path(crawl_path)
+        method_eventables_path = method_name[10:]
+        logging.info('Path {}: length={}, {}'.format(path_num, len(crawl_path), method_name))
         if method_eventables_path in method_eventables_path_count:
             method_eventables_path_count[method_eventables_path] = method_eventables_path_count[method_eventables_path] + 1
-            method_eventables_path = '{}_dup{}'.format(method_eventables_path, method_eventables_path_count[method_eventables_path])
-            logging.info('Creating duplicate test method: {}'.format(method_eventables_path))
+            method_name = '{}_dup{}'.format(method_name, method_eventables_path_count[method_eventables_path])
+            logging.info('Creating duplicate test method: {}'.format(method_name))
         else:
             method_eventables_path_count[method_eventables_path] = 0
         method_context = {
-            'comment': heuristic_label.method_labels[method_eventables_path[10:]],
+            'comment': heuristic_label.method_labels[method_eventables_path],
             'priority': path_num,
-            'name': method_eventables_path,
+            'name': method_name,
             'eventables': [],
 
         }
@@ -125,11 +126,10 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
             eventable_dom_label_table.append([eventable['id'],
                                               eventable['element'],
                                               heuristic_label.find_element(eventable['source']['dom'],
-                                                                           eventable['identification']['value'].lower(),
+                                                                           eventable['identification'],
                                                                            'str'),
                                               heuristic_label.get_context_dom(eventable['source']['dom'],
-                                                                              eventable['identification'][
-                                                                                  'value'].lower()),
+                                                                              eventable['identification']),
                                               heuristic_label.eventable_labels[eventable['id']][0]])
             total_clickables += 1
             total_form_field_elements += len(heuristic_label.eventable_labels[eventable['id']][1])
@@ -139,9 +139,9 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
             i = 0
             for form_input in eventable['relatedFormInputs']:
                 form_field_dom = heuristic_label.find_element(eventable['source']['dom'],
-                                                form_input['identification']['value'].lower(), 'str')
+                                                form_input['identification'], 'str')
                 form_field_extended_dom = heuristic_label.get_form_field_extended_dom(eventable['source']['dom'],
-                                                form_input['identification']['value'].lower(), 'str')
+                                                form_input['identification'], 'str')
                 form_field_label = heuristic_label.eventable_labels[eventable['id']][1][i]
 
                 form_field_dom_label_table.append([form_field_dom, form_field_extended_dom, form_field_label])
