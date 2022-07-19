@@ -390,31 +390,30 @@ class HeuristicLabel:
                     if not form_field_label:
                         form_field_label = form_field_extended_dom.get('aria-label')
 
-            # if no label has been generated so far, check directly with the ranked attributes for form fields
-            if not form_field_label or form_field_label.strip() == '':
-                form_field_label = self.get_form_field_label_by_attribute(form_field_dom_str)
-
             # get type of the form field
             form_field_type = form_field_dom.get('type')
 
-
-            form_field_label = form_field_label.strip().lower()
-
-            # remove punctuation
-            punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
-            for chr in form_field_label:
-                if chr in punc:
-                    form_field_label = form_field_label.replace(chr,'')
-
             # process table element
             parent = form_field_dom.getparent()
-            if parent.tag in ['tr', 'th']:
+            if parent.tag in ['tr', 'th', 'td']:
                 form_field_label = 'On page "' + title + '", ' + self.process_table_element(form_field_dom, form_field_label)
 
             # non table element
             else:
+                # if no label has been generated so far, check directly with the ranked attributes for form fields
+                if not form_field_label or form_field_label.strip() == '':
+                    form_field_label = self.get_form_field_label_by_attribute(form_field_dom_str)
+
+                # remove punctuation
+                punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+                for chr in form_field_label:
+                    if chr in punc:
+                        form_field_label = form_field_label.replace(chr, '')
+
+                form_field_label = form_field_label.strip().lower()
+
                 # get final label based on form field type
-                if form_field_label != '':
+                if form_field_label is not None and form_field_label != '':
                     if form_field_type in ['checkbox', 'file', 'radio']:
                         form_field_label = 'On page "' + title + '", select "' + form_field_label + '"'
                     else:
@@ -445,7 +444,6 @@ class HeuristicLabel:
             label (str): label for the table element
         """
         form_field_type = form_field_dom.get('type')
-
         # go up till tr tag reached, to get the row dom
         row_dom = form_field_dom
         while row_dom is not None and row_dom.tag != 'tr':
@@ -496,10 +494,10 @@ class HeuristicLabel:
             if prev_element.tag in ['h1', 'h2', 'h3']:
                 table_label = prev_element.text
 
-        verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] else 'enter '
+        verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] else 'enter data in '
 
         # for empty form field label, calculate row number
-        if form_field_label == '':
+        if form_field_label is None or form_field_label == '':
 
             form_field_row = 1
             for sibling in row_dom.itersiblings(preceding = True):
@@ -854,7 +852,7 @@ class HeuristicLabel:
 if __name__ == "__main__":
     # save analysis outputs in tkltest/generate/ui/analysis_outputs
 
-    file = json.load(open('crawl_paths_tmf_small.json'))
+    file = json.load(open('crawl_paths_petclinic.json'))
     curr_labels = dict()
     method_labels = dict()
     total_clickables = 0
