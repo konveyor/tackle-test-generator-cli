@@ -269,7 +269,7 @@ class HeuristicLabel:
             heuristic_label = element_dom.text
 
         # otherwise, calculate label using element dom
-        if not heuristic_label or heuristic_label == '':
+        if not heuristic_label or heuristic_label.strip() == '':
             heuristic_label = self.get_element_label(eventable['element'])
 
             # calculate label using context dom
@@ -312,10 +312,17 @@ class HeuristicLabel:
         if form_field_dom is None:
             return None
 
-        # get a parent that has a label or has more than one eventable
+        # get a parent that has a label,text or has more than one eventable
         while form_field_dom.getparent():
             form_field_dom = form_field_dom.getparent()
-            if form_field_dom.get('label') is not None or form_field_dom.get('aria-label') is not None or self.contains_more_than_one_eventable(form_field_dom):
+            if form_field_dom.get('label') is not None or form_field_dom.get(
+                    'aria-label') is not None or form_field_dom.text is not None or self.contains_more_than_one_eventable(
+                    form_field_dom):
+                break
+
+            # possible to have a label for the nested form field dom, before this parent
+            prev_sibling = form_field_dom.getprevious()
+            if prev_sibling is not None and prev_sibling.tag == 'label':
                 break
 
         if return_format == 'str':
@@ -344,7 +351,6 @@ class HeuristicLabel:
         for form_input in eventable['relatedFormInputs']:
 
             form_field_dom_str = self.find_element(eventable['source']['dom'], form_input['identification'], 'str')
-
             form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification'])
 
             # form field dom not found
@@ -359,12 +365,13 @@ class HeuristicLabel:
             form_field_label = form_field_dom.text
 
             # if no text found in form field dom, try to get the label sibling of this dom
-            if not form_field_label or form_field_label == '':
+            if form_field_label is None or form_field_label.strip() == '':
 
                 # if no id, only previous sibling of the form field dom can be its label
                 if not form_field_dom.get('id'):
                     previous_sibling = form_field_dom.getprevious()
-                    if previous_sibling is not None:
+                    if previous_sibling is not None and previous_sibling.tag == 'label':
+                        # label for this element
                         form_field_label = previous_sibling.text
 
                 # if id, search for the preceding sibling which has this id
@@ -389,9 +396,15 @@ class HeuristicLabel:
                     form_field_label = form_field_extended_dom.get('label')
                     if not form_field_label:
                         form_field_label = form_field_extended_dom.get('aria-label')
+                    if not form_field_label:
+                        form_field_label = form_field_extended_dom.text
+                    prev_sibling = form_field_extended_dom.getprevious()
+                    if not form_field_label and prev_sibling is not None and prev_sibling.tag == 'label':
+                        form_field_label = prev_sibling.text
 
             # get type of the form field
             form_field_type = form_field_dom.get('type')
+            form_field_tag = form_field_dom.tag
 
             # process table element
             parent = form_field_dom.getparent()
@@ -414,7 +427,7 @@ class HeuristicLabel:
 
                 # get final label based on form field type
                 if form_field_label is not None and form_field_label != '':
-                    if form_field_type in ['checkbox', 'file', 'radio']:
+                    if form_field_type in ['checkbox', 'file', 'radio'] or form_field_tag == 'select':
                         form_field_label = 'On page "' + title + '", select "' + form_field_label + '"'
                     else:
                         form_field_label = 'On page "' + title + '", enter "' + form_field_label + '"'
@@ -422,7 +435,7 @@ class HeuristicLabel:
                 # empty form field label
                 else:
                     self.empty_form_field_labels += 1
-                    if form_field_type in ['checkbox', 'file', 'radio']:
+                    if form_field_type in ['checkbox', 'file', 'radio'] or form_field_tag == 'select':
                         form_field_label = 'On page "' + title + '", ' + 'select "' + form_field_type + '"'
                     else:
                         form_field_label = 'On page "' + title + '", enter data into form field'
@@ -494,10 +507,10 @@ class HeuristicLabel:
             if prev_element.tag in ['h1', 'h2', 'h3']:
                 table_label = prev_element.text
 
-        verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] else 'enter data in '
+        verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] or form_field_dom.tag == 'select' else 'enter data in '
 
         # for empty form field label, calculate row number
-        if form_field_label is None or form_field_label == '':
+        if form_field_label is None or form_field_label.strip() == '':
 
             form_field_row = 1
             for sibling in row_dom.itersiblings(preceding = True):
@@ -568,6 +581,7 @@ class HeuristicLabel:
 
             if attr == 'text' and attr in eventable:
                 element_label = self.process_attribute_value(eventable[attr])
+
             elif 'attributes' in eventable and attr in eventable['attributes']:
                 if attr == 'href':
                     # special case for "href" attribute because its value
@@ -852,7 +866,7 @@ class HeuristicLabel:
 if __name__ == "__main__":
     # save analysis outputs in tkltest/generate/ui/analysis_outputs
 
-    file = json.load(open('crawl_paths_petclinic.json'))
+    file = json.load(open('crawl_paths_tmf_small.json'))
     curr_labels = dict()
     method_labels = dict()
     total_clickables = 0
