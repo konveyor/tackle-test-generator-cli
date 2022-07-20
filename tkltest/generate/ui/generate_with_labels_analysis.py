@@ -15,6 +15,8 @@
 # ***************************************************************************
 import datetime
 import json
+import sys
+
 import jinja2
 import logging
 import os.path
@@ -27,8 +29,6 @@ from generate_selenium import __create_method_name_for_path, __get_context_for_e
 # names and paths for generated code files
 _POM_FILE = 'pom.xml'
 
-_CRAWL_PATHS_FILE = 'crawl_paths_mdh.json'
-
 
 
 def generate_selenium_api_tests_analysis(config, crawl_dir):
@@ -39,6 +39,8 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
         config (dict): Configuration information for test generation
         crawl_dir (dict): Root crawl directory created by Crawljax for the current test-generation run
     """
+    app_name = config['general']['app_name']
+    _CRAWL_PATHS_FILE = 'crawl_paths_' + app_name + '.json'
     logging.info('Creating Selenium API tests from paths in {} for analysis'.format(os.path.join(crawl_dir, _CRAWL_PATHS_FILE)))
 
     app_name = _CRAWL_PATHS_FILE[12:-5] # assuming all crawlpaths files follow the format crawl_paths_xxx.json
@@ -214,7 +216,7 @@ if __name__ == '__main__':  # pragma: no cover
     app_config = {
         'general': {
             'log-level': 'WARNING',
-            'app_name': 'N/A - for analysis purposes',
+            'app_name': sys.argv[1],
             'app_url': 'N/A - for analysis purposes'
         },
         'generate': {
