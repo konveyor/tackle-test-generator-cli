@@ -404,6 +404,8 @@ class HeuristicLabel:
 
             # get type of the form field
             form_field_type = form_field_dom.get('type')
+            if not form_field_type:
+                form_field_type = 'form field'
             form_field_tag = form_field_dom.tag
 
             # process table element
@@ -457,6 +459,8 @@ class HeuristicLabel:
             label (str): label for the table element
         """
         form_field_type = form_field_dom.get('type')
+        if not form_field_type:
+            form_field_type = 'form field'
         # go up till tr tag reached, to get the row dom
         row_dom = form_field_dom
         while row_dom is not None and row_dom.tag != 'tr':
@@ -717,12 +721,12 @@ class HeuristicLabel:
         # at most find the fourth parent
         iterations = 0
         while curr_dom.getparent() and iterations <= 3:
-            curr_dom_without_context = ''
+            curr_dom_etree = ''
             try:
                 curr_dom_string = etree.tostring(curr_dom).decode('UTF-8').strip()
                 if not curr_dom_string.endswith(">"):
                     curr_dom_string = curr_dom_string[:curr_dom_string.rindex(">") + 1]
-                curr_dom_without_context = etree.parse(StringIO(curr_dom_string))
+                curr_dom_etree = etree.parse(StringIO(curr_dom_string))
 
             except Exception as e:
 
@@ -730,9 +734,10 @@ class HeuristicLabel:
 
                 logging.warning(curr_dom_string)
                 logging.warning("Exception while getting parent", e)
+                return ''
             parent = curr_dom.getparent()
-            if (parent is None) or (parent and curr_dom_without_context and self.contains_more_than_one_eventable(
-                    curr_dom)):
+            if (parent is None) or (parent and curr_dom_etree and self.contains_more_than_one_eventable(
+                    curr_dom_etree)):
                 return etree.tostring(curr_dom).decode('UTF-8')
             curr_dom = parent
             iterations += 1
