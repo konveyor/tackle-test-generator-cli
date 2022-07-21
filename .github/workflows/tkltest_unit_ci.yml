@@ -24,6 +24,10 @@ on:
       - '.gitattributes'
       - 'test/ui/**'
 
+env:
+  GRADLE_HOME: /opt/gradle
+  GRADLE_VERSION: 7.4
+
 jobs:
   build:
 
@@ -50,7 +54,7 @@ jobs:
         gradle --version
     - name: Install gradle 7.4
       run: |
-        wget --no-verbose --output-document=gradle.zip https://services.gradle.org/distributions/gradle-7.4-bin.zip \
+        wget --no-verbose --output-document=gradle.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
             && unzip gradle.zip \
             && rm gradle.zip \
             && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}/" \
