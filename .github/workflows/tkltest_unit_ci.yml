@@ -46,7 +46,16 @@ jobs:
         sudo apt-get update && sudo apt-get install -y bats libxml2-utils
         bats --version
         xmllint --version
+        which gradle
         gradle --version
+    - name: Install gradle 7.4
+      run: |
+        wget --no-verbose --output-document=gradle.zip https://services.gradle.org/distributions/gradle-7.4-bin.zip \
+            && unzip gradle.zip \
+            && rm gradle.zip \
+            && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}/" \
+            && ln --symbolic "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
+            && gradle --version
     - name: Download Java libraries
       run: |
         cd tkltest-lib
