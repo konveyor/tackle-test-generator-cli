@@ -24,10 +24,6 @@ on:
       - '.gitattributes'
       - 'test/ui/**'
 
-#env:
-#  GRADLE_HOME: /opt/gradle
-#  GRADLE_VERSION: 7.4
-
 jobs:
   build:
 
@@ -56,14 +52,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: 7.4
-#    - name: Install gradle 7.4
-#      run: |
-#        wget --no-verbose --output-document=gradle.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-#            && unzip gradle.zip \
-#            && rm gradle.zip \
-#            && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}/" \
-#            && ln --symbolic "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
-#            && gradle --version
+      run: gradle --version
     - name: Download Java libraries
       run: |
         cd tkltest-lib
