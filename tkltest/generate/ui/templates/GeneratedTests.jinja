@@ -49,6 +49,7 @@ public class GeneratedTests {
         // create chrome driver instance and set options
 //        WebDriverManager.chromedriver().setup();
         ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--ignore-certificate-errors");
     {% if browser == 'chrome_headless' %}
     	chromeOptions.addArguments("--headless");
     {% endif %}
