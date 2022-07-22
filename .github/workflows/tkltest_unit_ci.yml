@@ -46,8 +46,14 @@ jobs:
         sudo apt-get update && sudo apt-get install -y bats libxml2-utils
         bats --version
         xmllint --version
+        gradle --version
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.4
     - name: Download Java libraries
       run: |
+        gradle --version
         cd tkltest-lib
         ./download_lib_jars.sh
         cd ..; ls tkltest-lib/*
