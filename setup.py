@@ -39,7 +39,6 @@ setup(
         'lxml==4.9.1',
         'xmltodict==0.12.0',
         'keybert==0.4.0',
-        'flair==0.11.3',
         'pandas==1.4.3'
 
     ],

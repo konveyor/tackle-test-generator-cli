@@ -191,7 +191,9 @@ public class GeneratedTests {
      */
 
 {% for method in test_methods %}
-    // {{method.comment}}
+    /**
+    * {{method.comment}}
+    */
 	@Test(priority={{method.priority}})
     public void {{method.name}}() throws InterruptedException {
         WebElement element;
