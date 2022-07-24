@@ -7,6 +7,7 @@ name = "TKLTEST_CONFIG_FILE"
     # JDK home directory
     java_jdk_home = ""
     build_type = "gradle"
+    offline_instrumentation = true
 
 
 [generate]
@@ -18,12 +19,12 @@ excluded_class_list = []
 time_limit = 10
 app_build_files = ["test/data/splitNjoin/app/build.gradle"]
 app_build_settings_files = ["test/data/splitNjoin/settings.gradle"]
+reuse_base_tests = true
 
 [execute]
 app_packages = ['splitNjoin.*']
 no_create_build_file = false
 code_coverage = true
-online_instrumentation = false
 test_class = ""
 
 [generate.ctd_amplified]

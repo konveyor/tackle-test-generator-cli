@@ -40,6 +40,9 @@ required_lib_jars = {
     (True, 'com.github.EvoSuite.evosuite', 'evosuite-standalone-runtime', constants.EVOSUITE_VERSION, ''),
     (True, 'com.github.EvoSuite.evosuite', 'evosuite-master', constants.EVOSUITE_VERSION, ''),
     (False, 'org.jacoco', 'org.jacoco.cli', constants.JACOCO_MAVEN_VERSION, 'nodeps'),
+    (False, 'org.jacoco', 'org.jacoco.cli', constants.JACOCO_MAVEN_VERSION, ''),
+    (False, 'org.jacoco', 'org.jacoco.ant', constants.JACOCO_MAVEN_VERSION, 'nodeps'),
+    (False, 'org.jacoco', 'org.jacoco.ant', constants.JACOCO_MAVEN_VERSION, ''),
     (False, 'org.jacoco', 'org.jacoco.agent', constants.JACOCO_MAVEN_VERSION, ''),
 }
 

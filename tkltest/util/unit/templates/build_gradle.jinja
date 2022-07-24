@@ -21,17 +21,18 @@ configurations {
 }
 dependencies {
 
-jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.7', classifier: 'nodeps'
+jacocoInstrumentation group: 'org.jacoco', name: 'org.jacoco.ant', version: '0.8.8', classifier: ''
 
 //dependencies from class files:
 {% for item in classpath_list %}
   implementation files('{{ item }}')  {% endfor %}
-//we compile only the test files, so during compilation time, we add dependencies to the app class path:
-{% for item in monolith_app_paths %}
-    testCompileOnly files('{{ item }}') {% endfor %}
 //when running the tests, we use the app classes, can be instrumented/not-instrumented classes
 {% for item in app_classes_for_tests %}
     testRuntimeOnly files('{{ item }}') {% endfor %}
+
+//we compile only the test files, so during compilation time, we add dependencies to the app class path:
+{% for item in monolith_app_paths %}
+    testImplementation files('{{ item }}') {% endfor %}
 }
 
 task cleanInstrumentDir(){

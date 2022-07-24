@@ -81,6 +81,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         else:
             cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
         try:
+            print ('\n', cmd)
             command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
             tkltest_status('Warning: Error while running test suite for coverage computing, skipping current test file: {}\n{}'.format(e, e.stderr))
@@ -165,7 +166,6 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     jacoco_new_file_name = os.path.join(raw_cov_data_dir,
                                             raw_cov_data_file_pref + constants.JACOCO_SUFFIX_FOR_AUGMENTATION)
     shutil.move(jacoco_raw_data_file, jacoco_new_file_name)
-
 
     # read the coverage CSV file and compute total instruction, line, and branch coverage
     total_inst_covered = 0;

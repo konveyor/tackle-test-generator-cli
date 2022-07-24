@@ -110,7 +110,7 @@ MAVEN_VERSION = "4.0.0"
 
 # Jacoco for maven used version
 
-JACOCO_MAVEN_VERSION = "0.8.7"
+JACOCO_MAVEN_VERSION = "0.8.8"
 
 # maven site plugin version used
 

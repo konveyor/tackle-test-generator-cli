@@ -40,7 +40,7 @@ interaction_level = 1
 num_seq_executions = 10
 # refactored_app_path_prefix = ""
 # refactored_app_path_suffix = []
-reuse_base_tests = false
+reuse_base_tests = true
 
 [generate.evosuite]
 criterion = [ "BRANCH",]
