@@ -9,7 +9,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <tackletest_core.version>main-SNAPSHOT</tackletest_core.version>
+    <tackletest_core.version>borwser-provider-patch-SNAPSHOT</tackletest_core.version>
   </properties>
 
   <repositories>
