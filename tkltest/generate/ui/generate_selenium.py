@@ -42,6 +42,8 @@ _precrawl_action_locators = {
     'with_text': 'linkText',
     'by_css_selector': 'cssSelector'
 }
+# supported precrawl action types
+_precrawl_action_types = ['click', 'enter']
 
 def generate_selenium_api_tests(config, crawl_dir):
     """Generates test cases that use the Selenium API.
@@ -147,11 +149,27 @@ def generate_selenium_api_tests(config, crawl_dir):
 
 
 def __get_context_for_precrawl_actions(precrawl_actions_file):
+    """Creates Jinja context for pre-crawl actions.
+
+    Creates and returns jinja context for generating code for pre-crawl actions (pre-test-execution
+    actions in the Selenium API tests).
+
+    Args:
+        precrawl_actions_file (str): name of pre-crawl actions spec file
+
+    Returns:
+        list: list of contexts, one for each pre-crawl action
+    """
     precrawl_actions_spec = toml.load(precrawl_actions_file)
     precrawl_actions_context = []
     if 'precrawl_action' not in precrawl_actions_spec:
+        logging.warning('No "precrawl_action" element specified in pre-crawl actions spec file {}'.format(precrawl_actions_file))
         return precrawl_actions_context
+
+    # iterate over actions spec and create context for each action
     for action in precrawl_actions_spec['precrawl_action']:
+
+        # create code fragment for element locator, using selenium By API
         by_method = ''
         for locator in _precrawl_action_locators.keys():
             if locator in action.keys():
@@ -162,11 +180,25 @@ def __get_context_for_precrawl_actions(precrawl_actions_file):
                 list(_precrawl_action_locators.keys()), action
             ))
             continue
+
+        # check that expected action type is specified
+        if 'action_type' not in action.keys():
+            logging.warning('Skipping precrawl action with no "action_type" property: {}'.format(action))
+            continue
         action_type = action['action_type']
+        if action_type not in _precrawl_action_types:
+            logging.warning('Skipping precrawl action with unknown action type (must be one of {}): {}'.format(
+                _precrawl_action_types, action
+            ))
+            continue
+
+        # create context with action_type and by_method properties
         action_context = {
             'type': action_type,
             'by_method': by_method
         }
+
+        # for "enter" action, add input value to the context
         if action_type == 'enter':
             if 'input_value' not in action.keys():
                 logging.warning('Skipping precrawl "enter" action with no input value: {}'.format(action))
