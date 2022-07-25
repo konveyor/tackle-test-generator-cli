@@ -233,6 +233,14 @@ __options_spec = {
             'type': str,
             'default_value': '',
             'help_message': 'TOML file containing specification of form data'
+        },
+        'precrawl_actions_spec_file': {
+            'required': False,
+            'is_toml_option': True,
+            'is_cli_option': False,
+            'type': str,
+            'default_value': '',
+            'help_message': 'TOML file containing specification of UI actions to be executed before crawl'
         }
     },
 

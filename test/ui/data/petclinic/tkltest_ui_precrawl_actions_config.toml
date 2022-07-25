@@ -1,0 +1,24 @@
+###
+# Specification of pre-crawl actions to perform. The specification consists of the following properties
+#   - action_type: type of action to perform (click, enter)
+#   - one of the following element locator properties: by_id, by_name, under_xpath, with_text, by_css_selector
+#   - if action_type is "enter", the following property
+#     - input_value: value to be entered in text box
+###
+
+[[precrawl_action]]
+  action_type = "click"
+  under_xpath = "/html/body/app-root/div[1]/nav/div/ul/li[5]/a/span[2]"
+
+[[precrawl_action]]
+  action_type = "click"
+  under_xpath = "/html/body/app-root/app-specialty-list/div/div/div/button[2]"
+
+[[precrawl_action]]
+  action_type = "enter"
+  under_xpath = "//*[@id=\"name\"]"
+  input_value = "cardiology"
+
+[[precrawl_action]]
+  action_type = "click"
+  under_xpath = "/html/body/app-root/app-specialty-list/div/div/div[2]/button[1]"

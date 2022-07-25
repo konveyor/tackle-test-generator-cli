@@ -22,6 +22,8 @@ import jinja2
 import logging
 import os.path
 
+import toml
+
 from tkltest.util import constants, logging_util
 
 from tkltest.generate.ui.heuristic_labels import HeuristicLabel
@@ -32,6 +34,14 @@ from importlib import resources
 _POM_FILE = 'pom.xml'
 _CRAWL_PATHS_FILE = 'CrawlPaths.json'
 
+# map from supported locators in precrawl-actions spec to Selenium API "By" methods
+_precrawl_action_locators = {
+    'by_id': 'id',
+    'by_name': 'name',
+    'under_xpath': 'xpath',
+    'with_text': 'linkText',
+    'by_css_selector': 'cssSelector'
+}
 
 def generate_selenium_api_tests(config, crawl_dir):
     """Generates test cases that use the Selenium API.
@@ -84,8 +94,13 @@ def generate_selenium_api_tests(config, crawl_dir):
         'browser': browser,
         'wait_event': config['generate']['wait_after_event'],
         'wait_reload': config['generate']['wait_after_reload'],
+        'precrawl_actions': [],
         'test_methods': []
     }
+
+    # create context for precrawl actions, if specified
+    if 'precrawl_actions_spec_file' in config['generate'].keys() and config['generate']['precrawl_actions_spec_file']:
+        jinja_context['precrawl_actions'] = __get_context_for_precrawl_actions(config['generate']['precrawl_actions_spec_file'])
 
     # iterate over crawl paths and construct context for each test method
     method_name_count = {}
@@ -129,6 +144,38 @@ def generate_selenium_api_tests(config, crawl_dir):
 
     # clean up crawl folder
     __clean_up_crawl_artifacts(crawl_dir)
+
+
+def __get_context_for_precrawl_actions(precrawl_actions_file):
+    precrawl_actions_spec = toml.load(precrawl_actions_file)
+    precrawl_actions_context = []
+    if 'precrawl_action' not in precrawl_actions_spec:
+        return precrawl_actions_context
+    for action in precrawl_actions_spec['precrawl_action']:
+        by_method = ''
+        for locator in _precrawl_action_locators.keys():
+            if locator in action.keys():
+                by_method = 'By.{}("{}")'.format(_precrawl_action_locators[locator], action[locator].replace('"', '\\"'))
+                break
+        if not by_method:
+            logging.warning('Skipping precrawl action with no recognizable locator ({}): {}'.format(
+                list(_precrawl_action_locators.keys()), action
+            ))
+            continue
+        action_type = action['action_type']
+        action_context = {
+            'type': action_type,
+            'by_method': by_method
+        }
+        if action_type == 'enter':
+            if 'input_value' not in action.keys():
+                logging.warning('Skipping precrawl "enter" action with no input value: {}'.format(action))
+                continue
+            action_context['input_value'] = action['input_value']
+        precrawl_actions_context.append(action_context)
+
+    logging.info('Created pre-crawl actions context: {}'.format(precrawl_actions_context))
+    return precrawl_actions_context
 
 
 def __create_method_name_for_path(path):
@@ -245,15 +292,16 @@ if __name__ == '__main__':  # pragma: no cover
     app_config = {
         'general': {
             'log-level': 'WARNING',
-            # 'app_name': 'petclinic',
-            # 'app_url': 'http://localhost:8080'
-            'app_name': 'addressbook',
-            'app_url': 'http://localhost:3000/addressbook/'
+            'app_name': 'petclinic',
+            'app_url': 'http://localhost:8080'
+            # 'app_name': 'addressbook',
+            # 'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
             'wait_after_event': 500,
-            'wait_after_reload': 500
+            'wait_after_reload': 500,
+            'precrawl_actions_spec_file': "../../../test/ui/data/petclinic/tkltest_ui_precrawl_actions_config.toml"
         }
     }
     app_crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl1'

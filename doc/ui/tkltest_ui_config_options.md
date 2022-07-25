@@ -48,12 +48,13 @@ The following table lists the main configuration options of TackleTest-UI.
 | browser                             | -b/--browser         | browser on which to launch app under test for crawling and test generation; default is chrome_headless  |
 | time_limit                          | -t/--time-limit      | maximum crawl time (in minutes); default is 5 min                                                       |
 | max_states                          |                      | maximum UI pages/states to discover during crawl; default is 0 (unlimited)                              |
-| max_explore_action                   |                     | maximum number of times to explore a discovered action; default is 1                                    |
+| max_explore_action                  |                      | maximum number of times to explore a discovered action; default is 1                                    |
 | include_iframes                     |                      | if the AUT has iframes that need to be covered, set this option to true; default is false               |
 | wait_after_event                    |                      | the time to wait (in milliseconds) after an event has been fired; default is 500ms                      |
 | wait_after_reload                   |                      | the time to wait (in milliseconds) after URL load; default is 500; default is 500ms                     |
 | clickables_spec_file                |                      | TOML file containing specification of elements to click or not to click                                 |
 | form_data_spec_file                 |                      | TOML file containing specification of form data                                                         |
+| precrawl_actions_spec_file          |                      | TOML file containing specification of UI actions to be executed before crawl                            |
 |                                     |                      |                                                                                                         |
 | execute                             |                      | Execute generated UI tests on the application under test                                                |
 | api_type                            | -at/--api-type       | library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API |
