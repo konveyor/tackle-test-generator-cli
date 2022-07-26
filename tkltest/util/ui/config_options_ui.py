@@ -184,7 +184,7 @@ __options_spec = {
             'is_cli_option': False,
             'type': int,
             'default_value': 0,
-            'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited)'
+            'help_message': 'maximum UI pages/states to discover during crawl; default is 0 (unlimited states)'
         },
         'max_explore_action': {
             'required': False,
@@ -304,8 +304,8 @@ __options_spec_internal = {
             'is_toml_option': True,
             'is_cli_option': False,
             'type': int,
-            'default_value': 2,
-            'help_message': 'maximum depth for crawling; default is 2'
+            'default_value': 0,
+            'help_message': 'maximum depth for crawling; default is 0 (unlimited crawl depth)'
         },
         'crawl_hidden_anchors': {
             'required': False,
