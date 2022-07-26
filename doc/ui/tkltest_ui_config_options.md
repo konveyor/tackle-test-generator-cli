@@ -48,12 +48,13 @@ The following table lists the main configuration options of TackleTest-UI.
 | browser                             | -b/--browser         | browser on which to launch app under test for crawling and test generation; default is chrome_headless  |
 | time_limit                          | -t/--time-limit      | maximum crawl time (in minutes); default is 5 min                                                       |
 | max_states                          |                      | maximum UI pages/states to discover during crawl; default is 0 (unlimited)                              |
-| max_explore_action                   |                     | maximum number of times to explore a discovered action; default is 1                                    |
+| max_explore_action                  |                      | maximum number of times to explore a discovered action; default is 1                                    |
 | include_iframes                     |                      | if the AUT has iframes that need to be covered, set this option to true; default is false               |
 | wait_after_event                    |                      | the time to wait (in milliseconds) after an event has been fired; default is 500ms                      |
 | wait_after_reload                   |                      | the time to wait (in milliseconds) after URL load; default is 500; default is 500ms                     |
 | clickables_spec_file                |                      | TOML file containing specification of elements to click or not to click                                 |
 | form_data_spec_file                 |                      | TOML file containing specification of form data                                                         |
+| precrawl_actions_spec_file          |                      | TOML file containing specification of UI actions to be executed before crawl                            |
 |                                     |                      |                                                                                                         |
 | execute                             |                      | Execute generated UI tests on the application under test                                                |
 | api_type                            | -at/--api-type       | library API type used by the generated (Java) test cases: Selenium or Crawljax; default is Selenium API |
@@ -237,5 +238,49 @@ To illustrate, here are a few examples of `click` specifications:
 
 It also possible to exclude an entire tree of web elements by using the `under_xpath` specifier with
 a wildcard. For example, a `dont_click` specifier `under_xpath = //div[@id='xyz']//*` would exclude
-all web elements in the tree rooted at the web element with id `xyz`. This can be a conveient way
+all web elements in the tree rooted at the web element with id `xyz`. This can be a convenient way
 of omitting exploration, for example, of web elements locateds in the header or footer section of a web page.
+
+## Pre-crawl Actions Specification
+
+The pre-crawl specifications file can be used for specifying UI actions that should be performed on the
+AUT prior to crawling. For example, the AUT may require some initial actions (e.g., dismissing a modal dialog)
+to bring to a state  in which crawling can begin. The specified pre-crawl actions are added to the generated
+Selenium API tests to be executed as one-time setup before test execution begins.
+
+The form data specification is provided in TOML format in a particular schema.
+For an example specification, see the [pre-crawl actions spec for the Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_precrawl_actions_config.toml).
+
+The specification consists of a sequence of "click" (link, button) and "enter" (into text box) actions;
+currently, these are the only supported pre-crawl actions. A pre-crawl action has the following
+properties:
+
+1. `action_type`: the type of action to perform (click or enter)
+2. one of the following element locator properties: `by_id`, `by_name`, `under_xpath`, `with_text`, `by_css_selector`
+3. if `action_type` is "enter", the property `input_value` specifying the value to be entered in text box
+
+The following sample illustrates a sequence of five pre-crawl actions: three click actions, followed by a
+form-field enter action, and finally another click action.
+
+```
+[[precrawl_action]]
+  action_type = "click"
+  by_id = "id"
+
+[[precrawl_action]]
+  action_type = "click"
+  by_name = "name"
+
+[[precrawl_action]]
+  action_type = "click"
+  under_xpath = "//*[@id=\"primary-links\"]/li"
+
+[[precrawl_action]]
+  action_type = "enter"
+  by_name = "fileName"
+  input_value = "some_file"
+
+[[precrawl_action]]
+  action_type = "click"
+  with_text = "Upload file"
+```

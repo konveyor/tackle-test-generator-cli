@@ -44,7 +44,7 @@ public class GeneratedTests {
     private WebDriverWait webDriverWait;
 
     @BeforeClass
-	public void oneTimeSetUp() {
+	public void oneTimeSetUp() {% if precrawl_actions %}throws InterruptedException{% endif %} {
 {% if browser == 'chrome' or browser == 'chrome_headless' %}
         // create chrome driver instance and set options
 //        WebDriverManager.chromedriver().setup();
@@ -62,6 +62,11 @@ public class GeneratedTests {
 
         // create wait instance
         this.webDriverWait = new WebDriverWait(webDriver, Duration.ofMillis(waitAfterEvent));
+
+{% if precrawl_actions %}
+        // preform pre-crawl actions
+        this.performPreExecutionActions();
+{% endif %}
     }
 
 	@AfterClass
@@ -79,6 +84,29 @@ public class GeneratedTests {
 	public void getStatusAndDuration(ITestResult tr) {
         // TODO: code related to test report
     }
+
+{% if precrawl_actions %}
+    /**
+     * Preforms pre-execution actions on the AUT: these are actions specified as "pre-crawl actions" during
+     * test generation.
+     */
+    private void performPreExecutionActions() throws InterruptedException {
+        this.webDriver.navigate().to(URL);
+        Thread.sleep(this.waitAfterReload);
+
+        WebElement element;
+    {% for action in precrawl_actions %}
+
+        {% if action.type == 'click' %}
+        element = this.webDriverWait.until(ExpectedConditions.elementToBeClickable({{action.by_method}}));
+        element.click();
+        {% else %}
+        element = this.webDriverWait.until(ExpectedConditions.presenceOfElementLocated({{action.by_method}}));
+        element.sendKeys("{{action.input_value}}");
+        {% endif %}
+    {% endfor %}
+    }
+{% endif %}
 
     /**
      * Switches focus to the frame with the given frame ID.
