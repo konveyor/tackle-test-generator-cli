@@ -153,7 +153,12 @@ class HeuristicLabel:
         return s
 
     def remove_non_english_words(self, s):
-        s = (word for word in nltk.wordpunct_tokenize(s) if word in set(nltk.corpus.words.words()))
+        logging.info('Removing non-english words for string of size {}'.format(len(s)))
+        s = nltk.wordpunct_tokenize(s)
+        logging.info('Tokenized s')
+        english_words = set(nltk.corpus.words.words())
+        s = list(word for word in s if word in english_words)
+        logging.info('Removed non-english words to create array of size {}'.format(len(s)))
         s = ' '.join(s)
         return s
 
