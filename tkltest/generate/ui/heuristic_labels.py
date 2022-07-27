@@ -513,7 +513,7 @@ class HeuristicLabel:
         # if no caption element exists, search for a header previous sibling of the table
         else:
             prev_element = table_dom.getprevious()
-            if prev_element.tag in ['h1', 'h2', 'h3']:
+            if prev_element and prev_element.tag in ['h1', 'h2', 'h3']:
                 table_label = prev_element.text
 
         verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] or form_field_dom.tag == 'select' else 'enter data in '
