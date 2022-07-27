@@ -2,7 +2,7 @@
     "categories": [
       {
         "title": "## 🚀 Features",
-        "labels": ["feature", "enhancement"]
+        "labels": ["kind/feature", "enhancement"]
       },
       {
         "title": "## 🐛 Fixes",
