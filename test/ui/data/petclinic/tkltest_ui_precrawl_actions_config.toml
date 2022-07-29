@@ -20,5 +20,10 @@
   input_value = "cardiology"
 
 [[precrawl_action]]
+  action_type = "enter"
+  under_xpath = "//*[@id=\"name\"]"
+  input_value_env_var = "SPECIALTY"
+
+[[precrawl_action]]
   action_type = "click"
   under_xpath = "/html/body/app-root/app-specialty-list/div/div/div[2]/button[1]"

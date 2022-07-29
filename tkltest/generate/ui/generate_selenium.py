@@ -200,10 +200,13 @@ def __get_context_for_precrawl_actions(precrawl_actions_file):
 
         # for "enter" action, add input value to the context
         if action_type == 'enter':
-            if 'input_value' not in action.keys():
+            if 'input_value' in action.keys():
+                action_context['input_value'] = action['input_value']
+            elif 'input_value_env_var' in action.keys():
+                action_context['input_value_env_var'] = action['input_value_env_var']
+            else:
                 logging.warning('Skipping precrawl "enter" action with no input value: {}'.format(action))
                 continue
-            action_context['input_value'] = action['input_value']
         precrawl_actions_context.append(action_context)
 
     logging.info('Created pre-crawl actions context: {}'.format(precrawl_actions_context))

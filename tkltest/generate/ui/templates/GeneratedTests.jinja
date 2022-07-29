@@ -102,7 +102,11 @@ public class GeneratedTests {
         element.click();
         {% else %}
         element = this.webDriverWait.until(ExpectedConditions.presenceOfElementLocated({{action.by_method}}));
+            {% if 'input_value_env_var' in action %}
+        element.sendKeys(System.getenv("{{action.input_value_env_var}}"));
+            {% else %}
         element.sendKeys("{{action.input_value}}");
+            {% endif %}
         {% endif %}
     {% endfor %}
     }
