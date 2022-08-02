@@ -174,10 +174,16 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
     output_file = open('analysis_outputs/label_analysis_results_' + app_name + '.json', 'w')
     output_file.write(json.dumps(results))
 
-    eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_' + app_name + '.csv')
-    form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_' + app_name + '.csv')
+    eventable_dom_label_table.to_csv('analysis_outputs/eventable_dom_label_table_{}.csv'.format(app_name))
+    form_field_dom_label_table.to_csv('analysis_outputs/form_field_dom_label_table_{}.csv'.format(app_name))
 
+    method_comment_list = []
+    for method_eventables_path in heuristic_label.method_labels:
+        comment = ' '.join(heuristic_label.method_labels[method_eventables_path].split('\n\t* '))
+        method_comment_list.append(comment)
 
+    method_comment_list = pd.DataFrame(method_comment_list, columns=['X'])
+    method_comment_list.to_csv('analysis_outputs/method_comments_{}.csv'.format(app_name))
     # render template to generate source code for test class
     testclass_code = testclass_template.render(jinja_context)
     logging.info('Generated test class')
