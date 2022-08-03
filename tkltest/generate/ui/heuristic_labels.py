@@ -1087,6 +1087,8 @@ class HeuristicLabel:
         Returns:
             context_dom_dict (dict): dictionary of the parsed DOM
         """
+        if not dom.endswith('>'):
+            dom = dom[:dom.rindex('>') + 1]
         context_dom_str = r"<html>" + dom + r"</html>"
         context_dom_dict = xd.parse(context_dom_str)
         # print(f"context dom dict: {context_dom_dict}")
