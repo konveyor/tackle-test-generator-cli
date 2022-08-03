@@ -83,7 +83,7 @@ def generate_selenium_api_tests(config, crawl_dir):
 
     # load crawl paths
     crawl_paths_file = os.path.join(crawl_dir, _CRAWL_PATHS_FILE)
-    with open(crawl_paths_file) as f:
+    with open(crawl_paths_file, encoding="utf8") as f:
         crawl_paths = json.load(f)
     logging.info('Generating tests for {} crawl paths'.format(len(crawl_paths)))
 
