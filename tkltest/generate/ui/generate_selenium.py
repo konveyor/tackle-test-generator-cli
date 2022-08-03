@@ -43,7 +43,7 @@ _precrawl_action_locators = {
     'by_css_selector': 'cssSelector'
 }
 # supported precrawl action types
-_precrawl_action_types = ['click', 'enter']
+_precrawl_action_types = ['click', 'enter', 'alert_accept']
 
 def generate_selenium_api_tests(config, crawl_dir):
     """Generates test cases that use the Selenium API.
