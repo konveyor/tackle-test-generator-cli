@@ -1,10 +1,11 @@
 import json
+import sys
+
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import string
 import logging
-import enchant
 from lxml import html, etree
 import xmltodict as xd
 from io import StringIO
@@ -20,13 +21,14 @@ class HeuristicLabel:
         """
         Initialize with the ranked attribute order to use while calculating the label
 
-        Parameters:
+        Args:
                     rankings_file_path (str): A string path to the ranked_attributes.json file
 
         Returns:
                     Nothing, creates a ranked_attributes list and rankings_set set to find the labels"""
-
-        self.html_stop_words = ["a", "abbr", "acronym", "address", "area", "b", "base", "bdo", "big", "blockquote",
+        self.english_words = set(nltk.corpus.words.words())
+        self.english_stopwords = set(stopwords.words('english'))
+        self.html_stop_words = set(["a", "abbr", "acronym", "address", "area", "b", "base", "bdo", "big", "blockquote",
                                 "body",
                                 "br",
                                 "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn", "div", "dl",
@@ -44,7 +46,7 @@ class HeuristicLabel:
                                 "thead",
                                 "title",
                                 "tr", "tt", "ul", "var", "", "submit", "false", "action", "javascript", "javascript:;",
-                                "href"]
+                                "href"])
 
         with open(rankings_file_path) as f:
             self.ranked_attributes = json.load(f)
@@ -76,7 +78,7 @@ class HeuristicLabel:
         """
         Preprocess value of ranked attributes of eventables-  tokenize, remove stop words, lemmatize and remove non-English words
 
-        Parameters:
+        Args:
                     s (str): A string word or phrase to be preprocessed
 
         Returns:
@@ -86,11 +88,12 @@ class HeuristicLabel:
 
         return s
 
+
     def tokenize(self, s: str):
         """
         Tokenize input string to remove uppercase, camel case, snake case, etc. eg. TableSortTrigger -> table sort trigger
 
-        Parameters:
+        Args:
                     s (str): A string word or phrase to be tokenized
 
         Returns:
@@ -139,11 +142,13 @@ class HeuristicLabel:
                     buffer = ""
         return result
 
+
     def remove_stop_words(self, s):
         s = list(s.split(' '))
-        s = [word for word in s if word not in set(stopwords.words('english'))]
-        s = [word for word in s if word not in set(self.html_stop_words)]
+        s = [word for word in s if word not in self.english_stopwords]
+        s = [word for word in s if word not in self.html_stop_words]
         return ' '.join(s)
+
 
     def lemmatize(self, s):
         s = list(s.split(' '))
@@ -152,15 +157,32 @@ class HeuristicLabel:
         s = ' '.join(s)
         return s
 
+
     def remove_non_english_words(self, s):
         logging.info('Removing non-english words for string of size {}'.format(len(s)))
         s = nltk.wordpunct_tokenize(s)
         logging.info('Tokenized s')
-        english_words = set(nltk.corpus.words.words())
-        s = list(word for word in s if word in english_words)
+        s = list(word for word in s if word in self.english_words)
         logging.info('Removed non-english words to create array of size {}'.format(len(s)))
         s = ' '.join(s)
+        logging.info('Joined s to a string')
         return s
+
+
+    def remove_punctuation(self, s):
+        if not s:
+            return ''
+        punc = '''!()-[]{};:'"\,<>.?@#$%^&*_~'''
+        for chr in s:
+            if chr in punc:
+                s = s.replace(chr, '')
+        return self.to_lowercase(s.strip())
+
+
+    def to_lowercase(self, s):
+        if not s:
+            return ''
+        return s.lower()
 
     ########################################## Compute Labels ########################################################
 
@@ -168,23 +190,25 @@ class HeuristicLabel:
         """
         Get element level and method level labels
 
-        Parameters:
+        Args:
             crawl_paths (list): list of crawl paths, output by CrawlJax
 
         Returns:
             None (stores element and method level labels in self.eventable_labels and self.method_labels
 
         """
-        # to store eventable and method labels
+        # to store eventable and method labels, as well as frequency of eventable labels
         self.eventable_labels = dict()
         self.method_labels = dict()
+        self.eventable_counts = dict()
 
         for crawl_path in crawl_paths:
             for eventable in crawl_path:
-                self.get_label(eventable)
-
-        # get label counts of eventables to sort by frequency of occurrence in crawl paths
-        self.get_label_counts(crawl_paths)
+                label = self.get_label(eventable)[0]
+                if label not in self.eventable_counts:
+                    self.eventable_counts[label] = 1
+                else:
+                    self.eventable_counts[label] += 1
 
         # store method labels with id eventable path
         for crawl_path in crawl_paths:
@@ -195,64 +219,87 @@ class HeuristicLabel:
             self.method_labels[eventable_id_path] = method_label
 
 
-    def get_label_counts(self, crawl_paths):
-        """
-        Calculates frequency of occurrence of each clickable label
-
-        Parameters:
-            crawl_paths (list): list of crawl paths
-
-        Returns:
-            None (stores label frequencies in self.label_counts)
-
-        """
-
-        # store frequency of occurrence of each label in all crawl paths
-        self.label_counts = dict()
-        for crawl_path in crawl_paths:
-            for eventable in crawl_path:
-                eventable_label = self.eventable_labels[eventable['id']][0]
-                if eventable_label not in self.label_counts:
-                    self.label_counts[eventable_label] = 0
-                self.label_counts[eventable_label] += 1
-
-
     def get_method_label(self, crawl_path):
         """
         Calculates method level label
 
-        Parameters:
+        Args:
             crawl_path (list): a single crawl path, depicting a single output test method
 
         Returns:
             method_label (str): label for the method
 
         """
-
-        # eventables in current crawl path
-        curr_eventable_labels = [
-            self.eventable_labels[eventable['id']][0] for eventable in crawl_path
-        ]
-
-        # sort current eventable labels based on frequency of occurrence of the label in all crawl paths
-        sorted_eventable_labels = sorted(curr_eventable_labels, key=lambda ele: self.label_counts[ele])
+        i = 0
+        n = len(crawl_path)
+        path = []
         method_label = []
+        unique_eventables = []
+        while i < n:
+            eventable = crawl_path[i]
+            if self.eventable_counts[self.eventable_labels[eventable['id']][0]] == 1:
+                unique_eventables.append(self.eventable_labels[eventable['id']][0])
+            flag = False
+            for form_name in self.eventable_labels[eventable['id']][2]:
+                form_fill_line = 'enters values in form "{}"'.format(form_name)
+                # check if it submits this form
+                if self.submits_form(self.eventable_labels[eventable['id']][0]):
+                    flag = True
+                    path.append('{} and submits the form.'.format(form_fill_line))
+                else:
+                    path.append('{}.'.format(form_fill_line))
 
-        # calculate method label based on sorted eventable labels in this path
-        if self.label_counts[sorted_eventable_labels[0]] == 1:
-            method_label.append(sorted_eventable_labels[0]) # clickable only occurs in this crawlpath, unique label
-        else:
-            for label in curr_eventable_labels:
-                method_label.append(label) # use all clickables in crawlpath for the label
+           # if form is submitted, don't add the submitting clickable to the following navigation
+            if flag:
+                i += 1
+                continue
 
-        return ', '.join(method_label)
+            if i < n:
+                eventable_path = [self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip()]
+                i += 1
 
+            # get navigation of clickables until the next form field is filled
+            while i < n and len(self.eventable_labels[crawl_path[i]['id']][2]) == 0:
+                eventable_path.append(self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip())
+                i += 1
+            path.append('navigates the path: {}.'.format(', '.join(eventable_path)))
+
+        # make final method summary
+        method_label.append('This test {}'.format(path[0]))
+        for line in path[1:]:
+            method_label.append(('Then it {}'.format(line)))
+        if len(unique_eventables) > 0:
+            method_label.append('The unique clickables in this path are: {}.'.format(', '.join(unique_eventables)))
+
+        return '\n\t* '.join(method_label)
+
+    def submits_form(self, eventable_label):
+        """
+        Checks whether the eventable label marks a submission
+
+        Args:
+            eventable_label (str): check whether the eventable label is a submission
+
+        Returns:
+            boolean: whether or not the eventable label depicts a submission
+        """
+
+        # button label between double quotes in eventable label
+        button_label = eventable_label.split('"')[-2].strip()
+
+        # split button label into words to check if any submit words exist
+        button_word_set = button_label.split(' ')
+        submit_words = ['next', 'continue', 'enter', 'submit', 'save', 'done', 'update']
+        for word in button_word_set:
+            if word in submit_words:
+                return True
+        return False
 
     def get_label(self, eventable):
         """
-        Get the label for an eventable element, either based on element or its context (in the case of no relevant element attributes)
+        Get the label for an eventable element, its form field elements, and forms filled
 
-        Parameters:
+        Args:
             eventable (dict): A json dict of the eventable
 
         Returns:
@@ -262,9 +309,7 @@ class HeuristicLabel:
             return self.eventable_labels[eventable['id']]
 
         # get title of the source web page
-        tree = html.fromstring(eventable['source']['dom'])
-        title_element = tree.xpath('/html[1]/head[1]/title[1]')
-        title = title_element[0].text.strip()
+        title = self.get_title(eventable['source']['dom'])
 
         element_dom = self.find_element(eventable['source']['dom'], eventable['identification'])
 
@@ -275,7 +320,7 @@ class HeuristicLabel:
 
         # otherwise, calculate label using element dom
         if not heuristic_label or heuristic_label.strip() == '':
-            heuristic_label = self.get_element_label(eventable['element'])
+            heuristic_label = self.get_element_label(eventable['element'], element_dom)
 
             # calculate label using context dom
             if heuristic_label.strip() == '':
@@ -288,22 +333,31 @@ class HeuristicLabel:
             self.empty_eventable_labels += 1
 
         # add title and verb to label
-        heuristic_label = 'On page "' + title + '", ' + eventable['eventType'] + ' "' + heuristic_label + '"'
+        heuristic_label = 'on page "{}", {} "{}"'.format(title, eventable['eventType'], heuristic_label)
 
         # get all form fields
         form_field_labels = self.get_form_field_labels(eventable)
 
-        # store eventable and form field labels in dictionary
-        self.eventable_labels[eventable['id']] = [heuristic_label, form_field_labels]
+        # get all forms filled before clicking this eventable
+        forms_filled = set()
+        for form_input in eventable['relatedFormInputs']:
+            # check if form input is part of a form
+            form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification'])
+            form_header = self.get_form_header(form_field_dom)
+            if form_header != '':
+                forms_filled.add(form_header)
 
-        return [heuristic_label, form_field_labels]
+        # store eventable and form field labels in dictionary
+        self.eventable_labels[eventable['id']] = [heuristic_label, form_field_labels, list(forms_filled)]
+
+        return [heuristic_label, form_field_labels, list(forms_filled)]
 
 
     def get_form_field_extended_dom(self, source_dom, form_field_identification, return_format = 'dom'):
         """
         Get the extended dom of a form field element, which contains the label for that field
 
-        Parameters:
+        Args:
             source_dom (str): DOM of the web page in string format
             form_field_xpath (str): xpath of the form field element in string format
             return_format (str): specifies what format to return the extended dom in (str/dom)
@@ -334,12 +388,25 @@ class HeuristicLabel:
             return etree.tostring(form_field_dom).decode('UTF-8')
         return form_field_dom
 
+    def get_title(self, source_dom):
+        """
+        Get title of the source dom web page.
+
+        Args:
+            source_dom (str): string dom of source web page
+
+        Returns:
+            title (str): string title name
+        """
+        tree = html.fromstring(source_dom)
+        title_element = tree.xpath('/html[1]/head[1]/title[1]')
+        return title_element[0].text.strip()
 
     def get_form_field_labels(self, eventable):
         """
         Get label for all the form fields for this eventable element
 
-        Parameters:
+        Args:
             eventable (dict): A json dict of the eventable
 
         Returns:
@@ -347,76 +414,57 @@ class HeuristicLabel:
 
         """
         # get title text for the source dom
-        tree = html.fromstring(eventable['source']['dom'])
-        title_element = tree.xpath('/html[1]/head[1]/title[1]')
-        title = title_element[0].text.strip()
+        title = self.get_title(eventable['source']['dom'])
 
         # get all form field labels for this eventable
         form_field_labels = []
         for form_input in eventable['relatedFormInputs']:
-
             form_field_dom_str = self.find_element(eventable['source']['dom'], form_input['identification'], 'str')
             form_field_dom = self.find_element(eventable['source']['dom'], form_input['identification'])
+            value = form_input['inputValues'][0]['value']
 
             # form field dom not found
             if form_field_dom is None:
                 # if no dom found, not possible to calculate the label
                 self.empty_form_field_labels += 1
-                form_field_label = 'On page "' + title + '", enter data into form field'
-                form_field_labels.append(form_field_label)
+                form_field_labels.append('Enter data into form field')
                 continue
 
-            # check if form field dom has any text
-            form_field_label = form_field_dom.text
-
-            # if no text found in form field dom, try to get the label sibling of this dom
-            if form_field_label is None or form_field_label.strip() == '':
-
-                # if no id, only previous sibling of the form field dom can be its label
-                if not form_field_dom.get('id'):
-                    previous_sibling = form_field_dom.getprevious()
-                    if previous_sibling is not None and previous_sibling.tag == 'label':
-                        # label for this element
-                        form_field_label = previous_sibling.text
-
-                # if id, search for the preceding sibling which has this id
-                else:
-                    form_field_id = form_field_dom.get('id')
-                    for sibling in form_field_dom.itersiblings(preceding=True):
-                        if sibling.get('for') == form_field_id:
-                            form_field_label = sibling.text
-                            break
-
-            # if no label elements found, check for a few useful attributes
-            if not form_field_label or form_field_label == '':
-                for attr in ['aria-label', 'value', 'placeholder']:
-                    form_field_label = form_field_dom.get(attr)
-                    if form_field_label is not None:
-                        break
-
-            # if still no label has been generated, check in the extended dom of the form field for a label or aria-label
-            if not form_field_label or form_field_label == '':
-                form_field_extended_dom = self.get_form_field_extended_dom(eventable['source']['dom'], form_input['identification'])
-                if form_field_extended_dom is not None:
-                    form_field_label = form_field_extended_dom.get('label')
-                    if not form_field_label:
-                        form_field_label = form_field_extended_dom.get('aria-label')
-                    if not form_field_label:
-                        form_field_label = form_field_extended_dom.text
-                    prev_sibling = form_field_extended_dom.getprevious()
-                    if not form_field_label and prev_sibling is not None and prev_sibling.tag == 'label':
-                        form_field_label = prev_sibling.text
-
+            form_field_label = ''
             # get type of the form field
             form_field_type = form_field_dom.get('type')
             if not form_field_type:
                 form_field_type = 'form field'
-            form_field_tag = form_field_dom.tag
+
+            # handle select form fields
+            if form_field_dom.tag == 'select':
+                form_field_label = self.process_select_element(form_field_dom)
+
+
+            if not form_field_label or form_field_label.strip() == '':
+                # check if form field dom has any text
+                form_field_label = self.remove_punctuation(form_field_dom.text)
+
+            # if no text found in form field dom, try to get the label sibling of this dom
+            if not form_field_label or form_field_label.strip() == '':
+                form_field_label = self.get_label_sibling(form_field_dom)
+
+            # if no label elements found, check for a few useful attributes
+            if not form_field_label or form_field_label.strip() == '':
+                for attr in ['aria-label', 'value', 'placeholder']:
+                    form_field_label = self.remove_punctuation(form_field_dom.get(attr))
+                    if form_field_label:
+                        break
+
+            # if still no label has been generated, check in the extended dom of the form field for a label or aria-label
+            if not form_field_label or form_field_label.strip() == '':
+                form_field_extended_dom = self.get_form_field_extended_dom(eventable['source']['dom'], form_input['identification'])
+                form_field_label = self.get_label_from_dom(form_field_extended_dom)
 
             # process table element
             parent = form_field_dom.getparent()
             if parent.tag in ['tr', 'th', 'td']:
-                form_field_label = 'On page "' + title + '", ' + self.process_table_element(form_field_dom, form_field_label)
+                form_field_label = 'on page "{}", {}'.format(title, self.process_table_element(form_field_dom, form_input, self.remove_punctuation(form_field_label)))
 
             # non table element
             else:
@@ -424,88 +472,231 @@ class HeuristicLabel:
                 if not form_field_label or form_field_label.strip() == '':
                     form_field_label = self.get_form_field_label_by_attribute(form_field_dom_str)
 
-                # remove punctuation
-                punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
-                for chr in form_field_label:
-                    if chr in punc:
-                        form_field_label = form_field_label.replace(chr, '')
-
-                form_field_label = form_field_label.strip().lower()
-
                 # get final label based on form field type
-                if form_field_label is not None and form_field_label != '':
-                    if form_field_type in ['checkbox', 'file', 'radio'] or form_field_tag == 'select':
-                        form_field_label = 'On page "' + title + '", select "' + form_field_label + '"'
-                    else:
-                        form_field_label = 'On page "' + title + '", enter "' + form_field_label + '"'
-
-                # empty form field label
-                else:
-                    self.empty_form_field_labels += 1
-                    if form_field_type in ['checkbox', 'file', 'radio'] or form_field_tag == 'select':
-                        form_field_label = 'On page "' + title + '", ' + 'select "' + form_field_type + '"'
-                    else:
-                        form_field_label = 'On page "' + title + '", enter data into form field'
+                verb = 'select' if form_field_type in ['checkbox', 'file', 'radio'] or form_field_dom.tag == 'select' else 'enter'
+                form_field_label = self.generate_concatenated_label(title, verb, form_field_type, form_field_label.strip(), value)
 
             form_field_labels.append(form_field_label)
 
         return form_field_labels
 
+    def get_form_header(self, form_field_dom):
+        """
+        Get label/header for a form
 
-    def process_table_element(self, form_field_dom, form_field_label):
+        Args:
+            form_field_dom (dom): dom of the form field element
+
+        Returns:
+            form header (str): label/header for the form
+
+        """
+        # if part of a form, get form header or label for the form element
+
+        # go up till we find a form dom, if any
+        parent_dom = form_field_dom
+        while parent_dom is not None and parent_dom.tag != 'form':
+            parent_dom = parent_dom.getparent()
+        if parent_dom is None or parent_dom.tag != 'form':
+            # no form element
+            return ''
+        prev_sibling = parent_dom.getprevious()
+        while prev_sibling is not None and prev_sibling.tag not in ['h1', 'h2', 'h3', 'label']:
+            prev_sibling = prev_sibling.getprevious()
+        if prev_sibling is not None:
+            if prev_sibling.tag in ['h1', 'h2', 'h3']:
+                return self.remove_punctuation(prev_sibling.text)
+
+            # label element
+            label_sibling = prev_sibling
+            label = label_sibling.text
+            if label and label.strip() != '':
+                return self.remove_punctuation(label)
+            # a child of label could have the text
+            for child in label_sibling.getchildren():
+                label = child.text
+                if label and label.strip() != '':
+                    return self.remove_punctuation(label)
+        # no form header or form label present
+        return ''
+
+
+
+    def generate_concatenated_label(self, title, verb, form_field_type, form_field_label, value):
+        """
+        Generate the complete label for an element by concatenating inputs
+
+        Args:
+            title (str): title of the source web page
+            verb (str): verb to be used in concatenated sentence
+            form_field_type (str): type of form field
+            form_field_label (str): label calculated for just the form field element
+            value (str): value selected/entered in the form field element
+
+        Returns:
+            form_field_label (str): concatenated label for the form field
+
+        """
+        if form_field_label is not None and form_field_label.strip() != '':
+            form_field_label = 'on page "{}", {} "{}: {}"'.format(title, verb, form_field_label, value)
+        else:
+            self.empty_form_field_labels += 1
+            if form_field_type not in ['checkbox', 'file', 'radio']:
+                form_field_type = 'form field'
+            form_field_label = 'on page "{}", {} "{}: {}"'.format(title, verb, form_field_type, value)
+        return form_field_label
+
+
+    def get_label_sibling(self, form_field_dom):
+        """
+        Get label text from the label sibling of the form field dom if it exists
+
+        Args:
+            form_field_dom (dom): dom of the form field
+
+        Returns:
+
+        """
+
+        # if no id, only a previous sibling of the form field dom can be its label
+        label = ''
+
+        # if this label applies to more than one input element, need more than overall label to identify this element
+        num_siblings_between = 0
+        if not form_field_dom.get('id'):
+            previous_sibling = form_field_dom.getprevious()
+            while previous_sibling is not None and previous_sibling.tag != 'label':
+                num_siblings_between += 1
+                previous_sibling = previous_sibling.getprevious()
+
+            if previous_sibling is not None:
+                label = self.remove_punctuation(previous_sibling.text)
+                if not label:
+                    for child in previous_sibling.iterchildren():
+                        if child.text is not None:
+                            label = child.text
+
+            if label and num_siblings_between > 0:
+                # use the name attribute of the dom as well
+                label = '{} [{}]'.format(label, self.remove_punctuation(form_field_dom.get('name')))
+
+        # if id, search for the sibling which has this id
+        else:
+            form_field_id = form_field_dom.get('id')
+            for sibling in form_field_dom.itersiblings(preceding=True):
+                if sibling.get('for') == form_field_id:
+                    label = self.remove_punctuation(sibling.text)
+                    if not label:
+                        for child in sibling.iterchildren():
+                            if child.text is not None:
+                                label = self.to_lowercase(child.text.strip())
+                                break
+            if not label or label.strip() == '':
+                for sibling in form_field_dom.itersiblings(preceding=False):
+                    if sibling.get('for') == form_field_id:
+                        label = self.remove_punctuation(sibling.text)
+                        if not label:
+                            for child in sibling.iterchildren():
+                                if child.text is not None:
+                                    label = self.to_lowercase(child.text.strip())
+                                    break
+        return label
+
+    def get_label_from_dom(self, dom):
+        """
+        Get the label from the dom by considering label and aria-label attributes within the dom, as well as a label for this entire dom
+
+        Args:
+            dom (dom): extended form field dom, either containing a label, following a label, or containing more than one eventable
+
+        Returns:
+            label (str): label extracted from this extended dom
+
+        """
+        label = ''
+        if dom is None:
+            return label
+        label = dom.get('label')
+        if not label:
+            label = dom.get('aria-label')
+        if not label:
+            label = dom.text
+        prev_sibling = dom.getprevious()
+        if not label and prev_sibling is not None and prev_sibling.tag == 'label':
+            label = prev_sibling.text
+        return self.remove_punctuation(label)
+
+    def process_table_element(self, form_field_dom, form_input, form_field_label):
         """
         Process an element of a table to produce a meaningful label
 
-        Parameters:
+        Args:
             form_field_dom (dom): dom of the form field element in the table
             form_field_label: current label for this element; if empty, row needs to be calculated
 
         Returns:
             label (str): label for the table element
         """
+        value = form_input['inputValues'][0]['value']
         form_field_type = form_field_dom.get('type')
         if not form_field_type:
             form_field_type = 'form field'
+
         # go up till tr tag reached, to get the row dom
         row_dom = form_field_dom
         while row_dom is not None and row_dom.tag != 'tr':
             row_dom = row_dom.getparent()
 
         # check if more than 1 input element in the row with the same type as this form field
-        more_than_one_input_element = False
-        for element in row_dom.iterchildren():
-            for nested_element in element.iterchildren():  #each row element is a td or th element
-                if nested_element.tag == 'input' and nested_element != form_field_dom and nested_element.get('type') != form_field_type:
-                    more_than_one_input_element = True
-                    break
-
-        # if more than one input element, then column is also needed
-        # calculate column number
-        if more_than_one_input_element:
-            col_num = 0
-            for child in row_dom.getchildren():
-                child = child.getchildren()[0] #each row element is a td or th element
-                if child == form_field_dom:
-                    break
-                col_num += 0
+        more_than_one_input_element = self.contains_more_than_one_input(row_dom, form_field_dom)
 
         # find table dom, to get table label
         table_dom = row_dom
         while table_dom is not None and table_dom.tag != 'table':
             table_dom = table_dom.getparent()
 
+        # if more than one input element, need the column number and if it exists, column name
         col_label = ''
+        if more_than_one_input_element:
+            col_label = self.get_column_label(table_dom, row_dom, form_field_dom)
+
+        table_label = self.get_table_label(table_dom)
+        if not table_label or table_label.strip() == '':
+            # check for form header
+            form_header = self.get_form_header(table_dom)
+            if form_header and form_header.strip() != '':
+                table_label = form_header
+
+        verb = 'select' if form_field_type in ['checkbox', 'file', 'radio'] else 'enter data in'
+
+        # for empty form field label, calculate row number
+        if form_field_label is None or form_field_label.strip() == '':
+            form_field_row = 1
+            for sibling in row_dom.itersiblings(preceding = True):
+                form_field_row += 1
+            form_field_label = 'row ' + str(form_field_row)
+
+        if more_than_one_input_element:
+            label = 'in table "{}", column "{}", {} "{}: {}"'.format(table_label.strip(), col_label, verb, form_field_label, value)
+        else:
+            label = 'in table "{}", {} "{}: {}"'.format(table_label, verb, form_field_label, value)
+        return label
+
+
+
+    def get_table_label(self, table_dom):
+        """
+        Get label for the table element
+
+        Args:
+            table_dom (dom):  dom of the table element
+
+        Returns:
+            table label (str): label for the table
+
+        """
         table_label = ''
         first_child = table_dom.getchildren()[0]
-
-        # if more than one input element, need the column number and if it exists, column name
-        if more_than_one_input_element:
-            if first_child is not None and first_child.tag == 'thead':
-                header_row_dom = first_child.getchildren()[0]  # to get to the header row
-                col_label = header_row_dom.getchildren()[col_num].text
-            if col_label is None or col_label == '':
-                col_label = str(col_num)
-
         # if caption element exists for the table, choose that for the label
         if first_child is not None and first_child.tag == 'caption':
             table_label = first_child.text
@@ -513,34 +704,103 @@ class HeuristicLabel:
         # if no caption element exists, search for a header previous sibling of the table
         else:
             prev_element = table_dom.getprevious()
-            if prev_element and prev_element.tag in ['h1', 'h2', 'h3']:
+            if prev_element is not None and prev_element.tag in ['h1', 'h2', 'h3']:
                 table_label = prev_element.text
+        return self.remove_punctuation(table_label)
 
-        verb = 'select ' if form_field_type in ['checkbox', 'file', 'radio'] or form_field_dom.tag == 'select' else 'enter data in '
+    def get_column_label(self, table_dom, row_dom, form_field_dom):
+        """
+        Get label for column of a table
 
-        # for empty form field label, calculate row number
-        if form_field_label is None or form_field_label.strip() == '':
+        Args:
+            table_dom (dom): dom of the table
+            row_dom (dom): dom of the row in the table which contains the form field
+            form_field_dom (dom): dom of the form field element
 
-            form_field_row = 1
-            for sibling in row_dom.itersiblings(preceding = True):
-                form_field_row += 1
+        Returns:
+            col_label (str): label for the column
+        """
+        col_num = 0
+        for child in row_dom.getchildren():
+            child = child.getchildren()[0]  # each row element is a td or th element
+            if child == form_field_dom:
+                break
+            col_num += 0
 
-            form_field_label = 'row ' + str(form_field_row)
+        first_child = table_dom.getchildren()[0]
+        if first_child is not None and first_child.tag == 'thead':
+            header_row_dom = first_child.getchildren()[0]  # to get to the header row
+            # get name of this column
+            col_label = header_row_dom.getchildren()[col_num].text
 
-            # add column label as part of the label if more than one input element exists in the row
-            if more_than_one_input_element:
-                label = 'in table "' + table_label.strip() + '", column "' + col_label + '", ' + verb + form_field_label
-            else:
-                label = 'in table "' + table_label.strip() + '", ' + verb + form_field_label
+        # if no name is present for this column number, its number is the column label
+        if col_label is None or col_label == '':
+            col_label = str(col_num)
+        return col_label
 
-        # form field label not empty, row is not needed
-        else:
-            # add column label as part of the label if more than one input element exists in the row
-            if more_than_one_input_element:
-                label = 'in table "' + table_label.strip()+ '", column "' + col_label + '", ' + verb + '"' + form_field_label + '"'
-            else:
-                label = 'in table "' + table_label.strip()+ '", ' + verb + '"' + form_field_label + '"'
 
+    def contains_more_than_one_input(self, row_dom, form_field_dom):
+        """
+        Checks if there is more than one input element in the row dom with the same type as the form field dom
+
+        Args:
+            row_dom (dom): dom of the row
+            form_field_dom (dom): dom of the form field
+
+        Returns:
+            more_than_one_input_element (boolean): whether or not more than one such element exists
+
+        """
+        # check if more than 1 input element in the row with the same type as this form field
+        form_field_type = form_field_dom.get('type')
+        if not form_field_type:
+            form_field_type = 'form field'
+        more_than_one_input_element = False
+        for element in row_dom.iterchildren():
+            for nested_element in element.iterchildren():  # each row element is a td or th element
+                if nested_element.tag == 'input' and nested_element != form_field_dom and nested_element.get(
+                        'type') != form_field_type:
+                    more_than_one_input_element = True
+                    break
+        return more_than_one_input_element
+
+    def process_select_element(self, form_field_dom):
+        """
+        Handle processing for select elements
+
+        Args:
+            form_field_dom (dom): dom of the form field
+
+        Returns:
+            label (str): label for the select form field
+
+        """
+        # go back through all siblings till a label element is found
+        # combine with the element selected from the drop down
+        main_label = ''
+        element_name = form_field_dom.get('name')
+        prev_sibling = form_field_dom.getprevious()
+        # if more than one element depends on main label, only then use element name as well
+        num_siblings_between = 0
+        while prev_sibling is not None and prev_sibling.tag != 'label':
+            num_siblings_between += 1
+            prev_sibling = prev_sibling.getprevious()
+        if prev_sibling is not None:
+            main_label = prev_sibling.text
+        if not main_label:
+            main_label = ''
+        if not element_name:
+            element_name = ''
+        main_label = self.remove_punctuation(main_label).strip()
+        element_name = element_name.strip()
+        label = ''
+        if main_label != '' and element_name != '' and num_siblings_between > 0:
+            # need element name
+            label = '{} [{}]'.format(main_label, element_name)
+        elif main_label != '':
+            label = main_label
+        elif element_name != '':
+            label = element_name
         return label
 
 
@@ -548,7 +808,7 @@ class HeuristicLabel:
         """
         Get the label for a form field element by referring to a ranking of attributes
 
-        Parameters:
+        Args:
             form_field_dom (str): the dom of the form field element
 
         Returns:
@@ -572,24 +832,46 @@ class HeuristicLabel:
             if attr in attributes:
                 form_field_label = self.remove_non_english_words(self.lemmatize(self.tokenize(attributes[attr])))
                 break
-        return form_field_label
+        return self.remove_punctuation(form_field_label)
 
 
-    def get_element_label(self, eventable):
+    def get_element_label(self, eventable, element_dom):
         """ get heuristic labels by selecting the highest ranked attribute which this eventable has
 
-        Parameters:
+        Args:
                     eventable (dict): A json dict of the element field of the eventable
+                    element_dom (dom): dom fragment of the element
 
         Returns:
                     element_label (str): The label for this eventable based on the element itself"""
 
         element_label = ''
 
+        # first check for a few useful attributes in element dom
+        if element_dom is not None:
+            if element_dom.get('title') is not None and element_dom.get('title') != '':
+                return element_dom.get('title')
+
+            if element_dom.get('alt') is not None and element_dom.get('alt') != '':
+                return element_dom.get('alt')
+
+            for child in element_dom.iterchildren():
+                if child is not None and child.text is not None and child.text.strip() != '':
+                    return child.text.strip()
+
+            for child in element_dom.iterchildren():
+                if child is not None and child.get('title') is not None and child.get('title').strip() != '':
+                    return child.get('title')
+
+            for child in element_dom.iterchildren():
+                if child is not None and child.get('alt') is not None and child.get('alt').strip() != '':
+                    return child.get('alt')
+
+        # check in eventable dict
         for attr in self.ranked_attributes:
 
             if attr == 'text' and attr in eventable:
-                element_label = self.process_attribute_value(eventable[attr])
+                element_label = self.preprocess(eventable[attr])
 
             elif 'attributes' in eventable and attr in eventable['attributes']:
                 if attr == 'href':
@@ -597,7 +879,7 @@ class HeuristicLabel:
                     # is usually longer and more complicated than other
                     # attributes
                     href = eventable['attributes']['href']
-                    tokenized_href = self.process_attribute_value(href.strip().split("?")[-1])
+                    tokenized_href = self.preprocess(href.strip().split('?')[-1])
                     kw_model = KeyBERT()
                     keywords = kw_model.extract_keywords(tokenized_href, keyphrase_ngram_range=(1, 2),
                                                          stop_words='english', use_mmr=True,
@@ -606,9 +888,12 @@ class HeuristicLabel:
                         element_label = keywords[0][0]
                     else:
                         element_label = href.strip().split("/")[-1].split(".")[0]
-                        element_label = self.process_attribute_value(element_label)
+                        element_label = self.preprocess(element_label)
+                elif attr == 'value':
+                    # usually has more value and does not need to be that preprocessed
+                    element_label = self.to_lowercase(eventable['attributes'][attr])
                 else:
-                    element_label = self.process_attribute_value(eventable['attributes'][attr])
+                    element_label = self.preprocess(eventable['attributes'][attr])
             if element_label != '':
                 break
 
@@ -632,13 +917,13 @@ class HeuristicLabel:
         """
         Get label for a context DOM
 
-        Parameters:
+        Args:
             context_dom (str): context DOM for which we need to calculate the label
 
         Returns:
             label (str): label for this context DOM
         """
-
+        logging.info('Preprocessing context dom to generate a label')
         preprocessed_context_dom = self.dict_value_to_str(self.parse_dom_to_dict(context_dom))
 
         preprocessed_context_dom = self.preprocess(preprocessed_context_dom)
@@ -659,7 +944,7 @@ class HeuristicLabel:
                 if len(word.strip()) > 0 and word.strip() not in label_list:
                     label_list.append(word.strip())
             label = " ".join(label_list)
-        label = self.process_attribute_value(label)
+        label = self.preprocess(label)
         return label.strip()
 
 
@@ -667,9 +952,9 @@ class HeuristicLabel:
         """
         Locates the eventable element in the web page
 
-        Parameters:
+        Args:
             state_dom (str): DOM of the web page in string format
-            eventable_element_xpath (str): xpath of the eventable element in string format
+            eventable_element_identification (dict): identification to get the element
             return_format (str): return format of eventable element location, default 'dom'
 
         Returns:
@@ -710,7 +995,7 @@ class HeuristicLabel:
         """
         Gets context dom of the eventable element by finding the oldest parent of the eventable element without another child
 
-        Parameters:
+        Args:
             state_dom (str): DOM of the web page
             eventable_element_xpath (str): xpath of the eventable in this DOM
 
@@ -726,7 +1011,6 @@ class HeuristicLabel:
         # at most find the fourth parent
         iterations = 0
         while curr_dom.getparent() and iterations <= 3:
-            curr_dom_etree = ''
             try:
                 curr_dom_string = etree.tostring(curr_dom).decode('UTF-8').strip()
                 if not curr_dom_string.endswith(">"):
@@ -753,7 +1037,7 @@ class HeuristicLabel:
         """
         Checks whether the DOM has more than one eventable
 
-        Parameters:
+        Args:
             dom (str): string DOM
 
         Returns:
@@ -776,7 +1060,7 @@ class HeuristicLabel:
         """
         Preprocesses eventable['element'] to return a string
 
-        Parameters:
+        Args:
             eventable_element_details (dict): a dictionary of eventable['element']
 
         Returns:
@@ -793,41 +1077,11 @@ class HeuristicLabel:
         return preprocessed_eventable_details
 
 
-    def process_attribute_value(self, text):
-        # TODO: check how this is different from normal preprocessing
-        """
-        Process a string attribute value of an eventable
-
-        Parameters:
-            text (str): an attribute of an eventable to be processed
-
-        Returns:
-            preprocessed_attr (str): the preprocessed attribute value
-        """
-        preprocessed_attr = ''
-        dictionary = enchant.Dict("en_US")
-        punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
-        text = self.preprocess(text)
-        english = False
-        if text:
-            for button_text_word in text.split(" "):
-                if button_text_word in punc:
-                    continue
-                if not dictionary.check(button_text_word.lower()):
-                    english = False
-                    break
-                english = True
-            if english:
-                preprocessed_attr = text
-        logging.debug(f"text: {text}, isEnglish: {english}, element label: {preprocessed_attr}")
-        return preprocessed_attr.strip()
-
-
     def parse_dom_to_dict(self, dom: str):
         """
         Parses input string dom to a dict using the xmltodict library
 
-        Parameters:
+        Args:
             dom (str): input string DOM
 
         Returns:
@@ -843,7 +1097,7 @@ class HeuristicLabel:
         """
         Converts dict context dom to string
 
-        Parameters:
+        Args:
             context_dom_input (dict):  dict of context dom
 
         Returns:
@@ -875,8 +1129,8 @@ class HeuristicLabel:
 # for class testing and performance analysis
 if __name__ == "__main__":
     # save analysis outputs in tkltest/generate/ui/analysis_outputs
-
-    file = json.load(open('crawl_paths_tmf_small.json'))
+    app = sys.argv[1]
+    file = json.load(open('crawl_paths_{}.json'.format(app)))
     curr_labels = dict()
     method_labels = dict()
     total_clickables = 0
@@ -890,10 +1144,12 @@ if __name__ == "__main__":
     for crawlpath in file:
         for eventable in crawlpath:
             curr_labels[eventable['id']] = heuristic_label.eventable_labels[eventable['id']]
-            eventable_id_path = '_'.join([
+        eventable_id_path = '_'.join([
                 str(eventable['id']) for eventable in crawlpath
             ])
-            method_labels[eventable_id_path] = heuristic_label.method_labels[eventable_id_path]
+        method_labels[eventable_id_path] = heuristic_label.method_labels[eventable_id_path]
 
     print(curr_labels)
     print(method_labels)
+
+

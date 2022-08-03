@@ -1,9 +1,9 @@
 [
     "value",
+    "title",
     "text",
     "href",
     "name",
     "class",
-    "title",
     "onclick"
 ]
