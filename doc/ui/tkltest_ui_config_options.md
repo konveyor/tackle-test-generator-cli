@@ -91,7 +91,8 @@ that require other types of data could restrict the crawler's exploration of the
 The form data specification is provided in TOML format in a particular schema.
 For an example specification, see the [form data spec for the Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_formdata_config.toml).
 
-For each form, you need to specify a table with the form name `[forms.<form name>]`. In the 
+For each form, you need to specify a table with the form name `[forms.<form name>]`. Note that the form 
+name is just a placeholder that is not extracted from the DOM representation. In the 
 table of each form, you specify a list of input data for different fields. For each field,
 you need to specify (1) `input_type`, (2) `identification`, and (3) `input_value`.  
 1. `input type` is either `text`, `select`, `checkbox`, `radio`, `email`, `textarea`, `password`, or `number`.
@@ -185,6 +186,21 @@ specification identifies one or more web elements as follows:
 If the second part is omitted from an element specification, the click or don't click directive applies
 to all occurrences of the given tag name.
 
+It also possible to exclude an entire tree of web elements by using the `under_xpath` specifier with
+a wildcard. For example, a `dont_click` specifier `under_xpath = //div[@id='xyz']//*` would exclude
+all web elements in the tree rooted at the web element with id `xyz`. This can be a convenient way
+of omitting exploration, for example, of web elements located in the header or footer section of a web page.
+Alternatively, one can specify `dont_click.children_of`, causing the entire subtree of the element 
+to not be clicked. The `dont_click.children_of` specification identifies the excluded web elements as follows:
+
+1. `tag_name`: string, or a list of strings, specifying HTML tag(s)
+2. optionally, one of `with_class` or `with_id`, taking the following structure
+    ```buildoutcfg
+    with_class = "<class>"
+    with_id = "<id>"
+    ```
+
+
 To illustrate, here are a few examples of `click` specifications:
 
 ```buildoutcfg
@@ -236,10 +252,15 @@ To illustrate, here are a few examples of `click` specifications:
   under_xpath = "//*[@id=\"primary-links\"]/li"
 ```
 
-It also possible to exclude an entire tree of web elements by using the `under_xpath` specifier with
-a wildcard. For example, a `dont_click` specifier `under_xpath = //div[@id='xyz']//*` would exclude
-all web elements in the tree rooted at the web element with id `xyz`. This can be a convenient way
-of omitting exploration, for example, of web elements locateds in the header or footer section of a web page.
+
+`dont_click.children_of` specifications follow the same structure, as illustrated by the following examples:
+
+```buildoutcfg
+# do not click the entire top bar with the "topbar" id
+[[dont_click.children_of]]
+	tag_name = ["div"]
+	with_id = "topbar"
+```
 
 ## Pre-crawl Actions Specification
 
