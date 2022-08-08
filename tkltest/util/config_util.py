@@ -15,7 +15,6 @@
 # ***************************************************************************
 
 import logging
-import os
 import shutil
 import toml
 import sys
@@ -26,11 +25,11 @@ import re
 import copy
 import xml.etree.ElementTree as ElementTree
 import json
-from . import constants, config_options
-from .logging_util import tkltest_status
-from .constants import *
-from tkltest.util import command_util
+from tkltest.util import config_options, command_util
+from tkltest.util.logging_util import tkltest_status
+from tkltest.util.constants import *
 from tkltest.util.unit import dir_util
+from tkltest.util.ui import config_options_ui
 
 
 def load_config(test_level='unit', args=None, config_file=None):
@@ -55,14 +54,22 @@ def load_config(test_level='unit', args=None, config_file=None):
     if args is None and config_file is None:
         return tkltest_config
 
-    # load config toml file and merge it into initialized config; this ensures that options missing
-    # in the toml file are initialized to their default values
     # load config from the file if provided or from the file specified in command line
     if config_file is not None:
         toml_config = toml.load(config_file)
     else:
         toml_config = toml.load(args.config_file)
-    __merge_config(tkltest_config, toml_config)
+
+    # read internal options for tkltest-ui so they can be checked during config merging to avoid
+    # printing warning messages about unsupported options for internal options that occur in the toml file
+    if test_level == 'ui':
+        internal_config_options = config_options_ui.get_options_spec_internal()
+    else:
+        internal_config_options = {}
+
+    # merge config loaded from file into initialized config; this ensures that options missing
+    # in the toml file are initialized to their default values
+    __merge_config(tkltest_config, toml_config, base_config_internal=internal_config_options)
     logging.debug('config: {}'.format(tkltest_config))
 
     # update general options with values specified in command line
@@ -101,7 +108,7 @@ def load_config(test_level='unit', args=None, config_file=None):
     # map base test generator name to the internal code component name
     if subcommand == 'ctd_amplified':
         tkltest_config[args.command][subcommand]['base_test_generator'] = \
-            constants.BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
+            BASE_TEST_GENERATORS[tkltest_config[args.command][subcommand]['base_test_generator']]
 
     logging.debug('validated config: {}'.format(tkltest_config))
     return tkltest_config
@@ -279,7 +286,7 @@ def __update_config_with_cli_value(config, options_spec, args):
                     config[opt_name] = opt_value
 
 
-def __merge_config(base_config, update_config, key_prefix=""):
+def __merge_config(base_config, update_config, key_prefix="", base_config_internal={}):
     """Merge two config specs.
 
     Updates base config with data in update config.
@@ -288,10 +295,12 @@ def __merge_config(base_config, update_config, key_prefix=""):
     for key, val in update_config.items():
         full_key = key if key_prefix == "" else key_prefix + '.' + key
         if key not in base_config:
-            tkltest_status('Warning: Unsupported flag in toml file: {}'.format(full_key))
+            if not base_config_internal or key not in base_config_internal:
+                tkltest_status('Warning: Unsupported flag in toml file: {}'.format(full_key))
         if isinstance(val, dict):
             baseval = base_config.setdefault(key, {})
-            __merge_config(baseval, val, full_key)
+            basevalint = base_config_internal.setdefault(key, {})
+            __merge_config(baseval, val, full_key, basevalint)
         else:
             base_config[key] = val
 
@@ -1131,9 +1140,9 @@ if __name__ == '__main__':
     with open(config_file, 'r') as f:
         file_config = toml.load(f)
     print('file_config={}'.format(file_config))
-    base_config = init_config()
+    base_config = init_config(test_level='ui')
     print('base_config={}'.format(base_config))
-    __merge_config(base_config, file_config)
+    __merge_config(base_config, file_config, base_config_internal=config_options_ui.get_options_spec_internal())
     print('updated_config={}'.format(base_config))
-    failure_msgs = __validate_config(base_config, test_level='unit', command='generate', subcommand='ctd_amplified')
-    print('failure_msgs={}'.format(failure_msgs))
+    # failure_msgs = __validate_config(base_config, test_level='unit', command='generate', subcommand='ctd_amplified')
+    # print('failure_msgs={}'.format(failure_msgs))
