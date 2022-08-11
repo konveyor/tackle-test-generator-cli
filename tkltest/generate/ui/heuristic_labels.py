@@ -261,6 +261,8 @@ class HeuristicLabel:
             # get navigation of clickables until the next form field is filled
             while i < n and len(self.eventable_labels[crawl_path[i]['id']][2]) == 0:
                 eventable_path.append(self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip())
+                if self.eventable_counts[self.eventable_labels[crawl_path[i]['id']][0]] == 1:
+                    unique_eventables.append(self.eventable_labels[crawl_path[i]['id']][0])
                 i += 1
             path.append('navigates the path: {}.'.format(', '.join(eventable_path)))
 

@@ -58,12 +58,12 @@ class HeuristicLabelTest(unittest.TestCase):
         correct_method_labels = [
             {
                 '2_3': 'This test navigates the path: click "post login".\n\t* Then it enters values in form "number of results" and submits the form.\n\t* The unique clickables in this path are: on page "Address book", click "post login", on page "Address book", click "next birthdays".',
-                '4_5': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "export", click "groups".\n\t* The unique clickables in this path are: on page "Address book", click "export".',
-                '6_7': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "print all", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "print all".',
-                '9_11': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "import", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "import".',
+                '4_5': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "export", click "groups".\n\t* The unique clickables in this path are: on page "Address book", click "export", on page "Address book ([none])", click "groups".',
+                '6_7': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "print all", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "print all", on page "Address book (cEyhmIaV)", click "v8.0.0 - r475".',
+                '9_11': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "import", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "import", on page "Address book ([none])", click "v8.0.0 - r475".',
                 '12': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "print phones".\n\t* The unique clickables in this path are: on page "Address book", click "print phones".'},
             {
-                '2_3': 'This test navigates the path: click "veterinarians", click "owner add".\n\t* The unique clickables in this path are: on page "SpringPetclinicAngular", click "veterinarians".'}]
+                '2_3': 'This test navigates the path: click "veterinarians", click "owner add".\n\t* The unique clickables in this path are: on page "SpringPetclinicAngular", click "veterinarians", on page "SpringPetclinicAngular", click "owner add".'}]
 
         # check for all DOM fragments in these two files, that labels are produced correctly
 
