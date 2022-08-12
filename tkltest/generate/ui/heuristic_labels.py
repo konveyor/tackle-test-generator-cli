@@ -14,7 +14,7 @@ from keybert import KeyBERT
 
 from importlib import resources
 import torch
-from simplet5 import SimpleT5
+# from simplet5 import SimpleT5
 
 
 class HeuristicLabel:
