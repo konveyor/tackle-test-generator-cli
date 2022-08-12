@@ -13,6 +13,8 @@ import collections
 from keybert import KeyBERT
 
 from importlib import resources
+import torch
+from simplet5 import SimpleT5
 
 
 class HeuristicLabel:
@@ -172,7 +174,7 @@ class HeuristicLabel:
     def remove_punctuation(self, s):
         if not s:
             return ''
-        punc = '''!()-[]{};:'"\,<>.?@#$%^&*_~'''
+        punc = '''!()-[]{};:'\,<>.?@#$%^&*_~'''
         for chr in s:
             if chr in punc:
                 s = s.replace(chr, '')
@@ -218,7 +220,6 @@ class HeuristicLabel:
             method_label = self.get_method_label(crawl_path)
             self.method_labels[eventable_id_path] = method_label
 
-
     def get_method_label(self, crawl_path):
         """
         Calculates method level label
@@ -249,7 +250,7 @@ class HeuristicLabel:
                 else:
                     path.append('{}.'.format(form_fill_line))
 
-           # if form is submitted, don't add the submitting clickable to the following navigation
+            # if form is submitted, don't add the submitting clickable to the following navigation
             if flag:
                 i += 1
                 continue
@@ -261,6 +262,8 @@ class HeuristicLabel:
             # get navigation of clickables until the next form field is filled
             while i < n and len(self.eventable_labels[crawl_path[i]['id']][2]) == 0:
                 eventable_path.append(self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip())
+                if self.eventable_counts[self.eventable_labels[crawl_path[i]['id']][0]] == 1:
+                    unique_eventables.append(self.eventable_labels[crawl_path[i]['id']][0])
                 i += 1
             path.append('navigates the path: {}.'.format(', '.join(eventable_path)))
 
@@ -272,6 +275,96 @@ class HeuristicLabel:
             method_label.append('The unique clickables in this path are: {}.'.format(', '.join(unique_eventables)))
 
         return '\n\t* '.join(method_label)
+
+    def get_method_label_with_abstractive_summary(self, crawl_path):
+        """
+        Calculates method level label
+
+        Args:
+            crawl_path (list): a single crawl path, depicting a single output test method
+
+        Returns:
+            method_label (str): label for the method
+
+        """
+        i = 0
+        n = len(crawl_path)
+        path = []
+        method_label = []
+        unique_eventables = []
+        previous_clickable = ''
+        while i < n:
+            eventable = crawl_path[i]
+            if self.eventable_counts[self.eventable_labels[eventable['id']][0]] == 1:
+                unique_eventables.append(self.eventable_labels[eventable['id']][0])
+            flag = False
+            for form_name in self.eventable_labels[eventable['id']][2]:
+                # check for abstract summary in the case this form is submitted
+                # print(form_name)
+                # check if it submits this form
+                if self.submits_form(self.eventable_labels[eventable['id']][0]):
+                    flag = True
+                    if len(path) == 0:
+                        path.append('enters values in form {} and submits the form'.format(form_name))
+                    else:
+                        # print('\n\n\npath[-1]:',path[-1])
+                        previous_clickables = path[-1].split(':')[-1].split(',')
+                        # print('\n\nXXX',previous_clickables)
+                        # print(len(previous_clickables))
+                        if previous_clickable == previous_clickables[-1].strip():
+                            # need to remove it from previous navigation
+                            if len(previous_clickables) == 1:
+                                # remove previous navigation as it will be included in the abstractive summary
+                                path.pop(-1)
+                            else:
+                                path[-1] = ', '.join(path[-1].split(', ')[:-1]) # up till the last clickable
+                        text = '{} Then enter values in form "{}".'.format(previous_clickable, form_name)
+                        abstractive_summary = self.get_abstractive_summary(text)
+                        # print(previous_clickable)
+                        path.append('navigates the path: {}'.format(abstractive_summary))
+                else:
+                    form_fill_line = 'enters values in form "{}".'.format(form_name)
+                    path.append(form_fill_line)
+
+           # if form is submitted, don't add the submitting clickable to the following navigation
+            if flag:
+                i += 1
+                # in case two forms are submitted in a row, this is needed
+                previous_clickable = '{}.'.format(self.eventable_labels[eventable['id']][0].split(', ')[-1].strip())
+                continue
+
+            if i < n:
+                eventable_path = [self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip()]
+                i += 1
+
+            # get navigation of clickables until the next form field is filled
+            while i < n and len(self.eventable_labels[crawl_path[i]['id']][2]) == 0:
+                self.eventable_labels[crawl_path[i]['id']][0]
+                if self.eventable_counts[self.eventable_labels[crawl_path[i]['id']][0]] == 1:
+                    unique_eventables.append(self.eventable_labels[crawl_path[i]['id']][0])
+                eventable_path.append(self.eventable_labels[crawl_path[i]['id']][0].split(',')[-1].strip())
+                # print(self.eventable_labels[crawl_path[i]['id']][0])
+                i += 1
+            previous_clickable = '{}.'.format(eventable_path[-1].split(', ')[-1].strip())
+            path.append('navigates the path: {}.'.format(', '.join(eventable_path)))
+
+        # make final method summary
+        method_label.append('This test {}'.format(path[0]))
+        for line in path[1:]:
+            method_label.append(('Then it {}'.format(line)))
+        if len(unique_eventables) > 0:
+            method_label.append('The unique clickables in this path are: {}.'.format(', '.join(unique_eventables)))
+        # print(method_label)
+        return '\n\t* '.join(method_label)
+
+    def get_abstractive_summary(self, text):
+        text = """summarize: {}""".format(text)
+        PATH = 'model_aug8.pt'
+        model = torch.load(PATH, map_location=torch.device('cpu'))
+        summary = model.predict(text)[0]
+        # print('\n\n\nTEXT:',text)
+        # print('\nSUMMARY:',summary)
+        return self.to_lowercase('{}.'.format(summary))
 
     def submits_form(self, eventable_label):
         """
@@ -1141,7 +1234,7 @@ if __name__ == "__main__":
     empty_form_field_labels = 0
 
     eventable_dom_label_table = []
-    heuristic_label = HeuristicLabel('ranked_attributes_short.json')
+    heuristic_label = HeuristicLabel('ranked_attributes.json')
     heuristic_label.get_element_and_method_labels(file)
     for crawlpath in file:
         for eventable in crawlpath:
@@ -1151,7 +1244,21 @@ if __name__ == "__main__":
             ])
         method_labels[eventable_id_path] = heuristic_label.method_labels[eventable_id_path]
 
+    labels = dict()
+    for id in heuristic_label.eventable_labels:
+        if heuristic_label.eventable_labels[id][0] in labels:
+            labels[heuristic_label.eventable_labels[id][0]].append(id)
+        else:
+            labels[heuristic_label.eventable_labels[id][0]] = [id]
+
     print(curr_labels)
     print(method_labels)
+    #
+    # for label in labels:
+    #     if len(labels[label]) > 1:
+    #         print('\n\n\n',label)
+    #         print(labels[label])
+    #         for id in labels[label]:
+    #             print(heuristic_label.eventable_labels[id])
 
 
