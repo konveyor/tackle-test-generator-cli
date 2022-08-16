@@ -573,8 +573,7 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
     if not app_build_files:
         return
     app_build_file = app_build_files[0]
-    tkltest_app_build_file = os.path.abspath('tkltest_app_' + os.path.basename(app_build_file))
-    dependencies_jars = __get_jars_for_tests_execution()
+    tkltest_app_build_file = os.path.abspath(os.path.join(os.path.dirname(app_build_file),'tkltest_app_' + os.path.basename(app_build_file)))
     abs_test_dirs = [os.path.abspath(test_src_dir) for test_src_dir in test_dirs if os.path.basename(test_src_dir) not in ['target', 'build']]
     if app_build_type == 'maven':
         # tree and root of original build file
@@ -646,7 +645,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
             f.write('}\n')
             f.write('sourceSets.test.java.srcDirs = sourceSets.test.java.srcDirs + [\n')
             for abs_test_dir in abs_test_dirs:
-                f.write('    \'' + pathlib.PurePath(abs_test_dir).as_posix() + '\',\n')
+                relative_test_dir = os.path.relpath(abs_test_dir, os.path.dirname(tkltest_app_build_file))
+                f.write('    \'' + pathlib.PurePath(relative_test_dir).as_posix() + '\',\n')
             f.write(']\n')
         # todo  - use this comments for all types when ant implemented
         tkltest_status('Generated tests are integrated into {}. New build file is saved as: {}.'.format(app_build_file, tkltest_app_build_file))
