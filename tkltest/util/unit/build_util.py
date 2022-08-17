@@ -620,7 +620,8 @@ def integrate_tests_into_app_build_file(app_build_files, app_build_type, test_di
         sources_element = __get_xml_element(configuration_element, namespaces, 'sources')
 
         for abs_test_dir in abs_test_dirs:
-            __get_xml_element(sources_element, namespaces, 'source', abs_test_dir)
+            relative_test_dir = os.path.relpath(abs_test_dir, os.path.dirname(tkltest_app_build_file))
+            __get_xml_element(sources_element, namespaces, 'source', relative_test_dir)
 
         # writing the new file, removing empty lines
         lines = minidom.parseString(ElementTree.tostring(project_root)).toprettyxml(indent="   ").split('\n')
