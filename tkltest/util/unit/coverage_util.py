@@ -343,7 +343,7 @@ def add_test_class_to_ctd_suite(test_class, test_directory):
     test_path, _ = os.path.split(test_class)
     test_path_comp = os.path.normpath(test_path).split(os.sep)
     for test_file in glob.glob(test_base+'*.java'):
-        dst_dir = os.path.join(test_directory, 'monolithic', os.sep.join(test_path_comp[1:]))
+        dst_dir = os.path.join(test_directory, os.sep.join(test_path_comp[1:]))
         os.makedirs(dst_dir, exist_ok=True)
         shutil.copy(test_file, dst_dir)
 
@@ -364,8 +364,7 @@ def remove_test_class_from_ctd_suite(test_class, test_directory):
     test_path, _ = os.path.split(test_class)
     test_path_comp = os.path.normpath(test_path).split(os.sep)
     for test_file in glob.glob(test_base+'*.java'):
-        test_suite_file = os.path.join(test_directory, 'monolithic',
-                                       os.sep.join(test_path_comp[1:]), os.path.split(test_file)[1])
+        test_suite_file = os.path.join(test_directory, os.sep.join(test_path_comp[1:]), os.path.split(test_file)[1])
         os.remove(test_suite_file)
 
 
@@ -453,11 +452,7 @@ def get_jacoco_exec_file(build_type, test_root_dir):
     if build_type == 'ant':
         jacoco_raw_data_file = os.path.join(test_root_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        # in case of maven only, jacoco.exec is created inside the monolithic subdir of the cud-amplified tests
-        if os.path.isdir(os.path.join(test_root_dir, "monolithic")):
-            jacoco_raw_data_file = os.path.join(test_root_dir, "monolithic", "jacoco.exec")
-        else:
-            jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
     else: #gradle
         jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
     return jacoco_raw_data_file

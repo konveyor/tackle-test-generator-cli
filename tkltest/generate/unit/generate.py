@@ -180,7 +180,13 @@ def generate_ctd_amplified_tests(config, output_dir):
 
     if os.path.exists(test_directory):
         shutil.rmtree(test_directory)
-    shutil.move(tmp_test_directory, test_directory)
+    # todo - resolve at core, and remove this if (leave just the else)
+    if os.path.isdir(os.path.join(tmp_test_directory, 'monolithic')):
+        shutil.move(os.path.join(tmp_test_directory, 'monolithic'), test_directory)
+        for file in os.listdir(tmp_test_directory):
+            shutil.move(os.path.join(tmp_test_directory, file), test_directory)
+    else:
+        shutil.move(tmp_test_directory, test_directory)
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
@@ -209,8 +215,8 @@ def generate_ctd_amplified_tests(config, output_dir):
                     constants.TKL_CTD_REPORT_DIR, app_name + constants.TKL_EXTENDER_CTD_COVERAGE_FILE_SUFFIX))
 
     # we create this directory, so it will be at the build files, and will be later used for augmentation
-    if not os.path.isdir(os.path.join(test_directory, 'monolithic')):
-        os.mkdir(os.path.join(test_directory, 'monolithic'))
+    if not os.path.isdir(test_directory):
+        os.mkdir(test_directory)
 
     # generate a build file
     test_dirs = [
