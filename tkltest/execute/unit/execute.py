@@ -112,14 +112,7 @@ def __execute_base(args, config):
     # remove test classes from previous runs
     #__remove_test_classes(test_root_dir)
 
-    if gen_config['subcommand'] == 'ctd-amplified':
-        # test directory has partitions
-        test_dirs = [
-            os.path.join(test_root_dir, dir) for dir in os.listdir(test_root_dir)
-            if os.path.isdir(os.path.join(test_root_dir, dir)) and not dir.startswith('.')
-        ]
-    else:
-        test_dirs = [test_root_dir]
+    test_dirs = [test_root_dir]
 
     # run test classes
     if gen_config['subcommand'] == 'ctd-amplified' and\

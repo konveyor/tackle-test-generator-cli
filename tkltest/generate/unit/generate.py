@@ -219,10 +219,7 @@ def generate_ctd_amplified_tests(config, output_dir):
         os.mkdir(test_directory)
 
     # generate a build file
-    test_dirs = [
-        os.path.join(test_directory, dir) for dir in os.listdir(test_directory)
-        if os.path.isdir(os.path.join(test_directory, dir)) and not dir.startswith('.')
-    ]
+    test_dirs = [test_directory]
 
     if config['general']['reports_path']:
         reports_dir = config['general']['reports_path']

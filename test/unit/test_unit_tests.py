@@ -536,29 +536,28 @@ class UnitTests(unittest.TestCase):
             config['general']['reports_path'] = app_name + '-reports_dir'
         shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
         os.makedirs(config['general']['test_directory'])
-        monolithic_dir = os.path.join(config['general']['test_directory'], 'monolithic')
-        build_file = build_util.generate_build_xml(
-            app_name=app_name,
-            build_type='gradle',
-            monolith_app_path=config['general']['monolith_app_path'],
-            app_classpath=build_util.get_build_classpath(config),
-            test_root_dir=config['general']['test_directory'],
-            test_dirs=[monolithic_dir],
-            # partitions_file=None,
-            target_class_list=[],
-            main_reports_dir=config['general']['reports_path'],
-            app_packages=[],  # for coverage-based augmentation
-            collect_codecoverage=True,  # for coverage-based augmentation
-            offline_instrumentation=True,
-            output_dir=output_dir
-        )
         config['general']['build_type'] = 'gradle'
         test_files = [None, None]
         for use_for_augmentation in [False, True]:
             config['dev_tests']['use_for_augmentation'] = use_for_augmentation
-            shutil.rmtree(monolithic_dir, ignore_errors=True)
-            os.makedirs(monolithic_dir)
+            shutil.rmtree(config['general']['test_directory'], ignore_errors=True)
+            os.makedirs(config['general']['test_directory'])
             shutil.rmtree(config['general']['reports_path'], ignore_errors=True)
+            build_file = build_util.generate_build_xml(
+                app_name=app_name,
+                build_type='gradle',
+                monolith_app_path=config['general']['monolith_app_path'],
+                app_classpath=build_util.get_build_classpath(config),
+                test_root_dir=config['general']['test_directory'],
+                test_dirs=[config['general']['test_directory']],
+                # partitions_file=None,
+                target_class_list=[],
+                main_reports_dir=config['general']['reports_path'],
+                app_packages=[],  # for coverage-based augmentation
+                collect_codecoverage=True,  # for coverage-based augmentation
+                offline_instrumentation=True,
+                output_dir=output_dir
+            )
             augment.augment_with_code_coverage(config, build_file,
                                                config['general']['build_type'],
                                                config['general']['test_directory'],
