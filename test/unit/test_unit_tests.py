@@ -253,10 +253,8 @@ class UnitTests(unittest.TestCase):
         # call integrate_tests_into_app_build_file(), check that new pom is created:
         pom_file = config['generate']['app_build_files'][0]
         build_util.integrate_tests_into_app_build_file([pom_file], 'maven', ctd_tests)
-        integrated_pom_file_name = 'tkltest_app_' + os.path.basename(pom_file)
-        self.assertTrue(os.path.isfile(integrated_pom_file_name))
-        integrated_pom_file = os.path.join(os.path.dirname(pom_file), integrated_pom_file_name)
-        shutil.move(integrated_pom_file_name, integrated_pom_file)
+        integrated_pom_file = os.path.join(os.path.dirname(pom_file), 'tkltest_app_' + os.path.basename(pom_file))
+        self.assertTrue(os.path.isfile(integrated_pom_file))
 
         surefire_dir = os.path.join(os.path.dirname(pom_file), 'target', 'surefire-reports')
         shutil.rmtree(surefire_dir, ignore_errors=True)
@@ -297,7 +295,7 @@ class UnitTests(unittest.TestCase):
         shutil.move(local_gradle_file, local_gradle_new_filename)
         local_gradle_file = local_gradle_new_filename
         build_util.integrate_tests_into_app_build_file([local_gradle_file], 'gradle', [ctd_tests])
-        integrated_gradle_file_name = 'tkltest_app_' + os.path.basename(local_gradle_file)
+        integrated_gradle_file_name = os.path.join(os.path.dirname(local_gradle_file), 'tkltest_app_' + os.path.basename(local_gradle_file))
         self.assertTrue(os.path.isfile(integrated_gradle_file_name))
         shutil.move(integrated_gradle_file_name, local_gradle_file)
 
