@@ -187,7 +187,8 @@ def __compute_base_and_augmenting_tests_coverage(ctd_test_dir, evosuite_test_dir
     ctd_test_dir_bak = os.path.basename(ctd_test_dir) + '-augmentation-bak'
     shutil.rmtree(ctd_test_dir_bak, ignore_errors=True)
     os.mkdir(ctd_test_dir_bak)
-    for dir in [dir for dir in ctd_test_dir if os.path.isdir(dir) and dir != 'build' and dir != 'target']:
+    for dir in [dir for dir in os.listdir(ctd_test_dir) if os.path.isdir(dir) and dir != 'build' and dir != 'target']:
+        print(dir, ctd_test_dir_bak)
         shutil.move(dir, ctd_test_dir_bak)
 
     # initialize CTD test directory with evosuite tests for coverage data collection
@@ -292,7 +293,7 @@ def __compute_coverage_efficiency(test_dir, build_file, build_type, report_dir, 
 def __initialize_test_directory(ctd_test_dir, source_test_dir):
     """Clears CTD test directory and adds test classes from the given source test directory to the CTD test directory"""
     # clear the target (ctd) directory
-    for target_test_dir in [dir for dir in ctd_test_dir if os.path.isdir(dir) and dir != 'build' and dir != 'target']:
+    for target_test_dir in [dir for dir in os.listdir(ctd_test_dir) if os.path.isdir(dir) and dir != 'build' and dir != 'target']:
         shutil.rmtree(target_test_dir, ignore_errors=True)
         os.makedirs(target_test_dir)
 
