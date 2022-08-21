@@ -74,7 +74,7 @@ setup_file() {
     [ -d $IRS_INSTR_CLASSES_DIR ]
 
     # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
+    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/$IRS_CTD_AMPLIFIED_TESTDIR/raw
 
     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs.irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
@@ -159,7 +159,7 @@ setup_file() {
     [ -d ./$IRS_TEST_REPORTS_DIR/junit-reports ]
 
     # assert over test failures and errors
-    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/monolithic/raw
+    partition_rep_dir=$IRS_TEST_REPORTS_DIR/junit-reports/$IRS_CTD_AMPLIFIED_TESTDIR/raw
 
     employee_test_errors_count=`xmllint $partition_rep_dir/TEST-irs.irs_Employee_Test.xml -xpath 'string(testsuite/@errors)'`
     echo "# employee_test_errors_count=$employee_test_errors_count" >&3
