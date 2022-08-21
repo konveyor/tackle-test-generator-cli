@@ -331,7 +331,7 @@ def add_test_class_to_ctd_suite(test_class, test_directory):
     """Adds a test class to a CTD test suite directory.
 
     Adds the given test class (specified as a file path) to the test directory representing CTD-guided
-    test suite (i.e., assuming the particular directory structure with "monolithic" in the directory path).
+    test suite.
     Along with the test class, also adds other classes with the same base name; these could be EvoSuite
     scaffolding or JEE-support classes.
 
@@ -352,7 +352,7 @@ def remove_test_class_from_ctd_suite(test_class, test_directory):
     """Removes a test class from a CTD test suite directory.
 
     Removes the given test class (specified as a file path) to the test directory representing CTD-guided
-    test suite (i.e., assuming the particular directory structure with "monolithic" in the directory path).
+    test suite.
     Along with the test class, also removes other classes with the same base name; these could be EvoSuite
     scaffolding or JEE-support classes.
 
