@@ -185,6 +185,7 @@ def generate_ctd_amplified_tests(config, output_dir):
         shutil.move(os.path.join(tmp_test_directory, 'monolithic'), test_directory)
         for file in os.listdir(tmp_test_directory):
             shutil.move(os.path.join(tmp_test_directory, file), test_directory)
+            shutil.rmtree(tmp_test_directory)
     else:
         shutil.move(tmp_test_directory, test_directory)
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
