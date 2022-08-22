@@ -563,7 +563,7 @@ def __reset_test_directory(args, config):
         elif args.sub_command == "evosuite":
             test_directory = app_name + constants.TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX
 
-    directory_to_reset = test_directory;
+    directory_to_reset = test_directory
     if args.sub_command == "ctd-amplified":
         directory_to_reset = directory_to_reset + constants.TKLTEST_TEMP_DIR_SUFFIX
 

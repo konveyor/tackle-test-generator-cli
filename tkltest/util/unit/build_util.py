@@ -151,9 +151,11 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
     #     build_xml_file += 'micro.xml'
     # else:
     #     build_xml_file += 'mono.xml'
-
+    build_dir = os.path.join(output_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
+    if not os.path.isdir(build_dir):
+        os.mkdir(build_dir)
     if build_type == 'ant':
-        generated_build_file = test_root_dir + os.sep + 'build.xml'
+        generated_build_file = build_dir + os.sep + 'build.xml'
         __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                     app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
                     generated_build_file, output_dir)
@@ -165,13 +167,13 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
             outp.write(content)
 
     elif build_type == 'maven':
-        generated_build_file = test_root_dir + os.sep + 'pom.xml'
+        generated_build_file = build_dir + os.sep + 'pom.xml'
         __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                       app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
                       generated_build_file, output_dir)
 
     else:
-        generated_build_file = test_root_dir + os.sep + 'build.gradle'
+        generated_build_file = build_dir + os.sep + 'build.gradle'
         __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                        app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir)
 

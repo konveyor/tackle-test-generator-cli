@@ -448,11 +448,12 @@ def generate_coverage_report(monolith_app_path, jdk_path, exec_file, xml_file=''
         sys.exit(1)
 
 
-def get_jacoco_exec_file(build_type, test_root_dir):
+def get_jacoco_exec_file(build_type, build_dir):
+
     if build_type == 'ant':
-        jacoco_raw_data_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "jacoco.exec")
     else: #gradle
-        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "jacoco.exec")
     return jacoco_raw_data_file
