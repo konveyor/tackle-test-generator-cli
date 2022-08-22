@@ -25,7 +25,7 @@ and executing them. More detailed description is available in the [CLI user guid
    ```
    tkltest-unit --verbose generate ctd-amplified
    ```
-   The unit test cases will be generated in a folder named `tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests/monolith`.
+   The unit test cases will be generated in a folder named `tkltest-output-unit-<app-name>/<app-name>-ctd-amplified-tests`.
    A CTD coverage report will be created as well  in a folder named `tkltest-output-unit-<app-name>/<app-name>-tkltest-reports`, showing
    the CTD test plan row coverage achieved by the generated tests.
 
