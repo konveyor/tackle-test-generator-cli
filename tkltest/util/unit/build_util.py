@@ -158,7 +158,7 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
         generated_build_file = build_dir + os.sep + 'build.xml'
         __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                     app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                    generated_build_file, output_dir)
+                    generated_build_file, output_dir, build_dir)
 
         # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
         with open(generated_build_file, 'r') as inp:
@@ -170,25 +170,26 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
         generated_build_file = build_dir + os.sep + 'pom.xml'
         __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                       app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                      generated_build_file, output_dir)
+                      generated_build_file, output_dir, build_dir)
 
     else:
         generated_build_file = build_dir + os.sep + 'build.gradle'
         __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                       app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir)
+                       app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir, build_dir)
 
     return generated_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
                 app_collected_packages, app_reported_classes, offline_instrumentation, report_output_dir,
-                build_xml_file, output_dir):
+                build_xml_file, output_dir, build_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text = Doc().tagtext()
     test_root_src_dir = os.path.abspath(test_root_src_dir)
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_src_dir))
+
     inst_app_path = os.path.join(output_dir, app_name + "-instrumented-classes")
     with tag('project', name='tkl_tests'):
 
@@ -240,7 +241,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                 doc.stag('mkdir', dir=current_output_dir + '/raw')
                 doc.stag('mkdir', dir=current_output_dir + '/html')
                 if collect_codecoverage:
-                    with tag('jacoco:coverage', destfile=test_src_dir + "/jacoco.exec",
+                    with tag('jacoco:coverage', destfile=build_dir + "/jacoco.exec",
                              includes=":".join(app_collected_packages),
                              xmlnsjacoco="antlib:org.jacoco.ant"):
                         __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_dir)
@@ -257,7 +258,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                      depends="test-reports_" + current_partition):
                 with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
                     with tag('executiondata'):
-                        doc.stag('file', file=test_src_dir + '/jacoco.exec')
+                        doc.stag('file', file=build_dir + '/jacoco.exec')
                     with tag('structure', name='Jacoco'):
                         with tag('classfiles'):
                             for path in monolith_app_paths:
@@ -277,14 +278,14 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
         tasks_joined = ','.join(partitions_tasks)
 
         with tag('target', name='merge-coverage', depends=tasks_joined):
-            with tag('jacoco:merge', destfile=test_root_src_dir + '/merged_jacoco.exec',
+            with tag('jacoco:merge', destfile=build_dir + '/merged_jacoco.exec',
                      xmlnsjacoco="antlib:org.jacoco.ant"):
                 doc.stag('fileset', dir=test_root_src_dir, includes="**/*.exec")
 
         with tag('target', name='merge-coverage-report', depends='merge-coverage'):
             with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
                 with tag('executiondata'):
-                    doc.stag('file', file=test_root_src_dir + '/merged_jacoco.exec')
+                    doc.stag('file', file=build_dir + '/merged_jacoco.exec')
 
                 with tag('structure', name='Jacoco'):
                     with tag('classfiles'):
