@@ -178,16 +178,17 @@ def generate_ctd_amplified_tests(config, output_dir):
                      num_executions=config['generate']['ctd_amplified']['num_seq_executions'],
                      test_directory=tmp_test_directory, verbose=verbose)
 
-    if os.path.exists(test_directory):
-        shutil.rmtree(test_directory)
-    # todo - resolve at core, and remove this if (leave just the else)
-    if os.path.isdir(os.path.join(tmp_test_directory, 'monolithic')):
+    if not os.path.isdir(os.path.join(tmp_test_directory, 'monolithic')):
+        tkltest_status('Extender process has not created any JUnit tests', error=True)
+        sys.exit(1)
+    else:
+        if os.path.exists(test_directory):
+            shutil.rmtree(test_directory)
         shutil.move(os.path.join(tmp_test_directory, 'monolithic'), test_directory)
         for file in os.listdir(tmp_test_directory):
             shutil.move(os.path.join(tmp_test_directory, file), test_directory)
         shutil.rmtree(tmp_test_directory)
-    else:
-        shutil.move(tmp_test_directory, test_directory)
+
     tkltest_status("JUnit tests are saved in " + os.path.abspath(test_directory))
     tkltest_status("Extending test sequences and writing junit tests took " +
                  str(round(time.time() - start_time, 2)) + " seconds")
