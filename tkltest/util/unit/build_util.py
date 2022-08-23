@@ -280,7 +280,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
         with tag('target', name='merge-coverage', depends=tasks_joined):
             with tag('jacoco:merge', destfile=build_dir + '/merged_jacoco.exec',
                      xmlnsjacoco="antlib:org.jacoco.ant"):
-                doc.stag('fileset', dir=test_root_src_dir, includes="**/*.exec")
+                doc.stag('fileset', dir=build_dir, includes="**/*.exec")
 
         with tag('target', name='merge-coverage-report', depends='merge-coverage'):
             with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
@@ -424,7 +424,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                         with tag('goals'):
                                             line('goal', 'prepare-agent')
                                         with tag('configuration'):
-                                            line('destFile', os.path.join(build_dir, os.path.basename(test_src_dir), 'jacoco.exec'))
+                                            line('destFile', os.path.join(build_dir, 'jacoco.exec'))
                                 with tag('execution'):
                                     line('id', 'generate-code-coverage-report')
                                     with tag('goals'):
