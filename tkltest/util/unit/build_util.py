@@ -210,7 +210,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
             with tag('delete'):
                 doc.stag('fileset', dir=test_root_src_dir, includes="**/*.class")
                 if collect_codecoverage:
-                    doc.stag('fileset', dir=test_root_src_dir, includes="**/*jacoco.exec")
+                    doc.stag('fileset', dir=build_dir, includes="**/*jacoco.exec")
             if collect_codecoverage and offline_instrumentation:
                 doc.stag('mkdir', dir=inst_app_path)
                 with tag('delete'):
@@ -241,7 +241,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                 doc.stag('mkdir', dir=current_output_dir + '/raw')
                 doc.stag('mkdir', dir=current_output_dir + '/html')
                 if collect_codecoverage:
-                    with tag('jacoco:coverage', destfile=build_dir + "/jacoco.exec",
+                    with tag('jacoco:coverage', destfile=build_dir + '/' + os.path.basename(test_src_dir) + '/jacoco.exec',
                              includes=":".join(app_collected_packages),
                              xmlnsjacoco="antlib:org.jacoco.ant"):
                         __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_dir)
@@ -258,7 +258,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                      depends="test-reports_" + current_partition):
                 with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
                     with tag('executiondata'):
-                        doc.stag('file', file=build_dir + '/jacoco.exec')
+                        doc.stag('file', file=build_dir + '/' + os.path.basename(test_src_dir) + '/jacoco.exec')
                     with tag('structure', name='Jacoco'):
                         with tag('classfiles'):
                             for path in monolith_app_paths:
@@ -335,7 +335,7 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
-                  build_xml_file, output_dir):
+                  build_xml_file, output_dir, build_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
     test_root_dir = os.path.abspath(test_root_dir)
@@ -424,13 +424,13 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                         with tag('goals'):
                                             line('goal', 'prepare-agent')
                                         with tag('configuration'):
-                                            line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                            line('destFile', os.path.join(build_dir, os.path.basename(test_src_dir), 'jacoco.exec'))
                                 with tag('execution'):
                                     line('id', 'generate-code-coverage-report')
                                     with tag('goals'):
                                         line('goal', 'report')
                                     with tag('configuration'):
-                                        line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                        line('dataFile', os.path.join(build_dir, 'jacoco.exec'))
                                         line('outputDirectory', main_coverage_dir)
                                         if app_reported_packages:
                                             with tag('rules'):
@@ -458,7 +458,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                             line('testFailureIgnore', 'true')
                             line('reportsDirectory', junit_output_dir + '/raw')
                             with tag('systemPropertyVariables'):
-                                line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                line('jacoco-agent.destfile', os.path.join(build_dir, 'jacoco.exec'))
                         with tag('dependencies'):
                            with tag('dependency'):
                                 line('groupId', 'org.apache.maven.surefire')
@@ -499,7 +499,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
 
 
 def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file, output_dir):
+                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file, output_dir, build_dir):
 
     #gradle accept only posix paths, so we uses PurePath to convert:
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
@@ -510,7 +510,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
     main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))).as_posix()
-    coverage_exec_file = pathlib.PurePath(os.path.join(os.path.abspath(test_root_dir), 'jacoco.exec')).as_posix()
+    coverage_exec_file = pathlib.PurePath(os.path.join(build_dir, 'jacoco.exec')).as_posix()
     coverage_xml_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.xml')).as_posix()
     coverage_csv_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.csv')).as_posix()
 

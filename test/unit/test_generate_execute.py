@@ -1043,3 +1043,7 @@ class GenerateExecuteTest(unittest.TestCase):
             allow_artifacts.append(app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
             allow_artifacts.append(app_name + '-user-reports')
         self.assertFalse((set(current_dir_content) ^ set(self.begin_dir_content)) - set(allow_artifacts))
+
+        for app_name in self.test_apps:
+            if os.path.isdir(self.test_apps[app_name]['test_directory']):
+                self.assertTrue(len(os.listdir(self.test_apps[app_name]['test_directory'])) == 2)
