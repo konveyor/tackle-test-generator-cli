@@ -266,7 +266,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f IRS_TEST_BUILD_DIR/pom.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/pom.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
