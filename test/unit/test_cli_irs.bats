@@ -8,6 +8,7 @@ IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
 IRS_RANDOOP_TESTDIR=./irs-randoop-standalone-tests
 IRS_EVOSUITE_TESTDIR=./irs-evosuite-standalone-tests
 IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR//irs-tkltest-reports
+IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build
 IRS_INSTR_CLASSES_DIR=$IRS_OUTPUT_DIR/irs-instrumented-classes
 
 # setup commands run before execution of tests in file
@@ -56,7 +57,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/build.xml ]
 }
 
 @test "Test 02: CLI execute irs" {
@@ -208,7 +209,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_RANDOOP_TESTDIR/build.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/build.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
@@ -232,7 +233,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_EVOSUITE_TESTDIR/build.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/build.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
@@ -265,7 +266,7 @@ setup_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
+    [ -f IRS_TEST_BUILD_DIR/pom.xml ]
 
     # execute generated tests
     run tkltest-unit --log-level INFO \
