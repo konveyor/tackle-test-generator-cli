@@ -48,7 +48,7 @@ TKLTEST_DEFAULT_EVOSUITE_TEST_DIR_SUFFIX = "-evosuite-standalone-tests"
 
 # suffix for the temporary test directory name
 TKLTEST_TEMP_DIR_SUFFIX = "-tkltest-tmp"
-TKLTEST_BUILD_DIR_SUFFIX = "-tkltest-build"
+TKLTEST_BUILD_DIR_SUFFIX = "-tkltest-build-artifacts"
 
 # suffix for the directory containing test reports (CTD, junit, jacoco); names of the
 # sub-directories for different reports

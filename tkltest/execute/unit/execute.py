@@ -91,8 +91,9 @@ def __execute_base(args, config):
     if test_root_dir == '':
         test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
 
+    build_dir = os.path.join(output_dir, config['general']['app_name'] + constants.TKLTEST_BUILD_DIR_SUFFIX)
     # read generate config from test directory
-    gen_config = __get_generate_config(test_root_dir)
+    gen_config = __get_generate_config(test_root_dir, build_dir)
 
     # compute classpath for compiling and running test classes
     classpath = build_util.get_build_classpath(config, gen_config['subcommand'])
@@ -244,14 +245,14 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
                        os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
 
 
-def __get_generate_config(test_directory):
+def __get_generate_config(test_directory, build_dir):
     """Reads generate config file.
 
     Reads the config file created by the generate command from the given test directory
     """
-    gen_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
+    gen_config_file = os.path.join(build_dir, constants.TKLTEST_GENERATE_CONFIG_FILE)
     if not os.path.isfile(gen_config_file):
-        tkltest_status('Generate config file not found: {}'.format(gen_config_file)+
+        tkltest_status('Generate config file not found: {}'.format(gen_config_file) +
                        '\n\tTo execute tests in {}, the file created by the generate command must be available'.format(
                            test_directory
                        ), error=True)

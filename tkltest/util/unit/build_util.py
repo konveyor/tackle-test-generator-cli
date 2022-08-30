@@ -152,8 +152,6 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
     # else:
     #     build_xml_file += 'mono.xml'
     build_dir = os.path.join(output_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
-    if not os.path.isdir(build_dir):
-        os.mkdir(build_dir)
     if build_type == 'ant':
         generated_build_file = build_dir + os.sep + 'build.xml'
         __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,

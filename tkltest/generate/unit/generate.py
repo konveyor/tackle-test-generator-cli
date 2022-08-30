@@ -47,6 +47,9 @@ def process_generate_command(args, config):
     """
     logging.info('Processing generate command')
     output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
+    build_dir = os.path.join(output_dir, config['general']['app_name'] + constants.TKLTEST_BUILD_DIR_SUFFIX)
+    if not os.path.isdir(build_dir):
+        os.mkdir(build_dir)
     # clear test directory content
     test_directory = __reset_test_directory(args, config)
 
@@ -68,7 +71,7 @@ def process_generate_command(args, config):
         'general': config['general'],
         'generate': config['generate']
     }
-    generate_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
+    generate_config_file = os.path.join(build_dir, constants.TKLTEST_GENERATE_CONFIG_FILE)
     with open(generate_config_file, 'w') as f:
         toml.dump(generate_config, f)
     dir_util.delete_app_output(config['general']['app_name'])
