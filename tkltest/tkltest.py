@@ -110,7 +110,7 @@ def __process_config_commands(args, test_level):
 
     Args:
         args: parsed command-line arguments
-        test_level: level of testing (unit, ui)
+        test_level: level of testing (unit, ui, api)
     """
     if args.sub_command == 'init':
         # initialize config

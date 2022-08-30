@@ -1,0 +1,7 @@
+{
+  "openapi_specification_filename": "swagger.json",
+  "output_directory": "output/",
+  "codegen_output_directory": "codegen/",
+  "nominal_tester_output_directory": "nominal_tester/",
+  "error_tester_output_directory": "error_tester/"
+}

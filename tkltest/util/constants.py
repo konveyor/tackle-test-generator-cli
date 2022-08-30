@@ -166,3 +166,6 @@ CRAWLJAX_API_TEST_FILE = os.path.join('src', 'test', 'java', 'generated', 'Gener
 SELENIUM_API_TEST_ROOT = 'selenium-api-tests'
 SELENIUM_API_TEST_CLASS_DIR = os.path.join(SELENIUM_API_TEST_ROOT, 'src', 'test', 'java', 'generated')
 SELENIUM_API_TEST_FILE = os.path.join(SELENIUM_API_TEST_CLASS_DIR, 'GeneratedTests.java')
+
+# output directory for generated API tests
+TKLTEST_API_OUTPUT_DIR_PREFIX = 'tkltest-output-api-'

@@ -39,15 +39,16 @@ setup(
         'lxml==4.9.1',
         'xmltodict==0.12.0',
         'keybert==0.4.0',
-        'pandas==1.4.3'
-
+        'pandas==1.4.3',
+        'schemathesis>=3.15.4'
     ],
     setup_requires=['nltk==3.6.6'],
     cmdclass={'install': TkltestInstall},
     entry_points={
         "console_scripts": [
             "tkltest-unit = tkltest.tkltest_unit:main",
-            "tkltest-ui = tkltest.tkltest_ui:main"
+            "tkltest-ui = tkltest.tkltest_ui:main",
+            "tkltest-api = tkltest.tkltest_api:main"
         ]
     },
     include_package_data=True,

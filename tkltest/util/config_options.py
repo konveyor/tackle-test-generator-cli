@@ -23,6 +23,7 @@ import tabulate
 
 from tkltest.util.unit import config_options_unit
 from tkltest.util.ui import config_options_ui
+from tkltest.util.api import config_options_api
 
 
 def get_options_spec(command=None, subcommand=None, load_format=True, test_level='unit'):
@@ -36,12 +37,14 @@ def get_options_spec(command=None, subcommand=None, load_format=True, test_level
         subcommand: subcommand (of command) to load option spec for
         load_format: whether to use loaded format (which omits some fields); used only if command
             or subcommand is specified
-        test_level: level of testing (unit, ui)
+        test_level: level of testing (unit, ui, api)
     """
     if test_level == 'unit':
         return config_options_unit.get_options_spec(command=command, subcommand=subcommand, load_format=load_format)
-    else:
+    elif test_level == 'ui':
         return config_options_ui.get_options_spec(command=command, subcommand=subcommand, load_format=load_format)
+    else:
+        return config_options_api.get_options_spec(command=command, subcommand=subcommand, load_format=load_format)
 
 
 def print_options_with_help(command=None, tablefmt='simple', test_level='unit'):

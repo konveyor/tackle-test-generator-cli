@@ -1,0 +1,16 @@
+[general]
+app_name = "news"
+base_url = "http://clver.sl.cloud9.ibm.com:50103"
+api_spec = "test/api/data/news/swagger.json"
+test_directory = ""
+verbose = false
+
+[generate]
+
+[generate.schemathesis]
+
+[execute]
+
+[config.init]
+
+[config.list]

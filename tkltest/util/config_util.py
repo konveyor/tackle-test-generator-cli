@@ -40,7 +40,7 @@ def load_config(test_level='unit', args=None, config_file=None):
     are specified in both places), and returns the final options object.
 
     Args:
-        test_level: level of testing (unit, ui)
+        test_level: level of testing (unit, ui, api)
         args: parsed command-line arguments
         config_file: name of config file to be loaded
 
@@ -121,7 +121,7 @@ def init_config(test_level='unit'):
     configuration options (excluding non-toml options, which should not be loaded).
 
     Args:
-        test_level: level of testing (unit, ui)
+        test_level: level of testing (unit, ui, api)
 
     Returns:
         dict containing initialized options
