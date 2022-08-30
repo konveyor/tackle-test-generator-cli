@@ -11,6 +11,8 @@ verbose = false
 
 [execute]
 
+[execute.schemathesis]
+
 [config.init]
 
 [config.list]

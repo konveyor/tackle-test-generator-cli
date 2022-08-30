@@ -46,10 +46,12 @@ def generate_schemathesis(config, test_dir):
     try:
         command_util.run_command(command=st_command, verbose=config['general']['verbose'])
     except subprocess.CalledProcessError as e:
-        # Schemathesis returns exit code 1 if some of the generated tests failed, which sometimes is a normal behaviour for tkltest
-        # thus the exception here is printed and ignored, and we check later for other errors
+        # Schemathesis returns exit code 1 if some of the generated tests failed, which sometimes is a normal behavior
+        # for tkltest, and we don't want to exit with error automatically.
+        # Thus the exception here is printed and ignored, and we check later for other common errors.
         tkltest_status('Warning: Schemathesis returned non-zero exit code: {}\n{}'.format(e, e.stderr))
 
+    # check if a cassette was created
     if not os.path.exists(cassette_path):
         tkltest_status('Schemathesis did not create a cassette: {}'.format(cassette_path), error=True)
         sys.exit(1)
@@ -58,14 +60,22 @@ def generate_schemathesis(config, test_dir):
     with open(cassette_path, "r") as stream:
         try:
             data = yaml.safe_load(stream)
+
+            # check if the cassette has test cases
             if 'http_interactions' not in data or not data['http_interactions']:
                 tkltest_status('Schemathesis did not generate any tests', error=True)
                 sys.exit(1)
+
+            # the number of requests that have 'success' status
             passed_tests = len([1 for i in data['http_interactions'] if i['status'] == 'SUCCESS'])
+            total_tests = len(data['http_interactions'])
+
             if not passed_tests:
-                tkltest_status('All generated tests by Schemathesis failed', error=True)
+                # if all of the interactions were with status 'failure', then probably something is wrong in the
+                # configuration (path, connection etc.)
+                tkltest_status('All {} generated tests by Schemathesis failed'.format(total_tests), error=True)
                 sys.exit(1)
-            tkltest_status('{}/{} generated tests passed all checks'.format(passed_tests, len(data['http_interactions'])))
+            tkltest_status('{}/{} generated tests passed all checks'.format(passed_tests, total_tests))
         except yaml.YAMLError as e:
             tkltest_status('Parsing YAML cassette failed: {}\n{}'.format(e, e.stderr), error=True)
             sys.exit(1)
