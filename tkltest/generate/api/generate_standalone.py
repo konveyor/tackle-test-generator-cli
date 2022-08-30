@@ -20,10 +20,11 @@ import sys
 import yaml
 
 from tkltest.util import command_util
+from tkltest.util.api import dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
-def generate_schemathesis(config, output_dir):
+def generate_schemathesis(config, test_dir):
     """Generates test cases using Schemathesis.
     Stores the tests in a cassette (yaml), which can be replayed afterwards.
 
@@ -34,12 +35,12 @@ def generate_schemathesis(config, output_dir):
     app_name = config['general']['app_name']
     base_url = config['general']['base_url']
     api_spec = config['general']['api_spec']
-    cassette_path = os.path.join(output_dir, 'tkltest_' + app_name + '_cassette.yaml')
+    cassette_path = dir_util.get_cassette_path(test_dir, app_name)
     st_command = "st run --base-url={} --cassette-path {} --checks all {}".format(base_url, cassette_path, api_spec)
 
     if os.path.exists(cassette_path):
         os.remove(cassette_path)
-    os.makedirs(output_dir, exist_ok=True)  # Schemathesis expects the directory to exist
+    os.makedirs(test_dir, exist_ok=True)  # Schemathesis expects the directory to exist
 
     tkltest_status('Creating Schemathesis API tests for application: ' + app_name)
     try:

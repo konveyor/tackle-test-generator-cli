@@ -14,6 +14,7 @@
 # limitations under the License.
 # ***************************************************************************
 
+import os
 
 from tkltest.util import constants
 
@@ -23,3 +24,7 @@ def get_test_directory(config):
     if not test_directory:
         test_directory = constants.TKLTEST_API_OUTPUT_DIR_PREFIX + config['general']['app_name']
     return test_directory
+
+
+def get_cassette_path(test_dir, app_name):
+    return os.path.join(test_dir, 'tkltest_' + app_name + '_cassette.yaml')

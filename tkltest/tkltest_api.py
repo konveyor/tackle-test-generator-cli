@@ -42,7 +42,6 @@ def main():
     tkltest_config = load_configuration(args, 'api')
     logging.debug('Loaded config: {}'.format(tkltest_config))
 
-    # TODO: process execute commands
     if args.command == 'generate':
         generate.process_generate_command(args=args, config=tkltest_config)
     elif args.command == 'execute':
