@@ -4,7 +4,10 @@ IRS_CONFIG_FILE_ERR3=./test/data/irs/tkltest_config_err3.toml
 IRS_CONFIG_FILE=./test/data/irs/tkltest_config.toml
 IRS_PARTITIONS_FILE=./test/data/irs/refactored/PartitionsFile.json
 IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
-IRS_GENERATE_CONFIG_FILE=$IRS_CTD_AMPLIFIED_TESTDIR/.tkltest_generate.toml
+
+IRS_OUTPUT_DIR=./tkltest-output-unit-irs
+IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build-artifacts
+IRS_GENERATE_CONFIG_FILE=$IRS_TEST_BUILD_DIR/.tkltest_generate.toml
 TEST_CONFIG_FILE1=./__test_unit_config1.toml
 TEST_CONFIG_FILE2=./__test_unit_config2.toml
 TKLTEST_CLI_VERSION=`cat ./tkltest/_version.py | cut -d '=' -f 2 | xargs`

@@ -8,7 +8,7 @@ IRS_CTD_AMPLIFIED_TESTDIR=./irs-ctd-amplified-tests
 IRS_RANDOOP_TESTDIR=./irs-randoop-standalone-tests
 IRS_EVOSUITE_TESTDIR=./irs-evosuite-standalone-tests
 IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR//irs-tkltest-reports
-IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build
+IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build-artifacts
 IRS_INSTR_CLASSES_DIR=$IRS_OUTPUT_DIR/irs-instrumented-classes
 
 # setup commands run before execution of tests in file
