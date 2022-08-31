@@ -7,7 +7,7 @@ IRS_CTD_TEST_PLAN_FILE=$IRS_OUTPUT_DIR/irs_ctd_models_and_test_plans.json
 IRS_TESTGEN_SUMMARY_FILE=$IRS_OUTPUT_DIR/irs_test_generation_summary.json
 IRS_CTD_AMPLIFIED_TESTDIR=$IRS_OUTPUT_DIR/irs-ctd-amplified-tests
 IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR/irs-tkltest-reports
-IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build
+IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build-artifacts
 
 # setup commands run befeore execution of tests in file
 setup_file() {
