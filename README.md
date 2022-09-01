@@ -197,3 +197,6 @@ be added soon.
 - [Short demo of TackleTest](https://www.youtube.com/watch?v=wpgmB_xvZaQ) (5 min)
 - [Detailed TackleTest presentation and demo from Konveyor meetup](https://www.youtube.com/watch?v=qThqTFh2PM4&t) (48 min)
 - [Slide deck on TackleTest](https://www.slideshare.net/KonveyorIO/tackletest-an-automatic-unitlevel-test-case-generator)
+
+## Code of Conduct
+Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community/blob/main/CODE_OF_CONDUCT.md).
