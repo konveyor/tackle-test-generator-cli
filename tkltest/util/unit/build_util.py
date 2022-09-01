@@ -151,12 +151,14 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
     #     build_xml_file += 'micro.xml'
     # else:
     #     build_xml_file += 'mono.xml'
-
+    build_dir = os.path.join(output_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
+    if not os.path.isdir(build_dir):
+        os.mkdir(build_dir)
     if build_type == 'ant':
-        generated_build_file = test_root_dir + os.sep + 'build.xml'
+        generated_build_file = build_dir + os.sep + 'build.xml'
         __build_ant(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                     app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                    generated_build_file, output_dir)
+                    generated_build_file, output_dir, build_dir)
 
         # TODO: this is a hack to enable defining namespace in the build file, since doc tags do not allow colons in attributes
         with open(generated_build_file, 'r') as inp:
@@ -165,28 +167,29 @@ def generate_build_xml(app_name, build_type, monolith_app_path, app_classpath, t
             outp.write(content)
 
     elif build_type == 'maven':
-        generated_build_file = test_root_dir + os.sep + 'pom.xml'
+        generated_build_file = build_dir + os.sep + 'pom.xml'
         __build_maven(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
                       app_packages, app_reported_packages, offline_instrumentation, main_reports_dir,
-                      generated_build_file, output_dir)
+                      generated_build_file, output_dir, build_dir)
 
     else:
-        generated_build_file = test_root_dir + os.sep + 'build.gradle'
+        generated_build_file = build_dir + os.sep + 'build.gradle'
         __build_gradle(app_classpath, app_name, monolith_app_path, test_root_dir, test_dirs, collect_codecoverage,
-                       app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir)
+                       app_packages, offline_instrumentation, main_reports_dir, generated_build_file, output_dir, build_dir)
 
     return generated_build_file
 
 
 def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir, test_src_dirs, collect_codecoverage,
                 app_collected_packages, app_reported_classes, offline_instrumentation, report_output_dir,
-                build_xml_file, output_dir):
+                build_xml_file, output_dir, build_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text = Doc().tagtext()
     test_root_src_dir = os.path.abspath(test_root_src_dir)
     main_junit_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)
     main_coverage_dir = os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_src_dir))
+
     inst_app_path = os.path.join(output_dir, app_name + "-instrumented-classes")
     with tag('project', name='tkl_tests'):
 
@@ -207,7 +210,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
             with tag('delete'):
                 doc.stag('fileset', dir=test_root_src_dir, includes="**/*.class")
                 if collect_codecoverage:
-                    doc.stag('fileset', dir=test_root_src_dir, includes="**/*jacoco.exec")
+                    doc.stag('fileset', dir=build_dir, includes="**/*jacoco.exec")
             if collect_codecoverage and offline_instrumentation:
                 doc.stag('mkdir', dir=inst_app_path)
                 with tag('delete'):
@@ -238,7 +241,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                 doc.stag('mkdir', dir=current_output_dir + '/raw')
                 doc.stag('mkdir', dir=current_output_dir + '/html')
                 if collect_codecoverage:
-                    with tag('jacoco:coverage', destfile=test_src_dir + "/jacoco.exec",
+                    with tag('jacoco:coverage', destfile=build_dir + '/' + os.path.basename(test_src_dir) + '/jacoco.exec',
                              includes=":".join(app_collected_packages),
                              xmlnsjacoco="antlib:org.jacoco.ant"):
                         __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_dir)
@@ -255,7 +258,7 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
                      depends="test-reports_" + current_partition):
                 with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
                     with tag('executiondata'):
-                        doc.stag('file', file=test_src_dir + '/jacoco.exec')
+                        doc.stag('file', file=build_dir + '/' + os.path.basename(test_src_dir) + '/jacoco.exec')
                     with tag('structure', name='Jacoco'):
                         with tag('classfiles'):
                             for path in monolith_app_paths:
@@ -275,14 +278,14 @@ def __build_ant(classpath_list, app_name, monolith_app_paths, test_root_src_dir,
         tasks_joined = ','.join(partitions_tasks)
 
         with tag('target', name='merge-coverage', depends=tasks_joined):
-            with tag('jacoco:merge', destfile=test_root_src_dir + '/merged_jacoco.exec',
+            with tag('jacoco:merge', destfile=build_dir + '/merged_jacoco.exec',
                      xmlnsjacoco="antlib:org.jacoco.ant"):
-                doc.stag('fileset', dir=test_root_src_dir, includes="**/*.exec")
+                doc.stag('fileset', dir=build_dir, includes="**/*.exec")
 
         with tag('target', name='merge-coverage-report', depends='merge-coverage'):
             with tag('jacoco:report', xmlnsjacoco="antlib:org.jacoco.ant"):
                 with tag('executiondata'):
-                    doc.stag('file', file=test_root_src_dir + '/merged_jacoco.exec')
+                    doc.stag('file', file=build_dir + '/merged_jacoco.exec')
 
                 with tag('structure', name='Jacoco'):
                     with tag('classfiles'):
@@ -332,7 +335,7 @@ def __create_junit_task(doc, tag, classpath_list, test_src_dir, current_output_d
 
 def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
                   app_collected_packages, app_reported_packages, offline_instrumentation, report_output_dir,
-                  build_xml_file, output_dir):
+                  build_xml_file, output_dir, build_dir):
     classpath_list = classpath_list.split(os.pathsep)
     doc, tag, text, line = Doc().ttl()
     test_root_dir = os.path.abspath(test_root_dir)
@@ -421,13 +424,13 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                                         with tag('goals'):
                                             line('goal', 'prepare-agent')
                                         with tag('configuration'):
-                                            line('destFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                            line('destFile', os.path.join(build_dir, 'jacoco.exec'))
                                 with tag('execution'):
                                     line('id', 'generate-code-coverage-report')
                                     with tag('goals'):
                                         line('goal', 'report')
                                     with tag('configuration'):
-                                        line('dataFile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                        line('dataFile', os.path.join(build_dir, 'jacoco.exec'))
                                         line('outputDirectory', main_coverage_dir)
                                         if app_reported_packages:
                                             with tag('rules'):
@@ -455,7 +458,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
                             line('testFailureIgnore', 'true')
                             line('reportsDirectory', junit_output_dir + '/raw')
                             with tag('systemPropertyVariables'):
-                                line('jacoco-agent.destfile', os.path.join(os.path.abspath(test_src_dir), 'jacoco.exec'))
+                                line('jacoco-agent.destfile', os.path.join(build_dir, 'jacoco.exec'))
                         with tag('dependencies'):
                            with tag('dependency'):
                                 line('groupId', 'org.apache.maven.surefire')
@@ -496,7 +499,7 @@ def __build_maven(classpath_list, app_name, monolith_app_paths, test_root_dir, t
 
 
 def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, test_dirs, collect_codecoverage,
-                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file, output_dir):
+                  app_packages, offline_instrumentation, report_output_dir, build_gradle_file, output_dir, build_dir):
 
     #gradle accept only posix paths, so we uses PurePath to convert:
     classpath_list = [pathlib.PurePath(os.path.abspath(classpath)).as_posix() for classpath in classpath_list.split(os.pathsep)]
@@ -507,7 +510,7 @@ def __build_gradle(classpath_list, app_name, monolith_app_paths, test_root_dir, 
     main_junit_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_JUNIT_REPORT_DIR)).as_posix()
     main_coverage_report_dir = pathlib.PurePath(os.path.abspath(report_output_dir + os.sep + constants.TKL_CODE_COVERAGE_REPORT_DIR + os.sep +
                                         os.path.basename(test_root_dir))).as_posix()
-    coverage_exec_file = pathlib.PurePath(os.path.join(os.path.abspath(test_root_dir), 'jacoco.exec')).as_posix()
+    coverage_exec_file = pathlib.PurePath(os.path.join(build_dir, 'jacoco.exec')).as_posix()
     coverage_xml_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.xml')).as_posix()
     coverage_csv_file = pathlib.PurePath(os.path.join(os.path.abspath(main_coverage_report_dir), 'jacoco.csv')).as_posix()
 

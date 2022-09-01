@@ -91,8 +91,9 @@ def __execute_base(args, config):
     if test_root_dir == '':
         test_root_dir = config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
 
+    build_dir = os.path.join(output_dir, config['general']['app_name'] + constants.TKLTEST_BUILD_DIR_SUFFIX)
     # read generate config from test directory
-    gen_config = __get_generate_config(test_root_dir)
+    gen_config = __get_generate_config(test_root_dir, build_dir)
 
     # compute classpath for compiling and running test classes
     classpath = build_util.get_build_classpath(config, gen_config['subcommand'])
@@ -244,14 +245,14 @@ def __run_test_cases(app_name, collect_codecoverage, verbose,
                        os.path.abspath(main_reports_dir+os.sep+constants.TKL_CODE_COVERAGE_REPORT_DIR))
 
 
-def __get_generate_config(test_directory):
+def __get_generate_config(test_directory, build_dir):
     """Reads generate config file.
 
     Reads the config file created by the generate command from the given test directory
     """
-    gen_config_file = os.path.join(test_directory, constants.TKLTEST_GENERATE_CONFIG_FILE)
+    gen_config_file = os.path.join(build_dir, constants.TKLTEST_GENERATE_CONFIG_FILE)
     if not os.path.isfile(gen_config_file):
-        tkltest_status('Generate config file not found: {}'.format(gen_config_file)+
+        tkltest_status('Generate config file not found: {}'.format(gen_config_file) +
                        '\n\tTo execute tests in {}, the file created by the generate command must be available'.format(
                            test_directory
                        ), error=True)
@@ -274,6 +275,7 @@ def __compare_to_dev_tests_coverage(config, jacoco_raw_date_file = ''):
     app_name = config['general']['app_name']
     test_root_dir = config['general']['test_directory']
     output_dir = dir_util.cd_output_dir(config['general']['app_name'], config['general'].get('module_name', ''))
+    build_dir = os.path.join(output_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
     if test_root_dir == '':
         test_root_dir = os.path.join(output_dir, app_name + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX)
     main_reports_dir = config['general']['reports_path']
@@ -314,7 +316,7 @@ def __compare_to_dev_tests_coverage(config, jacoco_raw_date_file = ''):
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
 
     if not jacoco_raw_date_file:
-        jacoco_raw_date_file = coverage_util.get_jacoco_exec_file(config['general']['build_type'], test_root_dir)
+        jacoco_raw_date_file = coverage_util.get_jacoco_exec_file(config['general']['build_type'], build_dir)
     # merging the .exec files
     try:
         command_util.run_command("java -Xmx2048m -jar {} merge {} {} --destfile {}".
@@ -351,6 +353,7 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs, failed_modul
     # first collect exec files and app_paths
     for module_config in [mc for mc in modules_configs if mc['general']['module_name'] not in failed_modules]:
         module_output_dir = dir_util.get_output_dir(app_name, module_config['general']['module_name'])
+        module_build_dir = os.path.join(module_output_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
         module_test_root_dir = module_config['general']['test_directory']
         if not module_test_root_dir:
             module_test_root_dir = module_config['general']['app_name'] + constants.TKLTEST_DEFAULT_CTDAMPLIFIED_TEST_DIR_SUFFIX
@@ -358,7 +361,7 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs, failed_modul
         if not os.path.isabs(module_test_root_dir):
             module_test_root_dir = os.path.join(module_output_dir, module_test_root_dir)
 
-        module_jacoco_exec_file = coverage_util.get_jacoco_exec_file(module_config['general']['build_type'], module_test_root_dir)
+        module_jacoco_exec_file = coverage_util.get_jacoco_exec_file(module_config['general']['build_type'], module_build_dir)
         if not os.path.isfile(module_jacoco_exec_file):
             tkltest_status('Warning: exec_file {} does not exist for module {}'.format(module_jacoco_exec_file, module_config['general']['module_name']))
         else:
@@ -388,7 +391,8 @@ def merge_modules_coverage_reports(tkltest_config, modules_configs, failed_modul
         main_reports_dir = os.path.join(app_dir, app_name + constants.TKLTEST_MAIN_REPORT_DIR_SUFFIX)
 
     # get the merged exec file:
-    merged_exec_file = coverage_util.get_jacoco_exec_file(tkltest_config['general']['build_type'], test_root_dir)
+    app_build_dir = os.path.join(app_dir, app_name + constants.TKLTEST_BUILD_DIR_SUFFIX)
+    merged_exec_file = coverage_util.get_jacoco_exec_file(tkltest_config['general']['build_type'], app_build_dir)
     jacoco_cli_file = os.path.join(constants.TKLTEST_LIB_DOWNLOAD_DIR, constants.JACOCO_CLI_JAR_NAME)
     try:
         command_util.run_command('java -Xmx'+str(tkltest_config['general']['max_memory_for_coverage']) + 'm  -jar {} merge {} --destfile {}'.

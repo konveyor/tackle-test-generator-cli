@@ -68,7 +68,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
     env_vars = dict(os.environ.copy())
     env_vars['JAVA_HOME'] = jdk_path
     if has_test_suite:
-        jacoco_raw_data_file = get_jacoco_exec_file(build_type, test_root_dir)
+        jacoco_raw_data_file = get_jacoco_exec_file(build_type, os.path.dirname(build_file))
         try:
             os.remove(jacoco_raw_data_file)
         except OSError:
@@ -79,7 +79,7 @@ def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_di
         elif build_type == 'maven':
             cmd = "mvn -f {} clean verify site".format(build_file)
         else:
-            cmd = "gradle --project-dir {} tklest_task".format(test_root_dir)
+            cmd = "gradle --project-dir {} tklest_task".format(os.path.dirname(build_file))
         try:
             command_util.run_command(cmd, verbose=False, env_vars=env_vars)
         except subprocess.CalledProcessError as e:
@@ -448,11 +448,12 @@ def generate_coverage_report(monolith_app_path, jdk_path, exec_file, xml_file=''
         sys.exit(1)
 
 
-def get_jacoco_exec_file(build_type, test_root_dir):
+def get_jacoco_exec_file(build_type, build_dir):
+
     if build_type == 'ant':
-        jacoco_raw_data_file = os.path.join(test_root_dir, "merged_jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "merged_jacoco.exec")
     elif build_type == 'maven':
-        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "jacoco.exec")
     else: #gradle
-        jacoco_raw_data_file = os.path.join(test_root_dir, "jacoco.exec")
+        jacoco_raw_data_file = os.path.join(build_dir, "jacoco.exec")
     return jacoco_raw_data_file

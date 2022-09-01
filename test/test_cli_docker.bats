@@ -7,6 +7,7 @@ IRS_CTD_TEST_PLAN_FILE=$IRS_OUTPUT_DIR/irs_ctd_models_and_test_plans.json
 IRS_TESTGEN_SUMMARY_FILE=$IRS_OUTPUT_DIR/irs_test_generation_summary.json
 IRS_CTD_AMPLIFIED_TESTDIR=$IRS_OUTPUT_DIR/irs-ctd-amplified-tests
 IRS_TEST_REPORTS_DIR=$IRS_OUTPUT_DIR/irs-tkltest-reports
+IRS_TEST_BUILD_DIR=$IRS_OUTPUT_DIR//irs-tkltest-build-artifacts
 
 # setup commands run befeore execution of tests in file
 setup_file() {
@@ -120,7 +121,7 @@ teardown_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/build.xml ]
 }
 
 @test "Test 12: CLI [build_type=maven] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
@@ -161,7 +162,7 @@ teardown_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/pom.xml ]
+    [ -f $IRS_TEST_BUILD_DIR/pom.xml ]
 }
 
 @test "Test 13: CLI [build_type=gradle] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
@@ -202,5 +203,5 @@ teardown_file() {
     [ $test_count -gt 0 ]
 
     # assert build file is generated
-    [ -f $IRS_CTD_AMPLIFIED_TESTDIR/build.gradle ]
+    [ -f $IRS_TEST_BUILD_DIR/build.gradle ]
 }
