@@ -59,26 +59,26 @@ jobs:
         cd tkltest-lib
         ./download_lib_jars.sh
         cd ..; ls tkltest-lib/*
-    - name: Install Python dependencies
+    - name: Install Python dependencies and tkltest-unit command
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python -m venv venv
+        source venv/bin/activate
+        pip install .
+        which tkltest-unit
     - name: Run Python unit tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
         nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
         nosetests test/unit/test_generate_execute.py
-    - name: Install tkltest-unit command and run bats tests
+    - name: Pull bats dependency and bats tests
       env:
         JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
       run: |
         git submodule init
         git submodule update
-        python -m venv venv
         source venv/bin/activate
-        pip install .
-        which tkltest-unit
         bats test/unit/test_cli.bats
         bats test/unit/test_cli_irs.bats
         deactivate

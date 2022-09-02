@@ -20,6 +20,7 @@ bak.*
 bak/
 
 lib/download
+tkltest-lib
 test/coverage
 test/data/irs/monolith-*/
 maven-status/
