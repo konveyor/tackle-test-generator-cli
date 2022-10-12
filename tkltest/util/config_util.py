@@ -934,9 +934,6 @@ def resolve_tkltest_configs(tkltest_user_config, command):
     else:
         # we first obtain the module properties from the build file
         modules_properties = get_modules_properties(tkltest_user_config)
-        if not modules_properties:
-            tkltest_status('Failed to automatically obtain modules from user build files', error=True)
-            sys.exit(1)
         if len(modules_properties) == 1:
             # we have only one module - we will use the user config
             resolve_app_path(tkltest_user_config)
@@ -1011,6 +1008,7 @@ def get_modules_properties(tkltest_user_config):
     if os.path.isfile(modules_properties_file):
         os.remove(modules_properties_file)
 
+    tkltest_status('Automatically obtaining modules from user build files:')
     if app_build_type == 'maven':
         '''
         for each user pom file, we call exec:exec with executable "echo".
@@ -1045,6 +1043,13 @@ def get_modules_properties(tkltest_user_config):
             except subprocess.CalledProcessError as e:
                 tkltest_status('running {} command "{}" failed: {}\n{}'.
                                format(app_build_type, get_modules_command, e, e.stderr), error=True)
+                try:
+                    tkltest_status('command output without --quite:')
+                    get_modules_command = get_modules_command.replace('--quiet', '')
+                    get_modules_command = get_modules_command.replace(' >> ' + modules_properties_file, '')
+                    command_util.run_command(command=get_modules_command, verbose=True)
+                except subprocess.CalledProcessError as e:
+                    pass
                 sys.exit(1)
 
     elif app_build_type == 'gradle':
@@ -1107,6 +1112,10 @@ def get_modules_properties(tkltest_user_config):
 
     with open(modules_properties_file) as f:
         all_modules = json.load(f)
+
+    if not all_modules:
+        tkltest_status('Failed to load modules from properties file {}.'.format(modules_properties_file), error=True)
+
     for module in all_modules:
         if 'classpath' not in module.keys():
             module['classpath'] = ''
@@ -1132,6 +1141,15 @@ def get_modules_properties(tkltest_user_config):
         module = module_entries[0]
         if module['app_path']:
             modules.append(module)
+        else:
+            tkltest_status(' app_path dir of module {} does not exist, omitting the module '.format(module['name']))
+
+    if not modules:
+        tkltest_status('Failed to automatically obtain modules from user build files. all {} modules were omitted.\n'
+                       'for more details, see modules properties at {}'
+                       .format(len(all_modules), modules_properties_file), error=True)
+        sys.exit(1)
+    tkltest_status('Obtained {} modules from user build files'.format(len(modules)))
     return modules
 
 if __name__ == '__main__':
