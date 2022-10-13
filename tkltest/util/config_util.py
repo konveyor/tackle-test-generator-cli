@@ -1008,7 +1008,7 @@ def get_modules_properties(tkltest_user_config):
     if os.path.isfile(modules_properties_file):
         os.remove(modules_properties_file)
 
-    tkltest_status('Automatically obtaining modules from user build files:')
+    tkltest_status('Automatically obtaining modules from user build files')
     if app_build_type == 'maven':
         '''
         for each user pom file, we call exec:exec with executable "echo".
@@ -1149,7 +1149,8 @@ def get_modules_properties(tkltest_user_config):
                        'for more details, see modules properties at {}'
                        .format(len(all_modules), modules_properties_file), error=True)
         sys.exit(1)
-    tkltest_status('Obtained {} modules from user build files'.format(len(modules)))
+    tkltest_status('Obtained {} module{} from user build files'.format(len(modules),
+                                                                       "" if len(modules) == 1 else "s"))
     return modules
 
 if __name__ == '__main__':
