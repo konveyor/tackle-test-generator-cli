@@ -1044,7 +1044,7 @@ def get_modules_properties(tkltest_user_config):
                 tkltest_status('running {} command "{}" failed: {}\n{}'.
                                format(app_build_type, get_modules_command, e, e.stderr), error=True)
                 try:
-                    tkltest_status('command output without --quite:')
+                    tkltest_status('Command to obtain modules from user build files failed with the following output:')
                     get_modules_command = get_modules_command.replace('--quiet', '')
                     get_modules_command = get_modules_command.replace(' >> ' + modules_properties_file, '')
                     command_util.run_command(command=get_modules_command, verbose=True)
