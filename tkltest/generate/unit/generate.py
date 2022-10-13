@@ -183,6 +183,8 @@ def generate_ctd_amplified_tests(config, output_dir):
         shutil.rmtree(test_directory)
     if os.path.isdir(os.path.join(tmp_test_directory, 'monolithic')):
         shutil.move(os.path.join(tmp_test_directory, 'monolithic'), test_directory)
+    else:
+        os.mkdir(test_directory)
     for file in os.listdir(tmp_test_directory):
         shutil.move(os.path.join(tmp_test_directory, file), test_directory)
     shutil.rmtree(tmp_test_directory)
