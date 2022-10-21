@@ -5,8 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name='tkltest',
     version=tkltest.__version__,
-    description='Command-line interface for generating and executing test cases on'
-                'two application versions and performing differential testing',
+    description='Command-line interface for generating and executing unit test cases for Java application',
     packages=find_packages(),
     install_requires=[
         'coverage==5.5',

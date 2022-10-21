@@ -21,7 +21,7 @@ setup() {
 
 @test "Test 01: tkltest-ui docker generate petclinic" {
     # generate test cases for petclinic app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
@@ -52,7 +52,7 @@ setup() {
 
 @test "Test 02: tkltest-ui docker execute [api_type=selenium] petclinic" {
     # execute test cases for petclinic app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \
@@ -65,7 +65,7 @@ setup() {
 
 @test "Test 03: tkltest-ui docker execute [api_type=crawljax] petclinic" {
     # execute test cases for petclinic app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
         --test-directory $PETCLINIC_OUTPUT_DIR \

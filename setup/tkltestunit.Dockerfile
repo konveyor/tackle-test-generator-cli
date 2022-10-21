@@ -26,7 +26,7 @@ RUN ./download_lib_jars_unit.sh
 # copy cli code and install tkltest command
 WORKDIR /app/tackle-test-cli
 COPY tkltest ./tkltest
-COPY setup/setup_unit.py ./setup.py
+COPY setup/tkltestunit.setup.py ./setup.py
 COPY MANIFEST.in ./
 RUN pip install .
 
