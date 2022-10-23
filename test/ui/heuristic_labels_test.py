@@ -2,7 +2,7 @@ import os
 import json
 import unittest
 from importlib import resources
-from tkltest.generate.ui.heuristic_labels import HeuristicLabel
+from tkltest.ui.generate.heuristic_labels import HeuristicLabel
 
 
 class HeuristicLabelTest(unittest.TestCase):

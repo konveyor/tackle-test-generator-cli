@@ -21,8 +21,8 @@ for required options.
 """
 import tabulate
 
-from tkltest.util.unit import config_options_unit
-from tkltest.util.ui import config_options_ui
+from tkltest.unit.util import config_options_unit
+from tkltest.ui.util import config_options_ui
 
 
 def get_options_spec(command=None, subcommand=None, load_format=True, test_level='unit'):

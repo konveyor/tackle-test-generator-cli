@@ -3,28 +3,28 @@ name: TackleTest-UI CI
 on:
   push:
     paths-ignore:
-      - 'tkltest/generate/unit/**'
-      - 'tkltest/execute/unit/**'
-      - 'tkltest/util/unit/**'
-      - 'tkltest/tkltest_unit.py'
+      - 'tkltest/unit/**'
       - 'tkltest-lib/pom.xml'
       - 'doc/**'
-      - '**.md'
+      - 'experiment/**'
+      - 'setup/tkltestunit**'
+      - 'test/unit/**'
       - '.github/workflows/tkltest_unit_ci.yml'
       - '.gitattributes'
-      - 'test/unit/**'
+      - '.gitignore'
+      - '**.md'
   pull_request:
     paths-ignore:
-      - 'tkltest/generate/unit/**'
-      - 'tkltest/execute/unit/**'
-      - 'tkltest/util/unit/**'
-      - 'tkltest/tkltest_unit.py'
+      - 'tkltest/unit/**'
       - 'tkltest-lib/pom.xml'
       - 'doc/**'
-      - '**.md'
+      - 'experiment/**'
+      - 'setup/tkltestunit**'
+      - 'test/unit/**'
       - '.github/workflows/tkltest_unit_ci.yml'
       - '.gitattributes'
-      - 'test/unit/**'
+      - '.gitignore'
+      - '**.md'
 
 jobs:
   build:

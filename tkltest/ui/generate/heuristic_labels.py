@@ -57,13 +57,13 @@ class HeuristicLabel:
         self.eventable_labels = dict()
 
 
-        with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
+        with resources.path('tkltest.ui.generate', 'ranked_attributes_form_fields.json') as attr_file:
             with open(attr_file) as f:
                 self.ranked_attributes_form_fields = json.load(f)
 
 
 
-        with resources.path('tkltest.generate.ui', 'ranked_attributes_form_fields.json') as attr_file:
+        with resources.path('tkltest.ui.generate', 'ranked_attributes_form_fields.json') as attr_file:
             with open(attr_file) as f:
                 self.ranked_attributes_form_fields = json.load(f)
 

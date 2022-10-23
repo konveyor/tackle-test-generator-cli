@@ -23,7 +23,7 @@ import sys
 import copy
 
 from tkltest.util import constants
-from tkltest.util.unit import coverage_util
+from tkltest.unit.util import coverage_util
 from tkltest.util.logging_util import tkltest_status
 
 

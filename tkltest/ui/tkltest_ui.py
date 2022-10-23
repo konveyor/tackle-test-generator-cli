@@ -21,10 +21,10 @@ import sys
 import toml
 
 from tkltest.tkltest import *
-from tkltest.util.ui import config_options_ui
+from tkltest.ui.util import config_options_ui
 from tkltest.util.logging_util import *
-from tkltest.generate.ui import generate
-from tkltest.execute.ui import execute
+from tkltest.ui.generate import generate
+from tkltest.ui.execute import execute
 
 
 def __add_internal_config_options(loaded_config, internal_options):

@@ -28,8 +28,8 @@ import json
 from tkltest.util import config_options, command_util
 from tkltest.util.logging_util import tkltest_status
 from tkltest.util.constants import *
-from tkltest.util.unit import dir_util
-from tkltest.util.ui import config_options_ui
+from tkltest.unit.util import dir_util
+from tkltest.ui.util import config_options_ui
 
 
 def load_config(test_level='unit', args=None, config_file=None):

@@ -27,11 +27,11 @@ from threading import Thread
 import toml
 from tqdm import trange
 
-from tkltest.generate.ui import generate_selenium
+from tkltest.ui.generate import generate_selenium
 from tkltest.util import command_util
 from tkltest.util.constants import *
 from tkltest.util.logging_util import tkltest_status
-from tkltest.util.ui import dir_util, browser_util
+from tkltest.ui.util import dir_util, browser_util
 
 
 def process_generate_command(config):

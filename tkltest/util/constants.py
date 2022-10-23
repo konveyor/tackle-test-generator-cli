@@ -90,9 +90,6 @@ BASE_TEST_GENERATORS = {
     'randoop': 'RandoopTestGenerator'
 }
 
-# suffix for the file containing the CTD model and test plan
-ERROR_PATTERNS_FILE = 'errorPatterns.json'
-
 # randoop used version
 RANDOOP_VERSION = "v4.3.0"
 RANDOOP_REPLACECALL_VERSION = "4.3.0"

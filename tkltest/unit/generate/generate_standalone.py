@@ -22,7 +22,7 @@ import sys
 import json
 
 from tkltest.util import constants, command_util
-from tkltest.util.unit import build_util, dir_util
+from tkltest.unit.util import build_util, dir_util
 from tkltest.util.logging_util import tkltest_status
 
 
