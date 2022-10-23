@@ -48,7 +48,7 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
     browser = config['generate']['browser']
 
     jinja_env = jinja2.Environment(
-        loader=jinja2.PackageLoader('tkltest.generate.ui'),
+        loader=jinja2.PackageLoader('tkltest.ui.generate'),
         trim_blocks=True,
         lstrip_blocks=True,
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
@@ -90,7 +90,7 @@ def generate_selenium_api_tests_analysis(config, crawl_dir):
 
 
     # get heuristic labels for each eventable based on its ranked attributes
-    with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
+    with resources.path('tkltest.ui.generate', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
     # to store analysis outputs

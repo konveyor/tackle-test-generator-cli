@@ -21,7 +21,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "tkltest-unit = tkltest.tkltest_unit:main"
+            "tkltest-unit = tkltest.unit.tkltest_unit:main"
         ]
     },
     include_package_data=True,

@@ -25,7 +25,7 @@ import sys
 
 from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
-from tkltest.execute.unit import execute
+from tkltest.unit.execute import execute
 
 
 def get_coverage_for_test_suite(build_file, build_type, test_root_dir, report_dir,

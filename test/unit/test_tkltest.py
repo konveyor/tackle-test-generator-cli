@@ -20,7 +20,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
-from tkltest import tkltest_unit
+from tkltest.unit import tkltest_unit
 from tkltest.util import constants
 
 class TkltestTest(unittest.TestCase):

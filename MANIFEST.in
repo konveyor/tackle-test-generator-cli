@@ -1,5 +1,5 @@
-include tkltest/generate/ui/templates/*.jinja
-include tkltest/generate/ui/*.json
-include tkltest/util/unit/templates/*.jinja
+include tkltest/ui/generate/templates/*.jinja
+include tkltest/ui/generate/*.json
+include tkltest/unit/util/templates/*.jinja
 include tkltest-lib/*.jar
 include tkltest-lib/*.gif

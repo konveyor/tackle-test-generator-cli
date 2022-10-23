@@ -21,7 +21,7 @@ import logging
 import xml.etree.ElementTree as ElementTree
 
 from tkltest.util.logging_util import tkltest_status
-from tkltest.util.unit import code_util
+from tkltest.unit.util import code_util
 
 
 def compare_coverage(xml_file1, xml_file2, test_name1, test_name2, monolith_app_path, app_name):

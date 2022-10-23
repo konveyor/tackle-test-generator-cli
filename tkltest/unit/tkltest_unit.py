@@ -20,12 +20,12 @@ from zipfile import ZipFile
 from multiprocessing import Process
 from types import SimpleNamespace
 
-from .execute.unit import execute
-from .generate.unit import generate
-from .tkltest import *
-from .util import logging_util
-from .util.unit import config_options_unit
-from .util.constants import *
+from .execute import execute
+from .generate import generate
+from ..tkltest import *
+from ..util import logging_util
+from .util import config_options_unit
+from ..util.constants import *
 
 
 def __unjar_path(tkltest_config):

@@ -23,8 +23,8 @@ import shutil
 import copy
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))+os.sep+'..')
 from tkltest.util import config_util, constants, command_util
-from tkltest.util.unit import dir_util, build_util
-from tkltest.generate.unit import generate, augment
+from tkltest.unit.util import dir_util, build_util
+from tkltest.unit.generate import generate, augment
 
 
 class UnitTests(unittest.TestCase):

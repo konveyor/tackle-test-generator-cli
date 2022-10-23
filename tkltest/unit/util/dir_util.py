@@ -16,7 +16,7 @@
 
 import os
 import shutil
-from ..constants import *
+from tkltest.util.constants import *
 
 
 def cd_cli_dir():

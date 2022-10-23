@@ -41,7 +41,7 @@ setup(
     cmdclass={'install': TkltestInstall},
     entry_points={
         "console_scripts": [
-            "tkltest-ui = tkltest.tkltest_ui:main"
+            "tkltest-ui = tkltest.ui.tkltest_ui:main"
         ]
     },
     include_package_data=True,

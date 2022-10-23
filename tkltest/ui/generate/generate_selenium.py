@@ -26,7 +26,7 @@ import toml
 
 from tkltest.util import constants, logging_util
 
-from tkltest.generate.ui.heuristic_labels import HeuristicLabel
+from tkltest.ui.generate.heuristic_labels import HeuristicLabel
 
 from importlib import resources
 
@@ -64,7 +64,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     # logging.info('Creating jinja environment with searchpath={})'.format(searchpath))
     jinja_env = jinja2.Environment(
         # loader=jinja2.FileSystemLoader(searchpath=searchpath),
-        loader=jinja2.PackageLoader('tkltest.generate.ui'),
+        loader=jinja2.PackageLoader('tkltest.ui.generate'),
         trim_blocks=True,
         lstrip_blocks=True,
         extensions=['jinja2.ext.loopcontrols', 'jinja2.ext.do']
@@ -108,7 +108,7 @@ def generate_selenium_api_tests(config, crawl_dir):
     method_name_count = {}
 
     # get heuristic labels for each eventable based on its ranked attributes
-    with resources.path('tkltest.generate.ui', 'ranked_attributes.json') as attr_file:
+    with resources.path('tkltest.ui.generate', 'ranked_attributes.json') as attr_file:
         heuristic_label = HeuristicLabel(str(attr_file))
 
     # # to store eventable id : eventable label

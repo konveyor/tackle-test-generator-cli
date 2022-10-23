@@ -20,7 +20,7 @@ import sys
 import subprocess
 import urllib
 
-from tkltest.util.ui import dir_util, browser_util
+from tkltest.ui.util import dir_util, browser_util
 from tkltest.util import command_util, constants
 from tkltest.util.logging_util import tkltest_status
 
