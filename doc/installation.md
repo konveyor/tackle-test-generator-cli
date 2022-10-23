@@ -102,21 +102,45 @@ and re-install it.
 
 ## Building the Docker image and running the CLI via docker or docker-compose
 
-For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry. These images can be pulled and used without requiring any set up. For the available images and instructions on using them, please visit the [TackleTest container images](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli) page. To the build the TackleTest container locally using the latest (or a particular) code version, please go through the following instructions.
+For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry. These images can be pulled and used without requiring any set up. For the available images and instructions on using them, please visit the [TackleTest container images](ttps://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-cli) page. Note that there are three container images: one each that supports unit and UI testing only, and one that supports both unit and UI testing.
+
+To the build the TackleTest container locally using the latest (or a particular) code version, please go through the following instructions.
 
 To run the CLI using `docker-compose` (to print the CLI `help` message), run one of the following commands in the CLI directory,
 which builds the docker image for the CLI (called `tkltest-cli`) and then runs the CLI command; the docker
 container is removed upon completion of the CLI command.
 
+Consolidated unit and UI testing image:
 ```buildoutcfg
 docker-compose run --rm tkltest-cli tkltest-unit --help
 docker-compose run --rm tkltest-cli tkltest-ui --help
 ```
 
+Unit testing image:
+```buildoutcfg
+docker-compose run --rm tkltest-unit --help
+```
+
+UI testing image:
+```buildoutcfg
+docker-compose run --rm tkltest-ui --help
+```
+
 Alternatively, to build and run the CLI using `docker` instead of `docker-compose`, run these commands in the CLI:
 
+Consolidated unit and UI testing image:
 ```buildoutcfg
 docker build --tag tkltest-cli .
+```
+
+Unit testing image:
+```buildoutcfg
+docker build --file ./setup/tkltestunit.Dockerfile --tag tkltest-unit .
+```
+
+UI testing image:
+```buildoutcfg
+docker build --file ./setup/tkltestui.Dockerfile --tag tkltest-ui .
 ```
 
 Then, assuming `/home/user/tkltest-workspace` is the host directory to be mounted on to the container, the following
@@ -124,6 +148,8 @@ commands can be used:
 ```buildoutcfg
 docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-unit --help
 docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-cli tkltest-ui --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-unit --help
+docker run --rm -v /home/user/tkltest-workspace:/app/tackle-test-cli tkltest-ui --help
 ```
 
 The results of test generation or  execution in the container are available under the `/home/user/tkltest-workspace`
@@ -149,6 +175,8 @@ alias tkltest-ui='docker run --rm -v /home/user/tkltest-workspace:/app/tackle-te
 ```buildoutcfg
 alias tkltest-ui='docker-compose run --rm tkltest-cli tkltest-ui'
 ```
+
+If you are using a unit/UI-testing-specific image, exclude `tkltest-cli` from the commands above.
 
 Note that for using the CLI via `docker-compose`, `docker-compose.yml` has to be checkout out (it might be better to clone the repo) and
 that [the current directory is mounted onto the container](https://github.com/konveyor/tackle-test-generator-cli/blob/main/docker-compose.yml#L12). 

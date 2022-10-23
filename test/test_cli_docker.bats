@@ -19,73 +19,68 @@ teardown_file() {
     rm -f $TEST_CONFIG_FILE1 $TEST_CONFIG_FILE2
 }
 
-@test "Test 00: entrypoint help" {
-    run docker-compose run --rm tkltest-cli --help
+@test "Test 01: tkltest-unit help" {
+    run docker-compose run --rm tkltest-unit --help
     [ $status -eq 0 ]
 }
 
-@test "Test 01: CLI main help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit --help
+@test "Test 02: tkltest-unit config command help" {
+    run docker-compose run --rm tkltest-unit config --help
     [ $status -eq 0 ]
 }
 
-@test "Test 02: CLI config command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit config --help
+@test "Test 03: tkltest-unit config subcommands help" {
+    run docker-compose run --rm tkltest-unit config init --help
+    [ $status -eq 0 ]
+
+    run docker-compose run --rm tkltest-unit config list --help
     [ $status -eq 0 ]
 }
 
-@test "Test 03: CLI config subcommands help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit config init --help
-    [ $status -eq 0 ]
-
-    run docker-compose run --rm tkltest-cli tkltest-unit config list --help
-    [ $status -eq 0 ]
-}
-
-@test "Test 04: CLI config init" {
-    run docker-compose run --rm tkltest-cli tkltest-unit config init
+@test "Test 04: tkltest-unit config init" {
+    run docker-compose run --rm tkltest-unit config init
     [ $status -eq 0 ]
 
     # run "config init" with file name specified
-    run docker-compose run --rm tkltest-cli tkltest-unit config init --file $TEST_CONFIG_FILE2
+    run docker-compose run --rm tkltest-unit config init --file $TEST_CONFIG_FILE2
     [ $status -eq 0 ]
 
     # assert that config file is created
     [ -f $TEST_CONFIG_FILE2 ]
 }
 
-@test "Test 05: CLI config list" {
-    run docker-compose run --rm tkltest-cli tkltest-unit config list
+@test "Test 05: tkltest-unit config list" {
+    run docker-compose run --rm tkltest-unit config list
     [ $status -eq 0 ]
 }
 
-@test "Test 06: CLI generate command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit generate --help
+@test "Test 06: tkltest-unit generate command help" {
+    run docker-compose run --rm tkltest-unit generate --help
     [ $status -eq 0 ]
 }
 
-@test "Test 07: CLI execute command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit execute --help
+@test "Test 07: tkltest-unit execute command help" {
+    run docker-compose run --rm tkltest-unit execute --help
     [ $status -eq 0 ]
 }
 
-@test "Test 08: CLI \"generate ctd-amplified\" command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit generate ctd-amplified --help
+@test "Test 08: tkltest-unit \"generate ctd-amplified\" command help" {
+    run docker-compose run --rm tkltest-unit generate ctd-amplified --help
     [ $status -eq 0 ]
 }
 
-@test "Test 09: CLI \"generate evosuite\" command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit generate evosuite --help
+@test "Test 09: tkltest-unit \"generate evosuite\" command help" {
+    run docker-compose run --rm tkltest-unit generate evosuite --help
     [ $status -eq 0 ]
 }
 
-@test "Test 10: CLI \"generate randoop\" command help" {
-    run docker-compose run --rm tkltest-cli tkltest-unit generate randoop --help
+@test "Test 10: tkltest-unit \"generate randoop\" command help" {
+    run docker-compose run --rm tkltest-unit generate randoop --help
     [ $status -eq 0 ]
 }
 
-@test "Test 11: CLI [build_type=ant] generate [all-classes] ctd-amplified irs" {
-    run docker-compose run --rm tkltest-cli tkltest-unit \
+@test "Test 11: tkltest-unit [build_type=ant] generate [all-classes] ctd-amplified irs" {
+    run docker-compose run --rm tkltest-unit \
         --config-file $IRS_CONFIG_FILE \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
         generate ctd-amplified
@@ -124,8 +119,8 @@ teardown_file() {
     [ -f $IRS_TEST_BUILD_DIR/build.xml ]
 }
 
-@test "Test 12: CLI [build_type=maven] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
-    run docker-compose run --rm tkltest-cli tkltest-unit \
+@test "Test 12: tkltest-unit [build_type=maven] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
+    run docker-compose run --rm tkltest-unit \
         --config-file $IRS_CONFIG_FILE \
         --build-type maven \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \
@@ -165,8 +160,8 @@ teardown_file() {
     [ -f $IRS_TEST_BUILD_DIR/pom.xml ]
 }
 
-@test "Test 13: CLI [build_type=gradle] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
-    run docker-compose run --rm tkltest-cli tkltest-unit \
+@test "Test 13: tkltest-unit [build_type=gradle] generate [all-classes] ctd-amplified [reuse_base_tests] irs" {
+    run docker-compose run --rm tkltest-unit \
         --config-file $IRS_CONFIG_FILE \
         --build-type gradle \
         --test-directory $IRS_CTD_AMPLIFIED_TESTDIR \

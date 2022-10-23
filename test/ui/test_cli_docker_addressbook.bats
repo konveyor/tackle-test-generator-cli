@@ -19,7 +19,7 @@ setup() {
 
 @test "Test 01: tkltest-ui docker generate addressbook" {
     # generate test cases for addressbook app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose --log-level INFO \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
@@ -50,7 +50,7 @@ setup() {
 
 @test "Test 02: tkltest-ui docker execute [api_type=selenium] addressbook" {
     # execute test cases for addressbook app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \
@@ -63,7 +63,7 @@ setup() {
 
 @test "Test 03: tkltest-ui docker execute [api_type=crawljax] addressbook" {
     # execute test cases for addressbook app
-    run docker-compose run --rm tkltest-cli \
+    run docker-compose run --rm \
         tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
         --test-directory $ADDRESSBOOK_OUTPUT_DIR \

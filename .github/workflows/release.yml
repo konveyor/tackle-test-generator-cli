@@ -7,6 +7,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  TKLTESTUNIT_IMAGE_NAME: tkltest-unit
+  TKLTESTUI_IMAGE_NAME: tkltest-ui
 
 jobs:
   tagged-release:
@@ -66,13 +68,49 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
             org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
-      - name: Build and push Docker images
+      - name: Build and push tkltest Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GITHUB_USERNAME=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for tkltest-unit Docker image
+        id: meta_tkltestunit
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.TKLTESTUNIT_IMAGE_NAME }}
+          labels: |
+            org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
+      - name: Build and push tkltest-unit Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: setup/tkltestunit.Dockerfile
+          push: true
+          tags: ${{ steps.meta_tkltestunit.outputs.tags }}
+          labels: ${{ steps.meta_tkltestunit.outputs.labels }}
+          build-args: |
+            GITHUB_USERNAME=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for tkltest-ui Docker image
+        id: meta_tkltestui
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.TKLTESTUI_IMAGE_NAME }}
+          labels: |
+            org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
+      - name: Build and push tkltest-ui Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: setup/tkltestui.Dockerfile
+          push: true
+          tags: ${{ steps.meta_tkltestui.outputs.tags }}
+          labels: ${{ steps.meta_tkltestui.outputs.labels }}
           build-args: |
             GITHUB_USERNAME=${{ github.actor }}
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}

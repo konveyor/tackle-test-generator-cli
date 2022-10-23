@@ -10,3 +10,25 @@ services:
     stdin_open: true
     tty: true
     network_mode: host
+
+  tkltest-unit:
+    build:
+      context: .
+      dockerfile: setup/tkltestunit.Dockerfile
+    image: tkltest-unit
+    volumes:
+      - ./:/app/tackle-test-cli
+    stdin_open: true
+    tty: true
+    network_mode: host
+
+  tkltest-ui:
+    build:
+      context: .
+      dockerfile: setup/tkltestui.Dockerfile
+    image: tkltest-ui
+    volumes:
+      - ./:/app/tackle-test-cli
+    stdin_open: true
+    tty: true
+    network_mode: host

@@ -52,7 +52,7 @@ the various dependencies (e.g., Python, Java, Maven) need not be installed.
 
 ### Using a published Docker image
 
-The simplest way is to run the CLI using a [published Docker image](https://github.com/konveyor/tackle-test-generator-cli/pkgs/container/tackle-test-generator-cli). For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry.
+The simplest way is to run the CLI using a [published Docker image](https://github.com/orgs/konveyor/packages?repo_name=tackle-test-generator-cli). For each released version of TackleTest, the docker image (tagged with the version number) is published on the GitHub Container Registry. In addition to an image that supports both unit and UI testing, separate images that support respectively unit and UI testing only are also published. The commands below are illustrated for the consolidated image that supports both levels of testing.
 
 To run TackleTest from docker, the directory containing the TackleTest configuration file for the application under
 test (AUT)---along with the AUT classes and library dependencies, in the case of TackleTest-Unit---has to be mounted
@@ -74,6 +74,8 @@ relative to `/app/tackle-test-cli` in the container.
 
 The results of test generation or execution in the container are available under `/home/user/aut` on the
 host machine (`/app/tackle-test-cli` in the container).
+
+If you are using a unit/UI-testing-specific image, exclude `tkltest-unit` and `tkltest-ui` from the commands above as those images support only the `tkltest-unit` and `tkltest-ui` command, respectively.
 
 [//]: # (&#40;This also requires that the classes, the library dependencies, and the configuration file for the app&#41; under test be placed in a directory  under the CLI directory, so that they are available in the container.)
 
