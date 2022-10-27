@@ -6,7 +6,6 @@ on:
       - "v*.*.*"
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
   TKLTESTUNIT_IMAGE_NAME: tkltest-unit
   TKLTESTUI_IMAGE_NAME: tkltest-ui
 
@@ -65,7 +64,9 @@ jobs:
         id: meta_tkltestunit
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.TKLTESTUNIT_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.TKLTESTUNIT_IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{raw}}
           labels: |
             org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
       - name: Build and push tkltest-unit Docker image
@@ -74,7 +75,7 @@ jobs:
           context: .
           file: setup/tkltestunit.Dockerfile
           push: true
-          tags: unit-${{ steps.meta_tkltestunit.outputs.tags }}
+          tags: ${{ steps.meta_tkltestunit.outputs.tags }}
           labels: ${{ steps.meta_tkltestunit.outputs.labels }}
           build-args: |
             GITHUB_USERNAME=${{ github.actor }}
@@ -83,7 +84,9 @@ jobs:
         id: meta_tkltestui
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.TKLTESTUI_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.TKLTESTUI_IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{raw}}
           labels: |
             org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
       - name: Build and push tkltest-ui Docker image
@@ -92,7 +95,7 @@ jobs:
           context: .
           file: setup/tkltestui.Dockerfile
           push: true
-          tags: ui-${{ steps.meta_tkltestui.outputs.tags }}
+          tags: ${{ steps.meta_tkltestui.outputs.tags }}
           labels: ${{ steps.meta_tkltestui.outputs.labels }}
           build-args: |
             GITHUB_USERNAME=${{ github.actor }}
