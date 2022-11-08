@@ -31,7 +31,10 @@ and executing them. More detailed description is available in the [CLI user guid
    tkltest-ui --verbose execute
    ```
    Test results report will be created in  `tkltest-output-unit-<app-name>/<app-name>_localhost_<time-limit>mins/localhost/crawl##/selenium-api-tests/test-output`.
-   By default, the Selenium API test cases are executed. If you want to execute the CrawlJax API test cases, set the config option `api_type` to `crawljax`. 
+   By default, the Selenium API test cases are executed. If you want to execute the CrawlJax API test cases, set the config option `api_type` to `crawljax`.
+
+**Note:** since the test cases are using the Selenium API, you need to install a browser WebDriver 
+on the machine in which they are being executed. More details on installing can be found [here](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/).
  
 Note that, if the `--config-file` option is not specified on the command line (as in the commands above),
 the CLI uses by default `./tkltest_config.toml` as the configuration file.
