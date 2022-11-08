@@ -171,6 +171,10 @@ optional arguments:
                         cases: Selenium or Crawljax; default is Selenium API
 ``` 
 
+
+**Note:** since the test cases are using the Selenium API, you need to install a browser WebDriver 
+on the machine in which they are being executed. More details on installing can be found [here](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/).
+
 When test execution completes, a Maven Surfire report is generated, summarizing all test case results.
 The report is generated in the folder `crawl##/selenium-api-tests/test-results` for Selenium API tests;
 it is the standard TestNG test execution report, as illustrated in this image:
