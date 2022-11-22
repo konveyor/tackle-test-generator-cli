@@ -70,14 +70,14 @@ jobs:
         which tkltest-unit
     - name: Run Python unit tests
       env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.352-8/x64
       run: |
         source venv/bin/activate
         nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
         nosetests test/unit/test_generate_execute.py
     - name: Pull bats dependency and bats tests
       env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.292-1/x64
+        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.352-8/x64
       run: |
         git submodule init
         git submodule update
