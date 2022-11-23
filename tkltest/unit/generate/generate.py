@@ -24,6 +24,7 @@ import subprocess
 import sys
 import time
 import toml
+import json
 from threading import Thread
 
 
@@ -348,6 +349,17 @@ def generate_CTD_models_and_test_plans(app_name,
         command_util.run_command(command=modeling_command, verbose=verbose)
     except subprocess.CalledProcessError as e:
         tkltest_status('Computing CTD coverage goals failed: {}\n{}'.format(e, e.stderr), error=True)
+        sys.exit(1)
+
+    ctd_file = app_name + constants.TKL_CTD_TEST_PLAN_FILE_SUFFIX
+    if not os.path.isfile(ctd_file):
+        tkltest_status('Computing CTD coverage goals failed to create {}'.format(ctd_file), error=True)
+        sys.exit(1)
+    with open(ctd_file, encoding="utf8") as f:
+        ctd_plans = json.load(f)
+    total_targets = ctd_plans.get('statistics', {}).get('target_methods', 0)
+    if not total_targets:
+        tkltest_status('Computing CTD coverage goals did not find any target methods', error=True)
         sys.exit(1)
 
 
