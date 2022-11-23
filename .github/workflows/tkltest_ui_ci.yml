@@ -78,14 +78,10 @@ jobs:
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli.bats
     - name: Run tkltest-ui generate/execute tests - petclinic
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.352-8/x64
       run: |
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_petclinic.bats
     - name: Run tkltest-ui generate/execute tests - addressbook
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/8.0.352-8/x64
       run: |
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_addressbook.bats
