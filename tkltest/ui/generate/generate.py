@@ -60,22 +60,29 @@ def process_generate_command(config):
 
     # print message about generated crwaljax API tests
     test_class_file = os.path.join(output_crawl_dir, CRAWLJAX_API_TEST_FILE)
-    test_count = __get_generated_test_count(test_class_file=test_class_file)
+    try:
+        test_count = __get_generated_test_count(test_class_file=test_class_file)
+    except FileNotFoundError:
+        tkltest_status('Test generation terminated without creating any tests')
+        browser_util.cleanup_browser_instances(browser)
+        sys.exit(0)
+
     tkltest_status('Generated {} Crawljax API test cases; written to test class file "{}"'
                    .format(test_count, test_class_file))
 
     # generate Selenium API tests
-    tkltest_status('Creating Selenium API test cases from crawl paths')
-    try:
-        generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
-        test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
-        test_count = __get_generated_test_count(test_class_file=test_class_file)
-        tkltest_status('Generated {} Selenium API test cases; written to test class file "{}"'
-                       .format(test_count, test_class_file))
-    except Exception as e:
-        tkltest_status('Exception occurred while creating Selenium API tests: {}'.format(str(e)), error=True)
-        browser_util.cleanup_browser_instances(browser)
-        sys.exit(1)
+    if test_count > 0:
+        tkltest_status('Creating Selenium API test cases from crawl paths')
+        try:
+            generate_selenium.generate_selenium_api_tests(config=config, crawl_dir=output_crawl_dir)
+            test_class_file = os.path.join(output_crawl_dir, SELENIUM_API_TEST_FILE)
+            test_count = __get_generated_test_count(test_class_file=test_class_file)
+            tkltest_status('Generated {} Selenium API test cases; written to test class file "{}"'
+                           .format(test_count, test_class_file))
+        except Exception as e:
+            tkltest_status('Exception occurred while creating Selenium API tests: {}'.format(str(e)), error=True)
+            browser_util.cleanup_browser_instances(browser)
+            sys.exit(1)
 
     # cleanup browser instances
     browser_util.cleanup_browser_instances(browser)

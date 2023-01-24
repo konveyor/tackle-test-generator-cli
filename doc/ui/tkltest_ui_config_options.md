@@ -272,16 +272,31 @@ Selenium API tests to be executed as one-time setup before test execution begins
 The form data specification is provided in TOML format in a particular schema.
 For an example specification, see the [pre-crawl actions spec for the Petclinic webapp](../../test/ui/data/petclinic/tkltest_ui_precrawl_actions_config.toml).
 
-The specification consists of a sequence of "click" (link, button) and "enter" (into text box) actions;
-currently, these are the only supported pre-crawl actions. A pre-crawl action has the following
-properties:
+The specification consists of a sequence of "click" (link, button) and "enter" (into text box) actions
+and two specialized actions: one for accepting alert dialogs and another for generating and submitting
+time-based one-time passwords (TOTP). Currently, these four are the only supported pre-crawl actions.
 
-1. `action_type`: the type of action to perform (click or enter)
-2. one of the following element locator properties: `by_id`, `by_name`, `under_xpath`, `with_text`, `by_css_selector`
-3. if `action_type` is "enter", the property `input_value` specifying the value to be entered in text box
+A pre-crawl action can have the following properties:
 
-The following sample illustrates a sequence of five pre-crawl actions: three click actions, followed by a
-form-field enter action, and finally another click action.
+1. `action_type`: the type of action to perform (`click`, `enter`, `alert_accept`, `submit_totp`)
+2. if `action_type` is `enter` or `click`, one of the following element locator properties: `by_id`, `by_name`, `under_xpath`, `with_text`, `by_css_selector`
+3. if `action_type` is `enter`, one of the following properties:
+   - `input_value` specifying the value to be entered in text box or
+   - `input_value_env_var` specifying the name of an environment variable containing the value to be entered
+     (use this property for specifying passwords/secrets required, e.g., for authentication before crawling starts)
+4. if `action_type` is `submit_totp`, the following properties may be specified:
+   - `totp_secret_env_var` specifying the name of an environment variable containing the secret to be used for TOTP generation
+     (if omitted, is secret code is created by default for OTP hgeneration)
+   - `max_attempts` specifying the maximum number of attempts to be made for TOTP submission
+   - nested table `[precrawl_action.enter]` containing an element locator property (as described in item 2) for the TOTP textbox
+   - nested table `[precrawl_action.click]` containing an element locator property (as described in item 2) for the TOTP submit button
+5. A pre-crawl action can be tagged as optional by adding the property `optional=true` (by default, an action is not
+optional). For an optional pre-crawl action,  if the execution of the action fails, the tool ignores the failure
+and moves on to the next pre-crawl action. For a  non-optional (i.e., mandatory) pre-crawl action failure, test generation
+terminates.
+
+The following sample illustrates a sequence of seven pre-crawl actions: three `click` actions, an `alert_accept` action, an
+`enter` action, two `click` actions, and finally a `submit_totp` action.
 
 ```
 [[precrawl_action]]
@@ -297,6 +312,9 @@ form-field enter action, and finally another click action.
   under_xpath = "//*[@id=\"primary-links\"]/li"
 
 [[precrawl_action]]
+  action_type = alert_accept
+
+[[precrawl_action]]
   action_type = "enter"
   by_name = "fileName"
   input_value = "some_file"
@@ -304,4 +322,19 @@ form-field enter action, and finally another click action.
 [[precrawl_action]]
   action_type = "click"
   with_text = "Upload file"
+  
+[[precrawl_action]]
+  action_type = "click"
+  by_id = "totp"
+  optional = true
+
+[[precrawl_action]]
+  action_type = "submit_totp"
+  totp_secret_env_var = "TKLTESTUI_TOTP_SECRET"
+  optional = true
+  max_attempts = 2
+  [precrawl_action.enter]
+    by_id = "totp_input"
+  [precrawl_action.click]
+    by_id = "submit"
 ```
