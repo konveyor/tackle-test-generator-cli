@@ -38,7 +38,7 @@ setup(
         'pyenchant==3.2.2',
         'lxml==4.9.1',
         'xmltodict==0.12.0',
-        'keybert==0.4.0',
+        'keybert==0.7.0',
         'pandas==1.4.3'
 
     ],

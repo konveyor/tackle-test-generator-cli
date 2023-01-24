@@ -21,7 +21,7 @@ class HeuristicLabelTest(unittest.TestCase):
         with open(os.path.join(self.helper_file_dir, 'crawl_paths_petclinic_small.json')) as file2:
             crawl_paths_petclinic = json.load(file2)
 
-        correct_labels = [{2: ['on page "Address book", click "post login"',
+        correct_labels = [{2: ['on page "Address book", click "login"',
                                ['on page "Address book", enter "user: admin"',
                                 'on page "Address book", enter "password: secret"'], []],
                            3: ['on page "Address book", click "next birthdays"',
@@ -53,17 +53,17 @@ class HeuristicLabelTest(unittest.TestCase):
                                  'on page "Address book", select "group: cEyhmIaV"',
                                  'on page "Address book", select "to_group: cEyhmIaV"'], ['number of results']]},
                           {2: ['on page "SpringPetclinicAngular", click "veterinarians"', [], []],
-                           3: ['on page "SpringPetclinicAngular", click "owner add"', [], []]}]
+                           3: ['on page "SpringPetclinicAngular", click "brand"', [], []]}]
 
         correct_method_labels = [
             {
-                '2_3': 'This test navigates the path: click "post login".\n\t* Then it enters values in form "number of results" and submits the form.\n\t* The unique clickables in this path are: on page "Address book", click "post login", on page "Address book", click "next birthdays".',
+                '2_3': 'This test navigates the path: click "login".\n\t* Then it enters values in form "number of results" and submits the form.\n\t* The unique clickables in this path are: on page "Address book", click "login", on page "Address book", click "next birthdays".',
                 '4_5': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "export", click "groups".\n\t* The unique clickables in this path are: on page "Address book", click "export", on page "Address book ([none])", click "groups".',
                 '6_7': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "print all", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "print all", on page "Address book (cEyhmIaV)", click "v8.0.0 - r475".',
                 '9_11': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "import", click "v8.0.0 - r475".\n\t* The unique clickables in this path are: on page "Address book", click "import", on page "Address book ([none])", click "v8.0.0 - r475".',
                 '12': 'This test enters values in form "number of results".\n\t* Then it navigates the path: click "print phones".\n\t* The unique clickables in this path are: on page "Address book", click "print phones".'},
             {
-                '2_3': 'This test navigates the path: click "veterinarians", click "owner add".\n\t* The unique clickables in this path are: on page "SpringPetclinicAngular", click "veterinarians", on page "SpringPetclinicAngular", click "owner add".'}]
+                '2_3': 'This test navigates the path: click "veterinarians", click "brand".\n\t* The unique clickables in this path are: on page "SpringPetclinicAngular", click "veterinarians", on page "SpringPetclinicAngular", click "brand".'}]
 
         # check for all DOM fragments in these two files, that labels are produced correctly
 
