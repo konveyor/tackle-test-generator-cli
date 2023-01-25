@@ -286,7 +286,7 @@ A pre-crawl action can have the following properties:
      (use this property for specifying passwords/secrets required, e.g., for authentication before crawling starts)
 4. if `action_type` is `submit_totp`, the following properties may be specified:
    - `totp_secret_env_var` specifying the name of an environment variable containing the secret to be used for TOTP generation
-     (if omitted, is secret code is created by default for OTP hgeneration)
+     (if omitted, a secret code is created by default for OTP generation)
    - `max_attempts` specifying the maximum number of attempts to be made for TOTP submission
    - nested table `[precrawl_action.enter]` containing an element locator property (as described in item 2) for the TOTP textbox
    - nested table `[precrawl_action.click]` containing an element locator property (as described in item 2) for the TOTP submit button
