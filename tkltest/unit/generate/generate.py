@@ -332,11 +332,11 @@ def generate_CTD_models_and_test_plans(app_name,
     # elif
     if target_class_list:
         # Wrapping with double quotes to avoid misinterpretation of special characters such as '$' in command line
-        modeling_command += " -cl " + '"::'.join(target_class_list)+'"'
+        modeling_command += " -cl " + '"'+'::'.join(target_class_list)+'"'
 
     if excluded_class_list:
         # Wrapping with double quotes to avoid misinterpretation of special characters such as '$' in command line
-        modeling_command += " -el " + '"::'.join(excluded_class_list)+'"'
+        modeling_command += " -el " + '"'+'::'.join(excluded_class_list)+'"'
     modeling_command += " -pt " + os.pathsep.join(monolith_app_path)
     modeling_command += " -clpt " + app_classpath_file
     # if app_prefix:
