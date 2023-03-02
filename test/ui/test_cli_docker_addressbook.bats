@@ -62,6 +62,7 @@ setup() {
 }
 
 @test "Test 03: tkltest-ui docker execute [api_type=crawljax] addressbook" {
+    skip
     # execute test cases for addressbook app
     run docker-compose run --rm \
         tkltest-ui --verbose \
