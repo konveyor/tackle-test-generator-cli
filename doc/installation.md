@@ -57,7 +57,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 1. Install Python 3.9
 
-2. Install JDK 8
+2. Install JDK 11
 
 3. Install the Chrome browser. Currently, TackleTest-UI supports UI test generation on the Chrome browser only; support
    for other browsers will be added in the future.
@@ -67,7 +67,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 ## Installing the TackleTest CLI
 
-To install the CLI in a virtual enviornment (this would be the preferred installation mode to keep the TackleTest
+To install the CLI in a virtual environment (this would be the preferred installation mode to keep the TackleTest
 installation isolated and avoid version conflicts), run the commands:
 
 ```buildoutcfg

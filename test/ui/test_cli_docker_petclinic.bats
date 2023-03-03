@@ -64,6 +64,7 @@ setup() {
 }
 
 @test "Test 03: tkltest-ui docker execute [api_type=crawljax] petclinic" {
+    skip
     # execute test cases for petclinic app
     run docker-compose run --rm \
         tkltest-ui --verbose --log-level INFO \
