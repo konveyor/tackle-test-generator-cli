@@ -60,7 +60,6 @@ setup() {
 }
 
 @test "Test 03: tkltest-ui execute [api_type=crawljax] addressbook" {
-    skip
     # execute test cases for addressbook app
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE \
@@ -118,7 +117,6 @@ setup() {
 }
 
 @test "Test 06: tkltest-ui execute [nonfrag_mode][api_type=crawljax] addressbook" {
-    skip
     # execute test cases for addressbook app
     run tkltest-ui --verbose \
         --config-file $ADDRESSBOOK_CONFIG_FILE_NONFRAG \

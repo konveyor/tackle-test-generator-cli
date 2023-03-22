@@ -729,6 +729,7 @@ class HeuristicLabel:
                 break
             col_num += 0
 
+        col_label = None
         first_child = table_dom.getchildren()[0]
         if first_child is not None and first_child.tag == 'thead':
             header_row_dom = first_child.getchildren()[0]  # to get to the header row

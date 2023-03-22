@@ -61,7 +61,7 @@ directory and run TackleTest with the AUT configuration file, use the following 
 respectively) after pulling the image from the registry:
 
 ```buildoutcfg
-docker run --rm -v /home/user/aut:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit --config-file /app/tackle-test-cli/tkltest_config.toml --verbose generate ctd-mplified'
+docker run --rm -v /home/user/aut:/app/tackle-test-cli ghcr.io/konveyor/tackle-test-generator-cli:latest tkltest-unit --config-file /app/tackle-test-cli/tkltest_config.toml --verbose generate ctd-amplified'
 ```
 
 ```buildoutcfg

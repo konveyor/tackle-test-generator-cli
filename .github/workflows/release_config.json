@@ -26,7 +26,7 @@
       },
       {
         "title": "## \uD83D\uDEE0 Other Updates",
-        "labels": ["other"]
+        "labels": ["other", "kind/dependency-change"]
       }
     ],
     "ignore_labels": [

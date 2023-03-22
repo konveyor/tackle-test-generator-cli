@@ -62,7 +62,6 @@ setup() {
 }
 
 @test "Test 03: tkltest-ui execute [api_type=crawljax] petclinic" {
-    skip
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE \
@@ -120,7 +119,6 @@ setup() {
 }
 
 @test "Test 06: tkltest-ui execute [nonfrag_mode][api_type=crawljax] petclinic" {
-    skip
     # execute test cases for petclinic app
     run tkltest-ui --verbose --log-level INFO \
         --config-file $PETCLINIC_CONFIG_FILE_NONFRAG \
