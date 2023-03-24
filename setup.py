@@ -24,7 +24,7 @@ setup(
     install_requires=[
         'coverage==5.5',
         'nose==1.3.7',
-        'PyYAML>=5.4',
+        'PyYAML==5.4.1',
         'tabulate==0.8.9',
         'textile==4.0.1',
         'toml==0.10.2',
@@ -34,7 +34,7 @@ setup(
         'kaitaistruct==0.9',
         'psutil==5.9.0',
         'tqdm==4.62.3',
-        'nltk>=3.6.6',
+        'nltk==3.6.7',
         'pyenchant==3.2.2',
         'lxml==4.9.1',
         'xmltodict==0.12.0',
@@ -42,7 +42,7 @@ setup(
         'pandas==1.4.3'
 
     ],
-    setup_requires=['nltk==3.6.6'],
+    setup_requires=['nltk==3.6.7'],
     cmdclass={'install': TkltestInstall},
     entry_points={
         "console_scripts": [
