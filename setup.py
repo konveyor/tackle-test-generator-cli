@@ -30,7 +30,7 @@ setup(
         'toml==0.10.2',
         'yattag==1.14.0',
         'jinja2==3.0.2',
-        'bs4==0.0.1',
+        'beautifulsoup4==4.10.0',
         'kaitaistruct==0.9',
         'psutil==5.9.0',
         'tqdm==4.62.3',
