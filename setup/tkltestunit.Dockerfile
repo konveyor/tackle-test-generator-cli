@@ -1,4 +1,5 @@
-FROM maven:3-openjdk-8-slim
+#FROM maven:3-openjdk-8-slim
+FROM maven:3-ibmjava-8
 
 # copy from python 3.9 image
 COPY --from=python:3.9-slim / /
