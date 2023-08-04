@@ -839,7 +839,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             config = app_info['config']
-            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             config_util.resolve_app_path(config)
             config_util.resolve_classpath(config, 'generate')
             self.__process_generate(subcommand='ctd-amplified', config=config)
@@ -863,7 +863,7 @@ class GenerateExecuteTest(unittest.TestCase):
 
             # set up config and generate tests
             user_config = copy.deepcopy(app_info['config'])
-            user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['combined']
+            user_config['generate']['ctd_amplified']['base_test_generator'] = constants.BASE_TEST_GENERATORS['evosuite']
             configs = config_util.resolve_tkltest_configs(user_config, 'generate')
             modules_names = ['app', 'utilities', 'list']
             self.assertTrue(len(configs) == len(modules_names))
