@@ -44,19 +44,19 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
+    - name: Install prerequisites
+      run: |
+        ant -version
+        sudo apt-get update && sudo apt-get install -y bats libxml2-utils
+        bats --version
+        xmllint --version
+        gradle --version
     - name: Run tkltest-unit bats tests using docker-compose
       run: |
         docker build -f ./setup/tkltestunit.Dockerfile --tag tkltest-unit .
         docker images
         docker-compose run --rm tkltest-unit --help
         bats test/test_cli_docker.bats
-#    - name: Install prerequisites
-#      run: |
-#        ant -version
-#        sudo apt-get update && sudo apt-get install -y bats libxml2-utils
-#        bats --version
-#        xmllint --version
-#        gradle --version
 #    - name: Setup Gradle
 #      uses: gradle/gradle-build-action@v2
 #      with:
