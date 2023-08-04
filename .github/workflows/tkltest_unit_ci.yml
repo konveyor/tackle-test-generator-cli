@@ -68,9 +68,11 @@ jobs:
         source venv/bin/activate
         pip install .
         which tkltest-unit
+        docker --version
+        docker-compose --version
     - name: Run tkltest-unit bats tests using docker-compose
       run: |
-        docker-compose --version
+        docker build -f ./setup/tkltestunit.Dockerfile --tag tkltest-unit .
         docker-compose run --rm tkltest-unit --help
 #    - name: Run Python unit tests
 #      run: |
