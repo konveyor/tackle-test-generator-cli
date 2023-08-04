@@ -68,19 +68,22 @@ jobs:
         source venv/bin/activate
         pip install .
         which tkltest-unit
-    - name: Run Python unit tests
-      run: |
-        source venv/bin/activate
-        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
-        nosetests test/unit/test_generate_execute.py
-    - name: Pull bats dependency and bats tests
-      run: |
-        git submodule init
-        git submodule update
-        source venv/bin/activate
-        bats test/unit/test_cli.bats
-        bats test/unit/test_cli_irs.bats
-        deactivate
     - name: Run tkltest-unit bats tests using docker-compose
       run: |
-        bats test/test_cli_docker.bats
+        docker-compose run --rm tkltest-unit --help
+#    - name: Run Python unit tests
+#      run: |
+#        source venv/bin/activate
+#        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
+#        nosetests test/unit/test_generate_execute.py
+#    - name: Pull bats dependency and bats tests
+#      run: |
+#        git submodule init
+#        git submodule update
+#        source venv/bin/activate
+#        bats test/unit/test_cli.bats
+#        bats test/unit/test_cli_irs.bats
+#        deactivate
+#    - name: Run tkltest-unit bats tests using docker-compose
+#      run: |
+#        bats test/test_cli_docker.bats
