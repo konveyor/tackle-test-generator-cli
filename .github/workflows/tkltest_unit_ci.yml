@@ -51,45 +51,41 @@ jobs:
         bats --version
         xmllint --version
         gradle --version
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.4
+    - name: Download Java libraries
+      run: |
+        gradle --version
+        cd tkltest-lib
+        ./download_lib_jars_unit.sh
+        cd ..; ls tkltest-lib/*
+    - name: Install Python dependencies and tkltest-unit command
+      run: |
+        python -m pip install --upgrade pip
+        python -m venv venv
+        source venv/bin/activate
+        cp setup/tkltestunit.setup.py .
+        pip install .
+        which tkltest-unit
+        docker --version
+        docker-compose --version
+    - name: Run Python unit tests
+      run: |
+        source venv/bin/activate
+        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
+        nosetests test/unit/test_generate_execute.py
+    - name: Pull bats dependency and bats tests
+      run: |
+        git submodule init
+        git submodule update
+        source venv/bin/activate
+        bats test/unit/test_cli.bats
+        bats test/unit/test_cli_irs.bats
+        deactivate
     - name: Run tkltest-unit bats tests using docker-compose
       run: |
         docker build -f ./setup/tkltestunit.Dockerfile --tag tkltest-unit .
         docker images
-        docker-compose run --rm tkltest-unit --help
         bats test/test_cli_docker.bats
-#    - name: Setup Gradle
-#      uses: gradle/gradle-build-action@v2
-#      with:
-#        gradle-version: 7.4
-#    - name: Download Java libraries
-#      run: |
-#        gradle --version
-#        cd tkltest-lib
-#        ./download_lib_jars_unit.sh
-#        cd ..; ls tkltest-lib/*
-#    - name: Install Python dependencies and tkltest-unit command
-#      run: |
-#        python -m pip install --upgrade pip
-#        python -m venv venv
-#        source venv/bin/activate
-#        cp setup/tkltestunit.setup.py .
-#        pip install .
-#        which tkltest-unit
-#        docker --version
-#        docker-compose --version
-#    - name: Run Python unit tests
-#      run: |
-#        source venv/bin/activate
-#        nosetests test/unit/test_config.py test/unit/test_tkltest.py test/unit/test_unit_tests.py
-#        nosetests test/unit/test_generate_execute.py
-#    - name: Pull bats dependency and bats tests
-#      run: |
-#        git submodule init
-#        git submodule update
-#        source venv/bin/activate
-#        bats test/unit/test_cli.bats
-#        bats test/unit/test_cli_irs.bats
-#        deactivate
-#    - name: Run tkltest-unit bats tests using docker-compose
-#      run: |
-#        bats test/test_cli_docker.bats
