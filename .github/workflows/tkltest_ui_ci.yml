@@ -67,7 +67,7 @@ jobs:
       run: |
         python -m venv venv
         source venv/bin/activate
-        cp setup/tkltestunit.setup.py ./setup.py
+        cp setup/tkltestui.setup.py ./setup.py
         pip install .
         which tkltest-ui
 #    - name: Run labeling unit tests
