@@ -1,12 +1,12 @@
 FROM maven:3-openjdk-11-slim
 
 # copy from python 3.9 image
-COPY --from=python:3.9-slim / /
+#COPY --from=python:3.9-slim / /
 
 # install ant
 RUN mkdir -p /usr/share/man/man1
-RUN apt-get update && apt-get install -y wget
-RUN apt-get install -y gnupg2 libgtk2.0-0 enchant-2
+RUN apt-get update && apt-get install -y wget python3.9 python3-pip
+RUN apt-get install -y gnupg2 libgtk2.0-0
 
 # install google chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
