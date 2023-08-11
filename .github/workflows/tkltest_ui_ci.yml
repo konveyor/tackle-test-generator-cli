@@ -54,7 +54,7 @@ jobs:
     - name: Download Java libraries
       run: |
         cd tkltest-lib
-        ./download_lib_jars.sh
+        ./download_lib_jars_ui.sh
         cd ..; ls tkltest-lib/*
     - name: Install Python dependencies
       run: |
@@ -67,12 +67,13 @@ jobs:
       run: |
         python -m venv venv
         source venv/bin/activate
+        cp setup/tkltestui.setup.py ./setup.py
         pip install .
         which tkltest-ui
-    - name: Run labeling unit tests
-      run: |
-        source venv/bin/activate
-        nosetests test/ui/heuristic_labels_test.py
+#    - name: Run labeling unit tests
+#      run: |
+#        source venv/bin/activate
+#        nosetests test/ui/heuristic_labels_test.py
     - name: Run tkltest-ui help/config tests
       run: |
         source venv/bin/activate
@@ -85,12 +86,12 @@ jobs:
       run: |
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_addressbook.bats
-#    - name: Run tkltest-ui help/config tests using docker-compose
-#      run: |
-#        bats --print-output-on-failure test/ui/test_cli_docker.bats
+    - name: Run tkltest-ui help/config tests using docker-compose
+      run: |
+        bats --print-output-on-failure test/ui/test_cli_docker.bats
 #    - name: Run tkltest-ui generate/execute tests using docker-compose - petclinic
 #      run: |
 #        bats test/ui/test_cli_docker_petclinic.bats
-#    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
-#      run: |
-#        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats
+    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
+      run: |
+        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats

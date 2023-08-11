@@ -26,7 +26,7 @@ import toml
 
 from tkltest.util import constants, logging_util
 
-from tkltest.ui.generate.heuristic_labels import HeuristicLabel
+# from tkltest.ui.generate.heuristic_labels import HeuristicLabel
 
 from importlib import resources
 
@@ -108,12 +108,12 @@ def generate_selenium_api_tests(config, crawl_dir):
     method_name_count = {}
 
     # get heuristic labels for each eventable based on its ranked attributes
-    with resources.path('tkltest.ui.generate', 'ranked_attributes.json') as attr_file:
-        heuristic_label = HeuristicLabel(str(attr_file))
+    # with resources.path('tkltest.ui.generate', 'ranked_attributes.json') as attr_file:
+    #     heuristic_label = HeuristicLabel(str(attr_file))
 
     # # to store eventable id : eventable label
     # heuristic_label_dict = dict()
-    heuristic_label.get_element_and_method_labels(crawl_paths)
+    # heuristic_label.get_element_and_method_labels(crawl_paths)
 
     for path_num, crawl_path in enumerate(crawl_paths):
         # for each path create a jinja context for the test method to be generated
@@ -127,13 +127,13 @@ def generate_selenium_api_tests(config, crawl_dir):
         else:
             method_name_count[method_name] = 0
         method_context = {
-            'comment': heuristic_label.method_labels[method_path],
+            'comment': '',  # heuristic_label.method_labels[method_path],
             'priority': path_num,
             'name': method_name,
             'eventables': []
         }
         for eventable in crawl_path:
-            label = heuristic_label.eventable_labels[eventable['id']]
+            label = None  # heuristic_label.eventable_labels[eventable['id']]
             method_context['eventables'].append(__get_context_for_eventable(eventable, label))
         jinja_context['test_methods'].append(method_context)
 
@@ -227,7 +227,7 @@ def __create_method_name_for_path(path):
     return 'test_path_{}'.format('_'.join(eventable_ids))
 
 
-def __get_context_for_eventable(eventable, label):
+def __get_context_for_eventable(eventable, label=None):
     """Creates jinja context for an eventable.
     Creates and returns jinja context for the given eventable for rendering the test class code template.
     """
@@ -237,7 +237,7 @@ def __get_context_for_eventable(eventable, label):
         'related_frame': eventable['relatedFrame'],
         'form_inputs': [],
         # 'comment': json.dumps(eventable['element'])
-        'comment': label[0]
+        'comment': label[0] if label is not None else ''
     }
     for i, form_input in enumerate(eventable['relatedFormInputs']):
         context['form_inputs'].append({
@@ -245,7 +245,7 @@ def __get_context_for_eventable(eventable, label):
             'by_method': __get_by_method_for_eventable(form_input['identification']),
             'value': form_input['inputValues'][0]['value'],
             'checked': "true" if form_input['inputValues'][0]['checked'] is True else "false",
-            'comment': label[1][i]
+            'comment': label[1][i] if label is not None else ''
         })
     return context
 
@@ -327,10 +327,10 @@ if __name__ == '__main__':  # pragma: no cover
     app_config = {
         'general': {
             'log-level': 'WARNING',
-            'app_name': 'petclinic',
-            'app_url': 'http://localhost:8080'
-            # 'app_name': 'addressbook',
-            # 'app_url': 'http://localhost:3000/addressbook/'
+            # 'app_name': 'petclinic',
+            # 'app_url': 'http://localhost:8080'
+            'app_name': 'addressbook',
+            'app_url': 'http://localhost:3000/addressbook/'
         },
         'generate': {
             'browser': 'chrome_headless',
@@ -339,6 +339,6 @@ if __name__ == '__main__':  # pragma: no cover
             'precrawl_actions_spec_file': "../../../test/ui/data/petclinic/tkltest_ui_precrawl_actions_config.toml"
         }
     }
-    app_crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl1'
-    # app_crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_3mins/localhost/crawl0'
+    # app_crawl_dir = '../../../tkltest-output-ui-petclinic/petclinic_localhost_2mins/localhost/crawl1'
+    app_crawl_dir = '../../../tkltest-output-ui-addressbook/addressbook_localhost_2mins/localhost/crawl0'
     generate_selenium_api_tests(app_config, app_crawl_dir)
