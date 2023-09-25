@@ -8,15 +8,15 @@ setup(
     description='Command-line interface for generating and executing unit test cases for Java application',
     packages=find_packages(),
     install_requires=[
-        'coverage==5.5',
-        'nose==1.3.7',
-        'PyYAML>=5.4',
-        'tabulate==0.8.9',
-        'textile==4.0.1',
+        'coverage==7.3.0',
+        'green==3.4.3',
+        'PyYAML==6.0.1',
+        'tabulate==0.9.0',
+        'textile==4.0.2',
         'toml==0.10.2',
-        'yattag==1.14.0',
-        'jinja2==3.0.2',
-        'bs4==0.0.1',
+        'yattag==1.15.0',
+        'jinja2==3.1.2',
+        'beautifulsoup4==4.12.0',
         'kaitaistruct==0.9'
     ],
     entry_points={
