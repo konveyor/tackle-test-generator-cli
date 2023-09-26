@@ -6,7 +6,7 @@ FROM maven:3-eclipse-temurin-8
 
 # install ant, python
 RUN mkdir -p /usr/share/man/man1
-RUN apt-get update && apt-get install -y ant wget unzip python3.9 python3-pip
+RUN apt-get update && apt-get install -y ant wget unzip python3.11 python3-pip
 
 # install gradle
 ENV GRADLE_HOME /opt/gradle
