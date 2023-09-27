@@ -1,5 +1,5 @@
 #FROM maven:3-openjdk-8-slim
-FROM maven:3-eclipse-temurin-8
+FROM maven:3-eclipse-temurin-11
 
 # copy from python 3.9 image
 #COPY --from=python:3.9-slim / /
@@ -7,6 +7,8 @@ FROM maven:3-eclipse-temurin-8
 # install ant, python
 RUN mkdir -p /usr/share/man/man1
 RUN apt-get update && apt-get install -y ant wget unzip python3.11 python3-pip
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
+    && update-alternatives --config python3
 
 # install gradle
 ENV GRADLE_HOME /opt/gradle
