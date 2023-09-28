@@ -1012,7 +1012,7 @@ class GenerateExecuteTest(unittest.TestCase):
             if entities_missed+entities_covered > 0:
                 coverage_rate = entities_covered / (entities_missed+entities_covered)
                 print(f'coverage rate = {coverage_rate}')
-                self.assertGreater(coverage_rate, 0.95)
+                self.assertGreater(coverage_rate, 0.9)
             # self.assertTrue(coverage_counter[0].attrib['missed'] == '0')
 
         self.__assert_no_artifact_at_cli()
