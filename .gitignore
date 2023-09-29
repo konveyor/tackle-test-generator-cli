@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 .python-version
-venv/
+venv*/
 *.egg-info/
 
 # IDE, log, backup files

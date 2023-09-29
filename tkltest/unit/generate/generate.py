@@ -153,11 +153,22 @@ def generate_ctd_amplified_tests(config, output_dir):
         tkltest_status("Generating basic block test sequences with "+test_generator_name+" took " +
             str(round(time.time() - start_time, 2)) + " seconds")
 
+    # list of generated BB sequences files
+    bb_seq_files = []
     if test_generator_name == constants.COMBINED_TEST_GENERATOR_NAME:
-        bb_seq_file = app_name+"_RandoopTestGenerator"+constants.TKL_BB_SEQ_FILE_SUFFIX+"," + \
-                      app_name + "_EvoSuiteTestGenerator" + constants.TKL_BB_SEQ_FILE_SUFFIX
+        for testgen in ['EvoSuiteTestGenerator', 'RandoopTestGenerator']:
+            bb_seq_file = f'{app_name}_{testgen}{constants.TKL_BB_SEQ_FILE_SUFFIX}'
+            if os.path.isfile(bb_seq_file):
+                bb_seq_files.append(bb_seq_file)
     else:
-        bb_seq_file = app_name + "_" + test_generator_name + constants.TKL_BB_SEQ_FILE_SUFFIX
+        bb_seq_file = f'{app_name}_{test_generator_name}{constants.TKL_BB_SEQ_FILE_SUFFIX}'
+        if os.path.isfile(bb_seq_file):
+            bb_seq_files.append(bb_seq_file)
+
+    # if no BB sequences files created, exit
+    if not bb_seq_files:
+        tkltest_status(f'No basic block sequences generated using "{test_generator_name}"')
+        sys.exit(0)
 
     start_time = time.time()
 
@@ -171,7 +182,7 @@ def generate_ctd_amplified_tests(config, output_dir):
     tmp_test_directory = test_directory + constants.TKLTEST_TEMP_DIR_SUFFIX
     # generate extended test sequences
     extend_sequences(app_name=app_name, monolith_app_path=monolith_app_path, app_classpath_file=app_classpath_file,
-                     ctd_file=ctd_file, bb_seq_file=bb_seq_file, jdk_path=jdk_path,
+                     ctd_file=ctd_file, bb_seq_file=','.join(bb_seq_files), jdk_path=jdk_path,
                      no_diff_assertions=config['generate']['no_diff_assertions'],
                      no_ctd_coverage=config['generate']['ctd_amplified']['no_ctd_coverage'],
                      interaction_level=config['generate']['ctd_amplified']['interaction_level'],
@@ -432,6 +443,8 @@ def run_bb_test_generator(app_name, ctd_file, monolith_app_path, app_classpath_f
         command_util.run_command(command=tg_command, verbose=False)
     except subprocess.CalledProcessError as e:
         tkltest_status('Generating basic block sequences failed: {}\n{}'.format(e, e.stderr), error=True)
+        if 'Test generator failed to generate any tests' in e.stderr:
+            return
         sys.exit(1)
 
 
