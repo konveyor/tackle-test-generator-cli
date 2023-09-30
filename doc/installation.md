@@ -55,7 +55,7 @@ TackleTest-Unit performs CTD modeling and test-plan generation using the [NIST A
 
 ### Prerequisites for TackleTest-UI
 
-1. Install Python 3.9
+1. Install Python 3.9 (tested on Python 3.9, 3.10, 3.11)
 
 2. Install JDK 11
 

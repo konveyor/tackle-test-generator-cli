@@ -89,12 +89,12 @@ jobs:
       run: |
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_addressbook.bats
-#    - name: Run tkltest-ui help/config tests using docker-compose
-#      run: |
-#        bats --print-output-on-failure test/ui/test_cli_docker.bats
-#    - name: Run tkltest-ui generate/execute tests using docker-compose - petclinic
-#      run: |
-#        bats test/ui/test_cli_docker_petclinic.bats
-#    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
-#      run: |
-#        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats
+    - name: Run tkltest-ui help/config tests using docker-compose
+      run: |
+        bats --print-output-on-failure test/ui/test_cli_docker.bats
+    - name: Run tkltest-ui generate/execute tests using docker-compose - petclinic
+      run: |
+        bats test/ui/test_cli_docker_petclinic.bats
+    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
+      run: |
+        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats
