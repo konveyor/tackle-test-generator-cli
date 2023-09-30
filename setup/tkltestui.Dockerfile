@@ -1,11 +1,11 @@
-FROM maven:3-eclipse-temurin-11
+FROM maven:3-eclipse-temurin-11-focal
 
 # copy from python 3.9 image
 #COPY --from=python:3.9-slim / /
 
 # install python3.9
-RUN apt-get update && apt-get install -y wget unzip gnupg2 libgtk2.0-0 python3.11 python3-pip
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
+RUN apt-get update && apt-get install -y wget unzip gnupg2 libgtk2.0-0 python3.9 python3-pip
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 2 \
     && update-alternatives --config python3
 
 # install google chrome
