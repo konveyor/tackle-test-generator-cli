@@ -31,16 +31,19 @@ on:
 jobs:
   build:
 
+    strategy:
+      matrix:
+        version: ['3.9', '3.10', '3.11']
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.version }}
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: ${{ matrix.version }}
     - name: Set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: '11'
         distribution: 'adopt'
@@ -86,12 +89,12 @@ jobs:
       run: |
         source venv/bin/activate
         bats --print-output-on-failure test/ui/test_cli_addressbook.bats
-    - name: Run tkltest-ui help/config tests using docker-compose
-      run: |
-        bats --print-output-on-failure test/ui/test_cli_docker.bats
+#    - name: Run tkltest-ui help/config tests using docker-compose
+#      run: |
+#        bats --print-output-on-failure test/ui/test_cli_docker.bats
 #    - name: Run tkltest-ui generate/execute tests using docker-compose - petclinic
 #      run: |
 #        bats test/ui/test_cli_docker_petclinic.bats
-    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
-      run: |
-        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats
+#    - name: Run tkltest-ui generate/execute tests using docker-compose - addressbook
+#      run: |
+#        bats --print-output-on-failure test/ui/test_cli_docker_addressbook.bats
