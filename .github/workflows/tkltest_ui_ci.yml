@@ -37,7 +37,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
+      run: |
+        df -h
+    - name: Free up Ubuntu Runner disk space
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+      run: |
+        df -h
     - name: Set up Python ${{ matrix.version }}
       uses: actions/setup-python@v4
       with:
