@@ -39,8 +39,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      run: |
-        df -h
+    - name: disk space before cleanup
+      run: df -k
     - name: Free up Ubuntu Runner disk space
       uses: jlumbroso/free-disk-space@main
       with:
@@ -50,8 +50,8 @@ jobs:
         haskell: true
         large-packages: true
         swap-storage: true
-      run: |
-        df -h
+    - name: disk space after cleanup
+      run: df -k
     - name: Set up Python ${{ matrix.version }}
       uses: actions/setup-python@v4
       with:
