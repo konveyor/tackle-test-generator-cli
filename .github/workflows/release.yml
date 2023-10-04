@@ -87,7 +87,7 @@ jobs:
           labels: |
             org.opencontainers.image.description=See release notes at: https://github.com/konveyor/tackle-test-generator-cli/releases/tag/${{ steps.get_release_tag.outputs.tag_name }}
       - name: Build and push tkltest-unit Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: setup/tkltestunit.Dockerfile
