@@ -34,6 +34,7 @@ setup(
         'kaitaistruct==0.9',
         'psutil==5.9.5',
         'tqdm==4.66.0',
+        "setuptools; python_version >= '3.12'",
         # 'nltk==3.6.7',
         # 'pyenchant==3.2.2',
         # 'lxml==4.9.1',
